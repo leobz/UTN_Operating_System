@@ -1,9 +1,16 @@
 #include "gameboy.h"
+#include "test/testing.h"
 
-int main() {
-	t_gameboy_config *gameboy_config = cargar_gameboy_config("gameboy.config");
-	destruir_gameboy_config(gameboy_config);
-	return 0;
+int main(int argc, char ** argv) {
+	if (argc >= 2) {
+		if (strcmp(argv[1], "test") == 0)
+			correrTests();
+	} else {
+		t_gameboy_config *gameboy_config = cargar_gameboy_config(
+				"gameboy.config");
+		destruir_gameboy_config(gameboy_config);
+		return 0;
+	}
 }
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
