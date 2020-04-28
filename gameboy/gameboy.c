@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <commons/config.h>
-#include <string.h>
-#include "../utils/config.h"
 #include "gameboy.h"
 
 int main() {
