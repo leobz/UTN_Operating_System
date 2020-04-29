@@ -7,6 +7,7 @@
 
 #include <commons/config.h>
 #include "../utils/config.h"
+#include "../utils/log.h"
 
 // ESTRUCTURAS
 typedef struct {
@@ -19,8 +20,10 @@ typedef struct {
 } t_gameboy_config;
 
 // CONFIGURACION
-t_gameboy_config *cargar_gameboy_config(char *path_archivo);
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
+void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config);
+t_gameboy_config *cargar_gameboy_config(char *path_archivo);
 void destruir_gameboy_config(t_gameboy_config *gameboy_config);
 
 #endif /* GAMEBOY_H_ */

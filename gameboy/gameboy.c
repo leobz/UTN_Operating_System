@@ -1,16 +1,32 @@
 #include "gameboy.h"
 #include "test/testing.h"
 
+t_gameboy_config* gameboy_config;
+t_log* logger;
+
 int main(int argc, char ** argv) {
-	if (argc >= 2) {
+	inicializar_gameboy(&gameboy_config, &logger);
+
+	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
+
 	} else {
-		t_gameboy_config *gameboy_config = cargar_gameboy_config(
-				"gameboy.config");
-		destruir_gameboy_config(gameboy_config);
-		return 0;
+
 	}
+
+	finalizar_gameboy(gameboy_config, logger);
+	return 0;
+}
+
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger) {
+	*gameboy_config = cargar_gameboy_config("gameboy.config");
+	*logger = iniciar_logger("gameboy.log", "gameboy", LOG_LEVEL_INFO);
+}
+
+void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger) {
+	destruir_gameboy_config(gameboy_config);
+	destruir_logger(logger);
 }
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
