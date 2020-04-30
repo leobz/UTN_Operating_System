@@ -42,5 +42,6 @@ void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 
 t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer);
+void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 
 #endif /* SERIALIZACION_H_ */
