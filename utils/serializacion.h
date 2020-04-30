@@ -21,6 +21,13 @@ typedef struct {
 	t_buffer* buffer;
 } t_paquete;
 
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
+	int posx;
+	int posy;
+} t_mensaje_appeared;
+
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer);
 void eliminar_paquete(t_paquete* paquete);
@@ -33,5 +40,7 @@ void* deserializar_buffer_de_un_string(t_buffer* buffer);
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y);
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
+
+t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer);
 
 #endif /* SERIALIZACION_H_ */

@@ -8,9 +8,15 @@ void empaquetar_y_desempaquetar_appeared_pokemon() {
 	t_paquete *paquete = crear_paquete(APPEARED_POKEMON,
 			buffer_appeared_pokemon(pokemon, pos_x, pos_y));
 
-	// TODO: DESEMPAQUETAR PAQUETE y ASSERTS
+	t_mensaje_appeared* mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
+
+	CU_ASSERT_EQUAL(mensaje_appeared->length_pokemon, strlen(pokemon)+1);
+	CU_ASSERT_STRING_EQUAL(mensaje_appeared->pokemon, pokemon);
+	CU_ASSERT_EQUAL(mensaje_appeared->posx, pos_x);
+	CU_ASSERT_EQUAL(mensaje_appeared->posy, pos_y);
 
 	eliminar_paquete(paquete);
+	eliminar_mensaje_appeared(mensaje_appeared);
 }
 void serializar_y_deserializar_appeared_pokemon() {
 	char* pokemon = "pikachu";

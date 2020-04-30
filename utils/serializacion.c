@@ -15,6 +15,11 @@ void eliminar_paquete(t_paquete* paquete) {
 	free(paquete);
 }
 
+void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
+	free(mensaje_appeared->pokemon);
+	free(mensaje_appeared);
+}
+
 void* serializar_paquete(t_paquete* paquete, int bytes) {
 	void* a_enviar = malloc(bytes);
 	int offset = 0;
@@ -81,4 +86,25 @@ void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 	eliminar_paquete(paquete);
 
 	return a_enviar;
+}
+
+t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
+	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(sizeof(t_mensaje_appeared));
+
+	void* stream = buffer->stream;
+
+	memcpy(&(mensaje_appeared->length_pokemon), stream, sizeof(int));
+	stream += sizeof(int);
+
+	mensaje_appeared->pokemon = malloc(mensaje_appeared->length_pokemon);
+	memcpy(mensaje_appeared->pokemon, stream, mensaje_appeared->length_pokemon);
+	stream += mensaje_appeared->length_pokemon;
+
+	memcpy(&(mensaje_appeared->posx), stream, sizeof(int));
+	stream += sizeof(int);
+
+	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
+	stream += sizeof(int);
+
+	return mensaje_appeared;
 }
