@@ -7,7 +7,7 @@
 
 // ESTRUCTURAS
 typedef enum {
-	MENSAJE = 1, APPEARED_POKEMON = 2, GET = 3,
+	APPEARED_POKEMON = 1,
 	// TODO: Definir codigos de operacion restantes
 } op_code;
 
