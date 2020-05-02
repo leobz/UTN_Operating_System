@@ -8,6 +8,7 @@
 #include <commons/config.h>
 #include "../utils/config.h"
 #include "../utils/log.h"
+#include "../utils/serializacion.h"
 
 // ESTRUCTURAS
 typedef struct {
