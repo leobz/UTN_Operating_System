@@ -15,9 +15,9 @@ typedef struct {
 	char *ip_broker;
 	char *ip_team;
 	char *ip_gamecard;
-	int puerto_broker;
-	int puerto_team;
-	int puerto_gamecard;
+	char *puerto_broker;
+	char *puerto_team;
+	char *puerto_gamecard;
 } t_gameboy_config;
 
 // CONFIGURACION

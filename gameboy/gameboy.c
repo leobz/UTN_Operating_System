@@ -21,9 +21,11 @@ int main(int argc, char ** argv) {
 				int pos_y = atoi(argv[5]);
 
 				// TODO: Conectarse a Team
+
 				log_info(logger, "Conexion establecida con [Team]");
 
 				// TODO: Enviar mensaje serializado al Team
+
 				log_info(logger,
 						"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
 						pokemon, pos_x, pos_y);
@@ -54,11 +56,11 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 			config_get_string_value(config, "IP_GAMECARD"));
 	gameboy_config->ip_team = strdup(
 			config_get_string_value(config, "IP_TEAM"));
-	gameboy_config->puerto_broker = atoi(
+	gameboy_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
-	gameboy_config->puerto_gamecard = atoi(
+	gameboy_config->puerto_gamecard = strdup(
 			config_get_string_value(config, "PUERTO_GAMECARD"));
-	gameboy_config->puerto_team = atoi(
+	gameboy_config->puerto_team = strdup(
 			config_get_string_value(config, "PUERTO_TEAM"));
 }
 
@@ -78,5 +80,8 @@ void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
 	free(gameboy_config->ip_broker);
 	free(gameboy_config->ip_gamecard);
 	free(gameboy_config->ip_team);
+	free(gameboy_config->puerto_broker);
+	free(gameboy_config->puerto_gamecard);
+	free(gameboy_config->puerto_team);
 	free(gameboy_config);
 }

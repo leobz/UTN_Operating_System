@@ -15,9 +15,9 @@ void cargar_configuracion_puertos() {
 	t_gameboy_config *gameboy_config = cargar_gameboy_config(
 			"gameboy.config.sample");
 
-	CU_ASSERT_EQUAL(gameboy_config->puerto_broker, 5003);
-	CU_ASSERT_EQUAL(gameboy_config->puerto_team, 5002);
-	CU_ASSERT_EQUAL(gameboy_config->puerto_gamecard, 5001);
+	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_broker, "5003");
+	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_team, "5002");
+	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_gamecard, "5001");
 
 	destruir_gameboy_config(gameboy_config);
 }
