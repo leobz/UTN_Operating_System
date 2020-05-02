@@ -33,23 +33,6 @@ void* serializar_paquete(t_paquete* paquete, int bytes) {
 	return a_enviar;
 }
 
-void* deserializar_buffer_de_un_string(t_buffer* buffer) {
-	// SOLO SIRVE PARA DESERIALIZAR PAQUETES QUE CONTENGAN SOLO UN STRING
-	// NO SIRVE PARA DESERIALIZAR OTRO TIPO DE BUFFERS
-	char* msj;
-	int length = 0;
-
-	void* stream = buffer->stream;
-
-	memcpy(&length, stream, sizeof(int));
-	stream += sizeof(int);
-
-	msj = malloc(length);
-	memcpy(msj, stream, length);
-
-	return msj;
-}
-
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 
@@ -72,8 +55,6 @@ t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
 
 	return buffer;
 }
-
-
 
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y) {

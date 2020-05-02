@@ -33,9 +33,6 @@ t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer);
 void eliminar_paquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 
-// BUFFERS GENERAL
-void* deserializar_buffer_de_un_string(t_buffer* buffer);
-
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y);
