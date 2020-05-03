@@ -40,6 +40,8 @@ int main(int argc, char ** argv) {
 						"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
 						pokemon, pos_x, pos_y);
 
+				liberar_conexion(conexion);
+
 			};
 		}
 
