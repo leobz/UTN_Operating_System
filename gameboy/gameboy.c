@@ -20,8 +20,7 @@ int main(int argc, char ** argv) {
 				int pos_x = atoi(argv[4]);
 				int pos_y = atoi(argv[5]);
 
-				int conexion;
-				conexion = crear_conexion(gameboy_config->ip_team,
+				int conexion = crear_conexion(gameboy_config->ip_team,
 						gameboy_config->puerto_team);
 
 				if (conexion == -1) {
@@ -31,7 +30,11 @@ int main(int argc, char ** argv) {
 
 				log_info(logger, "Conexion establecida con [Team]");
 
-				// TODO: Enviar mensaje serializado al Team
+				int bytes;
+				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,
+						pos_x, pos_y);
+
+				enviar_mensaje(conexion, a_enviar, bytes);
 
 				log_info(logger,
 						"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
