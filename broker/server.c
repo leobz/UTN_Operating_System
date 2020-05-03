@@ -7,6 +7,7 @@
 
 
 #include"server.h"
+#include"colas.h"
 
 void iniciar_servidor(void)
 {
@@ -45,7 +46,7 @@ void esperar_cliente(int socket_servidor)
 {
 	struct sockaddr_in dir_cliente;
 
-	int tam_direccion = sizeof(struct sockaddr_in);
+	socklen_t tam_direccion = sizeof(struct sockaddr_in); //cambie int tam_direccion
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
@@ -64,13 +65,62 @@ void serve_client(int* socket)
 
 void process_request(int cod_op, int cliente_fd) {
 	int size;
-	void* msg;
+	void* payload;
+
+	//t_mensaje_cc mensaje_cc;
+
 		switch (cod_op) {
 		case MENSAJE:
-			msg = recibir_mensaje(cliente_fd, &size);
-			devolver_mensaje(msg, size, cliente_fd);
-			free(msg);
+			payload = recibir_mensaje(cliente_fd, &size);
+			devolver_mensaje(payload, size, cliente_fd);
+			free(payload);
 			break;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case NEW_POKEMON:
+
+			id_cola[NEW_POKEMON]++;
+			payload = recibir_mensaje(cliente_fd, &size);
+			t_mensaje_sc* mensaje= malloc(sizeof(t_mensaje_sc));
+
+
+			mensaje->codigo_operacion= NEW_POKEMON;
+			mensaje->id_mensaje=id_cola[NEW_POKEMON];
+			//mensaje->payload = malloc(sizeof(payload)) pensando si es necesario
+			memcpy(mensaje->payload, payload, size);
+			mensaje->siguiente=NULL;
+
+			insertar_new_pokemon(mensaje);
+
+
+
+
+			break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case APPEARED_POKEMON:
+
+					break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case GET_POKEMON:
+
+			break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case LOCALIZED_POKEMON:
+
+			break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case CATCH_POKEMON:
+
+			break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case CAUGHT_POKEMON:
+
+			break;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case SUSCRIPCION:
+
+			break;
+
 		case 0:
 			pthread_exit(NULL);
 		case -1:

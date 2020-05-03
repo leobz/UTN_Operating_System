@@ -18,26 +18,32 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<pthread.h>
+#include "serializacion.h"
 
 #define IP "127.0.0.1"
 #define PUERTO "4444"
 
-typedef enum
-{
-	MENSAJE=1
-}op_code;
 
-typedef struct
-{
-	int size;
-	void* stream;
-} t_buffer;
+typedef struct mensaje_sc{
 
-typedef struct
-{
 	op_code codigo_operacion;
-	t_buffer* buffer;
-} t_paquete;
+	int id_mensaje;
+	void* payload;
+	struct mensaje_sc* siguiente;
+
+}t_mensaje_sc;
+
+typedef struct mensaje_cc{
+
+	op_code codigo_operacion;
+	int id_mensaje;
+	int id_correlativo;
+	void* payload;
+	struct mensaje_cc* siguiente;
+
+}t_mensaje_cc;
+
+int id_cola[8]; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
 
 pthread_t thread;
 
@@ -49,7 +55,6 @@ void* recibir_mensaje(int socket_cliente, int* size);
 int recibir_operacion(int);
 void process_request(int cod_op, int cliente_fd);
 void serve_client(int *socket);
-void* serializar_paquete(t_paquete* paquete, int bytes);
 void devolver_mensaje(void* payload, int size, int socket_cliente);
 
 #endif /* SERVER_H_ */
