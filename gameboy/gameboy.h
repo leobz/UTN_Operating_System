@@ -9,6 +9,7 @@
 #include "../utils/config.h"
 #include "../utils/log.h"
 #include "../utils/serializacion.h"
+#include "../utils/cliente.h"
 
 // ESTRUCTURAS
 typedef struct {

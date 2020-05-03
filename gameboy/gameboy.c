@@ -20,8 +20,15 @@ int main(int argc, char ** argv) {
 				int pos_x = atoi(argv[4]);
 				int pos_y = atoi(argv[5]);
 
-				int conexion = crear_conexion(gameboy_config->ip_team,
+				int conexion;
+				conexion = crear_conexion(gameboy_config->ip_team,
 						gameboy_config->puerto_team);
+
+				if (conexion == -1) {
+					printf("ERROR: Conexion con [Team] no estable1cida");
+					exit(-1);
+				}
+
 				log_info(logger, "Conexion establecida con [Team]");
 
 				// TODO: Enviar mensaje serializado al Team
