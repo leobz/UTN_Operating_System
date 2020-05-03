@@ -7,8 +7,7 @@
 
 // ESTRUCTURAS
 typedef enum {
-	APPEARED_POKEMON = 1,
-	// TODO: Definir codigos de operacion restantes
+	OP_ERROR = -1, APPEARED_POKEMON = 1,
 } op_code;
 
 typedef struct {

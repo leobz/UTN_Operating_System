@@ -1,6 +1,6 @@
-#include"servidor.h"
+#include "servidor.h"
 
-void iniciar_servidor(char* ip, char* puerto)
+int iniciar_servidor(char* ip, char* puerto)
 {
 	int socket_servidor;
 
@@ -28,91 +28,49 @@ void iniciar_servidor(char* ip, char* puerto)
         break;
     }
 
+    return socket_servidor;
+
 	listen(socket_servidor, SOMAXCONN);
 
     freeaddrinfo(servinfo);
 
-    while(1)
-    	esperar_cliente(socket_servidor);
+    return socket_servidor;
 }
 
-void esperar_cliente(int socket_servidor)
+void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paquete*))
 {
 	struct sockaddr_in dir_cliente;
+	op_code cod_op;
 
 	int tam_direccion = sizeof(struct sockaddr_in);
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,&socket_cliente);
+	t_paquete* paquete = recibir_mensaje_servidor(socket_cliente);
+
+	if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+		cod_op = OP_ERROR;
+
+	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);
 }
 
-void procesar_mensaje_recibido(int* socket)
-{
-	int cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
-		cod_op = -1;
+t_paquete* recibir_mensaje_servidor(int socket_cliente) {
+	t_paquete* paquete = (t_paquete*)malloc(sizeof(t_paquete));
+	int size_buffer = 0;
 
-//	int size;
-//	void* msg;
-//		switch (cod_op) {
-//		case MENSAJE:
-//			msg = recibir_mensaje(cliente_fd, &size);
-//			devolver_mensaje(msg, size, cliente_fd);
-//			free(msg);
-//			break;
-//		case 0:
-//			pthread_exit(NULL);
-//		case -1:
-//			pthread_exit(NULL);
-//		}
+	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), 0) == -1)
+		paquete->codigo_operacion = OP_ERROR;
+
+	if (paquete->codigo_operacion != OP_ERROR) {
+		recv(socket_cliente, &(size_buffer), sizeof(int), 0);
+
+		paquete->buffer = (t_buffer*)malloc(sizeof(t_buffer));
+		paquete->buffer->size = size_buffer;
+		paquete->buffer->stream = malloc(size_buffer);
+
+		recv(socket_cliente, paquete->buffer->stream, paquete->buffer->size, 0);
+	}
+
+	return paquete;
 }
-
-//void* recibir_mensaje(int socket_cliente, int* size)
-//{
-//	void * buffer;
-//
-//	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//	buffer = malloc(*size);
-//	recv(socket_cliente, buffer, *size, MSG_WAITALL);
-//
-//	return buffer;
-//}
-//
-//void* serializar_paquete(t_paquete* paquete, int bytes)
-//{
-//	void * magic = malloc(bytes);
-//	int desplazamiento = 0;
-//
-//	memcpy(magic + desplazamiento, &(paquete->codigo_operacion), sizeof(int));
-//	desplazamiento+= sizeof(int);
-//	memcpy(magic + desplazamiento, &(paquete->buffer->size), sizeof(int));
-//	desplazamiento+= sizeof(int);
-//	memcpy(magic + desplazamiento, paquete->buffer->stream, paquete->buffer->size);
-//	desplazamiento+= paquete->buffer->size;
-//
-//	return magic;
-//}
-//
-//void devolver_mensaje(void* payload, int size, int socket_cliente)
-//{
-//	t_paquete* paquete = malloc(sizeof(t_paquete));
-//
-//	paquete->codigo_operacion = MENSAJE;
-//	paquete->buffer = malloc(sizeof(t_buffer));
-//	paquete->buffer->size = size;
-//	paquete->buffer->stream = malloc(paquete->buffer->size);
-//	memcpy(paquete->buffer->stream, payload, paquete->buffer->size);
-//
-//	int bytes = paquete->buffer->size + 2*sizeof(int);
-//
-//	void* a_enviar = serializar_paquete(paquete, bytes);
-//
-//	send(socket_cliente, a_enviar, bytes, 0);
-//
-//	free(a_enviar);
-//	free(paquete->buffer->stream);
-//	free(paquete->buffer);
-//	free(paquete);
-//}
