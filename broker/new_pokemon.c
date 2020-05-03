@@ -35,7 +35,7 @@ t_mensaje_sc* extraer_new_pokemon(){
 
 	return actual;
 
-
+	// TODO: suscript
 	//if(suscriptor confirma)
 	//free(actual);
 }
