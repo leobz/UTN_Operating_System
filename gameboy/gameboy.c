@@ -20,8 +20,8 @@ int main(int argc, char ** argv) {
 				int pos_x = atoi(argv[4]);
 				int pos_y = atoi(argv[5]);
 
-				// TODO: Conectarse a Team
-
+				int conexion = crear_conexion(gameboy_config->ip_team,
+						gameboy_config->puerto_team);
 				log_info(logger, "Conexion establecida con [Team]");
 
 				// TODO: Enviar mensaje serializado al Team
