@@ -28,6 +28,9 @@ void crear_pokemon_requeridos();
 void agregar_pokemon_a_pokemon_requeridos(char* pokemon, t_list* lista_posiciones);
 bool existe_pokemon_en_pokemon_requeridos(char* pokemon);
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char *pokemon);
+void destruir_pokemon_requeridos();
+void destruir_lista_posiciones(t_list* posiciones);
+void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete* paquete);

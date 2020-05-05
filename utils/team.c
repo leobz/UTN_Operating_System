@@ -35,7 +35,17 @@ t_list* obtener_lista_posiciones_by_pokemon_requerido(char* pokemon) {
 	return dictionary_get(pokemon_requeridos, pokemon);
 }
 
-// TODO: hacer metodo destroy_pokemon_requeridos()
+void destruir_pokemon_requeridos() {
+	dictionary_destroy_and_destroy_elements(pokemon_requeridos, destruir_lista_posiciones);
+}
+
+void destruir_lista_posiciones(t_list* posiciones) {
+	list_destroy_and_destroy_elements(posiciones, destruir_posicion);
+}
+
+void destruir_posicion(t_posicion* posicion) {
+	free(posicion);
+}
 
 void procesar_mensaje_recibido(t_paquete* paquete) {
 	t_mensaje_appeared* mensaje_appeared;
