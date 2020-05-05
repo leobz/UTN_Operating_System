@@ -15,8 +15,13 @@ typedef enum {
 	BLOCKED = 3,
 	EXEC = 4,
 	EXIT = 5,
-	// TODO: Definir estados restantes
 } tcb_estado;
+
+typedef enum {
+	FIFO = 1,
+	RR = 2,
+	SJF = 3,
+} tipo_de_planificacion;
 
 typedef struct {
 	int x;
