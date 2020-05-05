@@ -6,6 +6,7 @@
 #include <string.h>
 #include <commons/collections/list.h>
 #include <pthread.h>
+#include "../utils/listas.h"
 
 
 // ESTRUCTURAS
@@ -36,8 +37,7 @@ typedef struct {
 	// TODO: Agregar pokemons objetivo
 } tcb_entrenador;
 
-
-
 void inicializar_listas();
 void pasar_a_ready(tcb_entrenador* tcb);
+tcb_entrenador* siguiente_tcb_a_ejecutar();
 #endif /* MAIN_H_ */
