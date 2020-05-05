@@ -48,3 +48,26 @@ tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	}
 	return siguiente_tcb;
 }
+
+void cargar_rafaga(tcb_entrenador* tcb) {
+	switch (tcb->estado) {
+	case READY:
+		cargar_rafaga_captura(tcb);
+		break;
+	case READY_TO_EXCHANGE:
+		cargar_rafaga_intercambio(tcb);
+		break;
+	default:
+		printf("ERROR: No se pudo cargar la rafaga para el TID: %d\n", tcb->tid);
+		printf("ERROR: El estado %d no es soportado", tcb->estado);
+		exit(-1);
+	}
+}
+
+void cargar_rafaga_captura(tcb_entrenador* tcb) {
+	// TODO
+}
+
+void cargar_rafaga_intercambio(tcb_entrenador* tcb) {
+	// TODO
+}

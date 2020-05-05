@@ -16,6 +16,8 @@ typedef enum {
 	BLOCKED = 3,
 	EXEC = 4,
 	EXIT = 5,
+	//ESTADOS INTERMEDIOS
+	READY_TO_EXCHANGE = 6,
 } tcb_estado;
 
 typedef enum {
@@ -23,6 +25,12 @@ typedef enum {
 	RR = 2,
 	SJF = 3,
 } tipo_de_planificacion;
+
+typedef enum {
+	MOVERSE,
+	CATCH,
+	INTERCAMBIAR,
+} instruccion;
 
 typedef struct {
 	int x;
@@ -34,10 +42,18 @@ typedef struct {
 	int tid;
 	tcb_estado estado;
 	t_posicion posicion;
+	t_list* rafaga;
 	// TODO: Agregar pokemons objetivo
 } tcb_entrenador;
 
+// Listas de TCBs
 void inicializar_listas();
 void pasar_a_ready(tcb_entrenador* tcb);
 tcb_entrenador* siguiente_tcb_a_ejecutar();
+
+// Carga de rafagas
+void cargar_rafaga(tcb_entrenador* tcb);
+void cargar_rafaga_captura(tcb_entrenador* tcb);
+void cargar_rafaga_intercambio(tcb_entrenador* tcb);
+
 #endif /* MAIN_H_ */
