@@ -11,7 +11,24 @@ int main(int argc, char ** argv) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
 
-	} else {
+	}
+	if (strcmp(argv[1], "BROKER") == 0){
+
+		if((strcmp(argv[2], "NEW_POKEMON") == 0) && argc==7){
+			char* pokemon = argv[3];
+			int pos_x= argv[4];
+			int pos_y= argv[5];
+			int cantidad= argv[6];
+
+			int crear conexion = (game)
+		}
+
+
+
+
+	}
+
+
 
 		if (argc == 6) {
 			if (strcmp(argv[1], "TEAM") == 0
@@ -42,10 +59,10 @@ int main(int argc, char ** argv) {
 
 				liberar_conexion(conexion);
 
-			};
+			}
 		}
 
-	}
+
 
 	finalizar_gameboy(gameboy_config, logger);
 	return 0;
