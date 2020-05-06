@@ -4,6 +4,7 @@
 
 ### GameBoyProject Configuration ###
 *.config
+*.log
 
 ### C ###
 # Prerequisites
