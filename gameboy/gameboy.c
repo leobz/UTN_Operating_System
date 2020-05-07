@@ -30,7 +30,7 @@ int main(int argc, char ** argv) {
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x, pos_y);
+			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x, pos_y,cantidad);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 

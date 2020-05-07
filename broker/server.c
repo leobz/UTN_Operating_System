@@ -118,6 +118,10 @@ void process_request(int cod_op, int cliente_fd) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case SUSCRIPCION:
 
+			int num_cola;
+			recv(cliente_fd,&num_cola,sizeof(int),MSG_WAITALL);
+			encolar_proceso(cliente_fd,num_cola);
+
 			break;
 
 		case 0:

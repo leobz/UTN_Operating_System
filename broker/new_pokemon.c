@@ -40,3 +40,10 @@ t_mensaje_sc* extraer_new_pokemon(){
 	//free(actual);
 }
 
+void encolar_proceso_new_pokemon(int socket_cliente){
+
+
+}
+
+
+
