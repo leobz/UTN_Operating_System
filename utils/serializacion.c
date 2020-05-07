@@ -80,7 +80,7 @@ void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y) {
 
 	t_buffer* buffer = buffer_appeared_pokemon(nombre_pokemon, pos_x, pos_y);
-	t_paquete *paquete = crear_paquete(APPEARED_POKEMONE, buffer);
+	t_paquete *paquete = crear_paquete(APPEARED_POKEMON, buffer);
 
 	*bytes = paquete->buffer->size + sizeof(int) * 2;
 	void* a_enviar = serializar_paquete(paquete, *bytes);
