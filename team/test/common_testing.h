@@ -4,5 +4,7 @@
 #include "../main.h"
 
 tcb_entrenador *tcb_generico();
+t_posicion posicion_generica();
+t_posicion posicion(int x, int y);
 
 #endif /* TEST_COMMON_TESTING_H_ */
