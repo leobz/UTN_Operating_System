@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <pthread.h>
 #include <commons/collections/list.h>
 #include <commons/collections/queue.h>
-#include <pthread.h>
 #include "../utils/listas.h"
 
 

@@ -90,5 +90,5 @@ int distancia_entre(t_posicion inicio, t_posicion destino){
 	int delta_x = destino.x - inicio.x;
 	int delta_y = destino.y - inicio.y;
 
-	return delta_x + delta_y;
+	return fabs(delta_x + delta_y);
 }
