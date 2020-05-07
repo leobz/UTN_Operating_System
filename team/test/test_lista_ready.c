@@ -58,10 +58,3 @@ void pasar_a_ready_agrega_tcb_a_ready() {
 	//TODO: liberar memoria
 }
 
-tcb_entrenador* tcb_generico(int tid) {
-	tcb_entrenador* tcb = malloc(sizeof(tcb_entrenador));
-	tcb->estado = NEW;
-	tcb->tid = tid;
-
-	return tcb;
-}
