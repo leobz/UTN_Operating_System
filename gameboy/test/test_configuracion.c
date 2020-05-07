@@ -1,7 +1,7 @@
 #include "test_configuracion.h"
 
 void cargar_configuracion_ip() {
-	t_gameboy_config *gameboy_config = cargar_gameboy_config(
+	t_socket_config *gameboy_config = cargar_gameboy_config(
 			"gameboy.config.sample");
 
 	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_broker, "127.0.0.1");
@@ -12,14 +12,14 @@ void cargar_configuracion_ip() {
 }
 
 void cargar_configuracion_puertos() {
-	t_gameboy_config *gameboy_config = cargar_gameboy_config(
+	t_socket_config *gameboy_config = cargar_gameboy_config(
 			"gameboy.config.sample");
 
 	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_broker, "5003");
 	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_team, "5002");
 	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_gamecard, "5001");
 
-	destruir_gameboy_config(gameboy_config);
+	destruir_socket_config(gameboy_config);
 }
 
 void agregar_tests_configuracion(){

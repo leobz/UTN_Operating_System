@@ -7,7 +7,7 @@
 
 // ESTRUCTURAS
 
-typedef enum { MENSAJE = 1, APPEARED_POKEMONE = 2, NEW_POKEMON = 3, GET_POKEMON = 4,
+typedef enum { MENSAJE = 1, APPEARED_POKEMON = 2, NEW_POKEMON = 3, GET_POKEMON = 4,
 	           LOCALIZED_POKEMON= 5, CATCH_POKEMON= 6, CAUGHT_POKEMON= 7, SUSCRIPCION = 8
 
 	// TODO: Definir codigos de operacion restantes
@@ -48,6 +48,10 @@ void* serializar_paquete(t_paquete* paquete, int bytes);
 
 // BUFFERS GENERAL
 void* deserializar_buffer_de_un_string(t_buffer* buffer);
+
+// NEW_POKEMON
+void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y,int cantidad);
+t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y);

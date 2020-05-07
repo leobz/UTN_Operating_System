@@ -18,10 +18,14 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<pthread.h>
-#include "serializacion.h"
+
+#include"colas.h"
+#include "../utils/serializacion.h"
+#include "../utils/config.h"
+#include "../utils/log.h"
 
 #define IP "127.0.0.1"
-#define PUERTO "4444"
+#define PUERTO "5009"
 
 
 typedef struct mensaje_sc{

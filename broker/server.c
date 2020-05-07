@@ -7,7 +7,7 @@
 
 
 #include"server.h"
-#include"colas.h"
+
 
 void iniciar_servidor(void)
 {
@@ -19,6 +19,8 @@ void iniciar_servidor(void)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+
+
 
     getaddrinfo(IP, PUERTO, &hints, &servinfo);
 
@@ -86,19 +88,23 @@ void process_request(int cod_op, int cliente_fd) {
 
 			mensaje->codigo_operacion= NEW_POKEMON;
 			mensaje->id_mensaje=id_cola[NEW_POKEMON];
-			//mensaje->payload = malloc(sizeof(payload)) pensando si es necesario
+			mensaje->payload = malloc(sizeof(payload));
 			memcpy(mensaje->payload, payload, size);
 			mensaje->siguiente=NULL;
 
+			//empaquetar
+
 			insertar_new_pokemon(mensaje);
-			// TODO: Liberar mensaje
+
 
 			break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case APPEARED_POKEMON:
+
 			break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case GET_POKEMON:
+
 			break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case LOCALIZED_POKEMON:

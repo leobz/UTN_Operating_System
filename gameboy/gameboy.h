@@ -12,21 +12,12 @@
 #include "../utils/cliente.h"
 
 
-// ESTRUCTURAS
-typedef struct {
-	char *ip_broker;
-	char *ip_team;
-	char *ip_gamecard;
-	char *puerto_broker;
-	char *puerto_team;
-	char *puerto_gamecard;
-} t_gameboy_config;
 
 // CONFIGURACION
-void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
-void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);
-void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config);
-t_gameboy_config *cargar_gameboy_config(char *path_archivo);
-void destruir_gameboy_config(t_gameboy_config *gameboy_config);
+void inicializar_gameboy(t_socket_config **gameboy_config, t_log **logger);
+void finalizar_gameboy(t_socket_config* gameboy_config, t_log* logger);
+void parsear_socket_config(t_socket_config *gameboy_config, t_config *config);
+t_socket_config *cargar_gameboy_config(char *path_archivo);
+void destruir_gameboy_config(t_socket_config *gameboy_config);
 
 #endif /* GAMEBOY_H_ */
