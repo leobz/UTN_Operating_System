@@ -6,6 +6,7 @@
 #include "common_testing.h"
 
 void agregar_tests_rafagas();
-void test_cargar_rafaga_movimiento();
-
+void test_cargar_rafaga_movimiento_cuadrante_1();
+void test_cargar_rafaga_movimiento_cuadrante_3_1();
+void test_cargar_rafaga_movimiento_cuadrante_1_3();
 #endif /* TEST_TEST_RAFAGAS_H_ */
