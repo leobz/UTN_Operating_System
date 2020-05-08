@@ -19,7 +19,7 @@
 #include<string.h>
 #include<pthread.h>
 
-#include"colas.h"
+
 #include "../utils/serializacion.h"
 #include "../utils/config.h"
 #include "../utils/log.h"

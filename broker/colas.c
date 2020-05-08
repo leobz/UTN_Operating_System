@@ -5,6 +5,7 @@
  *      Author: diego
  */
 
+#include "colas.h"
 
 
 void encolar_proceso(int socket_cliente,int numero_de_cola){
@@ -12,6 +13,8 @@ void encolar_proceso(int socket_cliente,int numero_de_cola){
 	switch(numero_de_cola){
 
 	case NEW_POKEMON:
+
 		encolar_proceso_new_pokemon(socket_cliente);
+		break;
 	}
 }

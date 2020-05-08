@@ -5,19 +5,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <commons/config.h>
 #include "../utils/config.h"
 #include "../utils/log.h"
-#include "../utils/serializacion.h"
 #include "../utils/cliente.h"
 
 
 
+typedef struct {
+	char *ip_broker;
+	char *ip_team;
+	char *ip_gamecard;
+	char *puerto_broker;
+	char *puerto_team;
+	char *puerto_gamecard;
+} t_gameboy_config;
+
+
 // CONFIGURACION
-void inicializar_gameboy(t_socket_config **gameboy_config, t_log **logger);
-void finalizar_gameboy(t_socket_config* gameboy_config, t_log* logger);
-void parsear_socket_config(t_socket_config *gameboy_config, t_config *config);
-t_socket_config *cargar_gameboy_config(char *path_archivo);
-void destruir_gameboy_config(t_socket_config *gameboy_config);
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
+void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);
+void parsear_socket_config(t_gameboy_config *gameboy_config, t_config *config);
+t_gameboy_config *cargar_gameboy_config(char *path_archivo);
+void destruir_gameboy_config(t_gameboy_config *gameboy_config);
+
 
 #endif /* GAMEBOY_H_ */

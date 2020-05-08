@@ -1,7 +1,8 @@
 #include "gameboy.h"
 #include "test/testing.h"
 
-t_socket_config* gameboy_config;
+
+t_gameboy_config* gameboy_config;
 t_log* logger;
 
 int main(int argc, char ** argv) {
@@ -16,9 +17,9 @@ int main(int argc, char ** argv) {
 
 		if((strcmp(argv[2], "NEW_POKEMON") == 0) && argc==7){
 			char* pokemon = argv[3];
-			int pos_x= argv[4];
-			int pos_y= argv[5];
-			int cantidad= argv[6];
+			int pos_x= atoi(argv[4]);
+			int pos_y= atoi(argv[5]);
+			int cantidad= atoi(argv[6]);
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
@@ -65,8 +66,7 @@ int main(int argc, char ** argv) {
 				log_info(logger, "Conexion establecida con [Team]");
 
 				int bytes;
-				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,
-						pos_x, pos_y);
+				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,pos_x, pos_y);
 
 				enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -84,25 +84,52 @@ int main(int argc, char ** argv) {
 	return 0;
 }
 
-void inicializar_gameboy(t_socket_config **gameboy_config, t_log **logger) {
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger) {
 	*gameboy_config = cargar_gameboy_config("gameboy.config");
 	*logger = iniciar_logger("gameboy.log", "gameboy", LOG_LEVEL_INFO);
 }
 
-void finalizar_gameboy(t_socket_config* gameboy_config, t_log* logger) {
-	destruir_socket_config(gameboy_config);
+void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger) {
+	destruir_gameboy_config(gameboy_config);
 	destruir_logger(logger);
 }
 
 
-t_socket_config *cargar_gameboy_config(char *path_archivo) {
+t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
 	t_config *config;
-	t_socket_config *gameboy_config;
+	t_gameboy_config *gameboy_config;
 
 	config = leer_config(path_archivo);
-	gameboy_config = malloc(sizeof(t_socket_config));
+	gameboy_config = malloc(sizeof(t_gameboy_config));
 
-	parsear_socket_config(gameboy_config, config);
+	parsear_gameboy_config(gameboy_config, config);
 	destruir_config(config);
 	return gameboy_config;
 }
+
+
+void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
+	gameboy_config->ip_broker = strdup(
+			config_get_string_value(config, "IP_BROKER"));
+	gameboy_config->ip_gamecard = strdup(
+			config_get_string_value(config, "IP_GAMECARD"));
+	gameboy_config->ip_team = strdup(
+			config_get_string_value(config, "IP_TEAM"));
+	gameboy_config->puerto_broker = strdup(
+			config_get_string_value(config, "PUERTO_BROKER"));
+	gameboy_config->puerto_gamecard = strdup(
+			config_get_string_value(config, "PUERTO_GAMECARD"));
+	gameboy_config->puerto_team = strdup(
+			config_get_string_value(config, "PUERTO_TEAM"));
+}
+
+void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
+	free(gameboy_config->ip_broker);
+	free(gameboy_config->ip_gamecard);
+	free(gameboy_config->ip_team);
+	free(gameboy_config->puerto_broker);
+	free(gameboy_config->puerto_gamecard);
+	free(gameboy_config->puerto_team);
+	free(gameboy_config);
+}
+
