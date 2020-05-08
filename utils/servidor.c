@@ -28,8 +28,6 @@ int iniciar_servidor(char* ip, char* puerto)
         break;
     }
 
-    return socket_servidor;
-
 	listen(socket_servidor, SOMAXCONN);
 
     freeaddrinfo(servinfo);
@@ -47,9 +45,6 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
 	t_paquete* paquete = recibir_mensaje_servidor(socket_cliente);
-
-	if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) == -1)
-		cod_op = OP_ERROR;
 
 	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);

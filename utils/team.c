@@ -56,9 +56,10 @@ void procesar_mensaje_recibido(t_paquete* paquete) {
 			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
 			break;
 		case OP_ERROR:
-			printf("Código de operación invalido\n");
+			pthread_exit(NULL);
 			break;
 		default:
+			pthread_exit(NULL);
 			break;
 	}
 }
