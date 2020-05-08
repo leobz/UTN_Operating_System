@@ -6,10 +6,9 @@
 #include <string.h>
 
 #include "../utils/config.h"
+
 #include "../utils/log.h"
 #include "../utils/cliente.h"
-
-
 
 typedef struct {
 	char *ip_broker;
