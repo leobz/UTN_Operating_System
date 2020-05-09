@@ -1,4 +1,4 @@
-#include "../utils/team.h"
+#include "team.h"
 
 int main(){
 	char* ip = "127.0.0.1";
