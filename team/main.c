@@ -68,9 +68,14 @@ void cargar_rafaga(tcb_entrenador* tcb, t_posicion posicion_pokemon) {
 	}
 }
 
+void cargar_instruccion(tcb_entrenador* tcb, int instruccion){
+	queue_push(tcb->rafaga, instruccion);
+}
+
 void cargar_rafaga_captura(tcb_entrenador* tcb, t_posicion posicion_pokemon) {
 	cargar_rafaga_movimiento(tcb, posicion_pokemon);
-	// TODO
+	cargar_instruccion(tcb, CATCH);
+
 }
 
 void cargar_rafaga_intercambio(tcb_entrenador* tcb) {
@@ -81,7 +86,7 @@ void cargar_rafaga_movimiento(tcb_entrenador* tcb, t_posicion posicion_pokemon) 
 	int movimientos = 0;
 
 	while (movimientos < distancia_entre(tcb->posicion, posicion_pokemon)) {
-		queue_push(tcb->rafaga, MOVERSE);
+		cargar_instruccion(tcb, MOVERSE);
 		movimientos++;
 	}
 }
