@@ -22,5 +22,6 @@ t_mensaje_sc *extraer_new_pokemon();
 void encolar_proceso(int socket_cliente,int numero_de_cola);
 void encolar_proceso_new_pokemon(int socket_cliente);
 void encolar_proceso_get_pokemon(int socket_cliente);
+void encolar_proceso_catch_pokemon(int socket_cliente);
 
 #endif /* COLAS_H_ */

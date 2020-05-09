@@ -11,10 +11,17 @@
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	//t_mensaje_new* mensaje_new;
+
 	int size;
 	int num_cola;
+	t_log* logger;
+	t_broker_config* broker_config;
+
 	t_mensaje_sc* mensaje_a_encolar= malloc(sizeof(t_mensaje_sc));
 	t_mensaje_sc* mensaje_a_enviar;
+
+	inicializar_broker(&broker_config,&logger);
+
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
 
@@ -30,6 +37,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_new_pokemon(mensaje_a_encolar);
 			mensaje_a_enviar= extraer_new_pokemon();
 
+			log_info(logger,"Mensaje recibido de [GAMEBOY]:  %d",mensaje_a_enviar->codigo_operacion);
 
 			free(mensaje_a_encolar->payload);
 			free(mensaje_a_encolar);

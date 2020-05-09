@@ -35,10 +35,10 @@ int iniciar_servidor(char* ip, char* puerto)
     return socket_servidor;
 }
 
-void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paquete*))
+void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paquete_socket*))
 {
 	struct sockaddr_in dir_cliente;
-	int cod_op;
+
 
 	socklen_t tam_direccion = sizeof(struct sockaddr_in);
 

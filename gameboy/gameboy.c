@@ -8,7 +8,7 @@ t_log* logger;
 int main(int argc, char ** argv) {
 	inicializar_gameboy(&gameboy_config, &logger);
 
-	if (argc == 2) {
+	/*if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
 	}
@@ -103,8 +103,9 @@ int main(int argc, char ** argv) {
 		}
 
 
-
-	finalizar_gameboy(gameboy_config, logger);
+*/
+	//finalizar_gameboy(gameboy_config, logger);
+	printf("Hola");
 	return 0;
 }
 
