@@ -50,24 +50,6 @@ tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	return siguiente_tcb;
 }
 
-void cargar_rafaga(tcb_entrenador* tcb, t_posicion posicion_pokemon) {
-	// TODO: Necesito pasarle por parametro a esta funcion el mapa de pokemons disponibles
-	// Cuando se tenga, se agrega como parametro de cargar_rafaga
-	switch (tcb->estado) {
-	case READY:
-		cargar_rafaga_captura(tcb, posicion_pokemon);
-		break;
-	case READY_TO_EXCHANGE:
-		cargar_rafaga_intercambio(tcb);
-		break;
-	default:
-		printf("ERROR: No se pudo cargar la rafaga para el TID: %d\n",
-				tcb->tid);
-		printf("ERROR: El estado %d no es soportado", tcb->estado);
-		exit(-1);
-	}
-}
-
 void cargar_instruccion(tcb_entrenador* tcb, int instruccion){
 	queue_push(tcb->rafaga, instruccion);
 }
@@ -96,4 +78,8 @@ int distancia_entre(t_posicion inicio, t_posicion destino){
 	int delta_y = destino.y - inicio.y;
 
 	return fabs(delta_x + delta_y);
+}
+
+void cargar_tcb(tcb_entrenador* tcb){
+
 }

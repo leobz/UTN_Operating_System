@@ -57,19 +57,21 @@ typedef struct tcb_entrenador{
 	struct tcb_entrenador* entrenador_a_intercambiar;
 } tcb_entrenador;
 
-// Listas de TCBs
+// Inicializacion
 void inicializar_listas();
-void pasar_a_ready(tcb_entrenador* tcb);
-tcb_entrenador* siguiente_tcb_a_ejecutar();
 
-// Carga de rafagas
+// Carga de TCB
+void pasar_a_ready(tcb_entrenador* tcb);
 void cargar_instruccion(tcb_entrenador* tcb, int instruccion);
 
-void cargar_rafaga(tcb_entrenador* tcb, t_posicion posicion_pokemon);
 void cargar_rafaga_intercambio(tcb_entrenador* tcb);
 void cargar_rafaga_captura(tcb_entrenador*, t_posicion);
 void cargar_rafaga_movimiento(tcb_entrenador*, t_posicion);
 
 int distancia_entre(t_posicion inicio, t_posicion destino);
+
+
+// Ejecucion de TCB
+tcb_entrenador* siguiente_tcb_a_ejecutar();
 
 #endif /* MAIN_H_ */
