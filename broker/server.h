@@ -21,17 +21,17 @@
 
 
 #include "../utils/serializacion.h"
+#include "../utils/servidor.h"
 #include "../utils/config.h"
 #include "../utils/log.h"
 
-#define IP "127.0.0.1"
-#define PUERTO "5009"
 
 
 typedef struct mensaje_sc{
 
 	op_code codigo_operacion;
 	int id_mensaje;
+	int payload_size;
 	void* payload;
 	struct mensaje_sc* siguiente;
 
@@ -42,6 +42,7 @@ typedef struct mensaje_cc{
 	op_code codigo_operacion;
 	int id_mensaje;
 	int id_correlativo;
+	int payload_size;
 	void* payload;
 	struct mensaje_cc* siguiente;
 
@@ -68,14 +69,6 @@ int id_cola[8]; //este es vector de contadores para cada cola cuando les llega u
 
 pthread_t thread;
 
-void* recibir_buffer(int*, int);
-
-void iniciar_servidor(void);
-void esperar_cliente(int);
-void* recibir_mensaje(int socket_cliente, int* size);
-int recibir_operacion(int);
-void process_request(int cod_op, int cliente_fd);
-void serve_client(int *socket);
-void devolver_mensaje(void* payload, int size, int socket_cliente);
+void procesar_mensaje_recibido(t_paquete_socket* paquete);
 
 #endif /* SERVER_H_ */

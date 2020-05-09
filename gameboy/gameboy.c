@@ -11,8 +11,32 @@ int main(int argc, char ** argv) {
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
-
 	}
+
+
+	if(strcmp(argv[1], "SUSCRIPCION") == 0){
+		int cola = atoi(argv[2]);
+
+		int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
+
+		if (conexion == -1) {
+			printf("ERROR: Conexion con [Broker] no estable1cida");
+			exit(-1);
+		}
+
+		t_suscripcion* suscripcion= malloc(sizeof(t_suscripcion));
+		suscripcion->cod_operacion= SUSCRIPCION;
+		suscripcion->cola_a_suscribir = cola;
+
+		log_info(logger, "Conexion establecida con [Broker]");
+		enviar_mensaje(conexion, suscripcion, sizeof(int)*2);
+
+		log_info(logger, "Mensaje enviado a [Broker]: SUSCRIPCION cola %d", cola);
+
+		liberar_conexion(conexion);
+	}
+
+
 	if (strcmp(argv[1], "BROKER") == 0){
 
 		if((strcmp(argv[2], "NEW_POKEMON") == 0) && argc==7){
@@ -95,17 +119,6 @@ void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger) {
 }
 
 
-t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
-	t_config *config;
-	t_gameboy_config *gameboy_config;
-
-	config = leer_config(path_archivo);
-	gameboy_config = malloc(sizeof(t_gameboy_config));
-
-	parsear_gameboy_config(gameboy_config, config);
-	destruir_config(config);
-	return gameboy_config;
-}
 
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
@@ -131,5 +144,17 @@ void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
 	free(gameboy_config->puerto_gamecard);
 	free(gameboy_config->puerto_team);
 	free(gameboy_config);
+}
+
+t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
+	t_config *config;
+	t_gameboy_config *gameboy_config;
+
+	config = leer_config(path_archivo);
+	gameboy_config = malloc(sizeof(t_gameboy_config));
+
+	parsear_gameboy_config(gameboy_config, config);
+	destruir_config(config);
+	return gameboy_config;
 }
 

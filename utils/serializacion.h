@@ -24,6 +24,7 @@ typedef struct {
 	t_buffer* buffer;
 } t_paquete;
 
+
 typedef struct {
 	int length_pokemon;
 	char* pokemon;

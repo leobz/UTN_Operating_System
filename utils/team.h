@@ -33,7 +33,7 @@ void destruir_lista_posiciones(t_list* posiciones);
 void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
-void procesar_mensaje_recibido(t_paquete* paquete);
+void procesar_mensaje_recibido(t_paquete_socket* paquete);
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 
 #endif

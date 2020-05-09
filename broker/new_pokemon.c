@@ -37,7 +37,7 @@ t_mensaje_sc* extraer_new_pokemon(){
 
 	// TODO: suscript
 	//if(suscriptor confirma)
-	//free(actual);
+	free(actual);
 }
 
 void encolar_proceso_new_pokemon(int socket_cliente){

@@ -38,34 +38,50 @@ int iniciar_servidor(char* ip, char* puerto)
 void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paquete*))
 {
 	struct sockaddr_in dir_cliente;
-	op_code cod_op;
+	int cod_op;
 
 	socklen_t tam_direccion = sizeof(struct sockaddr_in);
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	t_paquete* paquete = recibir_mensaje_servidor(socket_cliente);
+	t_paquete_socket* paquete;
+	paquete = recibir_mensaje_servidor(socket_cliente);         //cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
+																//del cliente y opcionalmente un idntififcador de colas en caso de ser suscripcion
+																//pq a procesar_mensaje_recibido solo se le puede pasar un argumento
 
 	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);
 }
 
-t_paquete* recibir_mensaje_servidor(int socket_cliente) {
-	t_paquete* paquete = (t_paquete*)malloc(sizeof(t_paquete));
+t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
+	t_paquete_socket* paquete = (t_paquete_socket*)malloc(sizeof(t_paquete_socket));
 	int size_buffer = 0;
+	int cola=0;
 
-	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), 0) == -1)
-		paquete->codigo_operacion = OP_ERROR;
+	paquete->socket_cliente = socket_cliente;
+
+	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL) == -1){
+		paquete->codigo_operacion= OP_ERROR;
+		}
+
+	if((paquete->codigo_operacion == SUSCRIPCION)&&(paquete->codigo_operacion != OP_ERROR)){
+		recv(socket_cliente,&cola,sizeof(int), 0);
+		paquete->cola=cola;
+		}
+
 
 	if (paquete->codigo_operacion != OP_ERROR) {
-		recv(socket_cliente, &(size_buffer), sizeof(int), 0);
+
+		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);
 
 		paquete->buffer = (t_buffer*)malloc(sizeof(t_buffer));
 		paquete->buffer->size = size_buffer;
 		paquete->buffer->stream = malloc(size_buffer);
 
-		recv(socket_cliente, paquete->buffer->stream, paquete->buffer->size, 0);
+		recv(socket_cliente, paquete->buffer->stream, paquete->buffer->size, MSG_WAITALL);
 	}
 
 	return paquete;
 }
+
+

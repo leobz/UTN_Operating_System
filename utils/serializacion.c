@@ -53,6 +53,31 @@ void* deserializar_buffer_de_un_string(t_buffer* buffer) {
 }
 
 
+t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y, int cantidad) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
+
+	char *pokemon = strdup(nombre_pokemon);
+	int pokemon_length = strlen(pokemon) + 1;
+
+	buffer->size = sizeof(int) * 4 + pokemon_length;
+	buffer->stream = malloc(buffer->size);
+
+	int offset = 0;
+	memcpy(buffer->stream + offset, &pokemon_length, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, pokemon, pokemon_length);
+	offset += pokemon_length;
+	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &cantidad, sizeof(int));
+
+	free(pokemon);
+
+	return buffer;
+}
+
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 
@@ -124,29 +149,5 @@ void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos
 	return a_enviar;
 }
 
-t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y, int cantidad) {
-	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
-
-	char *pokemon = strdup(nombre_pokemon);
-	int pokemon_length = strlen(pokemon) + 1;
-
-	buffer->size = sizeof(int) * 4 + pokemon_length;
-	buffer->stream = malloc(buffer->size);
-
-	int offset = 0;
-	memcpy(buffer->stream + offset, &pokemon_length, sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer->stream + offset, pokemon, pokemon_length);
-	offset += pokemon_length;
-	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer->stream + offset, &cantidad, sizeof(int));
-
-	free(pokemon);
-
-	return buffer;
-}
 
 
