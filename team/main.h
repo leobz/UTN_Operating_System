@@ -20,7 +20,7 @@ typedef enum {
 	EXIT = 5,
 	//ESTADOS INTERMEDIOS
 	READY_TO_EXCHANGE = 6,
-} tcb_estado;
+} estado;
 
 typedef enum {
 	FIFO = 1,
@@ -40,12 +40,21 @@ typedef struct {
 } t_posicion;
 
 typedef struct {
+	t_posicion posicion;
+	char* pokemon;
+} t_pokemon;
+
+
+typedef struct tcb_entrenador{
 	pthread_t *entrenador;
 	int tid;
-	tcb_estado estado;
+	estado estado;
 	t_posicion posicion;
+	t_list* objetivos;
+	instruccion instruccion;
 	t_queue* rafaga;
-	// TODO: Agregar pokemons objetivo
+	t_pokemon* pokemon_a_capturar;
+	struct tcb_entrenador* entrenador_a_intercambiar;
 } tcb_entrenador;
 
 // Listas de TCBs
