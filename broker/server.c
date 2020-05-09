@@ -41,6 +41,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case SUSCRIPCION:
 
+
 			recv(paquete->socket_cliente,&num_cola,sizeof(int),MSG_WAITALL);
 			encolar_proceso(paquete->socket_cliente,num_cola);
 
