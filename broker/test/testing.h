@@ -8,6 +8,8 @@
 #ifndef TEST_TESTING_H_
 #define TEST_TESTING_H_
 
+#include "test_configuration.h"
+
 void correrTests();
 
 #endif /* TEST_TESTING_H_ */

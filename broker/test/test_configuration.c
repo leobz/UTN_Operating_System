@@ -8,22 +8,22 @@
 #include "test_configuration.h"
 
 void cargar_configuracion_ip() {
-	t_broker_config *gameboy_config = cargar_gameboy_config(
-			"gameboy.config.sample");
+	t_broker_config *broker_config = cargar_broker_config(
+			"broker.config.sample");
 
-	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_broker, "127.0.0.1");
+	CU_ASSERT_STRING_EQUAL(broker_config->ip_broker, "127.0.0.1");
 
 
-	destruir_gameboy_config(gameboy_config);
+	destruir_broker_config(broker_config);
 }
 
 void cargar_configuracion_puertos() {
-	t_broker_config *gameboy_config = cargar_gameboy_config(
-			"gameboy.config.sample");
+	t_broker_config *broker_config = cargar_broker_config(
+			"broker.config.sample");
 
-	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_broker, "4444");
+	CU_ASSERT_STRING_EQUAL(broker_config->puerto_broker, "4444");
 
-	destruir_gameboy_config(gameboy_config);
+	destruir_broker_config(broker_config);
 }
 
 void agregar_tests_configuracion(){

@@ -34,10 +34,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			memcpy(mensaje_a_encolar->payload, paquete->buffer->stream, size);
 			mensaje_a_encolar->siguiente=NULL;
 
-			insertar_new_pokemon(mensaje_a_encolar);
-			mensaje_a_enviar= extraer_new_pokemon();
+			log_info(logger,"Mensaje recibido de [GAMEBOY]:  %d",mensaje_a_encolar->codigo_operacion);
 
-			log_info(logger,"Mensaje recibido de [GAMEBOY]:  %d",mensaje_a_enviar->codigo_operacion);
+
+			//insertar_new_pokemon(mensaje_a_encolar);
+			//mensaje_a_enviar= extraer_new_pokemon();
+
 
 			free(mensaje_a_encolar->payload);
 			free(mensaje_a_encolar);
@@ -64,6 +66,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			pthread_exit(NULL);
 			break;
 	}
+	finalizar_broker(broker_config,logger);
 }
 
 

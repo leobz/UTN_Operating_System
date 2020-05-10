@@ -42,6 +42,7 @@ t_broker_config *cargar_broker_config(char *path_archivo) {
 void inicializar_broker(t_broker_config **broker_config, t_log **logger) {
 	*broker_config = cargar_broker_config("broker.config");
 	*logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
+
 }
 
 

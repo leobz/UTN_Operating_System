@@ -44,8 +44,7 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	t_paquete_socket* paquete;
-	paquete = recibir_mensaje_servidor(socket_cliente);         //cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
+	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);         //cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
 																//del cliente y opcionalmente un idntififcador de colas en caso de ser suscripcion
 																//pq a procesar_mensaje_recibido solo se le puede pasar un argumento
 
@@ -70,7 +69,7 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 		}
 
 
-	if (paquete->codigo_operacion != OP_ERROR) {
+	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)) {
 
 		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);
 
