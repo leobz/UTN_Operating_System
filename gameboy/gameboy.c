@@ -8,13 +8,13 @@ t_log* logger;
 int main(int argc, char ** argv) {
 	inicializar_gameboy(&gameboy_config, &logger);
 
-	/*if (argc == 2) {
+	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
 	}
 
 
-	if(strcmp(argv[1], "SUSCRIPCION") == 0){
+	/*if(strcmp(argv[1], "SUSCRIPCION") == 0){
 		int cola = atoi(argv[2]);
 
 		int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
@@ -35,11 +35,10 @@ int main(int argc, char ** argv) {
 
 		liberar_conexion(conexion);
 	}
+*/
 
-
-	if (strcmp(argv[1], "BROKER") == 0){
-
-		if((strcmp(argv[2], "NEW_POKEMON") == 0) && argc==7){
+	if(argc==7){
+		if (strcmp(argv[1], "BROKER") == 0){
 			char* pokemon = argv[3];
 			int pos_x= atoi(argv[4]);
 			int pos_y= atoi(argv[5]);
@@ -64,13 +63,7 @@ int main(int argc, char ** argv) {
 			liberar_conexion(conexion);
 
 		}
-
-
-
-
 	}
-
-
 
 		if (argc == 6) {
 			if (strcmp(argv[1], "TEAM") == 0
@@ -103,8 +96,8 @@ int main(int argc, char ** argv) {
 		}
 
 
-*/
-	//finalizar_gameboy(gameboy_config, logger);
+
+	finalizar_gameboy(gameboy_config, logger);
 	printf("Hola");
 	return 0;
 }
