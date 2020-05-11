@@ -14,11 +14,10 @@ int crear_conexion(char *ip, char* puerto) {
 	int socket_cliente = socket(server_info->ai_family,
 			server_info->ai_socktype, server_info->ai_protocol);
 
-
-
-	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)== -1){
-		printf("Error al ejecutar la llamada al método connect()\n");
-	return -1;
+	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
+			== -1) {
+		printf("WARNING: Error al conectar con IP:%s Puerto:%s\n", ip, puerto);
+		return -1;
 	}
 
 	freeaddrinfo(server_info);
@@ -43,10 +42,8 @@ int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido) {
 	buffer_recibido->stream = malloc(size_buffer);
 	recv(socket_cliente, buffer_recibido->stream, buffer_recibido->size, 0);
 
-
 	return codigo_operacion;
 }
-
 
 void liberar_conexion(int socket_cliente) {
 	close(socket_cliente);
