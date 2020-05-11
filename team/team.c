@@ -48,13 +48,35 @@ void destruir_pokemon_requeridos() {
 	dictionary_destroy_and_destroy_elements(pokemon_requeridos, destruir_lista_posiciones);
 }
 
+void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
+	log_info(logger, "[MSG_RECIBIDO] APPEARED_POKEMON: %s %d %d",
+			mensaje_appeared->pokemon,
+			mensaje_appeared->posx,
+			mensaje_appeared->posy);
+}
+
+void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
+	t_list* de_la_especie_en_mapa = dictionary_get(pokemon_requeridos,
+			mensaje->pokemon);
+
+	int cantidad = list_size(de_la_especie_en_mapa);
+	t_posicion* posicion = list_get(de_la_especie_en_mapa, cantidad - 1);
+
+	printf("[AGREGADO]: %s %d %d [TOTAL]: %d\n",
+			mensaje->pokemon,
+			posicion->x,
+			posicion->y,
+			cantidad);
+}
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared;
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
+
 			mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
+			loggear_appeared_recibido(mensaje_appeared);
 			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
 			break;
 
@@ -81,5 +103,6 @@ void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) 
 		list_add(lista_posiciones, posicion);
 
 		agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
+		imprimir_pokemon_agregado(mensaje);
 	}
 }

@@ -1,7 +1,6 @@
 #include "gameboy.h"
 #include "test/testing.h"
 
-
 t_gameboy_config* gameboy_config;
 t_log* logger;
 
@@ -65,40 +64,39 @@ int main(int argc, char ** argv) {
 		}
 	}
 
-		if (argc == 6) {
-			if (strcmp(argv[1], "TEAM") == 0
-					&& strcmp(argv[2], "APPEARED_POKEMON") == 0) {
-				char *pokemon = argv[3];
-				int pos_x = atoi(argv[4]);
-				int pos_y = atoi(argv[5]);
+	if (argc == 6) {
+		if (strcmp(argv[1], "TEAM") == 0
+				&& strcmp(argv[2], "APPEARED_POKEMON") == 0) {
+			char *pokemon = argv[3];
+			int pos_x = atoi(argv[4]);
+			int pos_y = atoi(argv[5]);
 
-				int conexion = crear_conexion(gameboy_config->ip_team,
-						gameboy_config->puerto_team);
+			int conexion = crear_conexion(gameboy_config->ip_team,
+					gameboy_config->puerto_team);
 
-				if (conexion == -1) {
-					printf("ERROR: Conexion con [Team] no estable1cida");
-					exit(-1);
-				}
-
-				log_info(logger, "Conexion establecida con [Team]");
-
-				int bytes;
-				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,pos_x, pos_y);
-
-				enviar_mensaje(conexion, a_enviar, bytes);
-
-				log_info(logger,"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
-						pokemon, pos_x, pos_y);
-
-				liberar_conexion(conexion);
-
+			if (conexion == -1) {
+				printf("ERROR: Conexion con [Team] no estable1cida");
+				exit(-1);
 			}
-		}
 
+			log_info(logger, "Conexion establecida con [Team]");
 
+			int bytes;
+			void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,
+					pos_x, pos_y);
+
+			enviar_mensaje(conexion, a_enviar, bytes);
+
+			log_info(logger,
+					"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
+					pokemon, pos_x, pos_y);
+
+			liberar_conexion(conexion);
+
+		};
+	}
 
 	finalizar_gameboy(gameboy_config, logger);
-	printf("Hola");
 	return 0;
 }
 
@@ -111,9 +109,6 @@ void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger) {
 	destruir_gameboy_config(gameboy_config);
 	destruir_logger(logger);
 }
-
-
-
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
 	gameboy_config->ip_broker = strdup(
@@ -130,16 +125,6 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 			config_get_string_value(config, "PUERTO_TEAM"));
 }
 
-void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
-	free(gameboy_config->ip_broker);
-	free(gameboy_config->ip_gamecard);
-	free(gameboy_config->ip_team);
-	free(gameboy_config->puerto_broker);
-	free(gameboy_config->puerto_gamecard);
-	free(gameboy_config->puerto_team);
-	free(gameboy_config);
-}
-
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
 	t_config *config;
 	t_gameboy_config *gameboy_config;
@@ -152,3 +137,12 @@ t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
 	return gameboy_config;
 }
 
+void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
+	free(gameboy_config->ip_broker);
+	free(gameboy_config->ip_gamecard);
+	free(gameboy_config->ip_team);
+	free(gameboy_config->puerto_broker);
+	free(gameboy_config->puerto_gamecard);
+	free(gameboy_config->puerto_team);
+	free(gameboy_config);
+}
