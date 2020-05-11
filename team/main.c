@@ -4,8 +4,9 @@ int main(){
 	char* ip = "127.0.0.1";
 	char* puerto = "4444";
 
-	cargar_objetivo_global();
 	cargar_configuracion();
+	cargar_objetivo_global();
+
 	//crear_tcb_entrenadores(t_team_config);
 
 	crear_pokemon_requeridos();
