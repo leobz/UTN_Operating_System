@@ -9,6 +9,7 @@
 #include "../utils/log.h"
 #include "../utils/cliente.h"
 #include "../utils/servidor.h"
+#include "../utils/serializacion.h"
 
 typedef struct {
 	char *ip_broker;
@@ -23,7 +24,7 @@ typedef struct {
 // CONFIGURACION
 void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
 void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);
-void parsear_socket_config(t_gameboy_config *gameboy_config, t_config *config);
+void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config);
 t_gameboy_config *cargar_gameboy_config(char *path_archivo);
 void destruir_gameboy_config(t_gameboy_config *gameboy_config);
 

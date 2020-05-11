@@ -99,7 +99,6 @@ int main(int argc, char ** argv) {
 	//	}
 
 	finalizar_gameboy(gameboy_config, logger);
-	printf("Hola");
 	return 0;
 }
 
@@ -128,16 +127,6 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 			config_get_string_value(config, "PUERTO_TEAM"));
 }
 
-void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
-	free(gameboy_config->ip_broker);
-	free(gameboy_config->ip_gamecard);
-	free(gameboy_config->ip_team);
-	free(gameboy_config->puerto_broker);
-	free(gameboy_config->puerto_gamecard);
-	free(gameboy_config->puerto_team);
-	free(gameboy_config);
-}
-
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
 	t_config *config;
 	t_gameboy_config *gameboy_config;
@@ -150,3 +139,12 @@ t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
 	return gameboy_config;
 }
 
+void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
+	free(gameboy_config->ip_broker);
+	free(gameboy_config->ip_gamecard);
+	free(gameboy_config->ip_team);
+	free(gameboy_config->puerto_broker);
+	free(gameboy_config->puerto_gamecard);
+	free(gameboy_config->puerto_team);
+	free(gameboy_config);
+}
