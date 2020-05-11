@@ -50,13 +50,13 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 			"TIEMPO_RECONEXION");
 	team_config->retardo_ciclo_cpu = config_get_int_value(config,
 			"RETARDO_CICLO_CPU");
-	team_config->algoritmo_de_planificacion = config_get_string_value(config,
-			"ALGORITMO_PLANIFICACION");
+	team_config->algoritmo_de_planificacion = strdup(config_get_string_value(config,
+			"ALGORITMO_PLANIFICACION"));
 	team_config->quantum = config_get_int_value(config, "QUANTUM");
-	team_config->estimacion_inicial = config_get_int_value(config, "IP_BROKER");
-	team_config->ip_broker = config_get_int_value(config, "ESTIMACION_INICIAL");
-	team_config->puerto_broker = config_get_int_value(config, "PUERTO_BROKER");
-	team_config->log_file = config_get_string_value(config, "LOG_FILE");
+	team_config->ip_broker = strdup(config_get_string_value(config, "IP_BROKER"));
+	team_config->estimacion_inicial= config_get_int_value(config, "ESTIMACION_INICIAL");
+	team_config->puerto_broker = strdup(config_get_string_value(config, "PUERTO_BROKER"));
+	team_config->log_file = strdup(config_get_string_value(config, "LOG_FILE"));
 }
 t_team_config *cargar_team_config(char *path_archivo) {
 	t_config *config;
@@ -78,13 +78,7 @@ void destruir_team_config(t_team_config *team_config) {
 	free(team_config->log_file);
 	free(team_config);
 }
-int cargar_configuracion(void) {
 
-	t_team_config *team_config = cargar_team_config("team.config");
-	destruir_team_config(team_config);
-	printf("funciono");
-	return 0;
-}
 /*crear_tcb_entrenadores(t_team_config){
 
  }*/

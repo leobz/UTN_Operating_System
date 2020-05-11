@@ -49,7 +49,6 @@ typedef struct{
 
 // INICIALIZACIONES TEAM
 void cargar_objetivo_global (void);
-int cargar_configuracion(void);
 void crear_pokemon_requeridos();
 
 void agregar_pokemon_a_objetivo_global(char* pokemon, int cantidad);
