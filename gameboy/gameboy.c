@@ -12,38 +12,6 @@ int main(int argc, char ** argv) {
 			correrTests();
 	}
 
-	if (argc == 7) {
-		if (strcmp(argv[1], "BROKER") == 0) {
-			char* pokemon = argv[3];
-			int pos_x = atoi(argv[4]);
-			int pos_y = atoi(argv[5]);
-			int cantidad = atoi(argv[6]);
-
-			int conexion = crear_conexion(gameboy_config->ip_broker,
-					gameboy_config->puerto_broker);
-
-			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
-				exit(-1);
-			}
-
-			log_info(logger, "Conexion establecida con [Broker]");
-
-			int bytes;
-			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
-					pos_y, cantidad);
-
-			enviar_mensaje(conexion, a_enviar, bytes);
-
-			log_info(logger,
-					"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d",
-					pokemon, pos_x, pos_y, cantidad);
-
-			liberar_conexion(conexion);
-
-		}
-	}
-
 	if (argc == 6) {
 		if (strcmp(argv[1], "TEAM") == 0
 				&& strcmp(argv[2], "APPEARED_POKEMON") == 0) {
@@ -70,6 +38,38 @@ int main(int argc, char ** argv) {
 			log_info(logger,
 					"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
 					pokemon, pos_x, pos_y);
+
+			liberar_conexion(conexion);
+
+		}
+	}
+
+	if (argc == 7) {
+		if (strcmp(argv[1], "BROKER") == 0) {
+			char* pokemon = argv[3];
+			int pos_x = atoi(argv[4]);
+			int pos_y = atoi(argv[5]);
+			int cantidad = atoi(argv[6]);
+
+			int conexion = crear_conexion(gameboy_config->ip_broker,
+					gameboy_config->puerto_broker);
+
+			if (conexion == -1) {
+				printf("ERROR: Conexion con [Broker] no estable1cida");
+				exit(-1);
+			}
+
+			log_info(logger, "Conexion establecida con [Broker]");
+
+			int bytes;
+			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
+					pos_y, cantidad);
+
+			enviar_mensaje(conexion, a_enviar, bytes);
+
+			log_info(logger,
+					"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d",
+					pokemon, pos_x, pos_y, cantidad);
 
 			liberar_conexion(conexion);
 
