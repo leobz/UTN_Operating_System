@@ -4,8 +4,11 @@ void cargar_objetivo_global(void) {
 
 	t_config *config = config_create("./team.config");
 	char **read_array = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+	char **pos_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
+	char **pokemon_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
 	t_list *objetivo_global_desordenado = list_create();
 	objetivo_global = dictionary_create();
+	entrenadores = list_create();
 
 	void a_la_lista(char *pokemon_requerido) {
 		if (pokemon_requerido != NULL) {
@@ -45,6 +48,61 @@ void cargar_objetivo_global(void) {
 	dictionary_iterator(objetivo_global, imprimirObjetivoGlobal);
 
 	t_list *objetivo_global_final = list_create();
+
+	int cant_entrenadores = 0;
+
+	void cantidad_entrenadores(char* entrenador) {
+		cant_entrenadores++;
+	}
+
+	string_iterate_lines(pos_entrenadores, cantidad_entrenadores);
+
+	for (int i=0; i < cant_entrenadores; i++){
+		char** aux_pos_entrenadores = string_split(*(pos_entrenadores+i), "|");
+		char** aux_pokemon_entrenadores = string_split(*(pokemon_entrenadores+i), "|");
+		char** aux_pokemon_objetivo = string_split(*(read_array+i), "|");
+		t_tcb_entrenador* entrenador = malloc(sizeof(t_tcb_entrenador));
+		t_posicion* posicion = malloc(sizeof(t_posicion));
+		t_dictionary* pokemones_capturados = list_create();
+		t_dictionary* objetivo = list_create();
+
+		posicion->x = atoi(aux_pos_entrenadores[0]);
+		posicion->y = atoi(aux_pos_entrenadores[1]);
+
+		void agregar_pokemon_a_entrenador(char *pokemon_entrenador) {
+			if (pokemon_entrenador != NULL) {
+				if (dictionary_has_key(pokemones_capturados,pokemon_entrenador)){
+					int cantidad = dictionary_get(pokemones_capturados, pokemon_entrenador);
+					cantidad++;
+					dictionary_put(pokemones_capturados, pokemon_entrenador, cantidad);
+				}
+				else
+					dictionary_put(pokemones_capturados, pokemon_entrenador, 1);
+			}
+		}
+
+		string_iterate_lines(aux_pokemon_entrenadores, agregar_pokemon_a_entrenador);
+
+		void agregar_pokemon_a_objetivo(char *pokemon_objetivo) {
+			if (pokemon_objetivo != NULL) {
+				if (dictionary_has_key(objetivo,pokemon_objetivo)){
+					int cantidad = dictionary_get(objetivo, pokemon_objetivo);
+					cantidad++;
+					dictionary_put(objetivo, pokemon_objetivo, cantidad);
+				}
+				else
+					dictionary_put(objetivo, pokemon_objetivo, 1);
+			}
+		}
+
+		string_iterate_lines(aux_pokemon_objetivo, agregar_pokemon_a_objetivo);
+
+		entrenador->posicion;
+		entrenador->objetivos = objetivo;
+		entrenador->pokemones_capturados = pokemones_capturados;
+
+		list_add(entrenadores, entrenador);
+	}
 
 	//for(int i=0;objetivo_global_final[i]!=NULL;i++){
 

@@ -15,9 +15,15 @@
 //ESTRUCTURAS
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
+typedef t_list t_entrenadores;
 
 t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemon_requeridos;
+t_entrenadores* entrenadores;
+
+typedef enum {
+	REALIZAR_CATCH = 1,
+} type_instruccion;
 
 typedef struct {
 	int x;
@@ -37,15 +43,25 @@ typedef struct{
 	char *puerto_broker;
 	char *log_file;
 }t_team_config;
-/*typedef struct{
-	pthread entrenador;
-	int estado;
-	int tid;
-	int[2] posicion;
-	char **pokemons_a_capturar;
-	char **pokemons_que_tiene;
+
+typedef struct{
+	char* pokemon;
+	t_posicion* posicion;
+}t_pokemon;
+
+typedef struct{
+	pthread_t* entrenador;
+	int TID;
+	t_posicion* posicion;
+	t_dictionary* objetivos;
+	type_instruccion instruccion;
+	t_list* rafaga;
+	t_pokemon* pokemon_a_capturar;
+	struct t_tcb_entrenador* entrenador_a_intercambiar;
+	int pokemones_max;
+	t_dictionary* pokemones_capturados;
 }t_tcb_entrenador;
-*/
+
 
 // INICIALIZACIONES TEAM
 void cargar_objetivo_global (void);
