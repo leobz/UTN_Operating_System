@@ -51,6 +51,7 @@ typedef struct{
 void cargar_objetivo_global (void);
 void crear_pokemon_requeridos();
 
+int obtener_pokemon_a_objetivo_global(char* pokemon);
 void agregar_pokemon_a_objetivo_global(char* pokemon, int cantidad);
 bool existe_pokemon_en_objetivo_global(char* pokemon);
 void destruir_objetivo_global();

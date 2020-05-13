@@ -3,12 +3,20 @@
 void cargar_objetivo_global(void) {
 
 	t_config *config = config_create("./team.config");
-	char **read_array = config_get_array_value(config, "POKEMON_ENTRENADORES");
+	char **read_array = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 	t_list *objetivo_global_desordenado = list_create();
 	objetivo_global = dictionary_create();
 
 	void a_la_lista(char *pokemon_requerido) {
 		if (pokemon_requerido != NULL) {
+			if (existe_pokemon_en_objetivo_global(pokemon_requerido)){
+				int cantidad = obtener_pokemon_a_objetivo_global(pokemon_requerido);
+				cantidad++;
+				agregar_pokemon_a_objetivo_global(pokemon_requerido, cantidad);
+			}
+			else
+				agregar_pokemon_a_objetivo_global(pokemon_requerido, 1);
+
 			list_add(objetivo_global_desordenado, pokemon_requerido);
 		}
 	}
@@ -29,6 +37,12 @@ void cargar_objetivo_global(void) {
 		printf("El elemento: %s\n", (char *) elemento);
 	}
 	list_iterate(objetivo_global_desordenado, mostrar);
+
+	void imprimirObjetivoGlobal(char* pokemon, int cantidad){
+		printf("%s: %d\n", pokemon, cantidad);
+	}
+
+	dictionary_iterator(objetivo_global, imprimirObjetivoGlobal);
 
 	t_list *objetivo_global_final = list_create();
 
@@ -103,6 +117,10 @@ void destruir_team_config(t_team_config *team_config) {
  }
 
  */
+
+int obtener_pokemon_a_objetivo_global(char* pokemon) {
+	return dictionary_get(objetivo_global, pokemon);
+}
 
 void agregar_pokemon_a_objetivo_global(char* pokemon, int cantidad) {
 	dictionary_put(objetivo_global, pokemon, cantidad);
