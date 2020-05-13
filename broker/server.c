@@ -13,18 +13,22 @@ t_broker_config* broker_config;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
+
+
 	int num_cola;
 
-	t_mensaje_sc* mensaje_a_preparar_sc= malloc(sizeof(t_mensaje_sc));
+	t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
 	t_mensaje_sc* mensaje_a_encolar_sc;
 	t_mensaje_sc* mensaje_a_enviar_sc;
 
-	t_mensaje_sc* mensaje_a_preparar_cc= malloc(sizeof(t_mensaje_cc));
-	t_mensaje_sc* mensaje_a_encolar_cc;
-	t_mensaje_sc* mensaje_a_enviar_cc;
+	t_mensaje_cc* mensaje_a_preparar_cc = malloc(sizeof(t_mensaje_cc));
+	t_mensaje_cc* mensaje_a_encolar_cc;
+	t_mensaje_cc* mensaje_a_enviar_cc;
 
 
 	inicializar_broker(&broker_config,&logger);
+
+	log_info(logger, "[NUEVA CONEXION]: Numero de socket: %d", paquete->socket_cliente);
 
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
@@ -78,10 +82,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 		case SUSCRIPCION:
-
-
-			recv(paquete->socket_cliente,&num_cola,sizeof(int),MSG_WAITALL);
-			encolar_proceso(paquete->socket_cliente,num_cola);
+			encolar_proceso(paquete->socket_cliente,paquete->cola);
 
 			break;
 
@@ -109,7 +110,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensaje_a_preparar){ //esta funcion pasa el paquete a una mensaje encolable
 
-				id_cola[paquete->codigo_operacion];
+				id_cola[paquete->codigo_operacion]++;
 
 				mensaje_a_preparar->codigo_operacion= paquete->codigo_operacion;
 				mensaje_a_preparar->id_mensaje=id_cola[paquete->codigo_operacion];
@@ -118,7 +119,6 @@ t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensa
 				memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
 				mensaje_a_preparar->siguiente=NULL;
 
-				log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",mensaje_a_preparar->codigo_operacion);
 
 
 	return mensaje_a_preparar;
@@ -126,15 +126,13 @@ t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensa
 
 t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete, t_mensaje_cc* mensaje_a_preparar){
 
-				id_cola[paquete->codigo_operacion];
+				id_cola[paquete->codigo_operacion]++;
 				mensaje_a_preparar->codigo_operacion= paquete->codigo_operacion;
 				mensaje_a_preparar->id_mensaje=id_cola[paquete->codigo_operacion];
 				mensaje_a_preparar->payload_size= paquete->buffer->size;
 				mensaje_a_preparar->payload = malloc(paquete->buffer->size);
 				memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
 				mensaje_a_preparar->siguiente=NULL;
-
-				log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",mensaje_a_preparar->codigo_operacion);
 
 	return mensaje_a_preparar;
 }
