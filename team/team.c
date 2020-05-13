@@ -97,7 +97,7 @@ void cargar_objetivo_global(void) {
 
 		string_iterate_lines(aux_pokemon_objetivo, agregar_pokemon_a_objetivo);
 
-		entrenador->posicion;
+		entrenador->posicion = posicion;
 		entrenador->objetivos = objetivo;
 		entrenador->pokemones_capturados = pokemones_capturados;
 
