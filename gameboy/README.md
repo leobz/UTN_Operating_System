@@ -59,7 +59,20 @@ o tener su configuracion personalizada.
 	- {path_directorio_utils}/Debug
 - Hacer click en Apply y luego Run
 
+### 7) Configuración terminal
 
+Para poder correr el proceso por terminal, es necesario ejecutar un comando que permite incluir a la carpeta utils a la hora de linkear las bibliotecas al binario (ejecutable) del modulo (similar a lo que hacemos en el paso 6 en la pestaña Environment)
+- Tener un editor de texto a mano (se puede instalar gedit en la VM con el comando sudo apt install gedit )
+- Con una terminal abierta, ingresamos: gedit .bashrc
+- Cuando el editor de texto se abra, ir al final del archivo y copiar, en una linea a parte, la siguiente linea: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/tp-2020-1c-UNIX/utils/Debug
+- Guardar el cambio y cerrar el editor
+- Abrir otra terminal y probar correr el modulo:
+ - cd tp-2020-1c-UNIX/{nombre_modulo}/Debug
+ - make clean (por si ya existia el ejecutable) 
+ - make
+ - ./{nombre_modulo}
+
+NOTA: EL archivo .bashrc es un script que tiene la configuracion de nuestra terminal y se ejecuta cada vez que la abrimos.
 
 
 

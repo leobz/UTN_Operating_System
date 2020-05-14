@@ -13,18 +13,21 @@ t_broker_config* broker_config;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	/*int num_cola;
 
-	t_mensaje_sc* mensaje_a_preparar_sc= malloc(sizeof(t_mensaje_sc));
+/*
+	t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
 	t_mensaje_sc* mensaje_a_encolar_sc;
 	t_mensaje_sc* mensaje_a_enviar_sc;
 
-	t_mensaje_sc* mensaje_a_preparar_cc= malloc(sizeof(t_mensaje_cc));
-	t_mensaje_sc* mensaje_a_encolar_cc;
-	t_mensaje_sc* mensaje_a_enviar_cc;*/
+	t_mensaje_cc* mensaje_a_preparar_cc = malloc(sizeof(t_mensaje_cc));
+	t_mensaje_cc* mensaje_a_encolar_cc;
+	t_mensaje_cc* mensaje_a_enviar_cc;*/
+
 
 
 	inicializar_broker(&broker_config,&logger);
+
+	log_info(logger, "[NUEVA CONEXION]: Numero de socket: %d", paquete->socket_cliente);
 
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
@@ -80,13 +83,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			//break;
 
 
-			//case SUSCRIPCION:
 
+		case SUSCRIPCION:
+			encolar_proceso(paquete->socket_cliente,paquete->cola);
 
-			//recv(paquete->socket_cliente,&num_cola,sizeof(int),MSG_WAITALL);
-			//encolar_proceso(paquete->socket_cliente,num_cola);
-
-			//break;
+			break;
 
 		case OP_ERROR:
 
@@ -104,7 +105,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	free(mensaje_a_enviar_sc);
 	free(mensaje_a_enviar_cc->payload); Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
 	free(mensaje_a_enviar_cc);*/
-	fclose(file);
+
 	liberar_paquete(paquete);
 	finalizar_broker(broker_config,logger);
 }
@@ -121,7 +122,6 @@ t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensa
 				memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
 				mensaje_a_preparar->siguiente=NULL;
 
-				log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",mensaje_a_preparar->codigo_operacion);
 
 
 	return mensaje_a_preparar;
@@ -136,8 +136,6 @@ t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete, t_mensaje_cc* mensa
 				mensaje_a_preparar->payload = malloc(paquete->buffer->size);
 				memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
 				mensaje_a_preparar->siguiente=NULL;
-
-				log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",mensaje_a_preparar->codigo_operacion);
 
 	return mensaje_a_preparar;
 }

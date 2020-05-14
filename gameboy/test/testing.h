@@ -2,7 +2,6 @@
 #define TESTING_H_
 
 #include "CUnit/Basic.h"
-#include "../broker/server.h"
 
 void correrTests();
 

@@ -2,7 +2,8 @@
 #define TEAM_H_
 
 #include "../utils/servidor.h"
-#include<commons/collections/list.h>
+#include "../utils/log.h"
+#include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 
 typedef t_dictionary t_objetivo_global;
@@ -10,6 +11,7 @@ typedef t_dictionary t_pokemon_requeridos;
 
 t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemon_requeridos;
+t_log* logger;
 
 typedef struct {
 	int x;
@@ -35,5 +37,8 @@ void destruir_posicion(t_posicion* posicion);
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
+
+void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared);
+void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje);
 
 #endif
