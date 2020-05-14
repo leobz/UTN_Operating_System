@@ -63,12 +63,6 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 		paquete->codigo_operacion= OP_ERROR;
 		}
 
-	if((paquete->codigo_operacion == SUSCRIPCION)&&(paquete->codigo_operacion != OP_ERROR)){
-		recv(socket_cliente,&cola,sizeof(int), 0);
-		paquete->cola=cola;
-		}
-
-
 	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)) {
 
 		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);

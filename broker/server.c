@@ -13,7 +13,7 @@ t_broker_config* broker_config;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	int num_cola;
+	/*int num_cola;
 
 	t_mensaje_sc* mensaje_a_preparar_sc= malloc(sizeof(t_mensaje_sc));
 	t_mensaje_sc* mensaje_a_encolar_sc;
@@ -21,7 +21,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	t_mensaje_sc* mensaje_a_preparar_cc= malloc(sizeof(t_mensaje_cc));
 	t_mensaje_sc* mensaje_a_encolar_cc;
-	t_mensaje_sc* mensaje_a_enviar_cc;
+	t_mensaje_sc* mensaje_a_enviar_cc;*/
 
 
 	inicializar_broker(&broker_config,&logger);
@@ -29,7 +29,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
 
-			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
+			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
+
+
+			//mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 
 			/*insertar_mensaje_sc(mensaje_a_encolar_sc,NEW_POKEMON);
 			mensaje_a_enviar_sc= extraer_mensaje_sc(NEW_POKEMON);*/
@@ -37,53 +40,53 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			break;
 
 
-		case GET_POKEMON:
+		//case GET_POKEMON:
 
-			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
+			//	mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 			/*insertar_mensaje_sc(mensaje_a_encolar_sc,GET_POKEMON);
 			mensaje_a_enviar_sc= extraer_mensaje_sc(GET_POKEMON);*/
-			break;
+			//break;
 
-		case CATCH_POKEMON:
+			//case CATCH_POKEMON:
 
-			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
+			//	mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 			/*insertar_mensaje_sc(mensaje_a_encolar_sc,CATCH_POKEMON);
 			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);*/
 
-		break;
+			//break;
 
-		case APPEARED_POKEMON:
+			//case APPEARED_POKEMON:
 
-			mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
+			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
 			/*insertar_mensaje_cc(mensaje_a_encolar_sc,APPEARED_POKEMON);
 			mensaje_a_enviar_cc= extraer_mensaje_cc(APPEARED_POKEMON);*/
 
-		break;
+			//break;
 
-		case LOCALIZED_POKEMON:
+			//case LOCALIZED_POKEMON:
 
-			mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
+			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
 			/*insertar_mensaje_sc(mensaje_a_encolar_cc,LOCALIZED_POKEMON);
 			mensaje_a_enviar_cc= extraer_mensaje_cc(LOCALIZED_POKEMON);*/
 
-		break;
+			//break;
 
-		case CAUGHT_POKEMON:
+			//case CAUGHT_POKEMON:
 
-			mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
+			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
 			/*insertar_mensaje_cc(mensaje_a_encolar_cc,CATCH_POKEMON);
 			mensaje_a_enviar_cc= extraer_mensaje_cc(CATCH_POKEMON);*/
 
-		break;
+			//break;
 
 
-		case SUSCRIPCION:
+			//case SUSCRIPCION:
 
 
-			recv(paquete->socket_cliente,&num_cola,sizeof(int),MSG_WAITALL);
-			encolar_proceso(paquete->socket_cliente,num_cola);
+			//recv(paquete->socket_cliente,&num_cola,sizeof(int),MSG_WAITALL);
+			//encolar_proceso(paquete->socket_cliente,num_cola);
 
-			break;
+			//break;
 
 		case OP_ERROR:
 
@@ -101,7 +104,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	free(mensaje_a_enviar_sc);
 	free(mensaje_a_enviar_cc->payload); Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
 	free(mensaje_a_enviar_cc);*/
-
+	fclose(file);
 	liberar_paquete(paquete);
 	finalizar_broker(broker_config,logger);
 }
@@ -109,7 +112,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensaje_a_preparar){ //esta funcion pasa el paquete a una mensaje encolable
 
-				id_cola[paquete->codigo_operacion];
+				id_cola[paquete->codigo_operacion]++;
 
 				mensaje_a_preparar->codigo_operacion= paquete->codigo_operacion;
 				mensaje_a_preparar->id_mensaje=id_cola[paquete->codigo_operacion];
@@ -126,7 +129,7 @@ t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensa
 
 t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete, t_mensaje_cc* mensaje_a_preparar){
 
-				id_cola[paquete->codigo_operacion];
+				id_cola[paquete->codigo_operacion]++;
 				mensaje_a_preparar->codigo_operacion= paquete->codigo_operacion;
 				mensaje_a_preparar->id_mensaje=id_cola[paquete->codigo_operacion];
 				mensaje_a_preparar->payload_size= paquete->buffer->size;

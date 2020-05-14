@@ -16,7 +16,7 @@
 
 
 #define IP "127.0.0.1"
-#define PUERTO "4450"
+#define PUERTO "5001"
 
 typedef struct {
 	char *ip_broker;

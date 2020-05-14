@@ -3,6 +3,8 @@
 
 int main(){
 
+
+
 	int socket_servidor = iniciar_servidor(IP, PUERTO);
 
     while(1){
