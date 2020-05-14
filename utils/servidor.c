@@ -55,13 +55,16 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 	t_paquete_socket* paquete = (t_paquete_socket*)malloc(sizeof(t_paquete_socket));
 	int size_buffer = 0;
-	int cola=0;
 
 	paquete->socket_cliente = socket_cliente;
 
 	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL) == -1){
 		paquete->codigo_operacion= OP_ERROR;
 		}
+
+	if(paquete->codigo_operacion==SUSCRIPCION){
+		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
+	}
 
 	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)) {
 

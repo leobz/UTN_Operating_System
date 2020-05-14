@@ -20,7 +20,6 @@
 #include<pthread.h>
 
 
-#include "../utils/serializacion.h"
 #include "../utils/servidor.h"
 #include "../utils/config.h"
 #include "../utils/log.h"

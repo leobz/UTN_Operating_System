@@ -85,7 +85,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 		case SUSCRIPCION:
-			encolar_proceso(paquete->socket_cliente,paquete->cola);
+			//encolar_proceso(paquete->socket_cliente,paquete->cola);
 
 			break;
 
