@@ -1,6 +1,6 @@
 #include "team.h"
 
-// Configuracion INICIAL
+// CARGAR TEAM_CONFIG
 t_team_config *cargar_team_config(char *path_archivo) {
 	t_config *config;
 	t_team_config *team_config;
@@ -21,6 +21,8 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 			"POKEMON_ENTRENADORES");
 	team_config->objetivos_entrenadores = obtener_lista_de_pokemones(config,
 			"OBJETIVOS_ENTRENADORES");
+	team_config->cantidad_entrenadores = list_size(
+			team_config->objetivos_entrenadores);
 	team_config->tiempoDeReconexion = config_get_int_value(config,
 			"TIEMPO_RECONEXION");
 	team_config->retardo_ciclo_cpu = config_get_int_value(config,
@@ -43,7 +45,7 @@ char** separar_por_pipe(char* string_con_pipes) {
 
 t_posicion* strings_to_posicion(char** string_posicion) {
 	t_posicion* posicion = malloc(sizeof(t_posicion));
-	posicion->x= atoi(string_posicion[0]);
+	posicion->x = atoi(string_posicion[0]);
 	posicion->y = atoi(string_posicion[1]);
 	return posicion;
 }
@@ -82,88 +84,37 @@ void destruir_team_config(t_team_config *team_config) {
 	free(team_config);
 }
 
-
-
 // OBJETIVO GLOBAL
 
 void cargar_objetivo_global(t_team_config* team_config) {
-	objetivo_global = sum_dictionaries_values(team_config->objetivos_entrenadores);
-
-
-	// TODO: usar esta funcion para testear
-	// dictionary_iterator(objetivo_global, imprimirObjetivoGlobal);
+	objetivo_global = sum_dictionaries_values(
+			team_config->objetivos_entrenadores);
 }
-
-void agregar_pokemones_de_entrenador_a_objetivo_global(
-		char** objetivos_entrenadores) {
-	string_iterate_lines(objetivos_entrenadores,
-			agregar_pokemon_a_objetivo_global);
-}
-void agregar_pokemon_a_objetivo_global(char *pokemon) {
-	dictionary_increment_value(objetivo_global, pokemon);
-}
-
-
 
 // CARGA DE TCBs
 
-void crear_tcb_entrenadores() {
+void crear_tcb_entrenadores(t_team_config* team_config) {
 	entrenadores = list_create();
-	int cant_entrenadores = list_size(team_config->objetivos_entrenadores);
+	int cant_entrenadores = team_config->cantidad_entrenadores;
 
 	for (int i = 0; i < cant_entrenadores; i++) {
 		t_tcb_entrenador* entrenador = malloc(sizeof(t_tcb_entrenador));
 		t_posicion* posicion = malloc(sizeof(t_posicion));
-		t_dictionary* pokemones_capturados = dictionary_create();
 		t_dictionary* objetivo = dictionary_create();
+		t_dictionary* pokemones_capturados = dictionary_create();
 
-		posicion = list_get(team_config->posiciones_entrenadores, i);
-		objetivo = list_get(team_config->objetivos_entrenadores, i);
-		pokemones_capturados = list_get(team_config->pokemon_entrenadores, i);
-
-		entrenador->posicion = posicion;
-		entrenador->objetivos = objetivo;
-		entrenador->pokemones_capturados = pokemones_capturados;
+		entrenador->posicion = list_get(team_config->posiciones_entrenadores,
+				i);
+		entrenador->objetivos = list_get(team_config->objetivos_entrenadores,
+				i);
+		entrenador->pokemones_capturados = list_get(
+				team_config->pokemon_entrenadores, i);
 
 		list_add(entrenadores, entrenador);
 	}
 }
 
-
-void imprimirObjetivoGlobal(char* pokemon, int cantidad) {
-	printf("%s: %d\n", pokemon, cantidad);
-}
-
-
-
-void mostrar(void *elemento) {
-	printf("El elemento: %s\n", (char *) elemento);
-}
-/*crear_tcb_entrenadores(t_team_config){
-
- }*/
-
-//int i=0,j,ptr=0,flag;
-/*char strlist[NUMBER_OF_STRING][LENGTH_OF_STRING];
- int count[NUMBER_OF_STRING];
- while (name[i++]!=NULL){
- j=flag=0;
- while (j++<ptr){
- if (strcmp(name[i],strlist[j])){
- flag=1;
- count[j]++;
- break;
- }
- }
- if (!flag){
- strcpy(strlist[ptr],name[i]);
- count[ptr]=1;
- ptr++;
- }
- }
-
- */
-
+// PROCESAR MENSAJES RECIBIDOS
 int obtener_cantidad_global_por_pokemon(char* pokemon) {
 	return dictionary_get(objetivo_global, pokemon);
 }

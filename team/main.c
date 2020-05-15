@@ -1,54 +1,78 @@
 #include "team.h"
 
-void imprimir_lista_de_pokemones(t_list* lista_pokemones) {
-	t_dictionary* dic1 = list_get(lista_pokemones, 0);
-	int cant_pikachu = dictionary_get(dic1, "Pikachu");
-	int cant_pidgey = dictionary_get(dic1, "Pidgey");
+t_team_config* team_config;
 
-	//TODO: sustituir por ASSERTS
-	printf("%d\n", cant_pikachu);
-	printf("%d\n", cant_pidgey);
+void imprimir_diccionario(t_dictionary* diccionario) {
+	void imprimir_clave_valor(char* key, int value) {
+		printf("	%s -> %d\n", key, value);
+	}
+
+	dictionary_iterator(diccionario, imprimir_clave_valor);
 }
 
-void imprimir_posiciones(t_list* posiciones){
+void imprimir_posicion(t_posicion* posicion){
+	printf("	(%d, %d)\n", posicion->x, posicion->y);
+
+}
+
+void imprimir_posiciones(t_list* posiciones) {
 	t_posicion* posicion = list_get(posiciones, 0);
 	//TODO: sustiturir por ASSERTS
-	printf("(%d, %d)\n", posicion->x, posicion->y);
+	imprimir_posicion(posicion);
 }
 
-void imprimir_objetivo_global(){
-	int cantidad_pikachu = dictionary_get(objetivo_global, "Pikachu");
-	int cantidad_charmander = dictionary_get(objetivo_global, "Charmander");
-	int cantidad_pidgey = dictionary_get(objetivo_global, "Pidgey");
 
-	//TODO: sustituir por ASSERTS
-	printf("Cantidad de Pikachus:%d\n", cantidad_pikachu);
-	printf("Cantidad de Charmander:%d\n", cantidad_charmander);
-	printf("Cantidad de Pidgey:%d\n", cantidad_pidgey);
+void imprimir_objetivo_global() {
+
+//	void imprimirObjetivoGlobal(char* pokemon, int cantidad) {
+//		printf("%s: %d\n", pokemon, cantidad);
+//	}
 
 }
+
+void mostrar_lista_entrenadores(t_team_config* team_config) {
+	for (int i = 0; i < team_config->cantidad_entrenadores; i++) {
+		t_tcb_entrenador* entrenador = list_get(entrenadores, i);
+
+		printf("\nEntrenador %d\n", i);
+		printf("  Posicion:\n");
+		imprimir_posicion(entrenador->posicion);
+
+		printf("  Objetivos:\n");
+		imprimir_diccionario(entrenador->objetivos);
+
+
+		printf("  Capturados:\n");
+		imprimir_diccionario(entrenador->pokemones_capturados);
+
+
+	}
+
+}
+//void mostrar(void *elemento) {
+//	printf("El elemento: %s\n", (char *) elemento);
+//}
+
 
 int main() {
 
 	t_team_config *team_config = cargar_team_config("team.config");
 
-	imprimir_lista_de_pokemones(team_config->pokemon_entrenadores);
-	imprimir_lista_de_pokemones(team_config->objetivos_entrenadores);
-	imprimir_posiciones(team_config->posiciones_entrenadores);
-
 	char* puerto = team_config->puerto_broker;
 	char* ip = team_config->ip_broker;
 
+	char* puerto_gameboy = "4444";
+
 	cargar_objetivo_global(team_config);
 	imprimir_objetivo_global();
-	//crear_tcb_entrenadores(t_team_config);
 
-	//crear_pokemon_requeridos();
+	crear_tcb_entrenadores(team_config);
+	mostrar_lista_entrenadores(team_config);
 
-//	int socket_servidor = iniciar_servidor(ip, puerto);
-//
-//    while(1)
-//    	esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+	int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
+
+    while(1)
+    	esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 
 	destruir_objetivo_global();
 	destruir_pokemon_requeridos();

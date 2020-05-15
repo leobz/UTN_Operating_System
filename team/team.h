@@ -35,6 +35,7 @@ typedef struct{
 	t_list* posiciones_entrenadores;
 	t_list* pokemon_entrenadores;
 	t_list* objetivos_entrenadores;
+	int cantidad_entrenadores;
 	int tiempoDeReconexion;
 	int retardo_ciclo_cpu;
 	char *algoritmo_de_planificacion;

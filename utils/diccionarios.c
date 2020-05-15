@@ -23,6 +23,7 @@ t_dictionary* sum_dictionaries_values(t_list* dictionaries_list){
 	void increment_sum_of_dictionaries(char* key, void* value){
 		dictionary_increment_value_in(sum_of_dictionaries, key, value);
 	}
+
 	void merge_dictionary(t_dictionary* dic_entrada){
 		dictionary_iterator(dic_entrada, increment_sum_of_dictionaries);
 	}
