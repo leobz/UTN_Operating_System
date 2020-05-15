@@ -9,6 +9,7 @@
 #define DICCIONARIOS_H_
 
 #include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 #include <stdlib.h>
 
 /**
@@ -31,4 +32,21 @@ t_dictionary* strings_to_dictionary(char** strings);
 */
 void dictionary_increment_value(t_dictionary* dictionary, char* key);
 
+
+/**
+* @NAME: dictionary_increment_value_in
+* @DESC: Si la key ya existe, incrementa su valor en una cantidad X.
+* Si la clave no existe, la agrega y la inicializa en X.
+*
+* Ejemplo:
+* dictionary_increment_value_in("Pikachu", 10): {"Pikachu":2} -> {"Pikachu":12}
+*/
+void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amount);
+
+
+/**
+* @NAME: sum_dictionaries_values
+* @DESC: Dada una lista de diccionarios, retorna la suma de todos los valores.
+*/
+t_dictionary* sum_dictionaries_values(t_list* dictionaries_list);
 #endif /* DICCIONARIOS_H_ */
