@@ -144,33 +144,50 @@ t_list* obtener_lista_posiciones_by_pokemon_requerido(char* pokemon) {
 	return dictionary_get(pokemon_requeridos, pokemon);
 }
 
-void destruir_pokemon_requeridos() {
-	dictionary_destroy_and_destroy_elements(pokemon_requeridos,
-			destruir_lista_posiciones);
+void destruir_posicion(t_posicion* posicion) {
+	free(posicion);
+
 }
 
 void destruir_lista_posiciones(t_list* posiciones) {
 	list_destroy_and_destroy_elements(posiciones, destruir_posicion);
 }
 
-void destruir_posicion(t_posicion* posicion) {
-	free(posicion);
+void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
+	log_info(logger, "[MSG_RECIBIDO] APPEARED_POKEMON: %s %d %d",
+			mensaje_appeared->pokemon,
+			mensaje_appeared->posx,
+			mensaje_appeared->posy);
 }
 
-void procesar_mensaje_recibido(t_paquete* paquete) {
+void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
+	t_list* de_la_especie_en_mapa = dictionary_get(pokemon_requeridos,
+			mensaje->pokemon);
+
+	int cantidad = list_size(de_la_especie_en_mapa);
+	t_posicion* posicion = list_get(de_la_especie_en_mapa, cantidad - 1);
+
+	printf("[AGREGADO]: %s %d %d [TOTAL]: %d\n",
+			mensaje->pokemon,
+			posicion->x,
+			posicion->y,
+			cantidad);
+}
+
+void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared;
 
-	switch (paquete->codigo_operacion) {
-	case APPEARED_POKEMON:
-		mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
-		agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
-		break;
-	case OP_ERROR:
-		pthread_exit(NULL);
-		break;
-	default:
-		pthread_exit(NULL);
-		break;
+
+	switch(paquete->codigo_operacion) {
+		case APPEARED_POKEMON:
+			mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
+			loggear_appeared_recibido(mensaje_appeared);
+			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
+			break;
+
+		default:
+			pthread_exit(NULL);
+			break;
 	}
 }
 
@@ -191,7 +208,8 @@ void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) 
 
 		list_add(lista_posiciones, posicion);
 
-		agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon,
-				lista_posiciones);
+
+		agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
+		imprimir_pokemon_agregado(mensaje);
 	}
 }

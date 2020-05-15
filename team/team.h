@@ -10,6 +10,7 @@
 #include "../utils/diccionarios.h"
 #include "../utils/config.h"
 #include "../utils/servidor.h"
+#include "../utils/log.h"
 
 
 //ESTRUCTURAS
@@ -25,6 +26,8 @@ t_entrenadores* entrenadores;
 typedef enum {
 	REALIZAR_CATCH = 1,
 } type_instruccion;
+
+t_log* logger;
 
 typedef struct {
 	int x;
@@ -88,7 +91,7 @@ void destruir_lista_posiciones(t_list* posiciones);
 void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
-void procesar_mensaje_recibido(t_paquete* paquete);
+void procesar_mensaje_recibido(t_paquete_socket* paquete);
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 
 
@@ -103,6 +106,9 @@ t_list* obtener_lista_de_pokemones(t_config *config, char* clave);
 
 void a_la_lista(char *pokemon_requerido);
 void crear_tcb_entrenadores();
+
+void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared);
+void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje);
 
 #endif
 

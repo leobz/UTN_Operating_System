@@ -1,5 +1,5 @@
-#include "team.h"
-
+#include "main.h"
+t_log* logger;
 t_team_config* team_config;
 
 void imprimir_diccionario(t_dictionary* diccionario) {
@@ -41,10 +41,8 @@ void mostrar_lista_entrenadores(t_team_config* team_config) {
 		printf("  Objetivos:\n");
 		imprimir_diccionario(entrenador->objetivos);
 
-
 		printf("  Capturados:\n");
 		imprimir_diccionario(entrenador->pokemones_capturados);
-
 
 	}
 
@@ -55,6 +53,7 @@ void mostrar_lista_entrenadores(t_team_config* team_config) {
 
 
 int main() {
+	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 
 	t_team_config *team_config = cargar_team_config("team.config");
 
@@ -67,6 +66,8 @@ int main() {
 	imprimir_objetivo_global();
 
 	crear_tcb_entrenadores(team_config);
+	crear_pokemon_requeridos();
+
 	mostrar_lista_entrenadores(team_config);
 
 	int socket_servidor = iniciar_servidor(ip, puerto_gameboy);

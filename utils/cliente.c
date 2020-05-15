@@ -42,8 +42,10 @@ int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido) {
 	buffer_recibido->stream = malloc(size_buffer);
 	recv(socket_cliente, buffer_recibido->stream, buffer_recibido->size, 0);
 
+
 	return codigo_operacion;
 }
+
 
 void liberar_conexion(int socket_cliente) {
 	close(socket_cliente);
