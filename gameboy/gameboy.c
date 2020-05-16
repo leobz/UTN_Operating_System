@@ -10,6 +10,7 @@ int main(int argc, char ** argv) {
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
+
 	}
 
 	if (argc == 3) {
@@ -69,21 +70,24 @@ if(argc == 4){
 			int pos_y= atoi(argv[5]);
 			int cantidad= atoi(argv[6]);
 
-			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
+
+			int conexion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
+
 								printf("ERROR: Conexion con [Broker] no establecida");
 								exit(-1);
 								}
 
+
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x, pos_y,cantidad);
+			void* a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,pos_y,cantidad);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger, "Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d", pokemon, pos_x, pos_y, cantidad);
+			log_info(logger,"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d",pokemon, pos_x, pos_y,cantidad);
 
 			liberar_conexion(conexion);
 			}
@@ -100,26 +104,22 @@ if(argc == 4){
 
 				if (conexion == -1) {
 					printf("ERROR: Conexion con [Broker] no estable1cida");
-					//exit(-1);
+					exit(-1);
 				}
 
 				log_info(logger, "Conexion establecida con [Broker]");
 
 				int bytes;
-				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,
-						pos_x, pos_y);
+				void* a_enviar = serializar_appeared_pokemon(&bytes, pokemon,pos_x, pos_y);
 
 				enviar_mensaje(conexion, a_enviar, bytes);
 
-				log_info(logger,
-						"Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d",
-						pokemon, pos_x, pos_y);
+				log_info(logger,"Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d",pokemon, pos_x, pos_y);
 
 				liberar_conexion(conexion);
 
-			}
 		}
-
+	}
 
 	if (argc == 6) {
 		if ((strcmp(argv[1], "TEAM") == 0)&& (strcmp(argv[2], "APPEARED_POKEMON") == 0)) {
@@ -132,7 +132,7 @@ if(argc == 4){
 
 			if (conexion == -1) {
 				printf("ERROR: Conexion con [Team] no estable1cida");
-				//exit(-1);
+				exit(-1);
 			}
 
 			log_info(logger, "Conexion establecida con [Team]");
@@ -144,10 +144,33 @@ if(argc == 4){
 
 			log_info(logger,"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",pokemon, pos_x, pos_y);
 
+
 			liberar_conexion(conexion);
 
 		}
 	}
+
+	if(strcmp(argv[1], "SUSCRIPCION") == 0){
+			int cola = atoi(argv[2]);
+
+			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
+
+			if (conexion == -1) {
+				printf("ERROR: Conexion con [Broker] no estable1cida");
+				exit(-1);
+			}
+
+			t_suscripcion* suscripcion= malloc(sizeof(t_suscripcion));
+			suscripcion->cod_operacion= SUSCRIPCION;
+			suscripcion->cola_a_suscribir = cola;
+
+			log_info(logger, "Conexion establecida con [Broker]");
+			enviar_mensaje(conexion, suscripcion, sizeof(int)*2);
+
+			log_info(logger, "Mensaje enviado a [Broker]: SUSCRIPCION cola %d", cola);
+
+		liberar_conexion(conexion);
+		}
 
 	finalizar_gameboy(gameboy_config, logger);
 	return 0;

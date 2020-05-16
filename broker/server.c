@@ -13,22 +13,17 @@ t_broker_config* broker_config;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-
-
-
-
-
-
-
 	inicializar_broker(&broker_config,&logger);
 
 	log_info(logger, "[NUEVA CONEXION]: Numero de socket: %d", paquete->socket_cliente);
 
+	t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
+	t_mensaje_sc* mensaje_a_encolar_sc;
+	t_mensaje_sc* mensaje_a_enviar_sc;
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
-			t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
-			t_mensaje_sc* mensaje_a_encolar_sc;
-			t_mensaje_sc* mensaje_a_enviar_sc;
+
+
 
 
 			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
@@ -45,9 +40,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case GET_POKEMON:
 
-			t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
-			t_mensaje_sc* mensaje_a_encolar_sc;
-			t_mensaje_sc* mensaje_a_enviar_sc;
 
 			//	mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 			/*insertar_mensaje_sc(mensaje_a_encolar_sc,GET_POKEMON);
@@ -66,9 +58,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			case APPEARED_POKEMON:
 
-				t_mensaje_cc* mensaje_a_preparar_cc = malloc(sizeof(t_mensaje_cc));
-				t_mensaje_cc* mensaje_a_encolar_cc;
-				t_mensaje_cc* mensaje_a_enviar_cc;
 
 			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
 			/*insertar_mensaje_cc(mensaje_a_encolar_sc,APPEARED_POKEMON);
