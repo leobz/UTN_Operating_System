@@ -60,7 +60,7 @@ t_mensaje_sc* extraer_mensaje_sc(int cola_mensaje){
 
 }
 
-void encolar_mensaje_cc(t_mensaje_cc* nuevo_mensaje, int cola_mensaje){
+void insertar_mensaje_cc(t_mensaje_cc* nuevo_mensaje, int cola_mensaje){
 	if(mensajes_cc[cola_mensaje-reset_indice][FRENTE] == NULL){
 		mensajes_cc[cola_mensaje-reset_indice][FRENTE] = nuevo_mensaje;
 	} else{

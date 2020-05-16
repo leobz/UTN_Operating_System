@@ -212,7 +212,7 @@ void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int p
 	return a_enviar;
 }
 
-void* serializar_catch_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int id_mensaje){
+/*void* serializar_catch_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int id_mensaje){
 	// TODO
 }
 
@@ -222,5 +222,5 @@ void* serializar_new_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos
 
 void* serializar_appeared_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int id_mensaje){
 	// TODO
-}
+}*/
 

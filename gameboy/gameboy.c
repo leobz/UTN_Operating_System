@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
-			char id_mensaje = atoi(argv[6]);
+			//char id_mensaje = atoi(argv[6]);
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
@@ -88,8 +88,8 @@ int main(int argc, char **argv)
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void *a_enviar = serializar_appeared_pokemon_w_message(&bytes, pokemon, pos_x, pos_y, id_mensaje);
-
+			//void *a_enviar = serializar_appeared_pokemon_w_message(&bytes, pokemon, pos_x, pos_y, id_mensaje);
+			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x, pos_y);
 			enviar_mensaje(conexion, a_enviar, bytes);
 
 			log_info(logger, "Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d", pokemon, pos_x, pos_y);
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 		}
 
 		// ./gameboy BROKER CATCH_POKEMON [POKEMON] [POSX] [POSY]
-		if (strcmp(argv[2], "CATCH_POKEMON") == 0){
+		/*if (strcmp(argv[2], "CATCH_POKEMON") == 0){
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 		// ./gameboy BROKER CAUGHT_POKEMON [ID_MENSAJE_CORRELATIVO] [OK/FAIL]
 		if (strcmp(argv[2], "CAUGHT_POKEMON") == 0){
 		}
-
+*/
 		// ./gameboy BROKER GET_POKEMON [POKEMON]
 		if (strcmp(argv[2], "GET_POKEMON") == 0){
 			char *pokemon = argv[3];
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (strcmp(argv[1], "GAMECARD") == 0){
+	/*if (strcmp(argv[1], "GAMECARD") == 0){
 
 		// ./gameboy GAMECARD NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD] [ID_MENSAJE]
 		if (strcmp(argv[2], "NEW_POKEMON") == 0){
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 			liberar_conexion(conexion);			
 		}
 	}
-
+*/
 	finalizar_gameboy(gameboy_config, logger);
 	return 0;
 }

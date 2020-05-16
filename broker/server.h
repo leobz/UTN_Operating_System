@@ -70,8 +70,8 @@ int id_cola[8]; //este es vector de contadores para cada cola cuando les llega u
 pthread_t thread;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
-t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete, t_mensaje_sc* mensaje_a_preparar);
-t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete, t_mensaje_cc* mensaje_a_preparar);
+t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete);
+t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete);
 void liberar_paquete(t_paquete_socket* paquete);
 
 
