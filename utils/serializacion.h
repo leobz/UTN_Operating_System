@@ -8,9 +8,13 @@
 // ESTRUCTURAS
 
 
-typedef enum { OP_ERROR=-1,MENSAJE=1, APPEARED_POKEMON=2, NEW_POKEMON=3, GET_POKEMON=4,
-	           LOCALIZED_POKEMON=5, CATCH_POKEMON=6, CAUGHT_POKEMON=7, SUSCRIPCION=8
-
+typedef enum {
+	OP_ERROR = -1,
+	// Mensaje sin correlativo t_mensaje_sc
+	NEW_POKEMON = 0, GET_POKEMON = 1, CATCH_POKEMON = 2,
+	// Mensaje con correlativo t_mensaje_cc
+	APPEARED_POKEMON = 3, LOCALIZED_POKEMON = 4, CAUGHT_POKEMON = 5,
+	SUSCRIPCION = 6
 	// TODO: Definir codigos de operacion restantes
 } op_code;
 
@@ -55,6 +59,11 @@ void* deserializar_buffer_de_un_string(t_buffer* buffer);
 // NEW_POKEMON
 void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y,int cantidad);
 t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
+
+// GET_POKEMON
+void* serializar_get_pokemon(int* bytes, char* nombre_pokemon);
+t_buffer* buffer_get_pokemon(char* nombre_pokemon);
+
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y);

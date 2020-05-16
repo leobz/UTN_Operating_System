@@ -14,14 +14,9 @@ t_broker_config* broker_config;
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
-/*
-	t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
-	t_mensaje_sc* mensaje_a_encolar_sc;
-	t_mensaje_sc* mensaje_a_enviar_sc;
 
-	t_mensaje_cc* mensaje_a_preparar_cc = malloc(sizeof(t_mensaje_cc));
-	t_mensaje_cc* mensaje_a_encolar_cc;
-	t_mensaje_cc* mensaje_a_enviar_cc;*/
+
+
 
 
 
@@ -31,24 +26,35 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
+			t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
+			t_mensaje_sc* mensaje_a_encolar_sc;
+			t_mensaje_sc* mensaje_a_enviar_sc;
+
 
 			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
 
 
-			//mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
+			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 
-			/*insertar_mensaje_sc(mensaje_a_encolar_sc,NEW_POKEMON);
-			mensaje_a_enviar_sc= extraer_mensaje_sc(NEW_POKEMON);*/
+			insertar_mensaje_sc(mensaje_a_encolar_sc,NEW_POKEMON);
+			mensaje_a_enviar_sc= extraer_mensaje_sc(NEW_POKEMON);
 
+			log_info(logger,"Recibiendo de cola:  %d",mensaje_a_enviar_sc->codigo_operacion);
 			break;
 
 
-		//case GET_POKEMON:
+		case GET_POKEMON:
+
+			t_mensaje_sc* mensaje_a_preparar_sc = malloc(sizeof(t_mensaje_sc));
+			t_mensaje_sc* mensaje_a_encolar_sc;
+			t_mensaje_sc* mensaje_a_enviar_sc;
 
 			//	mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
 			/*insertar_mensaje_sc(mensaje_a_encolar_sc,GET_POKEMON);
 			mensaje_a_enviar_sc= extraer_mensaje_sc(GET_POKEMON);*/
-			//break;
+			log_info(logger,"Recibiendo de cola:  %d",paquete->codigo_operacion);
+
+			break;
 
 			//case CATCH_POKEMON:
 
@@ -58,13 +64,17 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			//break;
 
-			//case APPEARED_POKEMON:
+			case APPEARED_POKEMON:
+
+				t_mensaje_cc* mensaje_a_preparar_cc = malloc(sizeof(t_mensaje_cc));
+				t_mensaje_cc* mensaje_a_encolar_cc;
+				t_mensaje_cc* mensaje_a_enviar_cc;
 
 			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
 			/*insertar_mensaje_cc(mensaje_a_encolar_sc,APPEARED_POKEMON);
-			mensaje_a_enviar_cc= extraer_mensaje_cc(APPEARED_POKEMON);*/
-
-			//break;
+			mensaje_a_enviar_cc= extraer_mensaje(APPEARED_POKEMON);*/
+				log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
+			break;
 
 			//case LOCALIZED_POKEMON:
 
@@ -85,6 +95,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 		case SUSCRIPCION:
+			log_info(logger,"Mensaje recibido con cola a suscribir:  %d",paquete->cola);
 			//encolar_proceso(paquete->socket_cliente,paquete->cola);
 
 			break;
@@ -101,10 +112,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	}
 
 
-	/*free(mensaje_a_enviar_sc->payload); Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
+	free(mensaje_a_preparar_sc->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
 	free(mensaje_a_enviar_sc);
-	free(mensaje_a_enviar_cc->payload); Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
-	free(mensaje_a_enviar_cc);*/
+	//free(mensaje_a_preparar_cc->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
+	//free(mensaje_a_enviar_cc);
 
 	liberar_paquete(paquete);
 	finalizar_broker(broker_config,logger);
