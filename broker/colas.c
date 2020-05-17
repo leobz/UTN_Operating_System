@@ -9,9 +9,7 @@
 
 
 t_cola_proceso *cola_procesos[6][2] = { NULL };
-t_mensaje_sc *mensajes_sc[3][2] = { NULL };
-t_mensaje_cc *mensajes_cc[3][2] = { NULL };
-int reset_indice = 3; // Esta variable es para empezar de cero nuevamente en la matriz
+t_mensaje*mensajes[6][2] = { NULL };
 
 
 
@@ -38,48 +36,25 @@ void encolar_proceso(int socket, int cola){
 	cola_procesos[cola][FIN] = proceso;
 }
 
-void insertar_mensaje_sc(t_mensaje_sc* nuevo_mensaje, int cola_mensaje){
-	if(mensajes_sc[cola_mensaje][FRENTE] == NULL){
-		mensajes_sc[cola_mensaje][FRENTE] = nuevo_mensaje;
+void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
+	if(mensajes[cola_mensaje][FRENTE] == NULL){
+		mensajes[cola_mensaje][FRENTE] = nuevo_mensaje;
 	} else{
-		mensajes_sc[cola_mensaje][FIN]->siguiente = nuevo_mensaje;
+		mensajes[cola_mensaje][FIN]->siguiente = nuevo_mensaje;
 	}
-	mensajes_sc[cola_mensaje][FIN] = nuevo_mensaje;
+	mensajes[cola_mensaje][FIN] = nuevo_mensaje;
 }
 
-t_mensaje_sc* extraer_mensaje_sc(int cola_mensaje){
-	t_mensaje_sc *actual = NULL;
-	actual = mensajes_sc[cola_mensaje][FRENTE];
-	mensajes_sc[cola_mensaje][FRENTE] = mensajes_sc[cola_mensaje][FRENTE]->siguiente;
-	if (mensajes_sc[cola_mensaje][FRENTE] == NULL){
-		mensajes_sc[cola_mensaje][FIN] = NULL;
+t_mensaje* extraer_mensaje(int cola_mensaje){
+	t_mensaje *actual = NULL;
+	actual = mensajes[cola_mensaje][FRENTE];
+	mensajes[cola_mensaje][FRENTE] = mensajes[cola_mensaje][FRENTE]->siguiente;
+	if (mensajes[cola_mensaje][FRENTE] == NULL){
+		mensajes[cola_mensaje][FIN] = NULL;
 	}
 	return actual;
 	// TODO
 	free(actual);
 
 }
-
-void insertar_mensaje_cc(t_mensaje_cc* nuevo_mensaje, int cola_mensaje){
-	if(mensajes_cc[cola_mensaje-reset_indice][FRENTE] == NULL){
-		mensajes_cc[cola_mensaje-reset_indice][FRENTE] = nuevo_mensaje;
-	} else{
-		mensajes_cc[cola_mensaje-reset_indice][FIN]->siguiente = nuevo_mensaje;
-	}
-	mensajes_cc[cola_mensaje-reset_indice][FIN] = nuevo_mensaje;
-}
-
-t_mensaje_cc* extraer_mensaje_cc(int cola_mensaje){
-	t_mensaje_cc *actual = NULL;
-	actual = mensajes_cc[cola_mensaje-reset_indice][FRENTE];
-	mensajes_cc[cola_mensaje-reset_indice][FRENTE] = mensajes_cc[cola_mensaje][FRENTE]->siguiente;
-	if (mensajes_cc[cola_mensaje-reset_indice][FRENTE] == NULL){
-		mensajes_cc[cola_mensaje-reset_indice][FIN] = NULL;
-	}
-	return actual;
-	// TODO
-	free(actual);
-
-}
-
 

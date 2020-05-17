@@ -18,10 +18,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	log_info(logger, "[NUEVA CONEXION]: Numero de socket: %d", paquete->socket_cliente);
 
 
-	if((paquete->codigo_operacion>=0)&&(paquete->codigo_operacion<=2)){
+	if((paquete->codigo_operacion>=0)&&(paquete->codigo_operacion<=5)){
 
-	t_mensaje_sc* mensaje_a_encolar_sc;
-	t_mensaje_sc* mensaje_a_enviar_sc;
+	t_mensaje* mensaje_a_encolar;
+	t_mensaje* mensaje_a_enviar;
 
 		switch(paquete->codigo_operacion) {
 		case NEW_POKEMON:
@@ -29,57 +29,40 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
 
 
-			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete);
+			mensaje_a_encolar= preparar_mensaje(paquete);
 
-			insertar_mensaje_sc(mensaje_a_encolar_sc,NEW_POKEMON);
-			mensaje_a_enviar_sc= extraer_mensaje_sc(NEW_POKEMON);
+			insertar_mensaje(mensaje_a_encolar,NEW_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(NEW_POKEMON);
 
-			log_info(logger,"Recibiendo de cola:  %d",mensaje_a_enviar_sc->codigo_operacion);
+			log_info(logger,"Recibiendo de cola:  %d",mensaje_a_enviar->codigo_operacion);
 			break;
 
 
 		case GET_POKEMON:
 
 
-			mensaje_a_encolar_sc= preparar_mensaje_sc(paquete);
-			insertar_mensaje_sc(mensaje_a_encolar_sc,GET_POKEMON);
-			mensaje_a_enviar_sc= extraer_mensaje_sc(GET_POKEMON);
+			mensaje_a_encolar= preparar_mensaje(paquete);
+			insertar_mensaje(mensaje_a_encolar,GET_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(GET_POKEMON);
 			log_info(logger,"Recibiendo de cola:  %d",paquete->codigo_operacion);
 
 			break;
 
 			//case CATCH_POKEMON:
 
-			//	mensaje_a_encolar_sc= preparar_mensaje_sc(paquete,mensaje_a_preparar_sc);
-			/*insertar_mensaje_sc(mensaje_a_encolar_sc,CATCH_POKEMON);
+			//	mensaje_a_encolar= preparar_mensaje(paquete,mensaje_a_preparar_sc);
+			/*insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
 			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);*/
 
 			//break;
-		default:
-			pthread_exit(NULL);
-		break;
-	}
-
-		free(mensaje_a_encolar_sc->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
-		free(mensaje_a_encolar_sc);
-		liberar_paquete(paquete);
-
-}
-
-	if((paquete->codigo_operacion>=3)&&(paquete->codigo_operacion<=5)){
-
-		t_mensaje_cc* mensaje_a_encolar_cc;
-		t_mensaje_cc* mensaje_a_enviar_cc;
-
-				switch(paquete->codigo_operacion){
 
 			case APPEARED_POKEMON:
 
 
-			mensaje_a_encolar_cc= preparar_mensaje_cc(paquete);
-			insertar_mensaje_cc(mensaje_a_encolar_cc,APPEARED_POKEMON);
-			mensaje_a_enviar_cc= extraer_mensaje_cc(APPEARED_POKEMON);
-			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d", mensaje_a_enviar_cc->codigo_operacion);
+			mensaje_a_encolar= preparar_mensaje(paquete);
+			insertar_mensaje(mensaje_a_encolar,APPEARED_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(APPEARED_POKEMON);
+			log_info(logger,"Mensaje recibido con codigo_de_mensaje:  %d", mensaje_a_enviar->codigo_operacion);
 			break;
 
 			//case LOCALIZED_POKEMON:
@@ -103,8 +86,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			break;
 	}
 
-		free(mensaje_a_encolar_cc->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
-		free(mensaje_a_encolar_cc);
+		free(mensaje_a_encolar->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
+		free(mensaje_a_encolar);
 		liberar_paquete(paquete);
 }
 
@@ -134,27 +117,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 }
 
 
-t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete){ //esta funcion pasa el paquete a una mensaje encolable
+t_mensaje* preparar_mensaje(t_paquete_socket* paquete){
 
-				t_mensaje_sc* mensaje_a_preparar = malloc(sizeof(t_mensaje_sc));
-
-				id_cola[paquete->codigo_operacion]++;
-
-				mensaje_a_preparar->codigo_operacion= paquete->codigo_operacion;
-				mensaje_a_preparar->id_mensaje=id_cola[paquete->codigo_operacion];
-				mensaje_a_preparar->payload_size= paquete->buffer->size;
-				mensaje_a_preparar->payload = malloc(paquete->buffer->size);
-				memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
-				mensaje_a_preparar->siguiente=NULL;
-
-
-
-	return mensaje_a_preparar;
-}
-
-t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete){
-
-				t_mensaje_cc* mensaje_a_preparar = malloc(sizeof(t_mensaje_cc));
+				t_mensaje* mensaje_a_preparar = malloc(sizeof(t_mensaje));
 
 				id_cola[paquete->codigo_operacion]++;
 

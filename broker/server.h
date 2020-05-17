@@ -27,26 +27,16 @@
 
 
 
-typedef struct mensaje_sc{
-
-	op_code codigo_operacion;
-	int id_mensaje;
-	int payload_size;
-	void* payload;
-	struct mensaje_sc* siguiente;
-
-}t_mensaje_sc;
-
-typedef struct mensaje_cc{
+typedef struct mensaje{
 
 	op_code codigo_operacion;
 	int id_mensaje;
 	int id_correlativo;
 	int payload_size;
 	void* payload;
-	struct mensaje_cc* siguiente;
+	struct mensaje* siguiente;
 
-}t_mensaje_cc;
+}t_mensaje;
 
 typedef struct cola_mensaje_recibido{
 	int id_mensaje;
@@ -70,8 +60,7 @@ int id_cola[8]; //este es vector de contadores para cada cola cuando les llega u
 pthread_t thread;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
-t_mensaje_sc* preparar_mensaje_sc(t_paquete_socket* paquete);
-t_mensaje_cc* preparar_mensaje_cc(t_paquete_socket* paquete);
+t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
 void liberar_paquete(t_paquete_socket* paquete);
 
 
