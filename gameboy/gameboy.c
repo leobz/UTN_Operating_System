@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
 			int cantidad = atoi(argv[6]);
+			int id_correlativo = 0;
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x, pos_y, cantidad);
+			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x, pos_y, cantidad, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
-			//char id_mensaje = atoi(argv[6]);
+			int id_correlativo = atoi(argv[6]);
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
@@ -89,10 +90,10 @@ int main(int argc, char **argv)
 
 			int bytes;
 			//void *a_enviar = serializar_appeared_pokemon_w_message(&bytes, pokemon, pos_x, pos_y, id_mensaje);
-			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x, pos_y);
+			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x, pos_y, id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger, "Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d", pokemon, pos_x, pos_y);
+			log_info(logger, "Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d", pokemon, pos_x, pos_y, id_correlativo);
 
 			liberar_conexion(conexion);
 		}
@@ -129,6 +130,7 @@ int main(int argc, char **argv)
 		// ./gameboy BROKER GET_POKEMON [POKEMON]
 		if (strcmp(argv[2], "GET_POKEMON") == 0){
 			char *pokemon = argv[3];
+			int id_correlativo = 0;
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
@@ -141,7 +143,7 @@ int main(int argc, char **argv)
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void *a_enviar = serializar_get_pokemon(&bytes, pokemon);
+			void *a_enviar = serializar_get_pokemon(&bytes, pokemon, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -158,6 +160,7 @@ int main(int argc, char **argv)
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
+			int id_correlativo = 0;
 
 			int conexion = crear_conexion(gameboy_config->ip_team,
 										  gameboy_config->puerto_team);
@@ -171,7 +174,7 @@ int main(int argc, char **argv)
 			log_info(logger, "Conexion establecida con [Team]");
 
 			int bytes;
-			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x, pos_y);
+			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x, pos_y, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 

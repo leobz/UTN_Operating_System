@@ -26,6 +26,7 @@ typedef struct {
 typedef struct {
 	op_code codigo_operacion;
 	t_buffer* buffer;
+	int id_correlativo;
 } t_paquete;
 
 
@@ -47,7 +48,7 @@ typedef struct {
 }t_mensaje_new;
 
 // PAQUETES GENERAL
-t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer);
+t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer, int id_correlativo);
 void eliminar_paquete(t_paquete* paquete);
 void* serializar_paquete(t_paquete* paquete, int bytes);
 
@@ -57,16 +58,16 @@ void* serializar_paquete(t_paquete* paquete, int bytes);
 void* deserializar_buffer_de_un_string(t_buffer* buffer);
 
 // NEW_POKEMON
-void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y,int cantidad);
+void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y,int cantidad, int id_correlativo);
 t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
 
 // GET_POKEMON
-void* serializar_get_pokemon(int* bytes, char* nombre_pokemon);
+void* serializar_get_pokemon(int* bytes, char* nombre_pokemon, int id_correlativo);
 t_buffer* buffer_get_pokemon(char* nombre_pokemon);
 
 
 // APPEARED_POKEMON
-void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y);
+void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int pos_y, int id_correlativo);
 
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 

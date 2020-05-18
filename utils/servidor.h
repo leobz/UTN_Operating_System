@@ -14,6 +14,7 @@ pthread_t thread;
 
 typedef struct {
 	op_code codigo_operacion;
+	int id_correlativo;
 	int socket_cliente;
 	int cola; //Solo para el caso q sea una suscripcion
 	t_buffer* buffer;
