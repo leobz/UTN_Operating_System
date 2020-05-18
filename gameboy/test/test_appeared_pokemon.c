@@ -1,6 +1,6 @@
 #include "test_appeared_pokemon.h"
 
-void empaquetar_y_desempaquetar_appeared_pokemon() {
+/*void empaquetar_y_desempaquetar_appeared_pokemon() {
 	char* pokemon = "pikachu";
 	int pos_x = 1;
 	int pos_y = 2;
@@ -73,4 +73,4 @@ void agregar_tests_appeared_pokemon() {
 			serializar_y_deserializar_appeared_pokemon);
 
 }
-
+*/
