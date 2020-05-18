@@ -65,6 +65,7 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	if(paquete->codigo_operacion==SUSCRIPCION){
 		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
+		recv(socket_cliente, &(paquete->tiempo), sizeof(int), MSG_WAITALL);
 	}
 
 

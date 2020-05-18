@@ -18,6 +18,10 @@ typedef enum {
 	// TODO: Definir codigos de operacion restantes
 } op_code;
 
+typedef enum{
+	FAIL=0, OK=1
+}estado;
+
 typedef struct {
 	int size;
 	void* stream;
@@ -65,13 +69,17 @@ t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cant
 void* serializar_get_pokemon(int* bytes, char* nombre_pokemon, int id_correlativo);
 t_buffer* buffer_get_pokemon(char* nombre_pokemon);
 
+//CATCH_POKEMON
+void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int pos_y, int id_correlativo);
+t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int pos_y, int id_correlativo);
-
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
-
 t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer);
 void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 
+//CAUGHT_POKEMON
+void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
+t_buffer* buffer_caught_pokemon(int estado);
 #endif /* SERIALIZACION_H_ */

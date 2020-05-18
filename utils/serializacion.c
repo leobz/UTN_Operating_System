@@ -81,28 +81,6 @@ t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y, int can
 	return buffer;
 }
 
-t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
-	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
-
-	char *pokemon = strdup(nombre_pokemon);
-	int pokemon_lenght = strlen(pokemon) + 1;
-
-	buffer->size = sizeof(int) * 3 + pokemon_lenght;
-	buffer->stream = malloc(buffer->size);
-
-	int offset = 0;
-	memcpy(buffer->stream + offset, &pokemon_lenght, sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer->stream + offset, pokemon, pokemon_lenght);
-	offset += pokemon_lenght;
-	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
-	offset += sizeof(int);
-	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
-
-	free(pokemon);
-
-	return buffer;
-}
 
 t_buffer* buffer_get_pokemon(char* nombre_pokemon) {
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
@@ -146,39 +124,43 @@ t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
 	return buffer;
 }
 
-void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int pos_y, int id_correlativo) {
 
-	t_buffer* buffer = buffer_appeared_pokemon(nombre_pokemon, pos_x, pos_y);
-	t_paquete *paquete = crear_paquete(APPEARED_POKEMON, buffer, id_correlativo);
+t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 
-	*bytes = paquete->buffer->size + sizeof(int) * 3;
-	void* a_enviar = serializar_paquete(paquete, *bytes);
-	eliminar_paquete(paquete);
+	char *pokemon = strdup(nombre_pokemon);
+	int pokemon_lenght = strlen(pokemon) + 1;
 
-	return a_enviar;
+	buffer->size = sizeof(int) * 3 + pokemon_lenght;
+	buffer->stream = malloc(buffer->size);
+
+	int offset = 0;
+	memcpy(buffer->stream + offset, &pokemon_lenght, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, pokemon, pokemon_lenght);
+	offset += pokemon_lenght;
+	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
+
+	free(pokemon);
+
+	return buffer;
 }
 
-t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
-	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(sizeof(t_mensaje_appeared));
 
-	void* stream = buffer->stream;
+t_buffer* buffer_caught_pokemon(int estado) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 
-	memcpy(&(mensaje_appeared->length_pokemon), stream, sizeof(int));
-	stream += sizeof(int);
+	buffer->size = sizeof(int);
+	buffer->stream = malloc(sizeof(int));
 
-	mensaje_appeared->pokemon = malloc(mensaje_appeared->length_pokemon);
-	memcpy(mensaje_appeared->pokemon, stream, mensaje_appeared->length_pokemon);
-	stream += mensaje_appeared->length_pokemon;
+	memcpy(buffer->stream, &estado, sizeof(int));
 
-	memcpy(&(mensaje_appeared->posx), stream, sizeof(int));
-	stream += sizeof(int);
-
-	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
-	stream += sizeof(int);
-
-	return mensaje_appeared;
+	return buffer;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int cantidad, int id_correlativo) {
 
@@ -215,15 +197,47 @@ void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int 
 	return a_enviar;
 }
 
-/*void* serializar_catch_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int id_mensaje){
-	// TODO
+void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x, int pos_y, int id_correlativo) {
+
+	t_buffer* buffer = buffer_appeared_pokemon(nombre_pokemon, pos_x, pos_y);
+	t_paquete *paquete = crear_paquete(APPEARED_POKEMON, buffer, id_correlativo);
+
+	*bytes = paquete->buffer->size + sizeof(int) * 3;
+	void* a_enviar = serializar_paquete(paquete, *bytes);
+	eliminar_paquete(paquete);
+
+	return a_enviar;
 }
 
-void* serializar_new_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int cantidad, int id_mensaje){
-	// TODO
+void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo){
+	t_buffer* buffer = buffer_caught_pokemon(estado);
+	t_paquete *paquete = crear_paquete(CAUGHT_POKEMON, buffer, id_correlativo);
+
+	*bytes = paquete->buffer->size + sizeof(int) * 3;
+	void* a_enviar = serializar_paquete(paquete, *bytes);
+	eliminar_paquete(paquete);
+
+	return a_enviar;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void* serializar_appeared_pokemon_w_message(int* bytes, char* nombre_pokemon, int pos_x,int pos_y, int id_mensaje){
-	// TODO
-}*/
+t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
+	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(sizeof(t_mensaje_appeared));
 
+	void* stream = buffer->stream;
+
+	memcpy(&(mensaje_appeared->length_pokemon), stream, sizeof(int));
+	stream += sizeof(int);
+
+	mensaje_appeared->pokemon = malloc(mensaje_appeared->length_pokemon);
+	memcpy(mensaje_appeared->pokemon, stream, mensaje_appeared->length_pokemon);
+	stream += mensaje_appeared->length_pokemon;
+
+	memcpy(&(mensaje_appeared->posx), stream, sizeof(int));
+	stream += sizeof(int);
+
+	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
+	stream += sizeof(int);
+
+	return mensaje_appeared;
+}
