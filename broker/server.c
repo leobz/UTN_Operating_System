@@ -22,19 +22,17 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		t_mensaje* mensaje_a_encolar;
 		t_mensaje* mensaje_a_enviar;
 
+		log_info(logger, "Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
+
 		switch (paquete->codigo_operacion) {
+
 		case NEW_POKEMON:
 
-			log_info(logger, "Mensaje recibido con codigo_de_mensaje:  %d",
-					paquete->codigo_operacion);
-
 			mensaje_a_encolar = preparar_mensaje(paquete);
-
 			insertar_mensaje(mensaje_a_encolar, NEW_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(NEW_POKEMON);
 
-			log_info(logger, "Recibiendo de cola:  %d",
-					mensaje_a_enviar->codigo_operacion);
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 			break;
 
 		case GET_POKEMON:
@@ -42,42 +40,50 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			mensaje_a_encolar = preparar_mensaje(paquete);
 			insertar_mensaje(mensaje_a_encolar, GET_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(GET_POKEMON);
-			log_info(logger, "Recibiendo de cola:  %d",
-					paquete->codigo_operacion);
+
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
-			//case CATCH_POKEMON:
+		case CATCH_POKEMON:
 
-			//	mensaje_a_encolar= preparar_mensaje(paquete,mensaje_a_preparar_sc);
-			/*insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
-			 mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);*/
+			mensaje_a_encolar= preparar_mensaje(paquete);
+			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);
 
-			//break;
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
+
+			break;
+
 		case APPEARED_POKEMON:
 
 			mensaje_a_encolar = preparar_mensaje(paquete);
 			insertar_mensaje(mensaje_a_encolar, APPEARED_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(APPEARED_POKEMON);
-			log_info(logger, "Mensaje recibido con codigo_de_mensaje:  %d",
-					mensaje_a_enviar->codigo_operacion);
-			log_info(logger, "Mensaje recibido con id_correlativo:  %d",
-					mensaje_a_enviar->id_correlativo);
+
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
+
 			break;
 
-			//case LOCALIZED_POKEMON:
+		case LOCALIZED_POKEMON:
 
-			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
-			/*insertar_mensaje_sc(mensaje_a_encolar_cc,LOCALIZED_POKEMON);
-			 mensaje_a_enviar_cc= extraer_mensaje_cc(LOCALIZED_POKEMON);*/
+			mensaje_a_encolar= preparar_mensaje(paquete);
+			insertar_mensaje(mensaje_a_encolar,LOCALIZED_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(LOCALIZED_POKEMON);
 
-			//break;
-			//case CAUGHT_POKEMON:
-			//mensaje_a_encolar_cc= preparar_mensaje_cc(paquete,mensaje_a_preparar_cc);
-			/*insertar_mensaje_cc(mensaje_a_encolar_cc,CATCH_POKEMON);
-			 mensaje_a_enviar_cc= extraer_mensaje_cc(CATCH_POKEMON);*/
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
-			//break;
+			break;
+
+		case CAUGHT_POKEMON:
+			mensaje_a_encolar= preparar_mensaje(paquete);
+			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
+			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);
+
+			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
+
+			break;
+
 		default:
 			pthread_exit(NULL);
 
@@ -93,8 +99,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		switch (paquete->codigo_operacion) {
 		case SUSCRIPCION:
-			log_info(logger, "Mensaje recibido con cola a suscribir:  %d",
-					paquete->cola);
+
+			log_info(logger, "Mensaje recibido con cola a suscribir:  %d",paquete->cola);
+			log_info(logger,"Tiempo: %d",paquete->tiempo);
 			//encolar_proceso(paquete->socket_cliente,paquete->cola);
 
 			break;
@@ -126,8 +133,7 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 	mensaje_a_preparar->id_correlativo = paquete->id_correlativo;
 	mensaje_a_preparar->payload_size = paquete->buffer->size;
 	mensaje_a_preparar->payload = malloc(paquete->buffer->size);
-	memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,
-			mensaje_a_preparar->payload_size);
+	memcpy(mensaje_a_preparar->payload, paquete->buffer->stream,mensaje_a_preparar->payload_size);
 	mensaje_a_preparar->siguiente = NULL;
 
 	return mensaje_a_preparar;
