@@ -1,74 +1,69 @@
+# Test Team
 
 ## Inicializacion
-Eliminamos Logs antiguos
-```
-$ rm team.log
 
-```
+Eliminamos Logs antiguos y levantamos Team en segundo plano.
 
-Inicializamos el modulo Team  
-Lo enviamos a segundo plano  
-Guardamos su PID
+```bash
+$ rm team.log; ../team/Debug/team &
+<...>[<job-id>] <pid>
 ```
-$ ../team/Debug/team & 
-[<job-id>] <pid>
-```
-
-En el objetivo Global hay:
-  3 Pikachus
-  2 Squirtles
 
 ## Tests
-Envio de mensajes a TEAM
+
+En el **Objetivo Global** hay: **3 Pikachus** y **2 Squirtles**
 
 ### APPEARED_POKEMON
 
-### Pokemon Pertenece a Objetivo Global se agrega al Mapa
-Enviamos un Pikachu en la Posicion (1,1).
-Como Pikachu pertenece al Objetivo global se agregara al mapa. 
+- - -
 
-```
+#### Pokemon Pertenece a Objetivo Global -> Se agrega al Mapa
+
+Envío Pikachu en posicion (1,1).  
+Como pertenece al Objetivo global lo agrego al mapa.
+
+```bash
 $ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1
 [AGREGADO]: Pikachu 1 1 [TOTAL]: 1
 ```
 
-```
+```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 1 1
 ```
 
-### Pokemon Agregado aumenta el total
-Enviamos otro Pikachu en la Posicion (2,2).
-Como Pikachu pertenece al Objetivo global se agregara al mapa  
-y su cantidad aumenta.
-```
+Envio otro Pikachu (2,2).
+Como ya habia uno, la cantidad aumenta a dos.
+
+```bash
 $ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2
 [AGREGADO]: Pikachu 2 2 [TOTAL]: 2
 ```
 
-```
+```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 2 2
 ```
 
-### Pokemon que no esta en el Objetivo Global no se agrega
-Enviamos un Charmander en la Posicion (1,1).
-Como Charmander no pertenece al Objetivo global no se agrega  
-ni se muestra.
-```
+#### Pokemon No Pertenece a Objetivo Global -> No se agrega
+
+Envío Charmander.  
+Como no pertenece al Objetivo Global no se agrega.
+
+```bash
 $ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1
-
 ```
 
-```
+```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Charmander 1 1
 ```
 
 ## Finalizacion
+
 Cerramos el proceso Team (de otra manera el puerto quedara en uso)
-```
+
+```bash
 $ kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
 [<job-id>]+ Term<...>
 ```
-
