@@ -10,19 +10,25 @@
 t_log* logger;
 t_broker_config* broker_config;
 
+void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
+
+	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
+			op_code_to_string(paquete->codigo_operacion),
+			paquete->id_correlativo);
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	inicializar_broker(&broker_config, &logger);
 
-	log_info(logger, "[NUEVA CONEXION]: Numero de socket: %d",
-			paquete->socket_cliente);
+	loggear_nueva_conexion(logger, paquete);
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 
 		t_mensaje* mensaje_a_encolar;
 		t_mensaje* mensaje_a_enviar;
 
-		log_info(logger, "Mensaje recibido con codigo_de_mensaje:  %d",paquete->codigo_operacion);
+
 
 		switch (paquete->codigo_operacion) {
 
@@ -32,7 +38,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, NEW_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(NEW_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 			break;
 
 		case GET_POKEMON:
@@ -41,7 +46,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, GET_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(GET_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
@@ -51,7 +55,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
 			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
@@ -61,7 +64,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, APPEARED_POKEMON);
 			mensaje_a_enviar = extraer_mensaje(APPEARED_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
@@ -71,7 +73,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar,LOCALIZED_POKEMON);
 			mensaje_a_enviar= extraer_mensaje(LOCALIZED_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
@@ -80,7 +81,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
 			mensaje_a_enviar= extraer_mensaje(CATCH_POKEMON);
 
-			log_info(logger, "ID:  %d",mensaje_a_enviar->id_correlativo);
 
 			break;
 
@@ -100,8 +100,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		switch (paquete->codigo_operacion) {
 		case SUSCRIPCION:
 
-			log_info(logger, "Mensaje recibido con cola a suscribir:  %d",paquete->cola);
-			log_info(logger,"Tiempo: %d",paquete->tiempo);
+			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
+
 			//encolar_proceso(paquete->socket_cliente,paquete->cola);
 
 			break;
