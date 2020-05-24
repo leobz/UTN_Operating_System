@@ -23,7 +23,7 @@ Envío Pikachu en posicion (1,1).
 Como pertenece al Objetivo global lo agrego al mapa.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep 0.1
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep 3 # byexample: +timeout=4 
 [AGREGADO]: Pikachu 1 1 [TOTAL]: 1
 ```
 
@@ -36,7 +36,7 @@ Envio otro Pikachu (2,2).
 Como ya habia uno, la cantidad aumenta a dos.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep 0.1
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep 3 # byexample: +timeout=4 
 [AGREGADO]: Pikachu 2 2 [TOTAL]: 2
 ```
 
@@ -51,7 +51,7 @@ Envío Charmander.
 Como no pertenece al Objetivo Global no se agrega.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep 0.1
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep 3 # byexample: +timeout=4 
 ```
 
 ```bash
