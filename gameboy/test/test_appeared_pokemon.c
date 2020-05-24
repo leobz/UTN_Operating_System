@@ -6,7 +6,7 @@
 	int pos_y = 2;
 
 	t_paquete *paquete = crear_paquete(APPEARED_POKEMON,
-			buffer_appeared_pokemon(pokemon, pos_x, pos_y));
+			buffer_appeared_pokemon(pokemon, pos_x, pos_y), 0);
 
 	t_mensaje_appeared* mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
 
@@ -25,7 +25,7 @@ void serializar_y_deserializar_appeared_pokemon() {
 	int bytes;
 
 	void* mensaje_serializado = serializar_appeared_pokemon(&bytes, pokemon,
-			pos_x, pos_y);
+			pos_x, pos_y, 0);
 
 	deserializar_appeared_pokemon_test(mensaje_serializado, pokemon, pos_x, pos_y);
 

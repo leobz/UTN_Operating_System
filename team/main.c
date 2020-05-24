@@ -1,29 +1,37 @@
 #include "main.h"
-t_log* logger;
+#include "test/testing.h"
 
-int main(){
+t_log* logger;
+t_team_config* team_config;
+
+int main(int argc, char ** argv) {
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 
-	// TODO:HardCodeo datos de conexion con gameboy(puerto e IP)
-	//Borrar cuando pueda cargarse por archivo de configuracion
-	char* ip = "127.0.0.1";
-	char* puerto = "4444";
+	t_team_config *team_config = cargar_team_config("team.config");
 
-	inicializar_objetivo_global();
+	char* puerto = team_config->puerto_broker;
+	char* ip = team_config->ip_broker;
 
-	// TODO:HardCodeo dos pikachus en el Objetivo global.
-	//Borrar cuando pueda cargarse por archivo de configuracion
-	agregar_pokemon_a_objetivo_global("pikachu", 2);
+	char* puerto_gameboy = "4444";
 
+	cargar_objetivo_global(team_config);
+
+	crear_tcb_entrenadores(team_config);
 	crear_pokemon_requeridos();
 
-	int socket_servidor = iniciar_servidor(ip, puerto);
+	if (argc == 2) {
+		if (strcmp(argv[1], "test") == 0)
+			mostrar_lista_entrenadores(team_config);
+	} else {
+		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
 
-    while(1)
-    	esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+		while (1)
+			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 
-    destruir_objetivo_global();
-    destruir_pokemon_requeridos();
+		destruir_objetivo_global();
+		destruir_pokemon_requeridos();
+		destruir_team_config(team_config);
+		return 0;
+	}
 
-    return 0;
 }
