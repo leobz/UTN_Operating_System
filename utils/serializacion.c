@@ -241,3 +241,27 @@ t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
 
 	return mensaje_appeared;
 }
+
+char* op_code_to_string(int enum_value){
+	switch (enum_value) {
+	case OP_ERROR:
+		return "OP_ERROR";
+	case NEW_POKEMON:
+		return "NEW_POKEMON";
+	case GET_POKEMON:
+		return "GET_POKEMON";
+	case CATCH_POKEMON:
+		return "CATCH_POKEMON";
+	case APPEARED_POKEMON:
+		return "APPEARED_POKEMON";
+	case LOCALIZED_POKEMON:
+		return "LOCALIZED_POKEMON";
+	case CAUGHT_POKEMON:
+		return "CAUGHT_POKEMON";
+	case SUSCRIPCION:
+		return "SUSCRIPCION";
+	default:
+		return "NULL";
+	}
+}
+

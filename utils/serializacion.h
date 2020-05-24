@@ -82,4 +82,7 @@ void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
+
+// UTILIDADES
+char* op_code_to_string(int enum_value);
 #endif /* SERIALIZACION_H_ */
