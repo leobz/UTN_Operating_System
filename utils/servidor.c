@@ -39,14 +39,15 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 {
 	struct sockaddr_in dir_cliente;
 
-
 	socklen_t tam_direccion = sizeof(struct sockaddr_in);
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);         //cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
-																//del cliente y opcionalmente un idntififcador de colas en caso de ser suscripcion
-																//pq a procesar_mensaje_recibido solo se le puede pasar un argumento
+	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);
+	/* cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
+	 * del cliente y opcionalmente un idntififcador de colas en caso de ser suscripcion
+	 * pq a procesar_mensaje_recibido solo se le puede pasar un argumento
+	 */
 
 	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);
@@ -55,7 +56,6 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 	t_paquete_socket* paquete = (t_paquete_socket*)malloc(sizeof(t_paquete_socket));
 	int size_buffer = 0;
-	int cola=0;
 
 	paquete->socket_cliente = socket_cliente;
 
@@ -63,14 +63,15 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 		paquete->codigo_operacion= OP_ERROR;
 		}
 
-	if((paquete->codigo_operacion == SUSCRIPCION)&&(paquete->codigo_operacion != OP_ERROR)){
-		recv(socket_cliente,&cola,sizeof(int), 0);
-		paquete->cola=cola;
-		}
+	if(paquete->codigo_operacion==SUSCRIPCION){
+		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
+		recv(socket_cliente, &(paquete->tiempo), sizeof(int), MSG_WAITALL);
+	}
 
 
 	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)) {
-
+		// si lo que recivo es un mensaje
+		recv(socket_cliente, &(paquete->id_correlativo), sizeof(int), MSG_WAITALL);
 		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);
 
 		paquete->buffer = (t_buffer*)malloc(sizeof(t_buffer));
