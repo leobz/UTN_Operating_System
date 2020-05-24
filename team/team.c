@@ -35,17 +35,16 @@ t_list* obtener_lista_posiciones_by_pokemon_requerido(char* pokemon) {
 	return dictionary_get(pokemon_requeridos, pokemon);
 }
 
-
-void destruir_posicion(t_posicion* posicion) {
-	free(posicion);
+void destruir_pokemon_requeridos() {
+	dictionary_destroy_and_destroy_elements(pokemon_requeridos, destruir_lista_posiciones);
 }
 
 void destruir_lista_posiciones(t_list* posiciones) {
 	list_destroy_and_destroy_elements(posiciones, destruir_posicion);
 }
 
-void destruir_pokemon_requeridos() {
-	dictionary_destroy_and_destroy_elements(pokemon_requeridos, destruir_lista_posiciones);
+void destruir_posicion(t_posicion* posicion) {
+	free(posicion);
 }
 
 void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
@@ -70,6 +69,7 @@ void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
+
 	t_mensaje_appeared* mensaje_appeared;
 
 	switch(paquete->codigo_operacion) {
@@ -79,7 +79,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			loggear_appeared_recibido(mensaje_appeared);
 			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
 			break;
-
+		case OP_ERROR:
+			pthread_exit(NULL);
+			break;
 		default:
 			pthread_exit(NULL);
 			break;

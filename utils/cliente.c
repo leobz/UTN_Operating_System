@@ -15,8 +15,8 @@ int crear_conexion(char *ip, char* puerto) {
 			server_info->ai_socktype, server_info->ai_protocol);
 
 	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)
-			== -1){
-		printf("WARNING: Error al conectar con IP:%s Puerto:%s\n",ip,puerto);
+			== -1) {
+		printf("WARNING: Error al conectar con IP:%s Puerto:%s\n", ip, puerto);
 		return -1;
 	}
 
@@ -42,10 +42,8 @@ int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido) {
 	buffer_recibido->stream = malloc(size_buffer);
 	recv(socket_cliente, buffer_recibido->stream, buffer_recibido->size, 0);
 
-
 	return codigo_operacion;
 }
-
 
 void liberar_conexion(int socket_cliente) {
 	close(socket_cliente);
