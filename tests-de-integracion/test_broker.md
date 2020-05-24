@@ -1,38 +1,52 @@
+# Test de Broker
+
 ## Inicializacion
-Borrar logs anteriores
-```
-$ rm broker.log
-<...>
-```
 
-Levantar broker y pasarlo a segundo plano
-```
-$ ../broker/Debug/broker &
-[<job-id>] <pid>
+Borrar Logs anteriores y levanto el Broker en segundo plano
+
+```bash
+$ rm broker.log ; ../broker/Debug/broker &
+<...>[<job-id>] <pid>
 ```
 
-## Envio de mensajes
+- - - - - - - - - - - - -
 
-NEW: pikachu en posicion (1,1) cantidad: 1
+## NEW_POKEMON
 
-```
-$ ../gameboy/Debug/gameboy BROKER NEW pikachu 1 1 1
+Envio el mensaje
 
-```
-
-Comprobamos que el CODIDO_DE_OPERACION es NEW = 3
-
-```
-$ cat broker.log 
-<...>Mensaje recibido con codigo_de_mensaje:  3
+```bash
+$ ../gameboy/Debug/gameboy BROKER NEW_POKEMON pikachu 1 1 1
 ```
 
+Compruebo recepción del mensaje con Código de Operación e ID
 
-## Finalizacion
+```bash
+$ cat broker.log
+<...>[CONEXION] COD_OP:NEW_POKEMON ID:0
+```
+
+## SUSCRIPCIÓN
+
+Suscripción a NEW_POKEMON
+
+(Corregir: debe ser "SUSCRIPTOR" y no SUSCRIPCION -  Se pone NEW_POKEMON no cero)
+
+```bash
+$ ../gameboy/Debug/gameboy SUSCRIPCION 0 10
+```
+
+```bash
+$ cat broker.log
+<...>[CONEXION] COD_OP:SUSCRIPCION ID:0
+<...>[SUSCRIPCION] Cola:NEW_POKEMON
+```
+
+## Finalización
+
 Cierro broker (De otro modo el puerto queda sin poder usarse)
 
-```
+```bash
 $ kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
 [<job-id>]+ Term<...>
 ```
-
