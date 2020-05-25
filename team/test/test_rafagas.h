@@ -14,6 +14,6 @@ void test_cargar_rafaga_movimiento_cuadrante_1_3();
 
 void test_cargar_rafaga_captura();
 
-void test_leer_instrucciones(tcb_entrenador* tcb, int cantidad, int instruccion);
+void test_leer_instrucciones(t_tcb_entrenador* tcb, int cantidad, int instruccion);
 
 #endif /* TEST_TEST_RAFAGAS_H_ */

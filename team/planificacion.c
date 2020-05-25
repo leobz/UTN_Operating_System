@@ -10,18 +10,18 @@ t_list* blocked;
 // esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
 
-int main(int argc, char ** argv) {
-	inicializar_listas();
-
-	if (argc == 2) {
-		if (strcmp(argv[1], "test") == 0) {
-			correrTests();
-		}
-	}
-
-	// Cuando aparece
-	return 0;
-}
+//int main(int argc, char ** argv) {
+//	inicializar_listas();
+//
+//	if (argc == 2) {
+//		if (strcmp(argv[1], "test") == 0) {
+//			correrTests();
+//		}
+//	}
+//
+//	// Cuando aparece
+//	return 0;
+//}
 
 void inicializar_listas() {
 	ready = list_create();
@@ -29,14 +29,14 @@ void inicializar_listas() {
 	new = list_create();
 }
 
-void pasar_a_ready(tcb_entrenador* tcb) {
+void pasar_a_ready(t_tcb_entrenador* tcb) {
 	// TODO: implementar ordenamiento por cercania
 	list_add(ready, tcb);
-	tcb->estado = READY;
+	tcb->estado_tcb = READY;
 }
 
-tcb_entrenador* siguiente_tcb_a_ejecutar() {
-	tcb_entrenador* siguiente_tcb;
+t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
+	t_tcb_entrenador* siguiente_tcb;
 	switch (ALGORITMO_PLANIFICACION) {
 	case FIFO:
 		siguiente_tcb = list_pop_first(ready);
@@ -51,21 +51,21 @@ tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	return siguiente_tcb;
 }
 
-void cargar_instruccion(tcb_entrenador* tcb, int instruccion) {
+void cargar_instruccion(t_tcb_entrenador* tcb, int instruccion) {
 	queue_push(tcb->rafaga, instruccion);
 }
 
-void cargar_rafaga_captura(tcb_entrenador* tcb, t_posicion posicion_pokemon) {
+void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
 	cargar_rafaga_movimiento(tcb, posicion_pokemon);
 	cargar_instruccion(tcb, CATCH);
 
 }
 
-void cargar_rafaga_intercambio(tcb_entrenador* tcb) {
+void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
 	// TODO
 }
 
-void cargar_rafaga_movimiento(tcb_entrenador* tcb, t_posicion posicion_pokemon) {
+void cargar_rafaga_movimiento(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
 	int movimientos = 0;
 
 	while (movimientos < distancia_entre(tcb->posicion, posicion_pokemon)) {
@@ -74,15 +74,15 @@ void cargar_rafaga_movimiento(tcb_entrenador* tcb, t_posicion posicion_pokemon) 
 	}
 }
 
-int distancia_entre(t_posicion inicio, t_posicion destino) {
-	int delta_x = destino.x - inicio.x;
-	int delta_y = destino.y - inicio.y;
+int distancia_entre(t_posicion* inicio, t_posicion* destino) {
+	int delta_x = destino->x - inicio->x;
+	int delta_y = destino->y - inicio->y;
 
 	return fabs(delta_x + delta_y);
 }
 
-void cargar_tcb_captura(tcb_entrenador* tcb, t_pokemon* pokemon) {
-	cargar_rafaga_captura(tcb, pokemon->posicion); // TODO: Decidir si esto simplemente va a ser un entero
+void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
+	cargar_rafaga_captura(tcb, pokemon->posicion ); // TODO: Decidir si esto simplemente va a ser un entero
 	tcb->pokemon_a_capturar = pokemon;
 	tcb->instruccion = CATCH;
 }

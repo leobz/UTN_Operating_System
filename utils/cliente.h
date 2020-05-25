@@ -9,9 +9,14 @@
 #include<unistd.h>
 #include "serializacion.h"
 
+
+
 int crear_conexion(char* ip, char* puerto);
+
 void enviar_mensaje(int socket_cliente, void* a_enviar, int bytes);
 int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido);
+
+
 void liberar_conexion(int socket_cliente);
 
 #endif
