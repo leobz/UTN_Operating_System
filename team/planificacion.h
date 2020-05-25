@@ -1,5 +1,5 @@
-#ifndef MAIN_H_
-#define MAIN_H_
+#ifndef PLANIFICACION_H_
+#define PLANIFICACION_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,4 +74,4 @@ int distancia_entre(t_posicion inicio, t_posicion destino);
 // Ejecucion de TCB
 tcb_entrenador* siguiente_tcb_a_ejecutar();
 
-#endif /* MAIN_H_ */
+#endif /* PLANIFICACION_H_ */

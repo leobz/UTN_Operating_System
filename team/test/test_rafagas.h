@@ -2,7 +2,8 @@
 #define TEST_TEST_RAFAGAS_H_
 
 #include "CUnit/Basic.h"
-#include "../main.h"
+
+#include "../planificacion.h"
 #include "common_testing.h"
 
 void agregar_tests_rafagas();

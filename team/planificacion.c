@@ -1,4 +1,5 @@
-#include "main.h"
+#include "planificacion.h"
+
 #include "test/testing.h"
 
 t_list* ready;

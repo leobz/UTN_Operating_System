@@ -2,7 +2,8 @@
 #define TEST_TEST_LISTA_READY_H_
 
 #include "CUnit/Basic.h"
-#include "../main.h"
+
+#include "../planificacion.h"
 #include "common_testing.h"
 
 void agregar_tests_lista_ready();
