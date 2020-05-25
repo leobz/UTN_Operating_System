@@ -32,7 +32,7 @@ void testear_rafaga_movimiento(t_posicion inicio, t_posicion destino,
 
 void test_leer_instrucciones(tcb_entrenador* tcb, int cantidad, int instruccion) {
 	for (int i = 0; i < cantidad; i++) {
-		CU_ASSERT_EQUAL(queue_peek(tcb->rafaga), MOVERSE);
+		CU_ASSERT_EQUAL(queue_peek(tcb->rafaga), instruccion);
 		queue_pop(tcb->rafaga);
 	}
 }
