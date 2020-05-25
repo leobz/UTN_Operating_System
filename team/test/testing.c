@@ -1,4 +1,6 @@
+#include "CUnit/Basic.h"
 #include "testing.h"
+
 
 void imprimir_diccionario(t_dictionary* diccionario) {
 	void imprimir_clave_valor(char* key, int value) {
@@ -43,10 +45,14 @@ void mostrar_lista_entrenadores(t_team_config* team_config) {
 }
 
 void correrTests() {
+	CU_initialize_registry();
+	agregar_tests_lista_ready();
+	agregar_tests_rafagas();
+	CU_basic_set_mode(CU_BRM_VERBOSE);
+	CU_basic_run_tests();
+	CU_cleanup_registry();
+
 	imprimir_objetivo_global();
-//	CU_initialize_registry();
-//	CU_basic_set_mode(CU_BRM_VERBOSE);
-//	CU_basic_run_tests();
-//	CU_cleanup_registry();
 
 }
+

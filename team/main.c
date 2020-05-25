@@ -21,7 +21,9 @@ int main(int argc, char ** argv) {
 
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
+			correrTests();
 			mostrar_lista_entrenadores(team_config);
+
 	} else {
 		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
 

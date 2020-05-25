@@ -11,6 +11,7 @@
 #include "../utils/config.h"
 #include "../utils/servidor.h"
 #include "../utils/log.h"
+#include <commons/collections/queue.h>
 
 
 //ESTRUCTURAS
@@ -22,17 +23,30 @@ t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemon_requeridos;
 t_entrenadores* entrenadores;
 
-
-typedef enum {
-	REALIZAR_CATCH = 1,
-} type_instruccion;
-
 t_log* logger;
 
 typedef struct {
 	int x;
 	int y;
 } t_posicion;
+
+typedef enum {
+	NEW = 1,
+	READY = 2,
+	BLOCKED = 3,
+	EXEC = 4,
+	EXIT = 5,
+	//estado_tcbS INTERMEDIOS
+	READY_TO_EXCHANGE = 6,
+} estado_tcb;
+
+
+typedef enum {
+	MOVERSE = 1,
+	CATCH = 2,
+	INTERCAMBIAR = 3,
+} instruccion;
+
 
 typedef struct{
 	t_list* posiciones_entrenadores;
@@ -56,17 +70,18 @@ typedef struct{
 	t_posicion* posicion;
 }t_pokemon;
 
+
 typedef struct{
 	pthread_t* entrenador;
-	int TID;
+	int tid;
 	t_posicion* posicion;
 	t_dictionary* objetivos;
-	type_instruccion instruccion;
-	t_list* rafaga;
-	t_pokemon* pokemon_a_capturar;
+	t_queue* rafaga;
 	struct t_tcb_entrenador* entrenador_a_intercambiar;
 	int pokemones_max;
 	t_dictionary* pokemones_capturados;
+	estado_tcb estado_tcb;
+	t_pokemon* pokemon_a_capturar;
 }t_tcb_entrenador;
 
 

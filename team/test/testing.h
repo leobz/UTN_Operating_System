@@ -1,10 +1,10 @@
-#ifndef TEST_TESTING_H_
-#define TEST_TESTING_H_
+#ifndef TESTING_H_
+#define TESTING_H_
 
 #include "CUnit/Basic.h"
 #include "../main.h"
-
+#include "test_lista_ready.h"
+#include "test_rafagas.h"
 void correrTests();
 
-
-#endif /* TEST_TESTING_H_ */
+#endif /* TESTING_H_ */
