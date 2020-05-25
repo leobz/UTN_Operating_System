@@ -45,9 +45,6 @@ void mostrar_lista_entrenadores(t_team_config* team_config) {
 }
 
 void correrTests() {
-	printf("HOLA");
-
-	printf("CHAU\n");
 	CU_initialize_registry();
 	agregar_tests_lista_ready();
 	agregar_tests_rafagas();
