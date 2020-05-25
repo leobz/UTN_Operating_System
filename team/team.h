@@ -81,7 +81,6 @@ typedef struct{
 	int pokemones_max;
 	t_dictionary* pokemones_capturados;
 	estado_tcb estado_tcb;
-	instruccion instruccion;
 	t_pokemon* pokemon_a_capturar;
 }t_tcb_entrenador;
 

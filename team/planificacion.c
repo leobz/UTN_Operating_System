@@ -10,18 +10,6 @@ t_list* blocked;
 // esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
 
-//int main(int argc, char ** argv) {
-//	inicializar_listas();
-//
-//	if (argc == 2) {
-//		if (strcmp(argv[1], "test") == 0) {
-//			correrTests();
-//		}
-//	}
-//
-//	// Cuando aparece
-//	return 0;
-//}
 
 void inicializar_listas() {
 	ready = list_create();
@@ -82,7 +70,6 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino) {
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
-	cargar_rafaga_captura(tcb, pokemon->posicion ); // TODO: Decidir si esto simplemente va a ser un entero
+	cargar_rafaga_captura(tcb, pokemon->posicion );
 	tcb->pokemon_a_capturar = pokemon;
-	tcb->instruccion = CATCH;
 }
