@@ -12,7 +12,7 @@ sleep-time=<sleep-time>
 Compilo Broker
 
 ```shell
-$ make clean -C ../broker/Debug; make -C ../broker/Debug      # byexample: +timeout=10
+$ make clean -C ../broker/Debug; make -C ../broker/Debug      # byexample: +timeout=10 +fail-fast
 <...>Finished building target: broker<...>
 ```
 
