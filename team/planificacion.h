@@ -36,5 +36,10 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino);
 
 // Ejecucion de TCB
 t_tcb_entrenador* siguiente_tcb_a_ejecutar();
+void ejecutar_rafaga(t_tcb_entrenador*);
+void ejecutar_instruccion(int, t_tcb_entrenador*);
+
+// Mensajes
+void enviar_mensaje_catch(t_tcb_entrenador*, t_pokemon*);
 
 #endif /* PLANIFICACION_H_ */
