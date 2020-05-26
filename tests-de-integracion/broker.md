@@ -2,6 +2,13 @@
 
 ## Inicializacion
 
+Cargo configuración del test
+
+```shell
+$ cat byexample.config
+sleep-time=<sleep-time>
+```
+
 Compilo Broker
 
 ```shell
@@ -23,7 +30,7 @@ $ rm *.log ; ../broker/Debug/broker &
 Envio el mensaje
 
 ```bash
-$ ../gameboy/Debug/gameboy BROKER NEW_POKEMON pikachu 1 1 1; sleep 0.1 # byexample: +timeout=8
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy BROKER NEW_POKEMON pikachu 1 1 1; sleep <sleep-time> # byexample: +timeout=8 +paste
 ```
 
 Compruebo recepción del mensaje con Código de Operación e ID
@@ -40,7 +47,7 @@ Suscripción a NEW_POKEMON
 (Corregir: debe ser "SUSCRIPTOR" y no SUSCRIPCION -  Se pone NEW_POKEMON no cero)
 
 ```bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION 0 10; sleep 0.1 # byexample: +timeout=4 
+$ ../gameboy/Debug/gameboy SUSCRIPCION 0 10; sleep <sleep-time> # byexample: +timeout=4 +paste
 ```
 
 ```bash
