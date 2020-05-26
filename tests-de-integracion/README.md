@@ -19,7 +19,7 @@ $ byexample -V
 ## Correr los tests
 Para ejecutar el test de team ejecutar
 ```
-$ byexample -l shell test_team.md
+$ byexample -l shell team.md
 ```
 
 En caso de querer ejecutar otro test, solo cambiar el nombre del archivo test.

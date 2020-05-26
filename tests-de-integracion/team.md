@@ -2,10 +2,17 @@
 
 ## Inicializacion
 
+Compilo Team
+
+```bash
+$ make clean -C ../team/Debug; make -C ../team/Debug          # byexample: +timeout=10
+<...>Finished building target: team<...>
+```
+
 Eliminamos Logs antiguos y levantamos Team en segundo plano.
 
 ```bash
-$ rm team.log; ../team/Debug/team &
+$ rm *.log; ../team/Debug/team &
 <...>[<job-id>] <pid>
 ```
 
@@ -23,7 +30,7 @@ Envío Pikachu en posicion (1,1).
 Como pertenece al Objetivo global lo agrego al mapa.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep 3 # byexample: +timeout=4 
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep 0.1 # byexample: +timeout=4
 [AGREGADO]: Pikachu 1 1 [TOTAL]: 1
 ```
 
@@ -36,7 +43,7 @@ Envio otro Pikachu (2,2).
 Como ya habia uno, la cantidad aumenta a dos.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep 3 # byexample: +timeout=4 
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep 0.1 # byexample: +timeout=4
 [AGREGADO]: Pikachu 2 2 [TOTAL]: 2
 ```
 
@@ -51,7 +58,7 @@ Envío Charmander.
 Como no pertenece al Objetivo Global no se agrega.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep 3 # byexample: +timeout=4 
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep 0.1 # byexample: +timeout=4
 ```
 
 ```bash
@@ -64,6 +71,6 @@ $ cat team.log
 Cerramos el proceso Team (de otra manera el puerto quedara en uso)
 
 ```bash
-$ kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
+$ rm *.log; kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
 [<job-id>]+ Term<...>
 ```
