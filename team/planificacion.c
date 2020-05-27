@@ -6,6 +6,8 @@ t_list* ready;
 t_list* new;
 t_list* blocked;
 
+t_dictionary* enviaron_catch;
+
 // TODO: ALGORITMO_PLANIFICACION y SLEEP_TIME se debe cargar por configuracion, pero como no tengo
 // esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
@@ -18,9 +20,19 @@ void inicializar_listas() {
 	new = list_create();
 }
 
+void inicializar_diccionarios(){
+	enviaron_catch = dictionary_create();
+}
+
 void pasar_a_ready(t_tcb_entrenador* tcb) {
 	// TODO: implementar ordenamiento por cercania
 	list_add(ready, tcb);
+	tcb->estado_tcb = READY;
+}
+
+void pasar_a_blocked(t_tcb_entrenador* tcb) {
+	// TODO: implementar ordenamiento por cercania
+	list_add(blocked, tcb);
 	tcb->estado_tcb = READY;
 }
 
@@ -134,17 +146,31 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 
 	int pos_x = pokemon->posicion->x;
 	int pos_y = pokemon->posicion->y;
-	int id_correlativo = 0;
 
-	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, id_correlativo);
+	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
 	enviar_mensaje(conexion, a_enviar, bytes);
 
-	//TODO: Esperar el ID correlativo
-	//recv()
+	pasar_a_blocked(tcb);
 
-	// Pasar a bloqueado el tcb
+	char* id_correlativo = recibir_id_correlativo(conexion);
 
-	// Agregar TCB a diccionario "envio_catch" que tiene por clave un id_correlativo y una key que apunta al tcb
 
+	agregar_a_enviaron_catch(id_correlativo, tcb);
 	liberar_conexion(conexion);
+}
+
+
+char* recibir_id_correlativo(int socket_cliente) {
+	int id_correlativo_int;
+	char id_correlativo_char[10];
+
+	recv(socket_cliente, &id_correlativo_int, sizeof(int), 0);
+
+	snprintf(id_correlativo_char, 10, "%d", id_correlativo_int);
+
+	return id_correlativo_char;
+}
+
+void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb){
+	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }

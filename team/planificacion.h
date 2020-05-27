@@ -10,7 +10,7 @@
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
 
-
+t_dictionary* enviaron_catch;
 
 // ESTRUCTURAS
 
@@ -22,6 +22,7 @@ typedef enum {
 
 // Inicializacion
 void inicializar_listas();
+void inicializar_diccionarios();
 
 // Carga de TCB
 void pasar_a_ready(t_tcb_entrenador* tcb);
@@ -41,5 +42,7 @@ void ejecutar_instruccion(int, t_tcb_entrenador*);
 
 // Mensajes
 void enviar_mensaje_catch(t_tcb_entrenador*, t_pokemon*);
+char* recibir_id_correlativo(int);
+void agregar_a_enviaron_catch(char*, t_tcb_entrenador*);
 
 #endif /* PLANIFICACION_H_ */
