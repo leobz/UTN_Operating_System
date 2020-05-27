@@ -28,11 +28,13 @@ void serializar_y_deserializar_appeared_pokemon() {
 	void* mensaje_serializado = serializar_appeared_pokemon(&bytes, pokemon,
 			pos_x, pos_y, 0);
 
-	deserializar_appeared_pokemon_test(mensaje_serializado, pokemon, pos_x, pos_y);
+	test_deserializar_buffer_appeared_pokemon(mensaje_serializado, pokemon, pos_x, pos_y);
 
 }
 
-void deserializar_appeared_pokemon_test(void* mensaje_serializado, char* pokemon, int pos_x, int pos_y) {
+void test_deserializar_buffer_appeared_pokemon(void* mensaje_serializado, char* pokemon, int pos_x, int pos_y) {
+
+	//POR HACER: TODO ESTO SE PUEDE ABSTRAER EN UNA FUNCION GENERICA QUE SIRVA PARA TESTEAR OTROS MENSAJES
 	t_paquete* paquete = (t_paquete*) malloc(sizeof(t_paquete));
 	paquete->buffer = (t_buffer*) malloc(sizeof(t_buffer));
 	t_mensaje_appeared* mensaje_appeared;
@@ -52,6 +54,8 @@ void deserializar_appeared_pokemon_test(void* mensaje_serializado, char* pokemon
 
 	memcpy(paquete->buffer->stream, mensaje_serializado + offset, paquete->buffer->size);
 
+
+	// ESTA ES LA FUNCION QUE SE TESTEA
 	mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
 
 	CU_ASSERT_EQUAL(paquete->codigo_operacion, APPEARED_POKEMON);
