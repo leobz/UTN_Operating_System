@@ -1,6 +1,6 @@
 #include "test_appeared_pokemon.h"
 
-/*void empaquetar_y_desempaquetar_appeared_pokemon() {
+void empaquetar_y_desempaquetar_appeared_pokemon() {
 	char* pokemon = "pikachu";
 	int pos_x = 1;
 	int pos_y = 2;
@@ -18,6 +18,7 @@
 	eliminar_paquete(paquete);
 	eliminar_mensaje_appeared(mensaje_appeared);
 }
+
 void serializar_y_deserializar_appeared_pokemon() {
 	char* pokemon = "pikachu";
 	int pos_x = 1;
@@ -38,7 +39,10 @@ void deserializar_appeared_pokemon_test(void* mensaje_serializado, char* pokemon
 	int size = 0;
 	int offset = 0;
 
+
 	memcpy(&(paquete->codigo_operacion), mensaje_serializado + offset, sizeof(int));
+	offset += sizeof(int);
+	memcpy(&(paquete->id_correlativo), mensaje_serializado + offset, sizeof(int));
 	offset += sizeof(int);
 	memcpy(&(size), mensaje_serializado + offset, sizeof(int));
 	offset += sizeof(int);
@@ -73,4 +77,4 @@ void agregar_tests_appeared_pokemon() {
 			serializar_y_deserializar_appeared_pokemon);
 
 }
-*/
+
