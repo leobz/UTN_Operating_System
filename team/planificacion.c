@@ -76,6 +76,7 @@ void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 }
 
 void ejecutar_rafaga(t_tcb_entrenador* tcb){
+	//TODO: Esta funcion la tiene que correr el hilo entrenador
 	while (!queue_is_empty(tcb->rafaga))
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
@@ -85,7 +86,8 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 	switch (instruccion){
 	case MOVERSE:
 		sleep(SLEEP_TIME);
-		printf("Moviendose un paso\n");
+		actualizar_posicion(tcb);
+		printf("Posicion del TCB (%d, %d)", tcb->posicion->x, tcb->posicion->y);
 		break;
 	case CATCH:
 		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
@@ -94,6 +96,30 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 		//TODO
 		break;
 	}
+}
+
+void actualizar_posicion(t_tcb_entrenador* tcb){
+	t_posicion* destino = tcb->pokemon_a_capturar->posicion;
+	t_posicion* inicio = tcb->posicion;
+
+	int delta_x = destino->x - inicio->x;
+	int delta_y = destino->y - inicio->y;
+
+	if (delta_x > 0){
+		inicio->x++;
+	}
+	else if( delta_x < 0){
+		inicio->x--;
+	}
+	else if( delta_x == 0){
+		if( delta_y > 0){
+			inicio->y++;
+		}
+		else if(delta_y < 0){
+			inicio->y--;
+		}
+	}
+
 }
 
 void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
@@ -112,6 +138,13 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 
 	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, id_correlativo);
 	enviar_mensaje(conexion, a_enviar, bytes);
+
+	//TODO: Esperar el ID correlativo
+	//recv()
+
+	// Pasar a bloqueado el tcb
+
+	// Agregar TCB a diccionario "envio_catch" que tiene por clave un id_correlativo y una key que apunta al tcb
 
 	liberar_conexion(conexion);
 }
