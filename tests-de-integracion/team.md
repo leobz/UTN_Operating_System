@@ -12,7 +12,7 @@ sleep-time=<sleep-time>
 Compilo Team
 
 ```bash
-$ make clean -C ../team/Debug; make -C ../team/Debug          # byexample: +timeout=10 +fail-fast
+$ make clean -C ../team/Debug; make -C ../team/Debug; sleep <sleep-time> # byexample: +timeout=10 +fail-fast +paste
 <...>Finished building target: team<...>
 ```
 

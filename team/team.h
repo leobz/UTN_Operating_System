@@ -17,11 +17,13 @@
 //ESTRUCTURAS
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
-typedef t_list t_entrenadores;
 
 t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemon_requeridos;
-t_entrenadores* entrenadores;
+
+t_list* ready;
+t_list* new;
+t_list* blocked;
 
 t_log* logger;
 
@@ -108,6 +110,7 @@ void destruir_posicion(t_posicion* posicion);
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
+void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 
 
 // CONFIG

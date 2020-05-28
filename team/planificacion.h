@@ -10,8 +10,6 @@
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
 
-
-
 // ESTRUCTURAS
 
 typedef enum {
