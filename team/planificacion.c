@@ -2,10 +2,6 @@
 
 #include "test/testing.h"
 
-t_list* ready;
-t_list* new;
-t_list* blocked;
-
 // TODO: ALGORITMO_PLANIFICACION se debe cargar por configuracion, pero como no tengo
 // esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;

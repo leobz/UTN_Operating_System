@@ -94,7 +94,7 @@ void cargar_objetivo_global(t_team_config* team_config) {
 // CARGA DE TCBs
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
-	entrenadores = list_create();
+	new = list_create();
 	int cant_entrenadores = team_config->cantidad_entrenadores;
 
 	for (int i = 0; i < cant_entrenadores; i++) {
@@ -109,8 +109,9 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 				i);
 		entrenador->pokemones_capturados = list_get(
 				team_config->pokemon_entrenadores, i);
+		entrenador->estado_tcb = NEW;
 
-		list_add(entrenadores, entrenador);
+		list_add(new, entrenador);
 	}
 }
 
@@ -183,6 +184,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
 			loggear_appeared_recibido(mensaje_appeared);
 			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
+			pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
 			break;
 
 		default:
@@ -208,8 +210,39 @@ void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) 
 
 		list_add(lista_posiciones, posicion);
 
-
 		agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
 		imprimir_pokemon_agregado(mensaje);
 	}
+}
+
+void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
+	int distancia_cercana = 0;
+	t_tcb_entrenador* entrenador_cercano = NULL;
+
+	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
+		t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
+		int nueva_distancia = 0;
+
+		posicion_pokemon->x = mensaje->posx;
+		posicion_pokemon->y = mensaje->posy;
+
+		nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
+
+		if (entrenador_cercano == NULL){
+			distancia_cercana = nueva_distancia;
+			entrenador_cercano = entrenador;
+		}
+		else{
+			if (distancia_cercana > nueva_distancia){
+				distancia_cercana = nueva_distancia;
+				entrenador_cercano = entrenador;
+			}
+		}
+
+		free(posicion_pokemon);
+	}
+
+	list_iterate(new, elegir_entrenador_cercano);
+
+	pasar_a_ready(entrenador_cercano);
 }

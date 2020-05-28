@@ -28,7 +28,7 @@ void imprimir_objetivo_global() {
 
 void mostrar_lista_entrenadores(t_team_config* team_config) {
 	for (int i = 0; i < team_config->cantidad_entrenadores; i++) {
-		t_tcb_entrenador* entrenador = list_get(entrenadores, i);
+		t_tcb_entrenador* entrenador = list_get(new, i);
 
 		printf("\nEntrenador %d\n", i);
 		printf("  Posicion:\n");
