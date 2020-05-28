@@ -2,10 +2,6 @@
 
 #include "test/testing.h"
 
-t_list* ready;
-t_list* new;
-t_list* blocked;
-
 t_dictionary* enviaron_catch;
 
 // TODO: ALGORITMO_PLANIFICACION y SLEEP_TIME se debe cargar por configuracion, pero como no tengo

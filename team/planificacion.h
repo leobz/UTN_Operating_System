@@ -10,6 +10,7 @@
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
 
+
 t_dictionary* enviaron_catch;
 
 // ESTRUCTURAS
