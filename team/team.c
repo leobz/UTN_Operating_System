@@ -94,7 +94,6 @@ void cargar_objetivo_global(t_team_config* team_config) {
 // CARGA DE TCBs
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
-	new = list_create();
 	int cant_entrenadores = team_config->cantidad_entrenadores;
 
 	for (int i = 0; i < cant_entrenadores; i++) {

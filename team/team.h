@@ -17,7 +17,6 @@
 //ESTRUCTURAS
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
-typedef t_list t_entrenadores;
 
 t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemon_requeridos;

@@ -21,8 +21,6 @@ void agregar_tests_lista_ready() {
 }
 
 void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
-	inicializar_listas();
-
 	t_tcb_entrenador* tcb_1 = tcb_generico(1);
 
 	pasar_a_ready(tcb_1);
@@ -36,8 +34,6 @@ void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 }
 
 void pasar_a_ready_cambia_estado_tcb_a_ready() {
-	inicializar_listas();
-
 	t_tcb_entrenador* tcb = tcb_generico(NULL);
 	CU_ASSERT_EQUAL(tcb->estado_tcb, NEW);
 
@@ -47,8 +43,6 @@ void pasar_a_ready_cambia_estado_tcb_a_ready() {
 }
 
 void pasar_a_ready_agrega_tcb_a_ready() {
-	inicializar_listas();
-
 	t_tcb_entrenador* tcb = tcb_generico(NULL);
 
 	pasar_a_ready(tcb);
