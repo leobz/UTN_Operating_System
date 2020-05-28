@@ -29,7 +29,7 @@ void pasar_a_ready(t_tcb_entrenador* tcb) {
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	// TODO: implementar ordenamiento por cercania
 	list_add(blocked, tcb);
-	tcb->estado_tcb = READY;
+	tcb->estado_tcb = BLOCKED;
 }
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
