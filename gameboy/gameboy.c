@@ -253,8 +253,8 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [GAMECARD]");
 
 			int bytes;
-			void *a_enviar = serializar_new_pokemon_w_message(&bytes, pokemon,
-					pos_x, pos_y, cantidad, id_mensaje);
+			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
+					pos_y, cantidad, id_mensaje);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -283,8 +283,8 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [GAMECARD]");
 
 			int bytes;
-			void *a_enviar = serializar_catch_pokemon_w_message(&bytes, pokemon,
-					pos_x, pos_y, id_mensaje);
+			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,
+					pos_y, id_mensaje);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [GAMECARD]");
 
 			int bytes;
-			void *a_enviar = serializar_get_pokemon_w_message(&bytes, pokemon,
+			void *a_enviar = serializar_get_pokemon(&bytes, pokemon,
 					id_mensaje);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
