@@ -27,36 +27,49 @@ $ rm *.log; ../team/Debug/team &
 
 En el **Objetivo Global** hay: **3 Pikachus** y **2 Squirtles**
 
-### APPEARED_POKEMON
+Posición entrenadores: (1,1) (3,3) (5,5)
+
+### APPEARED_POKEMON 1
 
 - - -
 
 #### Pokemon Pertenece a Objetivo Global -> Se agrega al Mapa
 
-Envío Pikachu en posicion (1,1).  
-Como pertenece al Objetivo global lo agrego al mapa.
+Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al mapa.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep <sleep-time> # byexample: +timeout=4 +paste
-[AGREGADO]: Pikachu 1 1 [TOTAL]: 1
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste
+<...>
+[AGREGADO]: Pikachu 6 6 [TOTAL]: 1
+<...>
+```
+
+#### Se agrega al Mapa -> Se planifica entrenador
+
+El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
+
+```bash
+$ cat team.log
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(5,5)
+```
+
+### APPEARED_POKEMON 2
+
+#### Misma especie -> Se aumenta cantidad
+
+Envio otro Pikachu (3,3). Como ya habia uno, la cantidad aumenta a dos.
+Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
+
+```bash
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 3 3; sleep <sleep-time> # byexample: +timeout=4 +paste
+[AGREGADO]: Pikachu 3 3 [TOTAL]: 2
 ```
 
 ```bash
 $ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 1 1
-```
-
-Envio otro Pikachu (2,2).
-Como ya habia uno, la cantidad aumenta a dos.
-
-```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep <sleep-time> # byexample: +timeout=4 +paste
-[AGREGADO]: Pikachu 2 2 [TOTAL]: 2
-```
-
-```bash
-$ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 2 2
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 3 3
+<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(3,3)
 ```
 
 #### Pokemon No Pertenece a Objetivo Global -> No se agrega
