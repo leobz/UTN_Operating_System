@@ -32,13 +32,9 @@ void planificar(){
 	while(1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
 		if (!list_is_empty(ready)){
-			printf("Planifico un TCB\n");
-			printf("\n");
-
 			tcb_exec = siguiente_tcb_a_ejecutar();
 
-			//TODO: BORRAR LUEGO
-			printf("(%d, %d) \n", tcb_exec->posicion->x, tcb_exec->posicion->y);
+			//printf("(%d, %d) \n", tcb_exec->posicion->x, tcb_exec->posicion->y);
 			//ejecutar_rafaga(tcb_exec);
 		}
 }

@@ -39,7 +39,6 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 
 ```bash
 $ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste
-<...>
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 1
 <...>
 ```
