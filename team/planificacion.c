@@ -27,19 +27,20 @@ void iniciar_planificador(){
 }
 
 void planificar(){
+	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 
-}
+	while(1)
+		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
+		if (!list_is_empty(ready)){
+			printf("Planifico un TCB\n");
+			printf("\n");
 
-void pasar_a_ready(t_tcb_entrenador* tcb) {
-	// TODO: implementar ordenamiento por cercania
-	list_add(ready, tcb);
-	tcb->estado_tcb = READY;
-}
+			tcb_exec = siguiente_tcb_a_ejecutar();
 
-void pasar_a_blocked(t_tcb_entrenador* tcb) {
-	// TODO: implementar ordenamiento por cercania
-	list_add(blocked, tcb);
-	tcb->estado_tcb = BLOCKED;
+			//TODO: BORRAR LUEGO
+			printf("(%d, %d) \n", tcb_exec->posicion->x, tcb_exec->posicion->y);
+			//ejecutar_rafaga(tcb_exec);
+		}
 }
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
@@ -58,8 +59,9 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	return siguiente_tcb;
 }
 
-void cargar_instruccion(t_tcb_entrenador* tcb, int instruccion) {
-	queue_push(tcb->rafaga, instruccion);
+void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
+	cargar_rafaga_captura(tcb, pokemon->posicion );
+	tcb->pokemon_a_capturar = pokemon;
 }
 
 void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
@@ -81,39 +83,15 @@ void cargar_rafaga_movimiento(t_tcb_entrenador* tcb, t_posicion* posicion_pokemo
 	}
 }
 
+void cargar_instruccion(t_tcb_entrenador* tcb, int instruccion) {
+	queue_push(tcb->rafaga, instruccion);
+}
+
 int distancia_entre(t_posicion* inicio, t_posicion* destino) {
 	int delta_x = fabs(destino->x - inicio->x);
 	int delta_y = fabs(destino->y - inicio->y);
 
 	return delta_x + delta_y;
-}
-
-void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
-	cargar_rafaga_captura(tcb, pokemon->posicion );
-	tcb->pokemon_a_capturar = pokemon;
-}
-
-void ejecutar_rafaga(t_tcb_entrenador* tcb){
-	//TODO: Esta funcion la tiene que correr el hilo entrenador
-	while (!queue_is_empty(tcb->rafaga))
-		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
-		queue_pop(tcb->rafaga);
-}
-
-void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
-	switch (instruccion){
-	case MOVERSE:
-		sleep(SLEEP_TIME);
-		actualizar_posicion(tcb);
-		printf("Posicion del TCB (%d, %d)", tcb->posicion->x, tcb->posicion->y);
-		break;
-	case CATCH:
-		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
-		break;
-	case INTERCAMBIAR:
-		//TODO
-		break;
-	}
 }
 
 void actualizar_posicion(t_tcb_entrenador* tcb){
@@ -138,6 +116,29 @@ void actualizar_posicion(t_tcb_entrenador* tcb){
 		}
 	}
 
+}
+
+void ejecutar_rafaga(t_tcb_entrenador* tcb){
+	//TODO: Esta funcion la tiene que correr el hilo entrenador
+	while (!queue_is_empty(tcb->rafaga))
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+}
+
+void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
+	switch (instruccion){
+	case MOVERSE:
+		sleep(SLEEP_TIME);
+		actualizar_posicion(tcb);
+		printf("Posicion del TCB (%d, %d)", tcb->posicion->x, tcb->posicion->y);
+		break;
+	case CATCH:
+		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
+		break;
+	case INTERCAMBIAR:
+		//TODO
+		break;
+	}
 }
 
 void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
@@ -179,4 +180,16 @@ char* recibir_id_correlativo(int socket_cliente) {
 
 void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb){
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
+}
+
+void pasar_a_ready(t_tcb_entrenador* tcb) {
+	// TODO: implementar ordenamiento por cercania
+	list_add(ready, tcb);
+	tcb->estado_tcb = READY;
+}
+
+void pasar_a_blocked(t_tcb_entrenador* tcb) {
+	// TODO: implementar ordenamiento por cercania
+	list_add(blocked, tcb);
+	tcb->estado_tcb = BLOCKED;
 }
