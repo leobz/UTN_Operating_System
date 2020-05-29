@@ -222,6 +222,119 @@ void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo) {
 	return a_enviar;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+t_buffer* buffer_new_pokemon_w_message(char* nombre_pokemon, int pos_x,
+		int pos_y, int cantidad, int id_mensaje) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
+
+	char *pokemon = strdup(nombre_pokemon);
+	int pokemon_length = strlen(pokemon) + 1;
+
+	buffer->size = sizeof(int) * 4 + pokemon_length;
+	buffer->stream = malloc(buffer->size);
+
+	int offset = 0;
+	memcpy(buffer->stream + offset, &pokemon_length, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, pokemon, pokemon_length);
+	offset += pokemon_length;
+	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &cantidad, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &id_mensaje, sizeof(int));
+
+	free(pokemon);
+
+	return buffer;
+}
+
+t_buffer* buffer_catch_pokemon_w_message(char* nombre_pokemon, int pos_x,
+		int pos_y, int id_mensaje) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
+
+	char *pokemon = strdup(nombre_pokemon);
+	int pokemon_lenght = strlen(pokemon) + 1;
+
+	buffer->size = sizeof(int) * 3 + pokemon_lenght;
+	buffer->stream = malloc(buffer->size);
+
+	int offset = 0;
+	memcpy(buffer->stream + offset, &pokemon_lenght, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, pokemon, pokemon_lenght);
+	offset += pokemon_lenght;
+	memcpy(buffer->stream + offset, &pos_x, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &pos_y, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &id_mensaje, sizeof(int));
+
+	free(pokemon);
+
+	return buffer;
+}
+
+t_buffer* buffer_get_pokemon_w_message(char* nombre_pokemon, int id_mensaje) {
+	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
+
+	char *pokemon = strdup(nombre_pokemon);
+	int pokemon_length = strlen(pokemon) + 1;
+
+	buffer->size = sizeof(int) + pokemon_length;
+	buffer->stream = malloc(buffer->size);
+
+	int offset = 0;
+	memcpy(buffer->stream + offset, &pokemon_length, sizeof(int));
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, pokemon, pokemon_length);
+	offset += sizeof(int);
+	memcpy(buffer->stream + offset, &id_mensaje, sizeof(int));
+
+	free(pokemon);
+
+	return buffer;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+void* serializar_new_pokemon_w_message(int* bytes, char* nombre_pokemon,
+		int pos_x, int pos_y, int cantidad, int id_mensaje, int id_correlativo) {
+	t_buffer* buffer = buffer_new_pokemon_w_message(nombre_pokemon, pos_x,
+			pos_y, cantidad, id_mensaje);
+	t_paquete *paquete = crear_paquete(NEW_POKEMON, buffer, id_correlativo);
+
+	*bytes = paquete->buffer->size + sizeof(int) * 4; //TODO: Consultar a diego si esta bien
+	void* a_enviar = serializar_paquete(paquete, *bytes);
+	eliminar_paquete(paquete);
+
+	return a_enviar;
+}
+
+void* serializar_catch_pokemon_w_message(int* bytes, char* nombre_pokemon,
+		int pos_x, int pos_y, int cantidad, int id_mensaje, int id_correlativo) {
+	t_buffer* buffer = buffer_catch_pokemon_w_message(nombre_pokemon, pos_x,
+			pos_y, id_mensaje);
+	t_paquete *paquete = crear_paquete(CATCH_POKEMON, buffer, id_correlativo);
+
+	*bytes = paquete->buffer->size + sizeof(int) * 4; //TODO: Consultar a diego si esta bien
+	void* a_enviar = serializar_paquete(paquete, *bytes);
+	eliminar_paquete(paquete);
+
+	return a_enviar;
+}
+
+void* serializar_get_pokemon_w_message(int* bytes, char* nombre_pokemon,
+		int pos_x, int pos_y, int cantidad, int id_mensaje, int id_correlativo) {
+	t_buffer* buffer = buffer_get_pokemon_w_message(nombre_pokemon,
+			id_mensaje);
+	t_paquete *paquete = crear_paquete(NEW_POKEMON, buffer, id_correlativo);
+
+	*bytes = paquete->buffer->size + sizeof(int) * 4; //TODO: Consultar a diego si esta bien
+	void* a_enviar = serializar_paquete(paquete, *bytes);
+	eliminar_paquete(paquete);
+
+	return a_enviar;
+}
 
 t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
 	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(
