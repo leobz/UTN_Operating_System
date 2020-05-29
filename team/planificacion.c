@@ -21,6 +21,15 @@ void inicializar_diccionarios(){
 	enviaron_catch = dictionary_create();
 }
 
+void iniciar_planificador(){
+	pthread_create(&planificador,NULL,(void*)planificar, NULL);
+	pthread_detach(planificador);
+}
+
+void planificar(){
+
+}
+
 void pasar_a_ready(t_tcb_entrenador* tcb) {
 	// TODO: implementar ordenamiento por cercania
 	list_add(ready, tcb);

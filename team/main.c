@@ -28,6 +28,7 @@ int main(int argc, char ** argv) {
 	} else {
 		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
 
+		iniciar_planificador();
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 

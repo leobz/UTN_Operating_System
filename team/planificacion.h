@@ -12,6 +12,7 @@
 
 
 t_dictionary* enviaron_catch;
+pthread_t planificador;
 
 // ESTRUCTURAS
 
@@ -24,6 +25,8 @@ typedef enum {
 // Inicializacion
 void inicializar_listas();
 void inicializar_diccionarios();
+void iniciar_planificador();
+void planificar();
 
 // Carga de TCB
 void pasar_a_ready(t_tcb_entrenador* tcb);
