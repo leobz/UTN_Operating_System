@@ -1,7 +1,5 @@
 #include "test_lista_ready.h"
 
-t_list* ready;
-
 void agregar_tests_lista_ready() {
 	CU_pSuite suite_configuracion = CU_add_suite("TCBs en Ready", NULL,
 	NULL);
@@ -22,6 +20,7 @@ void agregar_tests_lista_ready() {
 
 void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 	t_tcb_entrenador* tcb_1 = tcb_generico(1);
+	list_clean(ready);
 
 	pasar_a_ready(tcb_1);
 	CU_ASSERT_PTR_EQUAL(list_get(ready, 0), tcb_1);
@@ -35,6 +34,8 @@ void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 
 void pasar_a_ready_cambia_estado_tcb_a_ready() {
 	t_tcb_entrenador* tcb = tcb_generico(NULL);
+	list_clean(ready);
+
 	CU_ASSERT_EQUAL(tcb->estado_tcb, NEW);
 
 	pasar_a_ready(tcb);
@@ -44,6 +45,7 @@ void pasar_a_ready_cambia_estado_tcb_a_ready() {
 
 void pasar_a_ready_agrega_tcb_a_ready() {
 	t_tcb_entrenador* tcb = tcb_generico(NULL);
+	list_clean(ready);
 
 	pasar_a_ready(tcb);
 	t_tcb_entrenador* tcb_en_ready = list_get(ready, 0);
