@@ -24,6 +24,7 @@ t_pokemon_requeridos* pokemon_requeridos;
 t_list* ready;
 t_list* new;
 t_list* blocked;
+t_list* unblocked;
 
 t_log* logger;
 

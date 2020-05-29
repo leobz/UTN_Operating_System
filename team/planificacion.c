@@ -14,6 +14,7 @@ void inicializar_listas() {
 	ready = list_create();
 	blocked = list_create();
 	new = list_create();
+	unblocked = list_create();
 }
 
 void inicializar_diccionarios(){
