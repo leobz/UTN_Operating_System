@@ -59,10 +59,10 @@ void cargar_rafaga_movimiento(t_tcb_entrenador* tcb, t_posicion* posicion_pokemo
 }
 
 int distancia_entre(t_posicion* inicio, t_posicion* destino) {
-	int delta_x = destino->x - inicio->x;
-	int delta_y = destino->y - inicio->y;
+	int delta_x = fabs(destino->x - inicio->x);
+	int delta_y = fabs(destino->y - inicio->y);
 
-	return fabs(delta_x + delta_y);
+	return delta_x + delta_y;
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
