@@ -3,8 +3,6 @@
 void agregar_tests_entrenador_cercano_a_ready() {
 	CU_pSuite suite_configuracion = CU_add_suite("TCBs en Ready", NULL, NULL);
 
-
-
 	CU_add_test(suite_configuracion,
 			"Al encontrar el entrenador mas cercano al pokemon: TCB cambia su estado_tcb a READY",
 			entrenador_cercano_cambia_estado_a_ready);

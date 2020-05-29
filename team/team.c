@@ -109,6 +109,7 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->pokemones_capturados = list_get(
 				team_config->pokemon_entrenadores, i);
 		entrenador->estado_tcb = NEW;
+		entrenador->rafaga = queue_create();
 
 		list_add(new, entrenador);
 	}
@@ -240,7 +241,11 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 			}
 		}
 
-		free(posicion_pokemon);
+		t_pokemon* pokemon = malloc(sizeof(t_pokemon));
+		pokemon->pokemon = mensaje->pokemon;
+		pokemon->posicion = posicion_pokemon;
+
+		cargar_tcb_captura(entrenador_cercano, pokemon);
 	}
 
 	list_iterate(new, elegir_entrenador_cercano);
