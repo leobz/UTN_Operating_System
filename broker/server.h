@@ -18,46 +18,24 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<pthread.h>
+#include<semaphore.h>
 
 
-#include "../utils/servidor.h"
-#include "../utils/config.h"
-#include "../utils/log.h"
+
+#include "../utils/cliente.h"
 #include "broker.h"
 
 
+t_log* logger;
+t_broker_config* broker_config;
 
-typedef struct mensaje{
 
-	op_code codigo_operacion;
-	int id_mensaje;
-	int id_correlativo;
-	int payload_size;
-	void* payload;
-	struct mensaje* siguiente;
 
-}t_mensaje;
-
-typedef struct cola_mensaje_recibido{
-	int id_mensaje;
-	struct cola_mensaje_recibido* siguiente;
-}t_cola_mensaje_recibido;
-
-typedef struct cola_mensaje_confirmado{
-	int id_mensaje;
-	struct cola_mensaje_confirmado* siguiente;
-}t_cola_mensaje_confirmado;
-
-typedef struct cola_proceso{
-	int socket_cliente;
-	t_cola_mensaje_recibido* mensaje_recibido;
-	t_cola_mensaje_confirmado* mensaje_confirmado;
-	struct cola_proceso* siguiente;
-}t_cola_proceso;
-
-int id_cola[8]; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
+int id_mensaje; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
 
 pthread_t thread;
+sem_t cola_vacia[6];
+sem_t sem_proceso[6];
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
