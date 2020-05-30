@@ -34,8 +34,6 @@ void planificar(){
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
 		if (!list_is_empty(ready)){
 			tcb_exec = siguiente_tcb_a_ejecutar();
-
-			//printf("(%d, %d) \n", tcb_exec->posicion->x, tcb_exec->posicion->y);
 			ejecutar_rafaga(tcb_exec);
 		}
 }
@@ -130,12 +128,14 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 	case MOVERSE:
 		sleep(SLEEP_TIME);
 		actualizar_posicion(tcb);
+		//TODO: Pasar a formato log (es requisito del tp)
 		printf("[EXEC] TID:%d Instruccion:MOVERSE  Posicion:(%d, %d)\n",
 				tcb->tid,
 				tcb->posicion->x,
 				tcb->posicion->y);
 		break;
 	case CATCH:
+		//TODO: Pasar a formato log (es requisito del tp)
 		printf("[EXEC] TID:%d Instruccion:CATCH\n", tcb->tid);
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
@@ -153,6 +153,7 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
 	while (conexion == -1) {
+		//TODO: Pasar a formato log (es requisito del tp)
 		printf("ERROR: Conexion con [Broker] no establecida. Reintentando...");
 		sleep(SLEEP_TIME_CONEXION);
 		conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
@@ -189,13 +190,11 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb){
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb) {
-	// TODO: implementar ordenamiento por cercania
 	list_add(ready, tcb);
 	tcb->estado_tcb = READY;
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
-	// TODO: implementar ordenamiento por cercania
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
 }
