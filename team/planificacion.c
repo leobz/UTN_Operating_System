@@ -4,10 +4,11 @@
 
 t_dictionary* enviaron_catch;
 
-// TODO: ALGORITMO_PLANIFICACION y SLEEP_TIME se debe cargar por configuracion, pero como no tengo
-// esa parte lo hardcodeo. Borrar esto al obtener configuracion
+// TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
+//pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
 SLEEP_TIME = 1;
+SLEEP_TIME_CONEXION = 10;
 
 
 void inicializar_listas() {
@@ -35,7 +36,7 @@ void planificar(){
 			tcb_exec = siguiente_tcb_a_ejecutar();
 
 			//printf("(%d, %d) \n", tcb_exec->posicion->x, tcb_exec->posicion->y);
-			//ejecutar_rafaga(tcb_exec);
+			ejecutar_rafaga(tcb_exec);
 		}
 }
 
@@ -116,9 +117,12 @@ void actualizar_posicion(t_tcb_entrenador* tcb){
 
 void ejecutar_rafaga(t_tcb_entrenador* tcb){
 	//TODO: Esta funcion la tiene que correr el hilo entrenador
-	while (!queue_is_empty(tcb->rafaga))
+	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
+	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+	while (!queue_is_empty(tcb->rafaga)){
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
+	}
 }
 
 void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
@@ -126,10 +130,18 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 	case MOVERSE:
 		sleep(SLEEP_TIME);
 		actualizar_posicion(tcb);
-		printf("Posicion del TCB (%d, %d)", tcb->posicion->x, tcb->posicion->y);
+		printf("[EXEC] TID:%d Instruccion:MOVERSE  Posicion:(%d, %d)\n",
+				tcb->tid,
+				tcb->posicion->x,
+				tcb->posicion->y);
 		break;
 	case CATCH:
+		printf("[EXEC] TID:%d Instruccion:CATCH\n", tcb->tid);
+		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
+		// a que me devuelvan un id_correlativo y eso puede tardar
 		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
+		pasar_a_blocked(tcb);
+
 		break;
 	case INTERCAMBIAR:
 		//TODO
@@ -140,9 +152,10 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
-	if (conexion == -1){
-		printf("ERROR: Conexion con [Broker] no establecida");
-		exit(-1);
+	while (conexion == -1) {
+		printf("ERROR: Conexion con [Broker] no establecida. Reintentando...");
+		sleep(SLEEP_TIME_CONEXION);
+		conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 	}
 
 	int bytes;
@@ -153,10 +166,7 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
 	enviar_mensaje(conexion, a_enviar, bytes);
 
-	pasar_a_blocked(tcb);
-
 	char* id_correlativo = recibir_id_correlativo(conexion);
-
 
 	agregar_a_enviaron_catch(id_correlativo, tcb);
 	liberar_conexion(conexion);
