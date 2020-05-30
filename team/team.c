@@ -221,12 +221,12 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	int distancia_cercana = 0;
 	t_tcb_entrenador* entrenador_cercano = NULL;
 
-	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
-		t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
-		int nueva_distancia = 0;
+	t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
+	posicion_pokemon->x = mensaje->posx;
+	posicion_pokemon->y = mensaje->posy;
 
-		posicion_pokemon->x = mensaje->posx;
-		posicion_pokemon->y = mensaje->posy;
+	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
+		int nueva_distancia = 0;
 
 		nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
 
@@ -240,15 +240,15 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 				entrenador_cercano = entrenador;
 			}
 		}
-
-		t_pokemon* pokemon = malloc(sizeof(t_pokemon));
-		pokemon->pokemon = mensaje->pokemon;
-		pokemon->posicion = posicion_pokemon;
-
-		cargar_tcb_captura(entrenador_cercano, pokemon);
 	}
 
 	list_iterate(new, elegir_entrenador_cercano);
+
+	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
+	pokemon->pokemon = mensaje->pokemon;
+	pokemon->posicion = posicion_pokemon;
+
+	cargar_tcb_captura(entrenador_cercano, pokemon);
 
 	pasar_a_ready(entrenador_cercano);
 	list_remove_element(new, entrenador_cercano);

@@ -32,6 +32,7 @@ void planificar(){
 
 	while(1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
+		//TODO: PONER CONDICION QUE NO HAYA NADA EN EJECUCION
 		if (!list_is_empty(ready)){
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			ejecutar_rafaga(tcb_exec);
@@ -152,6 +153,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
+	//TODO:PASAR A HILO
 	while (conexion == -1) {
 		//TODO: Pasar a formato log (es requisito del tp)
 		printf("ERROR: Conexion con [Broker] no establecida. Reintentando...");
@@ -159,6 +161,7 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 		conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 	}
 
+	//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
 	int bytes;
 
 	int pos_x = pokemon->posicion->x;

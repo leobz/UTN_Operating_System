@@ -54,7 +54,7 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 }
 
 t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
-	t_paquete_socket* paquete = (t_paquete_socket*)malloc(sizeof(t_paquete_socket));
+	t_paquete_socket* paquete = (t_paquete_socket*) malloc(sizeof(t_paquete_socket));
 	int size_buffer = 0;
 
 	paquete->socket_cliente = socket_cliente;
