@@ -5,9 +5,9 @@
 
 int main() {
 
-	inicializar_broker(&config_broker,&log_broker);
-	char*ip=config_broker->ip_broker;
-	char*puerto=config_broker->puerto_broker;
+	inicializar_broker(&broker_config,&logger);
+	char*ip=broker_config->ip_broker;
+	char*puerto=broker_config->puerto_broker;
 	int socket_servidor = iniciar_servidor(ip, puerto);
 
 
@@ -22,7 +22,7 @@ int main() {
 
 
 	pthread_detach(sem_mensajes[NEW_POKEMON]);
-	finalizar_broker(config_broker,log_broker);
+	finalizar_broker(broker_config,logger);
 	return 0;
 }
 
@@ -40,7 +40,7 @@ void extraer_new_pokemon(){
 				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
 				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
 		}*/
-		log_info(log_broker, "mensaje: %d",mensaje[NEW_POKEMON]->id_correlativo);
+		log_info(logger, "mensaje: %d",mensaje[NEW_POKEMON]->id_correlativo);
 		free(mensaje[NEW_POKEMON]->payload);
 		free(mensaje[NEW_POKEMON]);
 	}

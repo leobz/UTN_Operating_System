@@ -85,4 +85,5 @@ t_buffer* buffer_caught_pokemon(int estado);
 
 // UTILIDADES
 char* op_code_to_string(int enum_value);
+int string_to_op_code(char* enum_cola);
 #endif /* SERIALIZACION_H_ */

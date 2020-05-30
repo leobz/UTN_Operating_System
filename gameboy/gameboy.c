@@ -18,7 +18,8 @@ int main(int argc, char **argv)
 		// ./gameboy SUSCRIPTOR [COLA_DE_MENSAJES] [TIEMPO]
 		if (strcmp(argv[1], "SUSCRIPCION") == 0)
 		{
-			int cola = atoi(argv[2]);
+			int cola=string_to_op_code(argv[2]);
+
 			int tiempo= atoi(argv[3]);
 
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);

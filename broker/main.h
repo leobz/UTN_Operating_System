@@ -11,8 +11,8 @@
 #include "colas.h"
 
 t_mensaje* mensaje[6];
-t_broker_config* config_broker;
-t_log* log_broker;
+//t_broker_config* config_broker;
+//t_log* log_broker;
 
 pthread_t sem_mensajes[6];
 pthread_mutex_t mutex[6];

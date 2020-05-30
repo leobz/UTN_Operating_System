@@ -20,17 +20,14 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	inicializar_broker(&broker_config, &logger);
 
 	loggear_nueva_conexion(logger, paquete);
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 
-		t_mensaje* mensaje_a_encolar;
-
 
 		id_mensaje++;
-		//enviar_mensaje(paquete->socket_cliente,&id_mensaje,sizeof(int)); //le devuelve al proceso emisor el id del mensaje
+		enviar_mensaje_nofree(paquete->socket_cliente,&id_mensaje,sizeof(int)); //le devuelve al proceso emisor el id del mensaje
 
 		switch (paquete->codigo_operacion) {
 
@@ -116,7 +113,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		free(paquete);
 	}
-	finalizar_broker(broker_config, logger);
+	//finalizar_broker(broker_config, logger);
 }
 
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
