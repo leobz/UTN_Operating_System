@@ -39,3 +39,10 @@ void* list_pop(t_list* lista, int index){
 void* list_pop_first(t_list* lista){
 	return list_pop(lista, 0);
 }
+
+void list_remove_element(t_list* lista, void* element){
+	for(int i = 0;  i < list_size(lista); i++){
+		if  (list_get(lista, i) == element)
+			list_remove(lista, i);
+	}
+}

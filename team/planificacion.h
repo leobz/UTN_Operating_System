@@ -10,6 +10,10 @@
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
 
+
+t_dictionary* enviaron_catch;
+pthread_t planificador;
+
 // ESTRUCTURAS
 
 typedef enum {
@@ -20,6 +24,9 @@ typedef enum {
 
 // Inicializacion
 void inicializar_listas();
+void inicializar_diccionarios();
+void iniciar_planificador();
+void planificar();
 
 // Carga de TCB
 void pasar_a_ready(t_tcb_entrenador* tcb);
@@ -34,5 +41,12 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino);
 
 // Ejecucion de TCB
 t_tcb_entrenador* siguiente_tcb_a_ejecutar();
+void ejecutar_rafaga(t_tcb_entrenador*);
+void ejecutar_instruccion(int, t_tcb_entrenador*);
+
+// Mensajes
+void enviar_mensaje_catch(t_tcb_entrenador*, t_pokemon*);
+char* recibir_id_correlativo(int);
+void agregar_a_enviaron_catch(char*, t_tcb_entrenador*);
 
 #endif /* PLANIFICACION_H_ */
