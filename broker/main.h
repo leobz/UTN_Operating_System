@@ -18,4 +18,9 @@ pthread_t sem_mensajes[6];
 pthread_mutex_t mutex[6];
 
 void extraer_new_pokemon();
+void extraer_get_pokemon();
+void extraer_catch_pokemon();
+void extraer_appeared_pokemon();
+void extraer_localized_pokemon();
+void extraer_caught_pokemon();
 #endif /* MAIN_H_ */

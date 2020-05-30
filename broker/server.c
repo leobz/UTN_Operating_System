@@ -38,7 +38,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			break;
 
-		/*case GET_POKEMON:
+		case GET_POKEMON:
 
 			mensaje_a_encolar = preparar_mensaje(paquete);
 			insertar_mensaje(mensaje_a_encolar, GET_POKEMON);
@@ -75,7 +75,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
 
 
-			break;*/
+			break;
 
 		default:
 			pthread_exit(NULL);
@@ -83,8 +83,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			break;
 		}
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
-		//free(mensaje_a_encolar->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
-		//free(mensaje_a_encolar);
 		liberar_paquete(paquete);
 	}
 
@@ -113,7 +111,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		free(paquete);
 	}
-	//finalizar_broker(broker_config, logger);
 }
 
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
