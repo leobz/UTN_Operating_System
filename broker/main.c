@@ -8,20 +8,20 @@ int main() {
 	inicializar_broker(&config_broker,&log_broker);
 	char*ip=config_broker->ip_broker;
 	char*puerto=config_broker->puerto_broker;
-
 	int socket_servidor = iniciar_servidor(ip, puerto);
+
+
+	for(int i = 0; i < 6; i++)
+	     sem_init(&cola_vacia[i], 0, 0);
+
+	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)extraer_new_pokemon,NULL);
 
 	while (1) {
 		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 	}
 
-	for(int i = 0; i < 6; i++)
-	     sem_init(&cola_vacia[i], 0, 0);
 
-
-	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)extraer_new_pokemon,NULL);
-
-	pthread_join(sem_mensajes[NEW_POKEMON],NULL);
+	pthread_detach(sem_mensajes[NEW_POKEMON]);
 	finalizar_broker(config_broker,log_broker);
 	return 0;
 }

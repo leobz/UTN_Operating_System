@@ -28,6 +28,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		t_mensaje* mensaje_a_encolar;
 
+
 		id_mensaje++;
 		//enviar_mensaje(paquete->socket_cliente,&id_mensaje,sizeof(int)); //le devuelve al proceso emisor el id del mensaje
 
@@ -40,7 +41,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			break;
 
-		case GET_POKEMON:
+		/*case GET_POKEMON:
 
 			mensaje_a_encolar = preparar_mensaje(paquete);
 			insertar_mensaje(mensaje_a_encolar, GET_POKEMON);
@@ -77,7 +78,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
 
 
-			break;
+			break;*/
 
 		default:
 			pthread_exit(NULL);
@@ -85,8 +86,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			break;
 		}
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
-		free(mensaje_a_encolar->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
-		free(mensaje_a_encolar);
+		//free(mensaje_a_encolar->payload); //Hacer solo despues de guardar el mensaje en la cache y en la cola auxiliar
+		//free(mensaje_a_encolar);
 		liberar_paquete(paquete);
 	}
 
