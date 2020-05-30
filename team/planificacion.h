@@ -14,6 +14,7 @@
 t_dictionary* enviaron_catch;
 pthread_t planificador;
 
+
 // ESTRUCTURAS
 
 typedef enum {
@@ -21,6 +22,7 @@ typedef enum {
 	RR = 2,
 	SJF = 3,
 } tipo_de_planificacion;
+
 
 // Inicializacion
 void inicializar_listas();

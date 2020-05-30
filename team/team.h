@@ -66,7 +66,7 @@ typedef struct{
 	char *log_file;
 }t_team_config;
 
-t_team_config *team_config;
+t_team_config* team_config;
 
 typedef struct{
 	char* pokemon;

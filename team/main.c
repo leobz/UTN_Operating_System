@@ -6,8 +6,7 @@ t_team_config* team_config;
 
 int main(int argc, char ** argv) {
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
-
-	t_team_config *team_config = cargar_team_config("team.config");
+	team_config = cargar_team_config("team.config");
 
 	char* puerto = team_config->puerto_broker;
 	char* ip = team_config->ip_broker;
