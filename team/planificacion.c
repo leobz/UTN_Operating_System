@@ -16,6 +16,8 @@ void inicializar_listas() {
 	blocked = list_create();
 	new = list_create();
 	unblocked = list_create();
+	deadlock = list_create();
+	l_exit = list_create();
 }
 
 void inicializar_diccionarios(){
@@ -190,8 +192,12 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb){
 
 }
 
+int total_capturados(t_tcb_entrenador* tcb) {
+	return sum_dictionary_values(tcb->pokemones_capturados);
+}
+
 int capturo_maximo_permitido(t_tcb_entrenador* tcb) {
-	return tcb->pokemones_max == sum_dictionary_values(tcb->pokemones_capturados);
+	return tcb->pokemones_max == total_capturados(tcb);
 }
 
 void asignar_pokemon(t_tcb_entrenador* tcb) {
@@ -202,14 +208,30 @@ void asignar_pokemon(t_tcb_entrenador* tcb) {
 	tcb->pokemon_a_capturar = NULL;
 }
 
-void confirmar_caught(t_tcb_entrenador* tcb){
-	asignar_pokemon(tcb);
+int cumplio_objetivo(t_tcb_entrenador* tcb) {
+	return dictionaries_are_equals(tcb->pokemones_capturados, tcb->objetivos);
+}
+
+void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 	if (capturo_maximo_permitido(tcb)) {
-		//TODO: SI LOS TIENE PASAR A EXIT, SINO A DEADLOCK
-	}
-	else{
+		printf("[TCB-info] TID:%d Capturó máximo permitido(%d)\n", tcb->tid, tcb->pokemones_max);
+
+		if (cumplio_objetivo(tcb)) {
+			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
+			pasar_a_exit(tcb);
+		} else {
+			pasar_a_deadlock(tcb);
+		}
+	} else {
 		pasar_a_unblocked(tcb);
 	}
+}
+
+void confirmar_caught(t_tcb_entrenador* tcb){
+	asignar_pokemon(tcb);
+	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
+
+	definir_cola_post_caught(tcb);
 }
 
 
@@ -240,4 +262,15 @@ void pasar_a_blocked(t_tcb_entrenador* tcb) {
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	list_add(unblocked, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Unblocked\n", tcb->tid);
+}
+
+void pasar_a_exit(t_tcb_entrenador* tcb) {
+	list_add(l_exit, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Exit\n", tcb->tid);
+}
+
+void pasar_a_deadlock(t_tcb_entrenador* tcb) {
+	list_add(deadlock, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
 }
