@@ -10,7 +10,7 @@
 #include<pthread.h>
 #include "serializacion.h"
 
-pthread_t thread;
+
 
 typedef struct {
 	op_code codigo_operacion;

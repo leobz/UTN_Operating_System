@@ -29,11 +29,11 @@
 t_log* logger;
 t_broker_config* broker_config;
 
-t_mensaje* mensaje_a_encolar;
 int id_mensaje; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
 
 
-pthread_t thread;
+pthread_mutex_t mutex[6];
+pthread_mutex_t global;
 sem_t cola_vacia[6];
 sem_t sem_proceso[6];
 
