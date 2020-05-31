@@ -11,16 +11,6 @@
 #include "serializacion.h"
 
 
-
-typedef struct {
-	op_code codigo_operacion;
-	int id_correlativo;
-	int socket_cliente;
-	int cola; //Solo para el caso q sea una suscripcion
-	int tiempo;
-	t_buffer* buffer;
-} t_paquete_socket;
-
 typedef struct {
 	int cod_operacion;
 	int cola_a_suscribir;
@@ -28,6 +18,10 @@ typedef struct {
 
 } t_suscripcion;
 
+typedef struct {
+	int cod_operacion;
+	int cola_a_suscribir;
+} t_desuscripcion;
 
 int iniciar_servidor(char* ip, char* puerto);
 void esperar_cliente(int socket_cliente, void(*procesar_mensaje_recibido)(t_paquete_socket*));
