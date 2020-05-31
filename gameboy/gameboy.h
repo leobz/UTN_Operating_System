@@ -7,17 +7,6 @@
 
 #include "servidor_gameboy.h"
 
-
-typedef struct {
-	char *ip_broker;
-	char *ip_team;
-	char *ip_gamecard;
-	char *puerto_broker;
-	char *puerto_team;
-	char *puerto_gamecard;
-} t_gameboy_config;
-
-
 // CONFIGURACION
 void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
 void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);

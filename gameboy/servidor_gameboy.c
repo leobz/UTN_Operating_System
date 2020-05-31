@@ -4,12 +4,12 @@
  *  Created on: 30 may. 2020
  *      Author: utnso
  */
-
+/*
 #include "servidor_gameboy.h"
 
 void* servidor_gameboy() {
-	char*ip = gameboy_config->ip_broker;
-	char*puerto = gameboy_config->puerto_broker;
+	char*ip = gameboy_config->ip_gameboy;
+	char*puerto = gameboy_config->puerto_gameboy;
 	int socket_servidor = iniciar_servidor(ip, puerto);
 
 	while (1) {
@@ -25,6 +25,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 	if ((paquete_socket->codigo_operacion >= 0)
 			&& (paquete_socket->codigo_operacion <= 5)) {
 
+		t_mensaje_catch* mensaje_catch;
+
 		switch (paquete_socket->codigo_operacion) {
 
 		case NEW_POKEMON:
@@ -36,22 +38,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			break;
 
 		case CATCH_POKEMON:
-			t_buffer* buffer = paquete_socket->buffer;
-			t_mensaje_catch* mensaje_catch;
 
-			int offset = 0;
-			memcpy(mensaje_catch->length_pokemon, buffer->stream + offset,
-					sizeof(int));
-
-			offset += sizeof(int);
-			memcpy(mensaje_catch->pokemon, buffer->stream + offset,
-					sizeof(mensaje_catch->length_pokemon) - 1);
-			// TODO: a pokemon le tengo que sacar el ultimo caracter... esta bien hecho?
-			offset += mensaje_catch->length_pokemon;
-			memcpy(mensaje_catch->pos_x, buffer->stream + offset, sizeof(int));
-
-			offset += sizeof(int);
-			memcpy(mensaje_catch->pos_y, buffer->stream + offset, sizeof(int));
+			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 
 			log_info(logger,
 					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
@@ -71,7 +59,41 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		case CAUGHT_POKEMON:
 			// TODO
 			break;
-		}
-	}
 
+		default:
+			break;
+		}
+		liberar_paquete(paquete_socket);
+		free(mensaje_catch->pokemon);
+		free(mensaje_catch);
+	}
+	else{
+		switch (paquete_socket->codigo_operacion) {
+			case SUSCRIPCION:
+				break;
+
+			case DESUSCRIPCION:
+				break;
+
+			case OP_ERROR:
+				break;
+
+			default:
+				break;
+			}
+	free(paquete_socket);
+	}
 }
+
+void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion){
+	// Me desuscribo de la cola - structura nueva
+
+	suscripcion->cod_operacion = DESUSCRIPCION;
+
+	void *a_enviar = suscripcion;
+
+	log_info(logger, "Desuscribiendome del [Broker]");
+	enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
+}
+
+*/

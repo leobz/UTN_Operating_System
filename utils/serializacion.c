@@ -246,6 +246,27 @@ t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
 	return mensaje_appeared;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer){
+	t_mensaje_catch* mensaje_catch = malloc(sizeof(t_mensaje_catch));
+
+	int offset = 0;
+	memcpy(&(mensaje_catch->length_pokemon), buffer->stream + offset, sizeof(int));
+
+	mensaje_catch->pokemon = malloc(sizeof(mensaje_catch->length_pokemon));
+	offset += sizeof(int);
+	memcpy(mensaje_catch->pokemon, buffer->stream + offset, sizeof(mensaje_catch->length_pokemon));
+
+	offset += mensaje_catch->length_pokemon;
+	memcpy(&(mensaje_catch->pos_x), buffer->stream + offset, sizeof(int));
+
+	offset += sizeof(int);
+	memcpy(&(mensaje_catch->pos_y), buffer->stream + offset, sizeof(int));
+
+	return mensaje_catch;
+}
+
 char* op_code_to_string(int enum_value) {
 	switch (enum_value) {
 	case OP_ERROR:
@@ -295,4 +316,8 @@ int string_to_op_code(char* enum_cola){
 		return OP_ERROR;}
 }
 
-
+void liberar_paquete(t_paquete_socket* paquete) {
+	free(paquete->buffer->stream);
+	free(paquete->buffer);
+	free(paquete);
+}

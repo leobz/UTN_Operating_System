@@ -57,6 +57,16 @@ typedef struct {
 	int pos_y;
 } t_mensaje_catch;
 
+typedef struct {
+	op_code codigo_operacion;
+	int id_correlativo;
+	int id_mensaje;
+	int socket_cliente;
+	int cola; //Solo para el caso q sea una suscripcion
+	int tiempo;
+	t_buffer* buffer;
+} t_paquete_socket;
+
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer,
 		int id_correlativo);
@@ -81,6 +91,7 @@ t_buffer* buffer_get_pokemon(char* nombre_pokemon);
 void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int id_correlativo);
 t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
+t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer);
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
@@ -96,4 +107,5 @@ t_buffer* buffer_caught_pokemon(int estado);
 // UTILIDADES
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);
+void liberar_paquete(t_paquete_socket* paquete);
 #endif /* SERIALIZACION_H_ */

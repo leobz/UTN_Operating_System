@@ -1,9 +1,6 @@
 #include "gameboy.h"
 #include "test/testing.h"
 
-t_gameboy_config *gameboy_config;
-t_log *logger;
-
 int main(int argc, char **argv) {
 	inicializar_gameboy(&gameboy_config, &logger);
 
@@ -37,28 +34,19 @@ int main(int argc, char **argv) {
 		void *a_enviar = suscripcion;
 
 		log_info(logger, "Conexion establecida con [Broker]");
-		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
+		enviar_mensaje_nofree(conexion, a_enviar, sizeof(int) * 3);
 
 		log_info(logger,
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
 				cola, tiempo);
 
-		pthread_t hilo_gameboy;
-		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
-		pthread_detach(&hilo_gameboy);
+//		pthread_t hilo_gameboy;
+//		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
+//		pthread_detach(hilo_gameboy);
 
-		// Me desuscribo de la cola
-		t_suscripcion *desuscripcion = malloc(sizeof(t_suscripcion));
-		desuscripcion->cod_operacion = DESUSCRIPCION;
-		desuscripcion->cola_a_suscribir = cola;
-		desuscripcion->tiempo = tiempo;
-
-		void *a_enviar = desuscripcion;
-
-		log_info(logger, "Desuscribiendome del [Broker]");
-		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
-
-
+//		sleep(tiempo);
+//		desuscribir_gameboy(suscripcion, conexion);
+		free(a_enviar);
 		liberar_conexion(conexion);
 	}
 
@@ -363,12 +351,16 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 			config_get_string_value(config, "IP_GAMECARD"));
 	gameboy_config->ip_team = strdup(
 			config_get_string_value(config, "IP_TEAM"));
+	gameboy_config->ip_gameboy = strdup(
+			config_get_string_value(config, "IP_GAMEBOY"));
 	gameboy_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 	gameboy_config->puerto_gamecard = strdup(
 			config_get_string_value(config, "PUERTO_GAMECARD"));
 	gameboy_config->puerto_team = strdup(
 			config_get_string_value(config, "PUERTO_TEAM"));
+	gameboy_config->puerto_gameboy = strdup(
+			config_get_string_value(config, "PUERTO_GAMEBOY"));
 }
 
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
@@ -387,8 +379,10 @@ void destruir_gameboy_config(t_gameboy_config *gameboy_config) {
 	free(gameboy_config->ip_broker);
 	free(gameboy_config->ip_gamecard);
 	free(gameboy_config->ip_team);
+	free(gameboy_config->ip_gameboy);
 	free(gameboy_config->puerto_broker);
 	free(gameboy_config->puerto_gamecard);
 	free(gameboy_config->puerto_team);
+	free(gameboy_config->puerto_gameboy);
 	free(gameboy_config);
 }
