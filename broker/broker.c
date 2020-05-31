@@ -6,8 +6,25 @@
  */
 #include "broker.h"
 
+void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
+
+	*bytes=mensaje->payload_size + sizeof(int)*4;
+	void* paquete_broker=malloc(*bytes);
+	int offset=0;
+	memcpy(paquete_broker + offset, &mensaje->codigo_operacion, sizeof(int));
+		offset += sizeof(int);
+	memcpy(paquete_broker + offset, &mensaje->id_correlativo, sizeof(int));
+		offset += sizeof(int);
+	memcpy(paquete_broker + offset, &mensaje->id_mensaje, sizeof(int));
+		offset += sizeof(int);
+	memcpy(paquete_broker + offset, &mensaje->payload_size, sizeof(int));
+		offset += sizeof(int);
+	memcpy(paquete_broker + offset, mensaje->payload, sizeof(mensaje->payload_size));
+		offset += sizeof(int);
 
 
+	return paquete_broker;
+}
 
 void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
 	broker_config->ip_broker = strdup(
@@ -44,7 +61,6 @@ void inicializar_broker(t_broker_config **broker_config, t_log **logger) {
 	*logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 
 }
-
 
 void finalizar_broker(t_broker_config* broker_config, t_log* logger) {
 	destruir_broker_config(broker_config);

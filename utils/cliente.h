@@ -14,6 +14,7 @@
 int crear_conexion(char* ip, char* puerto);
 
 void enviar_mensaje(int socket_cliente, void* a_enviar, int bytes);
+void enviar_mensaje_nofree(int socket_cliente, void* a_enviar, int bytes);
 int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido);
 
 
