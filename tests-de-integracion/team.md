@@ -52,7 +52,7 @@ $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
 <...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(5,5)
 <...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 5)
-<...>[MOVIMIENTO] ID_ENTRENADOR:-<...>, POSICION:(6, 6)
+<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 6)
 <...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
 <...>[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.
 ```

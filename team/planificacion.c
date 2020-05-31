@@ -7,7 +7,7 @@ t_dictionary* enviaron_catch;
 // TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
 //pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
-SLEEP_TIME = 1;
+SLEEP_TIME = 0;
 SLEEP_TIME_CONEXION = 10;
 
 void inicializar_listas() {
