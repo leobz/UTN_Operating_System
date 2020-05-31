@@ -9,15 +9,14 @@
 
 typedef enum {
 	OP_ERROR = -1,
-	// Mensaje sin correlativo t_mensaje_sc
 	NEW_POKEMON = 0,
 	GET_POKEMON = 1,
 	CATCH_POKEMON = 2,
-	// Mensaje con correlativo t_mensaje_cc
 	APPEARED_POKEMON = 3,
 	LOCALIZED_POKEMON = 4,
 	CAUGHT_POKEMON = 5,
-	SUSCRIPCION = 6
+	SUSCRIPCION = 6,
+	DESUSCRIPCION = 7
 // TODO: Definir codigos de operacion restantes
 } op_code;
 
@@ -50,6 +49,13 @@ typedef struct {
 	int posy;
 	int cantidad;
 } t_mensaje_new;
+
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
+	int pos_x;
+	int pos_y;
+} t_mensaje_catch;
 
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer,

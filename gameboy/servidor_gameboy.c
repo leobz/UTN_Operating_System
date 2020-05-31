@@ -18,8 +18,6 @@ void* servidor_gameboy() {
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
-	// deserializar paquete
-	// loggear en el archivo
 	// enviar el mensaje al brocker de desuscripcion
 
 	// swich case de deserializacion para cada mensaje
@@ -39,24 +37,26 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 		case CATCH_POKEMON:
 			t_buffer* buffer = paquete_socket->buffer;
-			char* pokemon;
-			int pokemon_length, pos_x, pos_y;
+			t_mensaje_catch* mensaje_catch;
 
 			int offset = 0;
-			memcpy(pokemon_length, buffer->stream + offset, sizeof(int));
+			memcpy(mensaje_catch->length_pokemon, buffer->stream + offset,
+					sizeof(int));
 
 			offset += sizeof(int);
-			memcpy(pokemon, buffer->stream + offset, pokemon_length - 1);
+			memcpy(mensaje_catch->pokemon, buffer->stream + offset,
+					sizeof(mensaje_catch->length_pokemon) - 1);
 			// TODO: a pokemon le tengo que sacar el ultimo caracter... esta bien hecho?
-			offset += pokemon_length;
-			memcpy(pos_x, buffer->stream + offset, sizeof(int));
+			offset += mensaje_catch->length_pokemon;
+			memcpy(mensaje_catch->pos_x, buffer->stream + offset, sizeof(int));
 
 			offset += sizeof(int);
-			memcpy(pos_y, buffer->stream + offset, sizeof(int));
+			memcpy(mensaje_catch->pos_y, buffer->stream + offset, sizeof(int));
 
 			log_info(logger,
 					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y);
+					mensaje_catch->pokemon, mensaje_catch->pos_x,
+					mensaje_catch->pos_y);
 
 			break;
 

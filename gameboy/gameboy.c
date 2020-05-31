@@ -47,6 +47,18 @@ int main(int argc, char **argv) {
 		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
 		pthread_detach(&hilo_gameboy);
 
+		// Me desuscribo de la cola
+		t_suscripcion *desuscripcion = malloc(sizeof(t_suscripcion));
+		desuscripcion->cod_operacion = DESUSCRIPCION;
+		desuscripcion->cola_a_suscribir = cola;
+		desuscripcion->tiempo = tiempo;
+
+		void *a_enviar = desuscripcion;
+
+		log_info(logger, "Desuscribiendome del [Broker]");
+		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
+
+
 		liberar_conexion(conexion);
 	}
 
