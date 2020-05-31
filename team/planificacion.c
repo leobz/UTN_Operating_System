@@ -33,6 +33,8 @@ void planificar() {
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(
 			sizeof(t_tcb_entrenador));
 
+	tcb_exec = NULL;
+
 	while (1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
@@ -184,11 +186,13 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb){
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
 	if (conexion == -1){
+
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
 		confirmar_caught(tcb);
 	}
 	else{
+
 		int bytes;
 
 		int pos_x = pokemon->posicion->x;
