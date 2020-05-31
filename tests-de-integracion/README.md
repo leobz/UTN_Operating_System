@@ -1,25 +1,74 @@
-## Instalar byexample
+# Tests de Integración
+
+## Instalar entorno
 
 1) Instalar Pip
-```
+
+```bash
 $ sudo apt-get install python3-pip
 ```
 
 2) Instalar Byexample
-```
+
+```bash
 $ pip3 install byexample
 ```
 
 3) Comprobar version
-```
+
+```bash
 $ byexample -V
 ```
 
+## Configurar tiempo de espera (Importante)
 
-## Correr los tests
-Para ejecutar el test de team ejecutar
+A raiz de que cada computadora es distinta en cuanto a velocidad de procesamiento,
+algunas necesitan mas tiempo para procesar los distintos modulos.
+Por esto se debera crear un archivo "byexample.config" que tenga el siguiente contenido:
+
+$ cat byexample.config
+
 ```
-$ byexample -l shell test_team.md
+sleep-time=0.05
+```
+
+0.05 es un valor de ejemplo, es el valor que el motor de test espera entre cada comando a ejecutar, en las maquinas virtuales puede llegar a ser de hasta 3 segundos,
+usted puede ir probando valores para ver cual es su tiempo de espera ideal.
+
+## Diferencia entre archivos .sh y .md
+
+Los .sh son scripts que compilan los módulos y además corren uno o más tests de byexample. Piense en ellos como si fuesen un wrapper que automatiza todo el proceso de testeo.
+
+Los .md son archivos de test de byexample, en ellos puede **agregar o modificar los tests** que correran los scripts .sh.
+
+## Correr Regresion
+
+Este script compila y corre los tests de todos los módulos
+
+```bash
+$ sh regresion.sh
+```
+
+## Correr un Test Particular
+
+Puede compilar y correr un módulo en especial (Broker, Team, etc).
+
+Por defecto, Utils y Gameboy siempre se van a compilar sea cual sea el test que se elija.
+
+Ejemplo:
+
+```bash
+$ sh team.sh
+```
+
+## Correr los tests desde byexample
+
+En caso de que quiera testear algo y no necesite o quiera compilarlo desde el script .sh, puede realizar la compilacion a mano y luego correr el test por separado.
+
+Si desea ejecutar el test de byexample, de por ejemplo team, debe ejecutar:
+
+```
+$ byexample -l shell team.md
 ```
 
 En caso de querer ejecutar otro test, solo cambiar el nombre del archivo test.

@@ -37,6 +37,7 @@ int iniciar_servidor(char* ip, char* puerto)
 
 void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paquete_socket*))
 {
+
 	struct sockaddr_in dir_cliente;
 
 	socklen_t tam_direccion = sizeof(struct sockaddr_in);
@@ -44,11 +45,8 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
 	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);
-	/* cambie t_paquete por t_paquete_socket pq necesito q el paquete tenga el socket
-	 * del cliente y opcionalmente un idntififcador de colas en caso de ser suscripcion
-	 * pq a procesar_mensaje_recibido solo se le puede pasar un argumento
-	 */
 
+	pthread_t thread;
 	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);
 }

@@ -22,3 +22,14 @@ t_posicion* posicion(int x, int y) {
 	posicion->y = y;
 	return posicion;
 }
+
+t_mensaje_appeared* create_mensaje_appeared(char* pokemon, int posx, int posy) {
+	t_mensaje_appeared* mensaje_appeared = malloc(sizeof(t_mensaje_appeared));
+
+	mensaje_appeared->length_pokemon = strlen(pokemon);
+	mensaje_appeared->pokemon = pokemon;
+	mensaje_appeared->posx = posx;
+	mensaje_appeared->posy = posy;
+
+	return mensaje_appeared;
+}
