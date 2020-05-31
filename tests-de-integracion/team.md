@@ -38,7 +38,7 @@ Posición entrenadores: (1,1) (3,3) (5,5)
 Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al mapa.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 1
 <...>
 ```
@@ -51,6 +51,10 @@ El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a captur
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
 <...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(5,5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:-<...>, POSICION:(6, 6)
+<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
+<...>[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.
 ```
 
 ### APPEARED_POKEMON 2

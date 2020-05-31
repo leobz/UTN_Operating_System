@@ -10,7 +10,6 @@ ALGORITMO_PLANIFICACION = FIFO;
 SLEEP_TIME = 1;
 SLEEP_TIME_CONEXION = 10;
 
-
 void inicializar_listas() {
 	ready = list_create();
 	blocked = list_create();
@@ -18,22 +17,23 @@ void inicializar_listas() {
 	unblocked = list_create();
 }
 
-void inicializar_diccionarios(){
+void inicializar_diccionarios() {
 	enviaron_catch = dictionary_create();
 }
 
-void iniciar_planificador(){
-	pthread_create(&planificador,NULL,(void*)planificar, NULL);
+void iniciar_planificador() {
+	pthread_create(&planificador, NULL, (void*) planificar, NULL);
 	pthread_detach(planificador);
 }
 
-void planificar(){
-	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
+void planificar() {
+	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(
+			sizeof(t_tcb_entrenador));
 
-	while(1)
+	while (1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
 		//TODO: PONER CONDICION QUE NO HAYA NADA EN EJECUCION
-		if (!list_is_empty(ready)){
+		if (!list_is_empty(ready)) {
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			ejecutar_rafaga(tcb_exec);
 		}
@@ -56,7 +56,7 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
-	cargar_rafaga_captura(tcb, pokemon->posicion );
+	cargar_rafaga_captura(tcb, pokemon->posicion);
 	tcb->pokemon_a_capturar = pokemon;
 }
 
@@ -70,7 +70,8 @@ void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
 	// TODO
 }
 
-void cargar_rafaga_movimiento(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
+void cargar_rafaga_movimiento(t_tcb_entrenador* tcb,
+		t_posicion* posicion_pokemon) {
 	int movimientos = 0;
 
 	while (movimientos < distancia_entre(tcb->posicion, posicion_pokemon)) {
@@ -90,54 +91,51 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino) {
 	return delta_x + delta_y;
 }
 
-void actualizar_posicion(t_tcb_entrenador* tcb){
+void actualizar_posicion(t_tcb_entrenador* tcb) {
 	t_posicion* destino = tcb->pokemon_a_capturar->posicion;
 	t_posicion* inicio = tcb->posicion;
 
 	int delta_x = destino->x - inicio->x;
 	int delta_y = destino->y - inicio->y;
 
-	if (delta_x > 0){
+	if (delta_x > 0) {
 		inicio->x++;
-	}
-	else if( delta_x < 0){
+	} else if (delta_x < 0) {
 		inicio->x--;
-	}
-	else if( delta_x == 0){
-		if( delta_y > 0){
+	} else if (delta_x == 0) {
+		if (delta_y > 0) {
 			inicio->y++;
-		}
-		else if(delta_y < 0){
+		} else if (delta_y < 0) {
 			inicio->y--;
 		}
 	}
 
 }
 
-void ejecutar_rafaga(t_tcb_entrenador* tcb){
+void ejecutar_rafaga(t_tcb_entrenador* tcb) {
 	//TODO: Esta funcion la tiene que correr el hilo entrenador
 	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
 	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
-	while (!queue_is_empty(tcb->rafaga)){
+	while (!queue_is_empty(tcb->rafaga)) {
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
 	}
 }
 
-void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
-	switch (instruccion){
+void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
+	switch (instruccion) {
 	case MOVERSE:
 		sleep(SLEEP_TIME);
 		actualizar_posicion(tcb);
-		//TODO: Pasar a formato log (es requisito del tp)
-		printf("[EXEC] TID:%d Instruccion:MOVERSE  Posicion:(%d, %d)\n",
-				tcb->tid,
-				tcb->posicion->x,
-				tcb->posicion->y);
+
+		log_info(logger, "[MOVIMIENTO] ID_ENTRENADOR:%d, POSICION:(%d, %d)", tcb->tid,
+				tcb->posicion->x, tcb->posicion->y);
 		break;
 	case CATCH:
-		//TODO: Pasar a formato log (es requisito del tp)
-		printf("[EXEC] TID:%d Instruccion:CATCH\n", tcb->tid);
+		log_info(logger, "[CATCH] POKEMON: %s, POSICION:(%d, %d)",
+				tcb->pokemon_a_capturar->pokemon,
+				tcb->pokemon_a_capturar->posicion->x,
+				tcb->pokemon_a_capturar->posicion->y);
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
 		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
@@ -150,15 +148,25 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 	}
 }
 
-void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
-	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
+void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
+	int conexion = crear_conexion(team_config->ip_broker,
+			team_config->puerto_broker);
 
 	//TODO:PASAR A HILO
 	while (conexion == -1) {
-		//TODO: Pasar a formato log (es requisito del tp)
-		printf("ERROR: Conexion con [Broker] no establecida. Reintentando...");
+
+		log_info(logger,
+				"[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.");
 		sleep(SLEEP_TIME_CONEXION);
-		conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
+		conexion = crear_conexion(team_config->ip_broker,
+				team_config->puerto_broker);
+
+		if (conexion == -1)
+			log_info(logger,
+					"[RESULTADO_REINTENTO_COMUNICACION] Conexión con Broker no establecida.");
+		else
+			log_info(logger,
+					"[RESULTADO_REINTENTO_COMUNICACION] Conexión con Broker establecida.");
 	}
 
 	//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
@@ -167,7 +175,8 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	int pos_x = pokemon->posicion->x;
 	int pos_y = pokemon->posicion->y;
 
-	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
+	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x,
+			pos_y, 0);
 	enviar_mensaje(conexion, a_enviar, bytes);
 
 	char* id_correlativo = recibir_id_correlativo(conexion);
@@ -175,7 +184,6 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	agregar_a_enviaron_catch(id_correlativo, tcb);
 	liberar_conexion(conexion);
 }
-
 
 char* recibir_id_correlativo(int socket_cliente) {
 	int id_correlativo_int;
@@ -188,7 +196,7 @@ char* recibir_id_correlativo(int socket_cliente) {
 	return id_correlativo_char;
 }
 
-void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb){
+void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
 
