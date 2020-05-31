@@ -7,7 +7,7 @@ t_dictionary* enviaron_catch;
 // TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
 //pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
-SLEEP_TIME = 1;
+SLEEP_TIME = 0.1;
 int SLEEP_TIME_CONEXION = 10;
 
 
@@ -170,7 +170,7 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb){
 	if (conexion == -1){
 		//TODO:PASAR A HILO. Preguntar si en foro si la mantenemos o no
 		//conexion = reintentar_conexion(SLEEP_TIME_CONEXION, conexion);
-		asignar_pokemon(tcb);
+		confirmar_caught(tcb);
 	}
 	else{
 		//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
@@ -190,7 +190,26 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb){
 
 }
 
-void asignar_pokemon(t_tcb_entrenador* tcb){
+int capturo_maximo_permitido(t_tcb_entrenador* tcb) {
+	return tcb->pokemones_max == sum_dictionary_values(tcb->pokemones_capturados);
+}
+
+void asignar_pokemon(t_tcb_entrenador* tcb) {
+	dictionary_increment_value(
+			tcb->pokemones_capturados,
+			tcb->pokemon_a_capturar->pokemon);
+
+	tcb->pokemon_a_capturar = NULL;
+}
+
+void confirmar_caught(t_tcb_entrenador* tcb){
+	asignar_pokemon(tcb);
+	if (capturo_maximo_permitido(tcb)) {
+		//TODO: SI LOS TIENE PASAR A EXIT, SINO A DEADLOCK
+	}
+	else{
+		pasar_a_unblocked(tcb);
+	}
 }
 
 
@@ -217,4 +236,8 @@ void pasar_a_ready(t_tcb_entrenador* tcb) {
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
+}
+
+void pasar_a_unblocked(t_tcb_entrenador* tcb) {
+	list_add(unblocked, tcb);
 }
