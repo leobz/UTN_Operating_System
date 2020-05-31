@@ -264,4 +264,31 @@ char* op_code_to_string(int enum_value){
 		return "NULL";
 	}
 }
+int string_to_op_code(char* enum_cola){
+
+	if (strcmp(enum_cola, "NEW_POKEMON") == 0)
+		return NEW_POKEMON;
+
+	else if (strcmp(enum_cola, "GET_POKEMON") == 0)
+		return GET_POKEMON;
+
+	else if (strcmp(enum_cola, "CATCH_POKEMON") == 0)
+		return CATCH_POKEMON;
+
+	else if (strcmp(enum_cola, "APPEARED_POKEMON") == 0)
+		return APPEARED_POKEMON;
+
+	else if (strcmp(enum_cola, "LOCALIZED_POKEMON") == 0)
+		return LOCALIZED_POKEMON;
+
+	else if (strcmp(enum_cola, "CAUGHT_POKEMON") == 0)
+		return CAUGHT_POKEMON;
+
+	else if (strcmp(enum_cola, "SUSCRIPCION") == 0)
+		return SUSCRIPCION;
+
+	else{
+		return OP_ERROR;}
+}
+
 

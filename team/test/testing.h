@@ -6,6 +6,8 @@
 #include "test_lista_ready.h"
 #include "test_rafagas.h"
 #include "test_entrenador_cercano_a_ready.h"
+#include "test_movimiento_entrenador.h"
+#include "test_lista_blocked.h"
 
 void correrTests();
 

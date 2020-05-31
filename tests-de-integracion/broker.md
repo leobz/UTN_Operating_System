@@ -44,15 +44,15 @@ $ cat broker.log
 
 Suscripción a NEW_POKEMON
 
-(Corregir: debe ser "SUSCRIPTOR" y no SUSCRIPCION -  Se pone NEW_POKEMON no cero)
+(Corregir: debe ser "SUSCRIPTOR" y no SUSCRIPCION)
 
 ```bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION 0 10; sleep <sleep-time> # byexample: +timeout=4 +paste
+$ ../gameboy/Debug/gameboy SUSCRIPCION NEW_POKEMON 10; sleep <sleep-time> # byexample: +timeout=4 +paste
 ```
 
 ```bash
 $ cat broker.log
-<...>[CONEXION] COD_OP:SUSCRIPCION ID:0
+<...>[CONEXION] COD_OP:SUSCRIPCION ID:<...>
 <...>[SUSCRIPCION] Cola:NEW_POKEMON
 ```
 
