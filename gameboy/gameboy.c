@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 			correrTests();
 	}
 
-	// ./gameboy SUSCRIPTOR [COLA_DE_MENSAJES] [TIEMPO]
+	// ./gameboy SUSCRIPCION [COLA_DE_MENSAJES] [TIEMPO]
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = atoi(argv[2]);
 		int tiempo = atoi(argv[3]);
@@ -40,12 +40,12 @@ int main(int argc, char **argv) {
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
 				cola, tiempo);
 
-//		pthread_t hilo_gameboy;
-//		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
-//		pthread_detach(hilo_gameboy);
+		pthread_t hilo_gameboy;
+		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
+		pthread_detach(hilo_gameboy);
 
-//		sleep(tiempo);
-//		desuscribir_gameboy(suscripcion, conexion);
+		sleep(tiempo);
+		desuscribir_gameboy(suscripcion, conexion);
 		free(a_enviar);
 		liberar_conexion(conexion);
 	}

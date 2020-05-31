@@ -4,7 +4,7 @@
  *  Created on: 30 may. 2020
  *      Author: utnso
  */
-/*
+
 #include "servidor_gameboy.h"
 
 void* servidor_gameboy() {
@@ -45,6 +45,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
 					mensaje_catch->pokemon, mensaje_catch->pos_x,
 					mensaje_catch->pos_y);
+			free(mensaje_catch->pokemon);
+			free(mensaje_catch);
 
 			break;
 
@@ -64,8 +66,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			break;
 		}
 		liberar_paquete(paquete_socket);
-		free(mensaje_catch->pokemon);
-		free(mensaje_catch);
 	}
 	else{
 		switch (paquete_socket->codigo_operacion) {
@@ -95,5 +95,3 @@ void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion){
 	log_info(logger, "Desuscribiendome del [Broker]");
 	enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 }
-
-*/
