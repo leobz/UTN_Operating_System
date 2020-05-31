@@ -5,11 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../utils/config.h"
-#include "../utils/log.h"
-
-#include "../utils/servidor.h"
-#include "../utils/cliente.h"
+#include "servidor_gameboy.h"
 
 
 typedef struct {

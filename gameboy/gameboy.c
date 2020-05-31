@@ -21,10 +21,13 @@ int main(int argc, char **argv) {
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
 
-		if (conexion == -1) {
+		if (conexion == -1)
+		{
 			printf("ERROR: Conexion con [Broker] no estable1cida");
 			//exit(-1);
 		}
+		// TODO: funcion de alarm
+		// TODO: buscar como terminar un hilo por cierto tiempo
 
 		t_suscripcion *suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
@@ -39,6 +42,10 @@ int main(int argc, char **argv) {
 		log_info(logger,
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
 				cola, tiempo);
+
+		pthread_t hilo_gameboy;
+		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
+		pthread_detach(&hilo_gameboy);
 
 		liberar_conexion(conexion);
 	}
