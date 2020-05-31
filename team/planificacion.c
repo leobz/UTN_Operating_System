@@ -8,7 +8,7 @@ t_dictionary* enviaron_catch;
 //pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
 SLEEP_TIME = 1;
-SLEEP_TIME_CONEXION = 10;
+int SLEEP_TIME_CONEXION = 10;
 
 
 void inicializar_listas() {
@@ -151,30 +151,42 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 	}
 }
 
+int reintentar_conexion(int SLEEP_TIME_CONEXION, int conexion) {
+	//TODO: Preguntar el foro de Github si esto va o no (por ahora
+	// no ejecuta porque esta en 0, pero si no va, eliminar esta funcion
+	while (0) {
+		//TODO: Pasar a formato log (es requisito del tp)
+		sleep(SLEEP_TIME_CONEXION);
+		conexion = crear_conexion(team_config->ip_broker,
+				team_config->puerto_broker);
+	}
+	return conexion;
+}
+
 void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
-	//TODO:PASAR A HILO
-	while (conexion == -1) {
-		//TODO: Pasar a formato log (es requisito del tp)
-		printf("ERROR: Conexion con [Broker] no establecida. Reintentando...");
-		sleep(SLEEP_TIME_CONEXION);
-		conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
+	if (conexion == -1){
+		//TODO:PASAR A HILO. Preguntar si en foro si la mantenemos o no
+		//conexion = reintentar_conexion(SLEEP_TIME_CONEXION, conexion);
+
+	}
+	else{
+		//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
+		int bytes;
+
+		int pos_x = pokemon->posicion->x;
+		int pos_y = pokemon->posicion->y;
+
+		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
+		enviar_mensaje(conexion, a_enviar, bytes);
+
+		char* id_correlativo = recibir_id_correlativo(conexion);
+
+		agregar_a_enviaron_catch(id_correlativo, tcb);
+		liberar_conexion(conexion);
 	}
 
-	//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
-	int bytes;
-
-	int pos_x = pokemon->posicion->x;
-	int pos_y = pokemon->posicion->y;
-
-	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
-	enviar_mensaje(conexion, a_enviar, bytes);
-
-	char* id_correlativo = recibir_id_correlativo(conexion);
-
-	agregar_a_enviaron_catch(id_correlativo, tcb);
-	liberar_conexion(conexion);
 }
 
 
