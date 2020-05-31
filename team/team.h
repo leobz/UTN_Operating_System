@@ -25,6 +25,8 @@ t_list* ready;
 t_list* new;
 t_list* blocked;
 t_list* unblocked;
+t_list* deadlock;
+t_list* l_exit;
 
 t_log* logger;
 

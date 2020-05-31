@@ -7,14 +7,17 @@ t_dictionary* enviaron_catch;
 // TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
 //pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
 ALGORITMO_PLANIFICACION = FIFO;
-SLEEP_TIME = 0;
-SLEEP_TIME_CONEXION = 10;
+
+int SLEEP_TIME = 0;
+int SLEEP_TIME_CONEXION = 10;
 
 void inicializar_listas() {
 	ready = list_create();
 	blocked = list_create();
 	new = list_create();
 	unblocked = list_create();
+	deadlock = list_create();
+	l_exit = list_create();
 }
 
 void inicializar_diccionarios() {
@@ -30,12 +33,15 @@ void planificar() {
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(
 			sizeof(t_tcb_entrenador));
 
+	tcb_exec = NULL;
+
 	while (1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
-		//TODO: PONER CONDICION QUE NO HAYA NADA EN EJECUCION
-		if (!list_is_empty(ready)) {
+		if (!list_is_empty(ready) && (tcb_exec == NULL)){
+
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			ejecutar_rafaga(tcb_exec);
+			tcb_exec = NULL;
 		}
 }
 
@@ -138,7 +144,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 				tcb->pokemon_a_capturar->posicion->y);
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
-		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
+		enviar_mensaje_catch(tcb);
 		pasar_a_blocked(tcb);
 
 		break;
@@ -148,11 +154,16 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 	}
 }
 
-void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
-	int conexion = crear_conexion(team_config->ip_broker,
-			team_config->puerto_broker);
 
-	//TODO:PASAR A HILO
+void lanzar_reintentar_conexion(int conexion){
+	pthread_create(&reintentador_de_conexion, NULL, (void*) planificar, conexion);
+	pthread_detach(reintentador_de_conexion);
+}
+
+void reintentar_conexion(int conexion) {
+	//TODO: Preguntar el foro de Github si esto se va a usar para todos los mensajes
+	// Es decir, usar la misma conexion para distintos mensajes
+
 	while (conexion == -1) {
 
 		log_info(logger,
@@ -168,21 +179,77 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 			log_info(logger,
 					"[RESULTADO_REINTENTO_COMUNICACION] Conexión con Broker establecida.");
 	}
+}
 
-	//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
-	int bytes;
+void enviar_mensaje_catch(t_tcb_entrenador* tcb){
+	t_pokemon* pokemon = tcb->pokemon_a_capturar;
+	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
-	int pos_x = pokemon->posicion->x;
-	int pos_y = pokemon->posicion->y;
+	if (conexion == -1){
 
-	void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x,
-			pos_y, 0);
-	enviar_mensaje(conexion, a_enviar, bytes);
+		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
+		// lanzar_reintentar_conexion(int conexion);
+		confirmar_caught(tcb);
+	}
+	else{
 
-	char* id_correlativo = recibir_id_correlativo(conexion);
+		int bytes;
 
-	agregar_a_enviaron_catch(id_correlativo, tcb);
-	liberar_conexion(conexion);
+		int pos_x = pokemon->posicion->x;
+		int pos_y = pokemon->posicion->y;
+
+		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
+		enviar_mensaje(conexion, a_enviar, bytes);
+
+		char* id_correlativo = recibir_id_correlativo(conexion);
+
+		agregar_a_enviaron_catch(id_correlativo, tcb);
+		liberar_conexion(conexion);
+	}
+
+}
+
+int total_capturados(t_tcb_entrenador* tcb) {
+	return sum_dictionary_values(tcb->pokemones_capturados);
+}
+
+int capturo_maximo_permitido(t_tcb_entrenador* tcb) {
+	return tcb->pokemones_max == total_capturados(tcb);
+}
+
+void asignar_pokemon(t_tcb_entrenador* tcb) {
+	dictionary_increment_value(
+			tcb->pokemones_capturados,
+			tcb->pokemon_a_capturar->pokemon);
+
+	tcb->pokemon_a_capturar = NULL;
+}
+
+int cumplio_objetivo(t_tcb_entrenador* tcb) {
+	//TODO: Cambiar nombre por "dictionarie_include()" o algo asi
+	return dictionaries_are_equals(tcb->pokemones_capturados, tcb->objetivos);
+}
+
+void definir_cola_post_caught(t_tcb_entrenador* tcb) {
+	if (capturo_maximo_permitido(tcb)) {
+		printf("[TCB-info] TID:%d Capturó máximo permitido(%d)\n", tcb->tid, tcb->pokemones_max);
+
+		if (cumplio_objetivo(tcb)) {
+			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
+			pasar_a_exit(tcb);
+		} else {
+			pasar_a_deadlock(tcb);
+		}
+	} else {
+		pasar_a_unblocked(tcb);
+	}
+}
+
+void confirmar_caught(t_tcb_entrenador* tcb){
+	asignar_pokemon(tcb);
+	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
+
+	definir_cola_post_caught(tcb);
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
@@ -208,4 +275,19 @@ void pasar_a_ready(t_tcb_entrenador* tcb) {
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
+}
+
+void pasar_a_unblocked(t_tcb_entrenador* tcb) {
+	list_add(unblocked, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Unblocked\n", tcb->tid);
+}
+
+void pasar_a_exit(t_tcb_entrenador* tcb) {
+	list_add(l_exit, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Exit\n", tcb->tid);
+}
+
+void pasar_a_deadlock(t_tcb_entrenador* tcb) {
+	list_add(deadlock, tcb);
+	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
 }

@@ -40,7 +40,11 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 ```bash
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 1
-<...>
+Tamaño de rafaga: 3  Posicion del TCB (5, 5)
+WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+[TCB-info] TID:0 Capturó pokemon. Total capturados:2
+[TCB-info] TID:0 Capturó máximo permitido(2)
+[TCB-info] TID:0 Pasó a lista Deadlock
 ```
 
 #### Se agrega al Mapa -> Se planifica entrenador
@@ -54,25 +58,35 @@ $ cat team.log
 <...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 5)
 <...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 6)
 <...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
-<...>[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.
 ```
 
 ### APPEARED_POKEMON 2
 
 #### Misma especie -> Se aumenta cantidad
 
-Envio otro Pikachu (3,3). Como ya habia uno, la cantidad aumenta a dos.
+Envio otro Pikachu (6,6). Como ya habia uno, la cantidad aumenta a dos.
 Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 3 3; sleep <sleep-time> # byexample: +timeout=4 +paste
-[AGREGADO]: Pikachu 3 3 [TOTAL]: 2
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste
+[AGREGADO]: Pikachu 6 6 [TOTAL]: 2
+Tamaño de rafaga: 7  Posicion del TCB (3, 3)
+WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+[TCB-info] TID:0 Capturó pokemon. Total capturados:2
+[TCB-info] TID:0 Pasó a lista Unblocked
 ```
 
 ```bash
 $ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 3 3
-<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(3,3)
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:0 POSICION:(3,3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(4, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(5, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 4)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 6)
+<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
 ```
 
 #### Pokemon No Pertenece a Objetivo Global -> No se agrega

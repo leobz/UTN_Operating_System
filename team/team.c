@@ -110,6 +110,7 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 				team_config->pokemon_entrenadores, i);
 		entrenador->estado_tcb = NEW;
 		entrenador->rafaga = queue_create();
+		entrenador->pokemones_max = sum_dictionary_values(entrenador->objetivos);
 
 		list_add(new, entrenador);
 	}
