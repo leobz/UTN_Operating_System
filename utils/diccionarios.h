@@ -60,4 +60,15 @@ t_dictionary* sum_dictionaries_values(t_list* dictionaries_list);
 */
 int sum_dictionary_values(t_dictionary* );
 
+/**
+* @NAME: dictionaries_are_equals
+* @DESC: Compara 2 diccionarios, si son iguales retorna true
+*
+* Ejemplo:
+* {"A":2} {"A":2} -> 1
+* {"A":2} {"A":0} -> 0
+*/
+
+int dictionaries_are_equals(t_dictionary*, t_dictionary*);
+
 #endif /* DICCIONARIOS_H_ */
