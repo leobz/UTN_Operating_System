@@ -52,7 +52,7 @@ $ ../gameboy/Debug/gameboy SUSCRIPCION NEW_POKEMON 10; sleep <sleep-time> # byex
 
 ```bash
 $ cat broker.log
-<...>[CONEXION] COD_OP:SUSCRIPCION ID:0
+<...>[CONEXION] COD_OP:SUSCRIPCION ID:<...>
 <...>[SUSCRIPCION] Cola:NEW_POKEMON
 ```
 

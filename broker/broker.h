@@ -15,10 +15,6 @@
 #include "../utils/log.h"
 #include "../utils/servidor.h"
 
-
-/*#define IP "127.0.0.1"
-#define PUERTO "5001"*/
-
 typedef struct {
 	char *ip_broker;
 	char *puerto_broker;
