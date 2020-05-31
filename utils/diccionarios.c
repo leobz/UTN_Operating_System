@@ -34,7 +34,16 @@ t_dictionary* sum_dictionaries_values(t_list* dictionaries_list){
 	return sum_of_dictionaries;
 }
 
+int sum_dictionary_values(t_dictionary* dictionary){
+	int sum = 0;
+	void sum_values(char* key, int value){
+		sum += value;
+	}
 
+	dictionary_iterator(dictionary, sum_values);
+
+	return sum;
+}
 
 void dictionary_increment_value(t_dictionary* dictionary, char* key) {
 	dictionary_increment_value_in(dictionary, key, 1);
