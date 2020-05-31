@@ -29,13 +29,14 @@ void iniciar_planificador(){
 
 void planificar(){
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
+	tcb_exec = NULL;
 
 	while(1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
-		//TODO: PONER CONDICION QUE NO HAYA NADA EN EJECUCION
-		if (!list_is_empty(ready)){
+		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			ejecutar_rafaga(tcb_exec);
+			tcb_exec = NULL;
 		}
 }
 
