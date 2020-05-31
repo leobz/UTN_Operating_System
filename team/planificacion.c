@@ -226,6 +226,7 @@ void asignar_pokemon(t_tcb_entrenador* tcb) {
 }
 
 int cumplio_objetivo(t_tcb_entrenador* tcb) {
+	//TODO: Cambiar nombre por "dictionarie_include()" o algo asi
 	return dictionaries_are_equals(tcb->pokemones_capturados, tcb->objetivos);
 }
 
