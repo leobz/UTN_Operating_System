@@ -141,7 +141,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb){
 		printf("[EXEC] TID:%d Instruccion:CATCH\n", tcb->tid);
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
-		enviar_mensaje_catch(tcb, tcb->pokemon_a_capturar);
+		enviar_mensaje_catch(tcb);
 		pasar_a_blocked(tcb);
 
 		break;
@@ -163,13 +163,14 @@ int reintentar_conexion(int SLEEP_TIME_CONEXION, int conexion) {
 	return conexion;
 }
 
-void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
+void enviar_mensaje_catch(t_tcb_entrenador* tcb){
+	t_pokemon* pokemon = tcb->pokemon_a_capturar;
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
 	if (conexion == -1){
 		//TODO:PASAR A HILO. Preguntar si en foro si la mantenemos o no
 		//conexion = reintentar_conexion(SLEEP_TIME_CONEXION, conexion);
-
+		asignar_pokemon(tcb);
 	}
 	else{
 		//TODO: SI LA CONEXION FALLA -> ASUMIR QUE RECIBIMOS EL ID_CORREATIVO
@@ -187,6 +188,9 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb, t_pokemon* pokemon){
 		liberar_conexion(conexion);
 	}
 
+}
+
+void asignar_pokemon(t_tcb_entrenador* tcb){
 }
 
 
