@@ -5,22 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../utils/config.h"
-#include "../utils/log.h"
-
-#include "../utils/servidor.h"
-#include "../utils/cliente.h"
-
-
-typedef struct {
-	char *ip_broker;
-	char *ip_team;
-	char *ip_gamecard;
-	char *puerto_broker;
-	char *puerto_team;
-	char *puerto_gamecard;
-} t_gameboy_config;
-
+#include "servidor_gameboy.h"
 
 // CONFIGURACION
 void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);

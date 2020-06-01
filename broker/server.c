@@ -148,9 +148,3 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 	return mensaje_a_preparar;
 }
 
-void liberar_paquete(t_paquete_socket* paquete) {
-
-	free(paquete->buffer->stream);
-	free(paquete->buffer);
-	free(paquete);
-}
