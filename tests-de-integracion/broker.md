@@ -5,7 +5,7 @@
 Cargo configuración del test
 
 ```shell
-$ cat byexample.config
+$ cat byexample.config                                        # byexample: +fail-fast
 sleep-time=<sleep-time>
 ```
 

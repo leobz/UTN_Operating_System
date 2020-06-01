@@ -49,4 +49,26 @@ void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amou
 * @DESC: Dada una lista de diccionarios, retorna la suma de todos los valores.
 */
 t_dictionary* sum_dictionaries_values(t_list* dictionaries_list);
+
+/**
+* @NAME: sum_dictionary_values
+* @DESC: Dado un diccionario con valores numericos, retorna la suma de todos
+* los valores
+*
+* Ejemplo:
+* {"A":2, "B":3} -> 5
+*/
+int sum_dictionary_values(t_dictionary* );
+
+/**
+* @NAME: dictionaries_are_equals
+* @DESC: Compara 2 diccionarios, si son iguales retorna true
+*
+* Ejemplo:
+* {"A":2} {"A":2} -> 1
+* {"A":2} {"A":0} -> 0
+*/
+
+int dictionaries_are_equals(t_dictionary*, t_dictionary*);
+
 #endif /* DICCIONARIOS_H_ */
