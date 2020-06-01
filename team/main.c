@@ -14,6 +14,7 @@ int main(int argc, char ** argv) {
 	char* puerto_gameboy = "4444";
 
 	inicializar_listas();
+	inicializar_diccionarios();
 	cargar_objetivo_global(team_config);
 
 	crear_tcb_entrenadores(team_config);

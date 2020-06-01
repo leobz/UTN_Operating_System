@@ -47,7 +47,7 @@ void ejecutar_rafaga(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
 
 // Mensajes
-void enviar_mensaje_catch(t_tcb_entrenador*);
+void ejecutar_catch(t_tcb_entrenador*);
 char* recibir_id_correlativo(int);
 void agregar_a_enviaron_catch(char*, t_tcb_entrenador*);
 
