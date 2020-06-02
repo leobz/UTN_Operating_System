@@ -44,7 +44,7 @@ typedef struct cola_mensaje_recibido{
 
 typedef struct cola_proceso{
 	int socket_cliente;
-	t_cola_mensaje_recibido* mensaje_recibido;
+	//t_cola_mensaje_recibido* mensaje_recibido;
 	struct cola_proceso* siguiente;
 }t_cola_proceso;
 

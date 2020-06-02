@@ -24,6 +24,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 	if ((paquete_socket->codigo_operacion >= 0)
 			&& (paquete_socket->codigo_operacion <= 5)) {
+		log_info(logger,"Recibiendo del broker");
 
 		t_mensaje_catch* mensaje_catch;
 

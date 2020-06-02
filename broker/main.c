@@ -14,6 +14,10 @@ int main() {
 	for(int i = 0; i < 6; i++)
 	     sem_init(&cola_vacia[i], 0, 0);
 
+
+	for(int j = 0; j < 6; j++)
+		     sem_init(&sem_proceso[j], 0, 0);
+
 	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)extraer_new_pokemon,NULL);
 	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)extraer_get_pokemon,NULL);
 	pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)extraer_catch_pokemon,NULL);
@@ -86,6 +90,11 @@ void extraer_get_pokemon(){
 
 void extraer_catch_pokemon(){
 	while(1){
+
+		sem_wait(&sem_proceso[CATCH_POKEMON]);
+		log_info(logger, "Hola");
+
+
 		sem_wait(&cola_vacia[CATCH_POKEMON]);
 		pthread_mutex_lock(&mutex[CATCH_POKEMON]);
 		mensaje[CATCH_POKEMON] = extraer_mensaje(CATCH_POKEMON);
@@ -94,16 +103,20 @@ void extraer_catch_pokemon(){
 		t_cola_proceso *proceso;
 		int bytes=0;
 
-		while(proceso_vacio[CATCH_POKEMON]==false){
-			sem_wait(&sem_proceso[CATCH_POKEMON]);
-				proceso=desencolar_proceso(CATCH_POKEMON);
+		//while(proceso_vacio[CATCH_POKEMON]==false){
+		log_info(logger, "id_correlativo: %d",mensaje[CATCH_POKEMON]->id_correlativo);
+
+
+
+			proceso=desencolar_proceso(CATCH_POKEMON);
 				void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
 				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
 				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
-		}
-		log_info(logger, "id_correlativo: %d",mensaje[CATCH_POKEMON]->id_correlativo);
+		//}
+
 		free(mensaje[CATCH_POKEMON]->payload);
 		free(mensaje[CATCH_POKEMON]);
+
 	}
 }
 

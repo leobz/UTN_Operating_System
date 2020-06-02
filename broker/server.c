@@ -21,10 +21,10 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
-	loggear_nueva_conexion(logger, paquete);
+
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
-
+		loggear_nueva_conexion(logger, paquete);
 
 		t_mensaje* mensaje_a_encolar;
 
@@ -95,6 +95,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			break;
 		}
+
+
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
 		liberar_paquete(paquete);
 	}
@@ -105,9 +107,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case SUSCRIPCION:
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-
 			encolar_proceso(paquete->socket_cliente,paquete->cola);
-			sem_post(&sem_proceso[paquete->codigo_operacion]);
+			log_info(logger, "Cola:%d",paquete->cola);
+			sem_post(&sem_proceso[paquete->cola]);
 			break;
 
 		case OP_ERROR:
