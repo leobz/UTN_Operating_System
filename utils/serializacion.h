@@ -63,7 +63,6 @@ typedef struct {
 	int id_mensaje;
 	int socket_cliente;
 	int cola; //Solo para el caso q sea una suscripcion
-	int tiempo;
 	t_buffer* buffer;
 } t_paquete_socket;
 

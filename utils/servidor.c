@@ -63,11 +63,14 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	if(paquete->codigo_operacion==SUSCRIPCION){
 		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
-		recv(socket_cliente, &(paquete->tiempo), sizeof(int), MSG_WAITALL);
+	}
+
+	if(paquete->codigo_operacion==DESUSCRIPCION){
+		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
 	}
 
 
-	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)) {
+	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)&&(paquete->codigo_operacion !=DESUSCRIPCION)) {
 		// si lo que recivo es un mensaje
 		recv(socket_cliente, &(paquete->id_correlativo), sizeof(int), MSG_WAITALL);
 		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);

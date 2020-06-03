@@ -14,8 +14,6 @@
 typedef struct {
 	int cod_operacion;
 	int cola_a_suscribir;
-	int tiempo;
-
 } t_suscripcion;
 
 typedef struct {
