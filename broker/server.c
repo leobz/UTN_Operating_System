@@ -27,12 +27,14 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		loggear_nueva_conexion(logger, paquete);
 
 		t_mensaje* mensaje_a_encolar;
+		t_mensaje_catch *mensaje_catch;
 
 		switch (paquete->codigo_operacion) {
 
 		case NEW_POKEMON:
 
 			mensaje_a_encolar = preparar_mensaje(paquete);
+
 
 			pthread_mutex_lock(&mutex[NEW_POKEMON]);
 			insertar_mensaje(mensaje_a_encolar, NEW_POKEMON);
@@ -52,7 +54,18 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case CATCH_POKEMON:
 
+
+			mensaje_catch=deserializar_mensaje_catch_pokemon(paquete->buffer);
+
+			log_info(logger,
+												"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
+												mensaje_catch->pokemon, mensaje_catch->pos_x,
+												mensaje_catch->pos_y);
+										free(mensaje_catch->pokemon);
+										free(mensaje_catch);
+
 			mensaje_a_encolar= preparar_mensaje(paquete);
+
 
 			pthread_mutex_lock(&mutex[CATCH_POKEMON]);
 			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);

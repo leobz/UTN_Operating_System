@@ -201,8 +201,7 @@ void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int id_correlativo) {
 
 	t_buffer* buffer = buffer_appeared_pokemon(nombre_pokemon, pos_x, pos_y);
-	t_paquete *paquete = crear_paquete(APPEARED_POKEMON, buffer,
-			id_correlativo);
+	t_paquete *paquete = crear_paquete(APPEARED_POKEMON, buffer,id_correlativo);
 
 	*bytes = paquete->buffer->size + sizeof(int) * 3;
 	void* a_enviar = serializar_paquete(paquete, *bytes);
@@ -246,17 +245,17 @@ t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
 	return mensaje_appeared;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////	/////////////////////////////////////////////////////////////
 
 t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer){
-	t_mensaje_catch* mensaje_catch = malloc(sizeof(t_mensaje_catch));
+	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*)malloc(sizeof(t_mensaje_catch));
 
 	int offset = 0;
 	memcpy(&(mensaje_catch->length_pokemon), buffer->stream + offset, sizeof(int));
 
-	mensaje_catch->pokemon = malloc(sizeof(mensaje_catch->length_pokemon));
+	mensaje_catch->pokemon = malloc(mensaje_catch->length_pokemon);
 	offset += sizeof(int);
-	memcpy(mensaje_catch->pokemon, buffer->stream + offset, sizeof(mensaje_catch->length_pokemon));
+	memcpy(mensaje_catch->pokemon, buffer->stream + offset, mensaje_catch->length_pokemon);
 
 	offset += mensaje_catch->length_pokemon;
 	memcpy(&(mensaje_catch->pos_x), buffer->stream + offset, sizeof(int));
@@ -268,23 +267,26 @@ t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer){
 }
 
 t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package){
-	t_mensaje_catch* mensaje_catch = malloc(sizeof(t_mensaje_catch));
 
 
 	int offset = 0;
 	int op=0;
 	int cod=0;
-
-
+	int size=0;
 	memcpy(&(op), package + offset, sizeof(int));
-
+	offset += sizeof(int);
 	memcpy(&(cod), package + offset, sizeof(int));
+	offset += sizeof(int);
+	memcpy(&(size), package + offset, sizeof(int));
+	offset += sizeof(int);
+
+	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*)malloc(sizeof(t_mensaje_catch));
 
 	memcpy(&(mensaje_catch->length_pokemon), package + offset, sizeof(int));
 
 	mensaje_catch->pokemon = malloc(sizeof(mensaje_catch->length_pokemon));
 	offset += sizeof(int);
-	memcpy(mensaje_catch->pokemon, package + offset, sizeof(mensaje_catch->length_pokemon));
+	memcpy(mensaje_catch->pokemon, package + offset, mensaje_catch->length_pokemon);
 
 	offset += mensaje_catch->length_pokemon;
 	memcpy(&(mensaje_catch->pos_x), package + offset, sizeof(int));

@@ -98,7 +98,7 @@ void extraer_catch_pokemon(){
 
 		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
 
-		pthread_mutex_lock(&mutex[CATCH_POKEMON]);
+		/*pthread_mutex_lock(&mutex[CATCH_POKEMON]);
 		mensaje[CATCH_POKEMON] = extraer_mensaje(CATCH_POKEMON);
 		pthread_mutex_unlock(&mutex[CATCH_POKEMON]);
 
@@ -125,12 +125,12 @@ void extraer_catch_pokemon(){
 							free(mensaje_catch->pokemon);
 							free(mensaje_catch);
 
-				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
+				//enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
 				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
 		//}
-
+		free(sent_package);
 		free(mensaje[CATCH_POKEMON]->payload);
-		free(mensaje[CATCH_POKEMON]);
+		free(mensaje[CATCH_POKEMON]);*/
 
 	}
 }

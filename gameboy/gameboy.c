@@ -125,9 +125,15 @@ int main(int argc, char **argv) {
 
 			log_info(logger, "Conexion establecida con [Broker]");
 
-			int bytes;
-			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,
-					pos_y, id_correlativo);
+			int bytes=0;
+			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,pos_y, id_correlativo);
+
+			t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(a_enviar);
+
+			log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
+				free(mensaje_catch->pokemon);
+				free(mensaje_catch);
+
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
