@@ -91,6 +91,7 @@ void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int id_correlativo);
 t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer);
+t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package);
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,

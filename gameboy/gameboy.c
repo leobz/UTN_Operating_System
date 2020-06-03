@@ -39,9 +39,9 @@ int main(int argc, char **argv) {
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
 				cola, tiempo);
 
-		pthread_t hilo_gameboy;
-		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
-		pthread_detach(hilo_gameboy);
+		//pthread_t hilo_gameboy;
+		//pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
+		//pthread_detach(hilo_gameboy);
 
 		sleep(tiempo);
 		desuscribir_gameboy(suscripcion, conexion);

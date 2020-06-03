@@ -90,12 +90,14 @@ void extraer_get_pokemon(){
 
 void extraer_catch_pokemon(){
 	while(1){
+		if(cola_procesos[CATCH_POKEMON][FRENTE]==NULL)//Me permite que verificar que la cola no este vacia si se desuscribe el gameboy
+			sem_wait(&sem_proceso[CATCH_POKEMON]); //existen procesos en la cola
 
-		sem_wait(&sem_proceso[CATCH_POKEMON]);
 		log_info(logger, "Hola");
 
 
-		sem_wait(&cola_vacia[CATCH_POKEMON]);
+		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
+
 		pthread_mutex_lock(&mutex[CATCH_POKEMON]);
 		mensaje[CATCH_POKEMON] = extraer_mensaje(CATCH_POKEMON);
 		pthread_mutex_unlock(&mutex[CATCH_POKEMON]);
@@ -109,7 +111,20 @@ void extraer_catch_pokemon(){
 
 
 			proceso=desencolar_proceso(CATCH_POKEMON);
+
+			log_info(logger, "socket: %d",proceso->socket_cliente);
+
 				void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
+
+				t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
+
+				log_info(logger,
+									"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
+									mensaje_catch->pokemon, mensaje_catch->pos_x,
+									mensaje_catch->pos_y);
+							free(mensaje_catch->pokemon);
+							free(mensaje_catch);
+
 				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
 				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
 		//}

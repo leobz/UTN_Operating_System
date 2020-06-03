@@ -267,6 +267,35 @@ t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer){
 	return mensaje_catch;
 }
 
+t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package){
+	t_mensaje_catch* mensaje_catch = malloc(sizeof(t_mensaje_catch));
+
+
+	int offset = 0;
+	int op=0;
+	int cod=0;
+
+
+	memcpy(&(op), package + offset, sizeof(int));
+
+	memcpy(&(cod), package + offset, sizeof(int));
+
+	memcpy(&(mensaje_catch->length_pokemon), package + offset, sizeof(int));
+
+	mensaje_catch->pokemon = malloc(sizeof(mensaje_catch->length_pokemon));
+	offset += sizeof(int);
+	memcpy(mensaje_catch->pokemon, package + offset, sizeof(mensaje_catch->length_pokemon));
+
+	offset += mensaje_catch->length_pokemon;
+	memcpy(&(mensaje_catch->pos_x), package + offset, sizeof(int));
+
+	offset += sizeof(int);
+	memcpy(&(mensaje_catch->pos_y), package + offset, sizeof(int));
+
+	return mensaje_catch;
+}
+
+
 char* op_code_to_string(int enum_value) {
 	switch (enum_value) {
 	case OP_ERROR:

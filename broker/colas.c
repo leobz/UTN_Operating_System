@@ -18,8 +18,6 @@ void encolar_proceso(int socket, int cola){
 	}
 
 	proceso->socket_cliente = socket;
-	//proceso->mensaje_recibido = malloc(sizeof(t_cola_mensaje_recibido));
-
 
 	// Si es el primero, ambos apuntan al mismo espacio de memoria
 	if (cola_procesos[cola][FRENTE] == NULL) {
@@ -36,6 +34,7 @@ t_cola_proceso* desencolar_proceso(int cola){
 
 	return cola_procesos[cola][ACTUAL];
 
+
 	proceso_vacio[cola]=false;
 
 	if(cola_procesos[cola][ACTUAL]->siguiente == NULL){
@@ -45,6 +44,7 @@ t_cola_proceso* desencolar_proceso(int cola){
 
 	if (proceso_vacio[cola]==false)
 		cola_procesos[cola][ACTUAL]=cola_procesos[cola][ACTUAL]->siguiente;
+
 }
 
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
