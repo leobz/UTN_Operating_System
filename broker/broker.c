@@ -8,8 +8,6 @@
 
 void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
 
-	printf("Empaquetando mensaje %s a enviar\n", op_code_to_string(mensaje->codigo_operacion));
-
 	void* paquete_broker=malloc(*bytes);
 	*bytes=mensaje->payload_size + sizeof(int)*4;
 	int offset=0;

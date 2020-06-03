@@ -44,8 +44,6 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	printf("Socket cliente recibido:%d\n", socket_cliente);
-
 	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);
 
 	pthread_t thread;

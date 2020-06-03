@@ -20,8 +20,6 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	printf("Procesando Mensaje del socket cliente: %d\n", paquete->socket_cliente);
-
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 		loggear_nueva_conexion(logger, paquete);
 

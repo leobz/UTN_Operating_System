@@ -33,7 +33,6 @@ void encolar_proceso(int socket, int cola){
 }
 
 t_cola_proceso* desencolar_proceso(int cola){
-	printf("Estoy por desencolar proceso %s\n", op_code_to_string(cola));
 	proceso_vacio[cola]=false;
 
 	if(cola_procesos[cola][ACTUAL]->siguiente == NULL){

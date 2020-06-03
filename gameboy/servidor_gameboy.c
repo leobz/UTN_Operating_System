@@ -9,7 +9,6 @@
 
 void* servidor_gameboy(conexion) {
 	t_paquete_socket* paquete =  recibir_mensaje_servidor(conexion);
-	printf("Se recibio conexion, aleluya\n");
 	procesar_mensaje_recibido(paquete);
 
 	while (1) {
@@ -20,10 +19,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 	// enviar el mensaje al brocker de desuscripcion
 
 	// swich case de deserializacion para cada mensaje
-
-	printf("Se recibio un mensaje\n");
-
-	printf("COP: %s\n", op_code_to_string(paquete_socket->codigo_operacion));
 
 	if ((paquete_socket->codigo_operacion >= 0)
 			&& (paquete_socket->codigo_operacion <= 5)) {
