@@ -33,9 +33,7 @@ void encolar_proceso(int socket, int cola){
 }
 
 t_cola_proceso* desencolar_proceso(int cola){
-
-	return cola_procesos[cola][ACTUAL];
-
+	printf("Estoy por desencolar proceso %s\n", op_code_to_string(cola));
 	proceso_vacio[cola]=false;
 
 	if(cola_procesos[cola][ACTUAL]->siguiente == NULL){
@@ -45,9 +43,14 @@ t_cola_proceso* desencolar_proceso(int cola){
 
 	if (proceso_vacio[cola]==false)
 		cola_procesos[cola][ACTUAL]=cola_procesos[cola][ACTUAL]->siguiente;
+
+	return cola_procesos[cola][ACTUAL];
+
 }
 
+
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
+	printf("Insertando mensaje Appeared\n");
 	if(mensajes[cola_mensaje][FRENTE] == NULL){
 		mensajes[cola_mensaje][FRENTE] = nuevo_mensaje;
 	} else{

@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 				cola, tiempo);
 
 		pthread_t hilo_gameboy;
-		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,NULL);
+		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,conexion);
 		pthread_detach(hilo_gameboy);
 
 		sleep(tiempo);

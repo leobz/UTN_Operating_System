@@ -7,13 +7,12 @@
 
 #include "servidor_gameboy.h"
 
-void* servidor_gameboy() {
-	char*ip = gameboy_config->ip_gameboy;
-	char*puerto = gameboy_config->puerto_gameboy;
-	int socket_servidor = iniciar_servidor(ip, puerto);
+void* servidor_gameboy(conexion) {
+	t_paquete_socket* paquete =  recibir_mensaje_servidor(conexion);
+	printf("Se recibio conexion, aleluya\n");
+	procesar_mensaje_recibido(paquete);
 
 	while (1) {
-		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 	}
 }
 
@@ -21,6 +20,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 	// enviar el mensaje al brocker de desuscripcion
 
 	// swich case de deserializacion para cada mensaje
+
+	printf("Se recibio un mensaje\n");
+
+	printf("COP: %s\n", op_code_to_string(paquete_socket->codigo_operacion));
 
 	if ((paquete_socket->codigo_operacion >= 0)
 			&& (paquete_socket->codigo_operacion <= 5)) {
