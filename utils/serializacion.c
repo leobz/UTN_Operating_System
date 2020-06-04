@@ -22,6 +22,11 @@ void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 	free(mensaje_appeared);
 }
 
+void eliminar_mensaje_catch(t_mensaje_catch* mensaje_catch){
+	free(mensaje_catch->pokemon);
+	free(mensaje_catch);
+}
+
 void* serializar_paquete(t_paquete* paquete, int bytes) {
 	void* a_enviar = malloc(bytes);
 	int offset = 0;
