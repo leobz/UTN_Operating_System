@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
 		//pthread_detach(hilo_gameboy);
 
 		sleep(tiempo);
-		desuscribir_gameboy(suscripcion, conexion);
+		free(a_enviar);
+		//desuscribir_gameboy(suscripcion, conexion);
 		liberar_conexion(conexion);
 	}
 

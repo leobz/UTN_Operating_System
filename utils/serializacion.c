@@ -284,7 +284,7 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package){
 
 	memcpy(&(mensaje_catch->length_pokemon), package + offset, sizeof(int));
 
-	mensaje_catch->pokemon = malloc(sizeof(mensaje_catch->length_pokemon));
+	mensaje_catch->pokemon = malloc(mensaje_catch->length_pokemon);
 	offset += sizeof(int);
 	memcpy(mensaje_catch->pokemon, package + offset, mensaje_catch->length_pokemon);
 

@@ -8,8 +8,9 @@
 
 void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
 
+
+	*bytes=mensaje->payload_size + sizeof(int)*3;
 	void* paquete_broker=malloc(*bytes);
-	*bytes=mensaje->payload_size + sizeof(int)*4;
 	int offset=0;
 
 	memcpy(paquete_broker + offset, &mensaje->codigo_operacion, sizeof(int));
@@ -18,21 +19,21 @@ void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
 	if ((mensaje->codigo_operacion >= 0) && (mensaje->codigo_operacion <= 2)){ //si es un mensaje de accion le envio el id_mensaje
 
 		memcpy(paquete_broker + offset, &mensaje->id_mensaje, sizeof(int));
-				offset += sizeof(int);
 
 	}
 
 	if ((mensaje->codigo_operacion >= 3) && (mensaje->codigo_operacion <= 5)){ //si es un mensaje de respuesta le envio el id_correlativo
 
 		memcpy(paquete_broker + offset, &mensaje->id_correlativo, sizeof(int));
-				offset += sizeof(int);
+
 
 	}
+	offset += sizeof(int);
 
 	memcpy(paquete_broker + offset, &mensaje->payload_size, sizeof(int));
 		offset += sizeof(int);
-	memcpy(paquete_broker + offset, mensaje->payload, sizeof(mensaje->payload_size));
-		offset += sizeof(int);
+	memcpy(paquete_broker + offset, mensaje->payload, mensaje->payload_size);
+		offset += mensaje->payload_size;
 
 
 	return paquete_broker;
