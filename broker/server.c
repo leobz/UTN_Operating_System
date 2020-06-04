@@ -58,7 +58,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			mensaje_catch=deserializar_mensaje_catch_pokemon(paquete->buffer);
 
 			log_info(logger,
-												"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
+												"Mensaje recibido de [GAMEBOY]: CATCH_POKEMON %s %d %d",
 												mensaje_catch->pokemon, mensaje_catch->pos_x,
 												mensaje_catch->pos_y);
 										free(mensaje_catch->pokemon);

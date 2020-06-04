@@ -15,12 +15,14 @@
 
 
 
-t_cola_proceso *cola_procesos[6][3];
+t_cola_proceso *cola_procesos[6][4];
 t_mensaje*mensajes[6][3];
-int proceso_vacio[6];
+int proceso_vacio[6][2];
+int contador_procesos[6];
 
+typedef enum{VACIA,ULTIMO}process;
 
-typedef enum{FRENTE,FIN,ACTUAL}punteros;
+typedef enum{FRENTE,FIN,ACTUAL,AUXILIAR}punteros;
 
 void encolar_proceso(int socket, int cola);
 t_cola_proceso* desencolar_proceso(int cola);
