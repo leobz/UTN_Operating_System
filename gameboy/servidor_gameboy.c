@@ -17,14 +17,8 @@ void servidor_gameboy(int conexion) {
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
-	// enviar el mensaje al brocker de desuscripcion
-
-	// swich case de deserializacion para cada mensaje
 
 	if ((paquete_socket->codigo_operacion >= 0)&& (paquete_socket->codigo_operacion <= 5)) {
-
-		//log_info(logger,"Recibiendo del broker");
-
 
 		switch (paquete_socket->codigo_operacion) {
 
