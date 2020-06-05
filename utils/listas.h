@@ -40,5 +40,11 @@ t_list* list_map_free(t_list* self, void*(*transformer)(void*));
 */
 t_list* strings_to_list(char** strings);
 
+/**
+* @NAME: list_remove_element
+* @DESC: Elimina al primer elemento que coincida con el puntero
+* del elemento pasado
+*/
+void list_remove_element(t_list* lista, void* element);
 
 #endif /* LISTAS_H_ */

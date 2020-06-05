@@ -5,7 +5,7 @@
 Cargo configuración del test
 
 ```shell
-$ cat byexample.config
+$ cat byexample.config                                                  # byexample: +fail-fast
 sleep-time=<sleep-time>
 ```
 
@@ -27,36 +27,68 @@ $ rm *.log; ../team/Debug/team &
 
 En el **Objetivo Global** hay: **3 Pikachus** y **2 Squirtles**
 
-### APPEARED_POKEMON
+Posición entrenadores: (1,1) (3,3) (5,5)
+
+### APPEARED_POKEMON 1
 
 - - -
 
 #### Pokemon Pertenece a Objetivo Global -> Se agrega al Mapa
 
-Envío Pikachu en posicion (1,1).  
-Como pertenece al Objetivo global lo agrego al mapa.
+Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al mapa.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1; sleep <sleep-time> # byexample: +timeout=4 +paste
-[AGREGADO]: Pikachu 1 1 [TOTAL]: 1
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
+[AGREGADO]: Pikachu 6 6 [TOTAL]: 1
+Tamaño de rafaga: 3  Posicion del TCB (5, 5)
+WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+[TCB-info] TID:0 Capturó pokemon. Total capturados:2
+[TCB-info] TID:0 Capturó máximo permitido(2)
+[TCB-info] TID:0 Pasó a lista Deadlock
+```
+
+#### Se agrega al Mapa -> Se planifica entrenador
+
+El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
+
+TODO: Arreglar logs para que sean mas expresivos (En el codigo y luego en el test)
+
+```bash
+$ cat team.log
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:<...> POSICION:(5,5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 6)
+<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
+```
+
+### APPEARED_POKEMON 2
+
+#### Misma especie -> Se aumenta cantidad
+
+Envio otro Pikachu (6,6). Como ya habia uno, la cantidad aumenta a dos.
+Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
+
+```bash
+$  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
+[AGREGADO]: Pikachu 6 6 [TOTAL]: 2
+Tamaño de rafaga: 7  Posicion del TCB (3, 3)
+WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+[TCB-info] TID:0 Capturó pokemon. Total capturados:2
+[TCB-info] TID:0 Pasó a lista Unblocked
 ```
 
 ```bash
 $ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 1 1
-```
-
-Envio otro Pikachu (2,2).
-Como ya habia uno, la cantidad aumenta a dos.
-
-```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 2 2; sleep <sleep-time> # byexample: +timeout=4 +paste
-[AGREGADO]: Pikachu 2 2 [TOTAL]: 2
-```
-
-```bash
-$ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 2 2
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:0 POSICION:(3,3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(4, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(5, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 3)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 4)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 5)
+<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 6)
+<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)
 ```
 
 #### Pokemon No Pertenece a Objetivo Global -> No se agrega
@@ -65,7 +97,7 @@ Envío Charmander.
 Como no pertenece al Objetivo Global no se agrega.
 
 ```bash
-$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep <sleep-time> # byexample: +timeout=4 +paste
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
 ```
 
 ```bash
@@ -78,6 +110,6 @@ $ cat team.log
 Cerramos el proceso Team (de otra manera el puerto quedara en uso)
 
 ```bash
-$ rm *.log; kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
+$ rm *.log; kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste -skip
 [<job-id>]+ Term<...>
 ```

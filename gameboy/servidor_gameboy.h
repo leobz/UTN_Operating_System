@@ -28,7 +28,9 @@ typedef struct {
 t_gameboy_config *gameboy_config;
 t_log *logger;
 
-void* servidor_gameboy();
+t_mensaje_catch* mensaje_catch;
+
+void servidor_gameboy(int*conexion);
 void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion);
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket);
 

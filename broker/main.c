@@ -1,7 +1,6 @@
-
 #include "main.h"
 
-
+t_cola_proceso *proceso;
 
 int main() {
 
@@ -10,13 +9,16 @@ int main() {
 	char*puerto=broker_config->puerto_broker;
 	int socket_servidor = iniciar_servidor(ip, puerto);
 
-
 	for(int i = 0; i < 6; i++)
 	     sem_init(&cola_vacia[i], 0, 0);
 
-
 	for(int j = 0; j < 6; j++)
 		     sem_init(&sem_proceso[j], 0, 0);
+
+	for(int j = 0; j < 6; j++)
+		inicializar_listas(j);
+
+
 
 	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)extraer_new_pokemon,NULL);
 	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)extraer_get_pokemon,NULL);
@@ -24,6 +26,8 @@ int main() {
 	pthread_create(&sem_mensajes[APPEARED_POKEMON],NULL,(void*)extraer_appeared_pokemon,NULL);
 	pthread_create(&sem_mensajes[LOCALIZED_POKEMON],NULL,(void*)extraer_localized_pokemon,NULL);
 	pthread_create(&sem_mensajes[CAUGHT_POKEMON],NULL,(void*)extraer_caught_pokemon,NULL);
+
+
 
 	while (1) {
 		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
@@ -57,7 +61,6 @@ void extraer_new_pokemon(){
 				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
 				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
 		}*/
-		log_info(logger, "mensaje: %d",mensaje[NEW_POKEMON]->id_correlativo);
 		free(mensaje[NEW_POKEMON]->payload);
 		free(mensaje[NEW_POKEMON]);
 	}
@@ -71,7 +74,7 @@ void extraer_get_pokemon(){
 		pthread_mutex_lock(&mutex[GET_POKEMON]);
 		mensaje[GET_POKEMON] = extraer_mensaje(GET_POKEMON);
 		pthread_mutex_unlock(&mutex[GET_POKEMON]);
-		//t_cola_proceso *proceso;
+		//t_colaproceso_proceso *proceso;
 		//int bytes=0;
 
 		/*while(proceso_vacio[GET_POKEMON]==false){
@@ -87,52 +90,82 @@ void extraer_get_pokemon(){
 	}
 }
 
+/*
+void extraer_catch_pokemon(){
+	while(1){
+
+		log_info(logger, "Hola");
+
+		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
+
+
+		pthread_mutex_lock(&mutex[CATCH_POKEMON]);
+		mensaje[CATCH_POKEMON] = extraer_mensaje(CATCH_POKEMON);
+		pthread_mutex_unlock(&mutex[CATCH_POKEMON]);
+
+		int bytes=0;
+		void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
+		t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
+
+		log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
+		free(mensaje_catch->pokemon);
+		free(mensaje_catch);
+
+
+		if(cola_procesos[CATCH_POKEMON][FRENTE]==NULL)//Me permite que verificar que la cola no este vacia si se desuscribe el gameboy
+			sem_wait(&sem_proceso[CATCH_POKEMON]); //existen procesos en la cola
+
+		//while(proceso_vacio[CATCH_POKEMON][VACIA]==false){
+
+		desencolar_proceso(CATCH_POKEMON);
+
+		enviar_mensaje(cola_procesos[CATCH_POKEMON][ACTUAL]->socket_cliente,sent_package,bytes);
+			//log_info(logger, "socket: %d",proceso->socket_cliente);
+
+				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
+		//}
+		proceso_vacio[CATCH_POKEMON][VACIA]=false;
+		proceso_vacio[CATCH_POKEMON][ULTIMO]=false;
+
+
+		//free(sent_package);
+		free(mensaje[CATCH_POKEMON]->payload);
+		free(mensaje[CATCH_POKEMON]);
+
+	}
+}
+*/
 
 void extraer_catch_pokemon(){
 	while(1){
 
 		log_info(logger, "Hola");
 
-		if(cola_procesos[CATCH_POKEMON][FRENTE]==NULL)//Me permite que verificar que la cola no este vacia si se desuscribe el gameboy
-			sem_wait(&sem_proceso[CATCH_POKEMON]); //existen procesos en la cola
-
-
-
+		list_clean(suscriptores[CATCH_POKEMON]);
 		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
+
 
 		pthread_mutex_lock(&mutex[CATCH_POKEMON]);
 		mensaje[CATCH_POKEMON] = extraer_mensaje(CATCH_POKEMON);
 		pthread_mutex_unlock(&mutex[CATCH_POKEMON]);
 
-		t_cola_proceso *proceso;
 		int bytes=0;
+		void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
+		t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
 
-		//while(proceso_vacio[CATCH_POKEMON][VACIA]==false){
-		log_info(logger, "id_correlativo: %d",mensaje[CATCH_POKEMON]->id_correlativo);
+		log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
+		free(mensaje_catch->pokemon);
+		free(mensaje_catch);
 
+		if(list_size(suscriptores[CATCH_POKEMON])==0)
+			sem_post(&sem_proceso[CATCH_POKEMON]);
 
+		void enviar_a_suscriptores(int *socket){
+			enviar_mensaje_nofree(*socket,sent_package,bytes);
+		}
 
-			proceso=desencolar_proceso(CATCH_POKEMON);
-
-			log_info(logger, "socket: %d",proceso->socket_cliente);
-
-				void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
-
-				t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
-
-				log_info(logger,
-									"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
-									mensaje_catch->pokemon, mensaje_catch->pos_x,
-									mensaje_catch->pos_y);
-							free(mensaje_catch->pokemon);
-							free(mensaje_catch);
-
-				//enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
-				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
-		//}
-		proceso_vacio[CATCH_POKEMON][VACIA]=false;
-		proceso_vacio[CATCH_POKEMON][ULTIMO]=false;
-
+		list_iterate(suscriptores[CATCH_POKEMON],&enviar_a_suscriptores);
+		list_clean(suscriptores[CATCH_POKEMON]);
 		free(sent_package);
 		free(mensaje[CATCH_POKEMON]->payload);
 		free(mensaje[CATCH_POKEMON]);
@@ -145,18 +178,18 @@ void extraer_appeared_pokemon(){
 		sem_wait(&cola_vacia[APPEARED_POKEMON]);
 		pthread_mutex_lock(&mutex[APPEARED_POKEMON]);
 		mensaje[APPEARED_POKEMON] = extraer_mensaje(APPEARED_POKEMON);
-
-
 		pthread_mutex_unlock(&mutex[APPEARED_POKEMON]);
-		//t_cola_proceso *proceso;
-		//int bytes=0;
+/*
+		t_cola_proceso *proceso;
+		int bytes=0;
 
-		/*while(proceso_vacio[APPEARED_POKEMON]==false){
+		while(proceso_vacio[APPEARED_POKEMON]==false){
 			sem_wait(&sem_proceso[APPEARED_POKEMON]);
-				proceso=desencolar_proceso(APPEARED_POKEMON);
-				void *sent_package=empaquetar_mensaje_broker(mensaje[APPEARED_POKEMON],&bytes);
-				enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
-				//proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
+			proceso = desencolar_proceso(APPEARED_POKEMON);
+
+			void *sent_package = empaquetar_mensaje_broker(mensaje[APPEARED_POKEMON],&bytes);
+			enviar_mensaje(proceso->socket_cliente,sent_package,bytes);
+		//	proceso->mensaje_recibido=malloc(sizeof(t_cola_mensaje_recibido));
 		}*/
 		log_info(logger, "id_correlativo: %d",mensaje[APPEARED_POKEMON]->id_correlativo);
 		free(mensaje[APPEARED_POKEMON]->payload);

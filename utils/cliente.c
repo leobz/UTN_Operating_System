@@ -26,11 +26,11 @@ int crear_conexion(char *ip, char* puerto) {
 }
 
 void enviar_mensaje(int socket_cliente, void* a_enviar, int bytes) {
-	send(socket_cliente, a_enviar, bytes, 0);
+	send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
 	free(a_enviar);
 }
 void enviar_mensaje_nofree(int socket_cliente, void* a_enviar, int bytes) {
-	send(socket_cliente, a_enviar, bytes, 0);
+	send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
 }
 
 int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido) {

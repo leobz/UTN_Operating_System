@@ -109,6 +109,8 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->pokemones_capturados = list_get(
 				team_config->pokemon_entrenadores, i);
 		entrenador->estado_tcb = NEW;
+		entrenador->rafaga = queue_create();
+		entrenador->pokemones_max = sum_dictionary_values(entrenador->objetivos);
 
 		list_add(new, entrenador);
 	}
@@ -182,8 +184,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case APPEARED_POKEMON:
 			mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
 			loggear_appeared_recibido(mensaje_appeared);
-			agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
-			pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+
+			if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)){
+				agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
+				pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+			}
+
 			break;
 
 		default:
@@ -193,37 +199,35 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 }
 
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
-	if (existe_pokemon_en_objetivo_global(mensaje->pokemon)) {
-		t_list* lista_posiciones;
+	t_list* lista_posiciones;
 
-		if (existe_pokemon_en_pokemon_requeridos(mensaje->pokemon))
-			lista_posiciones = obtener_lista_posiciones_by_pokemon_requerido(
-					mensaje->pokemon);
-		else
-			lista_posiciones = list_create();
+	if (existe_pokemon_en_pokemon_requeridos(mensaje->pokemon))
+		lista_posiciones = obtener_lista_posiciones_by_pokemon_requerido(
+				mensaje->pokemon);
+	else
+		lista_posiciones = list_create();
 
-		t_posicion* posicion = (t_posicion*) malloc(sizeof(t_posicion));
+	t_posicion* posicion = (t_posicion*) malloc(sizeof(t_posicion));
 
-		posicion->x = mensaje->posx;
-		posicion->y = mensaje->posy;
+	posicion->x = mensaje->posx;
+	posicion->y = mensaje->posy;
 
-		list_add(lista_posiciones, posicion);
+	list_add(lista_posiciones, posicion);
 
-		agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
-		imprimir_pokemon_agregado(mensaje);
-	}
+	agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
+	imprimir_pokemon_agregado(mensaje);
 }
 
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	int distancia_cercana = 0;
 	t_tcb_entrenador* entrenador_cercano = NULL;
 
-	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
-		t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
-		int nueva_distancia = 0;
+	t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
+	posicion_pokemon->x = mensaje->posx;
+	posicion_pokemon->y = mensaje->posy;
 
-		posicion_pokemon->x = mensaje->posx;
-		posicion_pokemon->y = mensaje->posy;
+	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
+		int nueva_distancia = 0;
 
 		nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
 
@@ -237,11 +241,22 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 				entrenador_cercano = entrenador;
 			}
 		}
-
-		free(posicion_pokemon);
 	}
 
 	list_iterate(new, elegir_entrenador_cercano);
 
+	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
+	pokemon->pokemon = mensaje->pokemon;
+	pokemon->posicion = posicion_pokemon;
+
+	cargar_tcb_captura(entrenador_cercano, pokemon);
+
 	pasar_a_ready(entrenador_cercano);
+	list_remove_element(new, entrenador_cercano);
+
+	log_info(
+			logger, "[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:%d POSICION:(%d,%d)",
+			entrenador_cercano->tid,
+			entrenador_cercano->posicion->x,
+			entrenador_cercano->posicion->y);
 }

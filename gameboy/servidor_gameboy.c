@@ -7,14 +7,13 @@
 
 #include "servidor_gameboy.h"
 
-void* servidor_gameboy() {
-	char*ip = gameboy_config->ip_gameboy;
-	char*puerto = gameboy_config->puerto_gameboy;
-	int socket_servidor = iniciar_servidor(ip, puerto);
+void servidor_gameboy(int *conexion) {
 
-	while (1) {
-		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
-	}
+
+	//while (1) {
+		t_paquete_socket* paquete =  recibir_mensaje_servidor(*conexion);
+		procesar_mensaje_recibido(paquete);
+	//}
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
@@ -22,11 +21,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 	// swich case de deserializacion para cada mensaje
 
-	if ((paquete_socket->codigo_operacion >= 0)
-			&& (paquete_socket->codigo_operacion <= 5)) {
+	if ((paquete_socket->codigo_operacion >= 0)&& (paquete_socket->codigo_operacion <= 5)) {
+
 		log_info(logger,"Recibiendo del broker");
 
-		t_mensaje_catch* mensaje_catch;
 
 		switch (paquete_socket->codigo_operacion) {
 
@@ -46,6 +44,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
 					mensaje_catch->pokemon, mensaje_catch->posx,
 					mensaje_catch->posy);
+
 			free(mensaje_catch->pokemon);
 			free(mensaje_catch);
 
