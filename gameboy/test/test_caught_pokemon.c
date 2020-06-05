@@ -13,7 +13,7 @@ void empaquetar_y_desempaquetar_caught_pokemon() {
 	t_paquete* paquete = crear_paquete(CAUGHT_POKEMON,
 			buffer_caught_pokemon(estado_actual), 0);
 
-	estado* mensaje_caught = deserializar_mensaje_caught_pokemon(
+	t_mensaje_caught* mensaje_caught = deserializar_mensaje_caught_pokemon(
 			paquete->buffer);
 
 	CU_ASSERT_EQUAL(mensaje_caught, estado_actual);
@@ -26,7 +26,7 @@ void empaquetar_y_desempaquetar_caught_pokemon() {
 void serializar_y_deserializar_caught_pokemon() {
 	estado estado = OK;
 	int bytes;
-	int id_correlativo;
+	int id_correlativo=0;
 
 	void* mensaje_serializado = serializar_caught_pokemon(&bytes, estado,
 			id_correlativo);
@@ -40,7 +40,7 @@ void test_deserializar_buffer_caught_pokemon(void* mensaje_serializado,
 		int estado_actual, int id_correlativo) {
 
 	t_paquete* paquete = crear_paquete_desde_mensaje(mensaje_serializado);
-	estado* mensaje_caught;
+	t_mensaje_caught* mensaje_caught;
 
 	// ESTA ES LA FUNCION QUE SE TESTEA
 	mensaje_caught = deserializar_mensaje_caught_pokemon(paquete->buffer);

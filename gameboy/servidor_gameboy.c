@@ -29,24 +29,23 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		switch (paquete_socket->codigo_operacion) {
 
 		case NEW_POKEMON:
-/*
 			mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
 
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
-				liberar_paquete(paquete_socket);*/
+
 			break;
 
 		case GET_POKEMON:
-			/*mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
+			mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s %d %d",mensaje_get->pokemon, mensaje_get->posx,mensaje_get->posy);
+				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
 
 				free(mensaje_get->pokemon);
 				free(mensaje_get);
-				liberar_paquete(paquete_socket);*/
+
 
 			break;
 
@@ -63,13 +62,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 		case APPEARED_POKEMON:
 
-			/*mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
+			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
 
 				free(mensaje_appeared->pokemon);
 				free(mensaje_appeared);
-				liberar_paquete(paquete_socket);*/
+
 
 			break;
 
@@ -81,18 +80,18 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
-				liberar_paquete(paquete_socket);*/
+				*/
 
 
 			break;
 
 		case CAUGHT_POKEMON:
-			/*mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
+			mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %d",mensaje_caught>resultado);
+			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s",value_to_state(mensaje_caught->resultado));
 
 				free(mensaje_caught);
-				liberar_paquete(paquete_socket);*/
+
 			break;
 
 		default:

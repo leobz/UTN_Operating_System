@@ -12,7 +12,7 @@ void inicializar_lista(int cola){
 }
 
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
-	printf("Insertando mensaje Appeared\n");
+	printf("Insertando mensaje %s\n",op_code_to_string(cola_mensaje));
 	if(mensajes[cola_mensaje][FRENTE] == NULL){
 		mensajes[cola_mensaje][FRENTE] = nuevo_mensaje;
 	} else{

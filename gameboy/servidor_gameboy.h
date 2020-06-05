@@ -32,8 +32,8 @@ t_mensaje_new* mensaje_new;
 t_mensaje_get* mensaje_get;
 t_mensaje_catch* mensaje_catch;
 t_mensaje_appeared* mensaje_appeared;
-t_mensaje_localized* mensaje_caught;
-t_mensaje_caught* mensaje_localized;
+t_mensaje_localized* mensaje_localized;
+t_mensaje_caught* mensaje_caught;
 
 void servidor_gameboy(int*conexion);
 void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion);

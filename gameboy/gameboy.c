@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 
 		log_info(logger,
-				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
+				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos",
 				cola, tiempo);
 
 
@@ -73,9 +73,7 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
 					pos_y, cantidad, id_correlativo);
 
-			log_info(logger,
-					"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d %d",
-					pokemon, pos_x, pos_y, cantidad, id_correlativo);
+			//log_info(logger,"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d %d",pokemon, pos_x, pos_y, cantidad, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
@@ -103,8 +101,7 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger, "Mensaje enviado a [Broker]: GET_POKEMON %s",
-					pokemon);
+			//log_info(logger, "Mensaje enviado a [Broker]: GET_POKEMON %s",pokemon);
 
 			liberar_conexion(conexion);
 		}
@@ -131,9 +128,7 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			/*log_info(logger,
-					"Mensaje enviado a [Broker]: CATCH_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y);*/
+			/*log_info(logger,"Mensaje enviado a [Broker]: CATCH_POKEMON %s %d %d",pokemon, pos_x, pos_y);*/
 
 			liberar_conexion(conexion);
 		}
@@ -161,9 +156,7 @@ int main(int argc, char **argv) {
 					pos_y, id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger,
-					"Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y, id_correlativo);
+			//log_info(logger,"Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d",pokemon, pos_x, pos_y, id_correlativo);
 
 			liberar_conexion(conexion);
 		}
@@ -196,8 +189,7 @@ int main(int argc, char **argv) {
 					id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger, "Mensaje enviado a [Broker]: CAUGHT_POKEMON %d %d",
-					estado, id_correlativo);
+			//log_info(logger, "Mensaje enviado a [Broker]: CAUGHT_POKEMON %d %d",estado, id_correlativo);
 
 			liberar_conexion(conexion);
 		}

@@ -123,15 +123,16 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package);
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int id_correlativo);
 t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
-t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer);
+t_mensaje_appeared* deserializar_mensaje_appeared_pokemon(t_buffer* buffer);
 void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
-estado* deserializar_mensaje_caught_pokemon(t_buffer* buffer);
+t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer);
 // UTILIDADES
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);
+char* value_to_state(int value);
 void liberar_paquete_socket(t_paquete_socket* paquete);
 #endif /* SERIALIZACION_H_ */

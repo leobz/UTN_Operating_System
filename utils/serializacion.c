@@ -177,12 +177,10 @@ t_mensaje_get* deserializar_mensaje_get_pokemon(t_buffer* buffer) {
 	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(sizeof(t_mensaje_get));
 
 	int offset = 0;
-	memcpy(&(mensaje_get->length_pokemon), buffer->stream + offset,
-			sizeof(int));
+	memcpy(&(mensaje_get->length_pokemon), buffer->stream + offset,sizeof(int));
 	mensaje_get->pokemon = malloc(mensaje_get->length_pokemon);
 	offset += sizeof(int);
-	memcpy(mensaje_get->pokemon, buffer->stream + offset,
-			mensaje_get->length_pokemon);
+	memcpy(mensaje_get->pokemon, buffer->stream + offset,mensaje_get->length_pokemon);
 
 	return mensaje_get;
 }
@@ -316,9 +314,8 @@ void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 	return a_enviar;
 }
 
-t_mensaje_appeared* get_mensaje_appeared_by_buffer(t_buffer* buffer) {
-	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(
-			sizeof(t_mensaje_appeared));
+t_mensaje_appeared* deserializar_mensaje_appeared_pokemon(t_buffer* buffer) {
+	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(sizeof(t_mensaje_appeared));
 
 	void* stream = buffer->stream;
 
@@ -361,12 +358,11 @@ void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo) {
 	return a_enviar;
 }
 
-estado* deserializar_mensaje_caught_pokemon(t_buffer* buffer) {
-	estado* mensaje_caught = (estado*) malloc(sizeof(estado));
+t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer) {
+	t_mensaje_caught* mensaje_caught = (t_mensaje_caught*) malloc(sizeof(t_mensaje_caught));
 
 	int offset = 0;
-	memcpy(&(mensaje_caught), buffer->stream + offset,
-			sizeof(int));
+	memcpy(&(mensaje_caught->resultado), buffer->stream + offset,sizeof(int));
 	return mensaje_caught;
 }
 
@@ -421,4 +417,13 @@ int string_to_op_code(char* enum_cola) {
 		return OP_ERROR;
 	}
 }
+
+char* value_to_state(int value){
+
+	if(value==1)
+		return "OK";
+	else
+		return "FAIL";
+}
+
 
