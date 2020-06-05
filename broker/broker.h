@@ -15,10 +15,6 @@
 #include "../utils/log.h"
 #include "../utils/servidor.h"
 
-
-/*#define IP "127.0.0.1"
-#define PUERTO "5001"*/
-
 typedef struct {
 	char *ip_broker;
 	char *puerto_broker;
@@ -44,7 +40,6 @@ typedef struct cola_mensaje_recibido{
 
 typedef struct cola_proceso{
 	int socket_cliente;
-	//t_cola_mensaje_recibido* mensaje_recibido;
 	struct cola_proceso* siguiente;
 }t_cola_proceso;
 

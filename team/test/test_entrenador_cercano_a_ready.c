@@ -4,23 +4,10 @@ void agregar_tests_entrenador_cercano_a_ready() {
 	CU_pSuite suite_configuracion = CU_add_suite("TCBs en Ready", NULL, NULL);
 
 	CU_add_test(suite_configuracion,
-				"Al encontrar el entrenador mas cercano al pokemon: TCB se agrega a lista READY",
-				agrega_entrenador_cercano_a_lista_ready);
-
-	CU_add_test(suite_configuracion,
 			"Al encontrar el entrenador mas cercano al pokemon: TCB cambia su estado_tcb a READY",
 			entrenador_cercano_cambia_estado_a_ready);
 }
 
-void agrega_entrenador_cercano_a_lista_ready() {
-	t_mensaje_appeared* mensaje = create_mensaje_appeared("Pikachu", 5, 6);
-	list_clean(ready);
-
-	pasar_entrenador_a_ready_segun_cercania(mensaje);
-
-	CU_ASSERT_EQUAL(list_size(ready), 1);
-	free(mensaje);
-}
 
 
 void entrenador_cercano_cambia_estado_a_ready() {
@@ -30,6 +17,8 @@ void entrenador_cercano_cambia_estado_a_ready() {
 
 	pasar_entrenador_a_ready_segun_cercania(mensaje);
 
+	CU_ASSERT_EQUAL(list_size(ready), 1);
+
 	entrenador = list_get(ready, 0);
 
 	CU_ASSERT_TRUE(entrenador != NULL);
@@ -37,6 +26,9 @@ void entrenador_cercano_cambia_estado_a_ready() {
 	// Si se cambia las posiciones de los entrenadores en el team.config, estos resultados van a fallar.
 	CU_ASSERT_EQUAL(entrenador->posicion->x, 5);
 	CU_ASSERT_EQUAL(entrenador->posicion->y, 5);
+
+	// Vuelvo a poner entrenador en new (Para que no rompan otros test)
+	list_add(new, entrenador);
 	free(mensaje);
 }
 

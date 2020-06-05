@@ -34,7 +34,16 @@ t_dictionary* sum_dictionaries_values(t_list* dictionaries_list){
 	return sum_of_dictionaries;
 }
 
+int sum_dictionary_values(t_dictionary* dictionary){
+	int sum = 0;
+	void sum_values(char* key, int value){
+		sum += value;
+	}
 
+	dictionary_iterator(dictionary, sum_values);
+
+	return sum;
+}
 
 void dictionary_increment_value(t_dictionary* dictionary, char* key) {
 	dictionary_increment_value_in(dictionary, key, 1);
@@ -50,4 +59,16 @@ void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amou
 		else
 			dictionary_put(dictionary, key, amount);
 	}
+}
+
+int dictionaries_are_equals(t_dictionary* dic1, t_dictionary* dic2) {
+	int equals = 1;
+	void same_value_as_dic_2(char* key, int value){
+		if (dictionary_get(dic2, key) != value){
+			equals = 0;
+		}
+	}
+	dictionary_iterator(dic1, same_value_as_dic_2);
+
+	return equals;
 }

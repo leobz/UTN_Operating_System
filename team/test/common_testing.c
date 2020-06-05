@@ -9,6 +9,29 @@ t_tcb_entrenador* tcb_generico(int tid) {
 	return tcb;
 }
 
+t_tcb_entrenador* create_tcb_entrenador(int entrenador_pos_x,
+		int entrenador_pos_y, int pokemon_pos_x, int pokemon_pos_y) {
+	t_tcb_entrenador* tcb = malloc(sizeof(t_tcb_entrenador));
+	tcb->posicion = malloc(sizeof(t_posicion));
+	tcb->pokemon_a_capturar = malloc(sizeof(t_pokemon));
+	tcb->pokemon_a_capturar->posicion = malloc(sizeof(t_posicion));
+
+	tcb->posicion->x = entrenador_pos_x;
+	tcb->posicion->y = entrenador_pos_y;
+
+	tcb->pokemon_a_capturar->posicion->x = pokemon_pos_x;
+	tcb->pokemon_a_capturar->posicion->y = pokemon_pos_y;
+
+	return tcb;
+}
+
+void destroy_tcb_entrenador(t_tcb_entrenador* tcb) {
+	free(tcb->pokemon_a_capturar->posicion);
+	free(tcb->pokemon_a_capturar);
+	free(tcb->posicion);
+	free(tcb);
+}
+
 t_posicion* posicion_generica() {
 	t_posicion* posicion;
 	posicion->x = 1;

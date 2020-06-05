@@ -20,94 +20,15 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-
-
-
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 		loggear_nueva_conexion(logger, paquete);
 
 		t_mensaje* mensaje_a_encolar;
-		t_mensaje_catch *mensaje_catch;
+		mensaje_a_encolar = preparar_mensaje(paquete);
 
-		switch (paquete->codigo_operacion) {
-
-		case NEW_POKEMON:
-
-			mensaje_a_encolar = preparar_mensaje(paquete);
-
-
-			pthread_mutex_lock(&mutex[NEW_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar, NEW_POKEMON);
-			pthread_mutex_unlock(&mutex[NEW_POKEMON]);
-
-			break;
-
-		case GET_POKEMON:
-
-			mensaje_a_encolar = preparar_mensaje(paquete);
-
-			pthread_mutex_lock(&mutex[GET_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar, GET_POKEMON);
-			pthread_mutex_unlock(&mutex[GET_POKEMON]);
-
-			break;
-
-		case CATCH_POKEMON:
-
-
-			mensaje_catch=deserializar_mensaje_catch_pokemon(paquete->buffer);
-
-			log_info(logger,
-												"Mensaje recibido de [GAMEBOY]: CATCH_POKEMON %s %d %d",
-												mensaje_catch->pokemon, mensaje_catch->pos_x,
-												mensaje_catch->pos_y);
-										free(mensaje_catch->pokemon);
-										free(mensaje_catch);
-
-			mensaje_a_encolar= preparar_mensaje(paquete);
-
-
-			pthread_mutex_lock(&mutex[CATCH_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar,CATCH_POKEMON);
-			pthread_mutex_unlock(&mutex[CATCH_POKEMON]);
-
-			break;
-
-		case APPEARED_POKEMON:
-
-			mensaje_a_encolar = preparar_mensaje(paquete);
-
-			pthread_mutex_lock(&mutex[APPEARED_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar, APPEARED_POKEMON);
-			pthread_mutex_unlock(&mutex[APPEARED_POKEMON]);
-
-			break;
-
-		case LOCALIZED_POKEMON:
-
-			mensaje_a_encolar= preparar_mensaje(paquete);
-
-			pthread_mutex_lock(&mutex[LOCALIZED_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar,LOCALIZED_POKEMON);
-			pthread_mutex_unlock(&mutex[LOCALIZED_POKEMON]);
-
-			break;
-
-		case CAUGHT_POKEMON:
-
-			mensaje_a_encolar= preparar_mensaje(paquete);
-
-			pthread_mutex_lock(&mutex[CAUGHT_POKEMON]);
-			insertar_mensaje(mensaje_a_encolar,CAUGHT_POKEMON);
-			pthread_mutex_unlock(&mutex[CAUGHT_POKEMON]);
-
-			break;
-
-		default:
-			pthread_exit(NULL);
-
-			break;
-		}
+		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
+			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
+		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
@@ -120,9 +41,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case SUSCRIPCION:
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-			encolar_proceso(paquete->socket_cliente,paquete->cola);
-			log_info(logger, "Cola:%d",paquete->cola);
+
+
+			list_add(suscriptores[paquete->cola],&paquete->socket_cliente);
+			//encolar_proceso(paquete->socket_cliente,paquete->cola);
 			sem_post(&sem_proceso[paquete->cola]);
+
 			break;
 
 		case OP_ERROR:
