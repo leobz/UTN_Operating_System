@@ -73,8 +73,6 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
 					pos_y, cantidad, id_correlativo);
 
-			//log_info(logger,"Mensaje enviado a [Broker]: NEW_POKEMON %s %d %d %d %d",pokemon, pos_x, pos_y, cantidad, id_correlativo);
-
 			enviar_mensaje(conexion, a_enviar, bytes);
 
 			liberar_conexion(conexion);
@@ -101,8 +99,6 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			//log_info(logger, "Mensaje enviado a [Broker]: GET_POKEMON %s",pokemon);
-
 			liberar_conexion(conexion);
 		}
 
@@ -128,8 +124,6 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			/*log_info(logger,"Mensaje enviado a [Broker]: CATCH_POKEMON %s %d %d",pokemon, pos_x, pos_y);*/
-
 			liberar_conexion(conexion);
 		}
 
@@ -151,12 +145,9 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			//void *a_enviar = serializar_appeared_pokemon_w_message(&bytes, pokemon, pos_x, pos_y, id_mensaje);
 			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x,
 					pos_y, id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
-
-			//log_info(logger,"Mensaje enviado a [Broker]: APPEARED_POKEMON %s %d %d",pokemon, pos_x, pos_y, id_correlativo);
 
 			liberar_conexion(conexion);
 		}
@@ -188,8 +179,6 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_caught_pokemon(&bytes, estado,
 					id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
-
-			//log_info(logger, "Mensaje enviado a [Broker]: CAUGHT_POKEMON %d %d",estado, id_correlativo);
 
 			liberar_conexion(conexion);
 		}
