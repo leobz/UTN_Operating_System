@@ -41,10 +41,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case SUSCRIPCION:
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-
-
 			list_add(suscriptores[paquete->cola],&paquete->socket_cliente);
-			//encolar_proceso(paquete->socket_cliente,paquete->cola);
+
 			sem_post(&sem_proceso[paquete->cola]);
 
 			break;
@@ -71,9 +69,21 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 
 	pthread_mutex_lock(&global); //id_mensaje es una variable compartida
 
-		id_mensaje++;
-		enviar_mensaje_nofree(paquete->socket_cliente,&id_mensaje,sizeof(int)); //le devuelve al proceso emisor el id del mensaje
-		mensaje_a_preparar->id_mensaje = id_mensaje;
+	/*
+		op_code ope=CONFIRMACION;
+		int ide=id_mensaje++;
+		log_info(logger, "id:%d",id_mensaje);
+		int offset=0;
+
+		void*enviar=malloc(sizeof(int)*2);
+		memcpy(enviar,&ope,sizeof(int));
+		offset+=sizeof(int);
+		memcpy(enviar,&ide,sizeof(int));
+
+		enviar_mensaje(paquete->socket_cliente,enviar,sizeof(int)*2); //le devuelve al proceso emisor el id del mensaje
+
+		*/
+	mensaje_a_preparar->id_mensaje = id_mensaje++;
 
 	pthread_mutex_unlock(&global);
 

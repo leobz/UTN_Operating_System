@@ -4,10 +4,11 @@
  *  Created on: 3 jun. 2020
  *      Author: utnso
  */
-
+/*
 #include "test_catch_pokemon.h"
 
 // ./gameboy BROKER CATCH_POKEMON [POKEMON] [POSX] [POSY]
+
 
 void empaquetar_y_desempaquetar_catch_pokemon(){
 	char* pokemon = "pikachu";
@@ -68,3 +69,4 @@ void agregar_tests_catch_pokemon() {
 			"Serializar y deserializar Catch Pokemon",
 			serializar_y_deserializar_catch_pokemon);
 }
+*/

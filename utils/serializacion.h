@@ -16,7 +16,7 @@ typedef enum {
 	LOCALIZED_POKEMON = 4,
 	CAUGHT_POKEMON = 5,
 	SUSCRIPCION = 6,
-	DESUSCRIPCION = 7
+	CONFIRMACION = 7
 // TODO: Definir codigos de operacion restantes
 } op_code;
 

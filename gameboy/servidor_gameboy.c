@@ -10,10 +10,10 @@
 void servidor_gameboy(int *conexion) {
 
 
-	//while (1) {
+	while (1) {
 		t_paquete_socket* paquete =  recibir_mensaje_servidor(*conexion);
 		procesar_mensaje_recibido(paquete);
-	//}
+	}
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
@@ -23,7 +23,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 	if ((paquete_socket->codigo_operacion >= 0)&& (paquete_socket->codigo_operacion <= 5)) {
 
-		log_info(logger,"Recibiendo del broker");
+		//log_info(logger,"Recibiendo del broker");
 
 
 		switch (paquete_socket->codigo_operacion) {
@@ -44,7 +44,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			free(mensaje_catch->pokemon);
 			free(mensaje_catch);
-
+			liberar_paquete(paquete_socket);
 			break;
 
 		case APPEARED_POKEMON:
@@ -62,14 +62,16 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		default:
 			break;
 		}
-		liberar_paquete(paquete_socket);
+
 	}
 	else{
 		switch (paquete_socket->codigo_operacion) {
 			case SUSCRIPCION:
 				break;
 
-			case DESUSCRIPCION:
+			case CONFIRMACION:
+				log_info(logger,"Confirmacion %d",paquete_socket->id_mensaje);
+
 				break;
 
 			case OP_ERROR:
@@ -80,15 +82,4 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			}
 	free(paquete_socket);
 	}
-}
-
-void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion){
-	// Me desuscribo de la cola - structura nueva
-
-	suscripcion->cod_operacion = DESUSCRIPCION;
-
-	void *a_enviar = suscripcion;
-
-	log_info(logger, "Desuscribiendome del [Broker]");
-	enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 }

@@ -7,7 +7,7 @@
 
 #include "colas.h"
 
-void inicializar_listas(int cola){
+void inicializar_lista(int cola){
 	suscriptores[cola]=list_create();
 }
 

@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 		void *a_enviar = suscripcion;
 
 		log_info(logger, "Conexion establecida con [Broker]");
-		enviar_mensaje_nofree(conexion, a_enviar, sizeof(int) * 2);
+		enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 
 		log_info(logger,
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d de tiempo",
@@ -45,8 +45,7 @@ int main(int argc, char **argv) {
 		pthread_detach(hilo_gameboy);
 
 		sleep(tiempo);
-		free(a_enviar);
-		//desuscribir_gameboy(suscripcion, conexion);
+
 		liberar_conexion(conexion);
 	}
 
@@ -130,18 +129,11 @@ int main(int argc, char **argv) {
 			int bytes=0;
 			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,pos_y, id_correlativo);
 
-			t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(a_enviar);
-
-			log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
-				free(mensaje_catch->pokemon);
-				free(mensaje_catch);
-
-
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger,
+			/*log_info(logger,
 					"Mensaje enviado a [Broker]: CATCH_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y);
+					pokemon, pos_x, pos_y);*/
 
 			liberar_conexion(conexion);
 		}

@@ -16,7 +16,7 @@ int main() {
 		     sem_init(&sem_proceso[j], 0, 0);
 
 	for(int j = 0; j < 6; j++)
-		inicializar_listas(j);
+		inicializar_lista(j);
 
 
 
@@ -139,9 +139,7 @@ void extraer_catch_pokemon(){
 void extraer_catch_pokemon(){
 	while(1){
 
-		log_info(logger, "Hola");
 
-		list_clean(suscriptores[CATCH_POKEMON]);
 		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
 
 
@@ -153,19 +151,25 @@ void extraer_catch_pokemon(){
 		void *sent_package=empaquetar_mensaje_broker(mensaje[CATCH_POKEMON],&bytes);
 		t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
 
+
+
 		log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
 		free(mensaje_catch->pokemon);
 		free(mensaje_catch);
 
-		if(list_size(suscriptores[CATCH_POKEMON])==0)
-			sem_post(&sem_proceso[CATCH_POKEMON]);
+
+		if(list_size(suscriptores[CATCH_POKEMON])==0){
+			sem_wait(&sem_proceso[CATCH_POKEMON]);
+		}
+
 
 		void enviar_a_suscriptores(int *socket){
 			enviar_mensaje_nofree(*socket,sent_package,bytes);
 		}
 
 		list_iterate(suscriptores[CATCH_POKEMON],&enviar_a_suscriptores);
-		list_clean(suscriptores[CATCH_POKEMON]);
+
+
 		free(sent_package);
 		free(mensaje[CATCH_POKEMON]->payload);
 		free(mensaje[CATCH_POKEMON]);
