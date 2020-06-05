@@ -32,7 +32,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
-		liberar_paquete(paquete);
+		liberar_paquete_socket(paquete);
 	}
 
 	else {
