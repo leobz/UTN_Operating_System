@@ -32,7 +32,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 /*
 			mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->pos_x,mensaje_new->pos_y,mensaje_new->cantidad);
+				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
 
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
@@ -42,7 +42,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		case GET_POKEMON:
 			/*mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s %d %d",mensaje_get->pokemon, mensaje_get->pos_x,mensaje_get->pos_y);
+				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s %d %d",mensaje_get->pokemon, mensaje_get->posx,mensaje_get->posy);
 
 				free(mensaje_get->pokemon);
 				free(mensaje_get);
@@ -54,18 +54,20 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
+
+				log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
+
 
 				free(mensaje_catch->pokemon);
 				free(mensaje_catch);
-				liberar_paquete(paquete_socket);
+
 			break;
 
 		case APPEARED_POKEMON:
 
 			/*mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->pos_x,mensaje_appeared->pos_y);
+				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
 
 				free(mensaje_appeared->pokemon);
 				free(mensaje_appeared);
@@ -98,6 +100,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		default:
 			break;
 		}
+		liberar_paquete_socket(paquete_socket);
 
 	}
 	else{
