@@ -1,6 +1,7 @@
 #include "../test/test_configuracion.h"
 #include "../test/test_appeared_pokemon.h"
 #include "../test/test_catch_pokemon.h"
+#include "../test/test_new_pokemon.h"
 
 void correrTests() {
 	CU_initialize_registry();
@@ -8,6 +9,9 @@ void correrTests() {
 	agregar_tests_configuracion();
 	agregar_tests_appeared_pokemon();
 	agregar_tests_catch_pokemon();
+	agregar_tests_new_pokemon();
+	agregar_tests_caught_pokemon();
+	agregar_tests_get_pokemon();
 
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();

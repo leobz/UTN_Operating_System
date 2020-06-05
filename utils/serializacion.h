@@ -53,8 +53,13 @@ typedef struct {
 typedef struct {
 	int length_pokemon;
 	char* pokemon;
-	int pos_x;
-	int pos_y;
+} t_mensaje_get;
+
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
+	int posx;
+	int posy;
 } t_mensaje_catch;
 
 typedef struct {
