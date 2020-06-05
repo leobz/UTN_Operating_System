@@ -40,11 +40,14 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 
-			log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->pos_x,mensaje_catch->pos_y);
+			log_info(logger,
+					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
+					mensaje_catch->pokemon, mensaje_catch->posx,
+					mensaje_catch->posy);
 
 			free(mensaje_catch->pokemon);
 			free(mensaje_catch);
-			liberar_paquete(paquete_socket);
+
 			break;
 
 		case APPEARED_POKEMON:
@@ -62,6 +65,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		default:
 			break;
 		}
+
+		liberar_paquete_socket(paquete_socket);
 
 	}
 	else{

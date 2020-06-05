@@ -41,7 +41,7 @@ sem_t sem;
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
-void liberar_paquete(t_paquete_socket* paquete);
+void liberar_paquete_socket(t_paquete_socket* paquete);
 
 
 #endif /* SERVER_H_ */

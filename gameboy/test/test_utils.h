@@ -11,4 +11,7 @@
 #include "CUnit/Basic.h"
 #include "../gameboy.h"
 
+t_paquete* crear_paquete_desde_mensaje(void* mensaje);
+
 #endif /* TEST_TEST_UTILS_H_ */
+
