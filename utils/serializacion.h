@@ -4,6 +4,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include <stdbool.h>
 
 // ESTRUCTURAS
 
@@ -35,12 +36,11 @@ typedef struct {
 	int id_correlativo;
 } t_paquete;
 
-typedef struct {
-	int length_pokemon;
-	char* pokemon;
-	int posx;
-	int posy;
-} t_mensaje_appeared;
+typedef struct{
+	int pos_x;
+	int pos_y;
+}
+t_posiciones;
 
 typedef struct {
 	int length_pokemon;
@@ -53,9 +53,32 @@ typedef struct {
 typedef struct {
 	int length_pokemon;
 	char* pokemon;
+} t_mensaje_get;
+
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
 	int pos_x;
 	int pos_y;
 } t_mensaje_catch;
+
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
+	int posx;
+	int posy;
+} t_mensaje_appeared;
+
+typedef struct {
+	int length_pokemon;
+	char* pokemon;
+	int cantidad_posiciones;
+	t_posiciones pos[];
+} t_mensaje_localized;
+
+typedef struct {
+	estado resultado;
+} t_mensaje_caught;
 
 typedef struct {
 	op_code codigo_operacion;
