@@ -12,6 +12,7 @@
 
 void empaquetar_y_desempaquetar_catch_pokemon(){
 
+
 	char* pokemon = "pikachu";
 	int pos_x = 1;
 	int pos_y = 2;

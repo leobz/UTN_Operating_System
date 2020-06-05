@@ -9,6 +9,7 @@ void correrTests() {
 	agregar_tests_configuracion();
 	agregar_tests_appeared_pokemon();
 
+
 	agregar_tests_catch_pokemon();
 	agregar_tests_new_pokemon();
 	agregar_tests_caught_pokemon();

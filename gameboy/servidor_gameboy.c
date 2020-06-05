@@ -53,8 +53,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		case CATCH_POKEMON:
 
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
-
-
 				log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
 
 
@@ -100,6 +98,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		default:
 			break;
 		}
+
 		liberar_paquete_socket(paquete_socket);
 
 	}
