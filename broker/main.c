@@ -139,8 +139,6 @@ void extraer_catch_pokemon(){
 void extraer_catch_pokemon(){
 	while(1){
 
-		log_info(logger, "Hola");
-
 		list_clean(suscriptores[CATCH_POKEMON]);
 		sem_wait(&cola_vacia[CATCH_POKEMON]); //existen mensajes en la cola
 
