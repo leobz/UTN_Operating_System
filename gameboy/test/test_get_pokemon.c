@@ -54,7 +54,7 @@ void test_deserializar_buffer_get_pokemon(void* mensaje_serializado,
 }
 
 void agregar_tests_get_pokemon() {
-	CU_pSuite suite_get_pokemon = CU_add_suite("Mensajes get Pokemon",
+	CU_pSuite suite_get_pokemon = CU_add_suite("Mensajes Get Pokemon",
 	NULL, NULL);
 
 	CU_add_test(suite_get_pokemon, "Empaquetar y desempaquetar Get Pokemon",

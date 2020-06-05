@@ -85,11 +85,13 @@ void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int cantidad, int id_correlativo);
 t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,
 		int cantidad);
+t_mensaje_new* deserializar_mensaje_new_pokemon(t_buffer* buffer);
 
 // GET_POKEMON
 void* serializar_get_pokemon(int* bytes, char* nombre_pokemon,
 		int id_correlativo);
 t_buffer* buffer_get_pokemon(char* nombre_pokemon);
+t_mensaje_get* deserializar_mensaje_get_pokemon(t_buffer* buffer);
 
 //CATCH_POKEMON
 void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
@@ -108,7 +110,7 @@ void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
-
+estado* deserializar_mensaje_caught_pokemon(t_buffer* buffer);
 // UTILIDADES
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);

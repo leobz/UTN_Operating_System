@@ -52,7 +52,7 @@ void test_deserializar_buffer_caught_pokemon(void* mensaje_serializado,
 }
 
 void agregar_tests_caught_pokemon() {
-	CU_pSuite suite_caught_pokemon = CU_add_suite("Mensajes caught Pokemon",
+	CU_pSuite suite_caught_pokemon = CU_add_suite("Mensajes Caught Pokemon",
 	NULL, NULL);
 
 	CU_add_test(suite_caught_pokemon,
