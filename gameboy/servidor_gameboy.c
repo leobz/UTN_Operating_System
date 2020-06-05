@@ -65,7 +65,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		default:
 			break;
 		}
-		liberar_paquete(paquete_socket);
+		liberar_paquete_socket(paquete_socket);
 	}
 	else{
 		switch (paquete_socket->codigo_operacion) {

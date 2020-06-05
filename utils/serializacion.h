@@ -112,5 +112,5 @@ t_buffer* buffer_caught_pokemon(int estado);
 // UTILIDADES
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);
-void liberar_paquete(t_paquete_socket* paquete);
+void liberar_paquete_socket(t_paquete_socket* paquete);
 #endif /* SERIALIZACION_H_ */

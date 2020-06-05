@@ -411,7 +411,7 @@ int string_to_op_code(char* enum_cola) {
 	}
 }
 
-void liberar_paquete(t_paquete_socket* paquete) {
+void liberar_paquete_socket_socket(t_paquete_socket* paquete) {
 	free(paquete->buffer->stream);
 	free(paquete->buffer);
 	free(paquete);
