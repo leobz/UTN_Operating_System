@@ -7,11 +7,11 @@
 
 #include "servidor_gameboy.h"
 
-void servidor_gameboy(int *conexion) {
+void servidor_gameboy(int conexion) {
 
 
 	while (1) {
-		t_paquete_socket* paquete =  recibir_mensaje_servidor(*conexion);
+		t_paquete_socket* paquete =  recibir_mensaje_servidor(conexion);
 		procesar_mensaje_recibido(paquete);
 	}
 }

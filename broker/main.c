@@ -130,7 +130,7 @@ void extraer_catch_pokemon(){
 
 
 
-		log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
+		log_info(logger,"Mensaje recibido CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
 		free(mensaje_catch->pokemon);
 		free(mensaje_catch);
 
@@ -140,8 +140,10 @@ void extraer_catch_pokemon(){
 		}
 
 
-		void enviar_a_suscriptores_catch(int *socket){
-			enviar_mensaje_nofree(*socket,sent_package,bytes);
+		void enviar_a_suscriptores_catch(int socket){
+			enviar_mensaje_nofree(socket,sent_package,bytes);
+			log_info(logger,"Mensaje enviado CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
+
 		}
 
 		list_iterate(suscriptores[CATCH_POKEMON],&enviar_a_suscriptores_catch);

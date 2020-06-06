@@ -43,7 +43,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case SUSCRIPCION:
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-			list_add(suscriptores[paquete->cola],&paquete->socket_cliente);
+			list_add(suscriptores[paquete->cola], paquete->socket_cliente);
 
 			sem_post(&sem_proceso[paquete->cola]);
 

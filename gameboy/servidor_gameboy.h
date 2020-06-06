@@ -35,7 +35,7 @@ t_mensaje_appeared* mensaje_appeared;
 t_mensaje_localized* mensaje_localized;
 t_mensaje_caught* mensaje_caught;
 
-void servidor_gameboy(int*conexion);
+void servidor_gameboy(int conexion);
 void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion);
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket);
 
