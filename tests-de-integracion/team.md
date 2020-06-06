@@ -9,18 +9,11 @@ $ cat byexample.config                                                  # byexam
 sleep-time=<sleep-time>
 ```
 
-Compilo Team
+Levanto Team en segundo plano.
 
 ```bash
-$ make clean -C ../team/Debug; make -C ../team/Debug; sleep <sleep-time> # byexample: +timeout=10 +fail-fast +paste
-<...>Finished building target: team<...>
-```
-
-Eliminamos Logs antiguos y levantamos Team en segundo plano.
-
-```bash
-$ rm *.log; ../team/Debug/team &
-<...>[<job-id>] <pid>
+$ ../team/Debug/team &
+[<job-id>] <pid>
 ```
 
 ## Tests
