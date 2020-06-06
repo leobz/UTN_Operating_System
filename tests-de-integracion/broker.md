@@ -1,4 +1,4 @@
-# Test de Broker
+# Test de Broker MEnsajes
 
 ## Inicializacion
 
@@ -9,58 +9,51 @@ $ cat byexample.config                                        # byexample: +fail
 sleep-time=<sleep-time>
 ```
 
-Compilo Broker
-
-```shell
-$ make clean -C ../broker/Debug; make -C ../broker/Debug      # byexample: +timeout=10 +fail-fast
-<...>Finished building target: broker<...>
-```
-
-Borro Logs anteriores y levanto el Broker en segundo plano
+Levanto el Broker en segundo plano
 
 ```bash
-$ rm *.log ; ../broker/Debug/broker &
-<...>[<job-id>] <pid>
+$ ../broker/Debug/broker &
+[<job-broker-id>] <broker-pid>
 ```
 
 - - - - - - - - - - - - -
 
-## NEW_POKEMON
+## Suscripción y envío de mensajes Catch
 
-Envio el mensaje
+Suscripción a CATCH_POKEMON
 
-```bash
-$ sleep <sleep-time>; ../gameboy/Debug/gameboy BROKER NEW_POKEMON pikachu 1 1 1; sleep <sleep-time> # byexample: +timeout=8 +paste
+```  bash
+$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 & # byexample: +timeout=100 +fail-fast +paste
+[<job-gameboy-id>] <gameboy-pid>
 ```
 
-Compruebo recepción del mensaje con Código de Operación e ID
+Comprobación de suscripción
 
 ```bash
-$ cat broker.log
-<...>[CONEXION] COD_OP:NEW_POKEMON ID:0
+$ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
+<...>[SUSCRIPCION] Cola:CATCH_POKEMON<...>
 ```
 
-## SUSCRIPCIÓN
+Envió Catch Pokemon y compruebo que le haya llegado al gameboy que estaba suscripto
 
-Suscripción a NEW_POKEMON
-
-(Corregir: debe ser "SUSCRIPTOR" y no SUSCRIPCION)
-
-```bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION NEW_POKEMON 10; sleep <sleep-time> # byexample: +timeout=4 +paste
+```  bash
+$ ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Pikachu 6 6 # byexample: +timeout=10 +fail-fast
+<...>
 ```
 
+Comprobación
+
 ```bash
-$ cat broker.log
-<...>[CONEXION] COD_OP:SUSCRIPCION ID:<...>
-<...>[SUSCRIPCION] Cola:NEW_POKEMON
+$ sleep <sleep-time>; cat gameboy.log   # byexample: +timeout=10 +fail-fast +paste
+<...>recibido de [Broker]: CATCH_POKEMON Pikachu 6 6<...>
 ```
 
 ## Finalización
 
-Cierro broker (De otro modo el puerto queda sin poder usarse)
+Cierro broker y gameboy (De otro modo los puertos quedan sin poder usarse)
 
 ```bash
-$ rm *.log; kill %% ; wait                    # byexample: +timeout=4 +norm-ws +paste
-[<job-id>]+ Term<...>
+$ rm *.log; kill <gameboy-pid> ; kill <broker-pid> ; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
+<...>Term<...>
+<...>Term<...>
 ```

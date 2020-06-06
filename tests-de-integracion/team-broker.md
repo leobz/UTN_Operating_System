@@ -90,7 +90,7 @@ $ sleep <sleep-time>; cat gameboy.log   # byexample: +timeout=10 +fail-fast +pas
 
 ## Finalización
 
-Cierro broker (De otro modo el puerto queda sin poder usarse)
+Cierro broker, gameboy suscriptor y team (De otro modo los puertos quedan sin poder usarse)
 
 ```bash
 $ rm *.log; kill <gameboy-pid> ; kill <broker-pid> ; kill <team-pid>; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
