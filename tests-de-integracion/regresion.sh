@@ -1,13 +1,25 @@
-echo TESTS DE INTEGRACION
+echo Regresion de Todos los Tests
 
 echo
-echo COMPILO BASE:
+echo Compilo Utils y Gameboy:
 byexample -l shell compilar-base.md
 
 echo
-echo COMPILO Y EJECUTO TEAM:
-byexample -l shell team.md
+echo Compilo Team:
+byexample -l shell compilo-team.md
 
 echo
-echo COMPILO Y EJECUTO BROKER:
+echo Compilo Broker:
+byexample -l shell compilo-broker.md
+
+echo
+echo Corro Tests Integración Team-Broker:
+byexample -l shell team-broker.md
+
+echo
+echo Corro Tests de Broker:
 byexample -l shell broker.md
+
+echo
+echo Corro Tests de Team:
+byexample -l shell team.md
