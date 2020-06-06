@@ -182,7 +182,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
-			mensaje_appeared = get_mensaje_appeared_by_buffer(paquete->buffer);
+			mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
 			loggear_appeared_recibido(mensaje_appeared);
 
 			if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)){
