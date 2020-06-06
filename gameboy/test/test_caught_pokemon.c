@@ -16,7 +16,7 @@ void empaquetar_y_desempaquetar_caught_pokemon() {
 	t_mensaje_caught* mensaje_caught = deserializar_mensaje_caught_pokemon(
 			paquete->buffer);
 
-	CU_ASSERT_EQUAL(mensaje_caught, estado_actual);
+	CU_ASSERT_EQUAL(mensaje_caught->resultado, estado_actual);
 
 	eliminar_paquete(paquete);
 	// eliminar_mensaje_caught(mensaje_caught);
@@ -46,7 +46,7 @@ void test_deserializar_buffer_caught_pokemon(void* mensaje_serializado,
 	mensaje_caught = deserializar_mensaje_caught_pokemon(paquete->buffer);
 
 	CU_ASSERT_EQUAL(paquete->codigo_operacion, CAUGHT_POKEMON);
-	CU_ASSERT_EQUAL(mensaje_caught, OK);
+	CU_ASSERT_EQUAL(mensaje_caught->resultado, OK);
 
 	eliminar_paquete(paquete);
 }
