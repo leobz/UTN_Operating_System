@@ -41,7 +41,7 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 1
 Tamaño de rafaga: 3  Posicion del TCB (5, 5)
-WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+WARNING: Error al conectar con IP:<...> Puerto:<...>
 [TCB-info] TID:0 Capturó pokemon. Total capturados:2
 [TCB-info] TID:0 Capturó máximo permitido(2)
 [TCB-info] TID:0 Pasó a lista Deadlock
@@ -73,7 +73,7 @@ Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a ca
 $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 2
 Tamaño de rafaga: 7  Posicion del TCB (3, 3)
-WARNING: Error al conectar con IP:127.0.0.1 Puerto:5002
+WARNING: Error al conectar con IP:<...> Puerto:<...>
 [TCB-info] TID:0 Capturó pokemon. Total capturados:2
 [TCB-info] TID:0 Pasó a lista Unblocked
 ```
