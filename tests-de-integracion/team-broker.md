@@ -1,5 +1,16 @@
 # Test Team-Broker
 
+## Introducción
+
+En este test demostramos:
+
+1) Suscribirnos con el Gameboy a la cola Catch del Broker
+2) Mandar un Appeared Pokémon de Gameboy a Team
+3) Team seleccionara al entrenador más cercano al Pokémon
+4) Una vez seleccionado, el entrenador se moverá X cantidad de posiciones al Pokémon a capturar
+5) una vez llegado a esa posición, se mandará un mensaje Catch a Broker para capturar ese Pokémon
+6) como Gameboy estaba suscripto a la cola Catch, el broker le tiene que mandar el mensaje que recibió en dicha cola (el mensaje Catch enviado por Team)
+
 ## Inicializacion
 
 Cargo configuración del test
