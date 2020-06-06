@@ -361,7 +361,7 @@ void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo) {
 t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer) {
 	t_mensaje_caught* mensaje_caught = (t_mensaje_caught*) malloc(sizeof(t_mensaje_caught));
 
-	memcpy(&(mensaje_caught->resultado), buffer->stream + offset,sizeof(int));
+	memcpy(&(mensaje_caught->resultado), buffer->stream ,sizeof(int));
 	return mensaje_caught;
 }
 
