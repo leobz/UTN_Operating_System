@@ -57,7 +57,6 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	paquete->socket_cliente = socket_cliente;
 
-	//recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL);
 
 	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL) == -1){
 		paquete->codigo_operacion= OP_ERROR;
