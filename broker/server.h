@@ -36,10 +36,13 @@ pthread_mutex_t mutex[6];
 pthread_mutex_t global;
 sem_t cola_vacia[6];
 sem_t sem_proceso[6];
+sem_t sem;
+
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
-void liberar_paquete(t_paquete_socket* paquete);
+void enviar_confirmacion(int id,op_code confirmacion,int socket);
+
 
 
 #endif /* SERVER_H_ */

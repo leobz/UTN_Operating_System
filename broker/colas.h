@@ -11,19 +11,24 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "server.h"
-#include <stdbool.h>
 
 
 
-t_cola_proceso *cola_procesos[6][3];
+t_list* suscriptores[6];
+
+
 t_mensaje*mensajes[6][3];
-int proceso_vacio[6];
 
 
-typedef enum{FRENTE,FIN,ACTUAL}punteros;
+
+typedef enum{VACIA,ULTIMO}process;
+
+typedef enum{FRENTE,FIN,ACTUAL}men;
+
+void inicializar_listas(int cola);
 
 void encolar_proceso(int socket, int cola);
-t_cola_proceso* desencolar_proceso(int cola);
+void desencolar_proceso(int cola);
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje);
 t_mensaje* extraer_mensaje(int cola_mensaje);
 

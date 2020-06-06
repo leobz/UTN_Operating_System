@@ -144,8 +144,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 				tcb->pokemon_a_capturar->posicion->y);
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
-		enviar_mensaje_catch(tcb);
-		pasar_a_blocked(tcb);
+		ejecutar_catch(tcb);
 
 		break;
 	case INTERCAMBIAR:
@@ -181,7 +180,7 @@ void reintentar_conexion(int conexion) {
 	}
 }
 
-void enviar_mensaje_catch(t_tcb_entrenador* tcb){
+void ejecutar_catch(t_tcb_entrenador* tcb){
 	t_pokemon* pokemon = tcb->pokemon_a_capturar;
 	int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
@@ -204,6 +203,7 @@ void enviar_mensaje_catch(t_tcb_entrenador* tcb){
 		char* id_correlativo = recibir_id_correlativo(conexion);
 
 		agregar_a_enviaron_catch(id_correlativo, tcb);
+		pasar_a_blocked(tcb);
 		liberar_conexion(conexion);
 	}
 
@@ -248,17 +248,19 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 void confirmar_caught(t_tcb_entrenador* tcb){
 	asignar_pokemon(tcb);
 	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
-
 	definir_cola_post_caught(tcb);
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
 	int id_correlativo_int;
-	char id_correlativo_char[10];
 
 	recv(socket_cliente, &id_correlativo_int, sizeof(int), 0);
 
-	snprintf(id_correlativo_char, 10, "%d", id_correlativo_int);
+	int length = snprintf( NULL, 0, "%d", id_correlativo_int);
+	char* id_correlativo_char = malloc( length + 1 );
+	snprintf(id_correlativo_char, length + 1, "%d", id_correlativo_int);
+
+	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH enviado:%s", id_correlativo_char);
 
 	return id_correlativo_char;
 }
@@ -275,6 +277,7 @@ void pasar_a_ready(t_tcb_entrenador* tcb) {
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
+	log_info(logger,"[TCB-info] TID:%d Pasó a lista Blocked\n", tcb->tid);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {

@@ -47,4 +47,3 @@ void mismo_entrenador_al_pasar_entrenador_a_blocked() {
 	CU_ASSERT_EQUAL_FATAL(list_get(blocked, 0), tcb);
 	free(tcb);
 }
-

@@ -1,8 +1,7 @@
 #ifndef TEST_TEST_APPEARED_POKEMON_H_
 #define TEST_TEST_APPEARED_POKEMON_H_
 
-#include "CUnit/Basic.h"
-#include "../gameboy.h"
+#include "test_utils.h"
 
 void empaquetar_y_desempaquetar_appeared_pokemon();
 void serializar_y_deserializar_appeared_pokemon();

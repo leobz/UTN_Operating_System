@@ -7,72 +7,102 @@
 
 #include "servidor_gameboy.h"
 
-void* servidor_gameboy() {
-	char*ip = gameboy_config->ip_gameboy;
-	char*puerto = gameboy_config->puerto_gameboy;
-	int socket_servidor = iniciar_servidor(ip, puerto);
+void servidor_gameboy(int conexion) {
+
 
 	while (1) {
-		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+		t_paquete_socket* paquete =  recibir_mensaje_servidor(conexion);
+		procesar_mensaje_recibido(paquete);
 	}
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
-	// enviar el mensaje al brocker de desuscripcion
 
-	// swich case de deserializacion para cada mensaje
-
-	if ((paquete_socket->codigo_operacion >= 0)
-			&& (paquete_socket->codigo_operacion <= 5)) {
-
-		t_mensaje_catch* mensaje_catch;
+	if ((paquete_socket->codigo_operacion >= 0)&& (paquete_socket->codigo_operacion <= 5)) {
 
 		switch (paquete_socket->codigo_operacion) {
 
 		case NEW_POKEMON:
-			// TODO
+			mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+
+				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
+
+				free(mensaje_new->pokemon);
+				free(mensaje_new);
+
 			break;
 
 		case GET_POKEMON:
-			// TODO
+			mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
+
+				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
+
+				free(mensaje_get->pokemon);
+				free(mensaje_get);
+
+
 			break;
 
 		case CATCH_POKEMON:
 
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
+				log_info(logger,"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
 
-			log_info(logger,
-					"Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d",
-					mensaje_catch->pokemon, mensaje_catch->pos_x,
-					mensaje_catch->pos_y);
-			free(mensaje_catch->pokemon);
-			free(mensaje_catch);
+
+				free(mensaje_catch->pokemon);
+				free(mensaje_catch);
 
 			break;
 
 		case APPEARED_POKEMON:
-			// TODO
+
+			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
+
+				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
+
+				free(mensaje_appeared->pokemon);
+				free(mensaje_appeared);
+
+
 			break;
 
 		case LOCALIZED_POKEMON:
-			// TODO
+
+			/*mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
+
+				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
+
+				free(mensaje_localized->pokemon);
+				free(mensaje_localized);
+				*/
+
+
 			break;
 
 		case CAUGHT_POKEMON:
-			// TODO
+			mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
+
+			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s",value_to_state(mensaje_caught->resultado));
+
+				free(mensaje_caught);
+
 			break;
 
 		default:
 			break;
 		}
-		liberar_paquete(paquete_socket);
+
+		liberar_paquete_socket(paquete_socket);
+
 	}
 	else{
 		switch (paquete_socket->codigo_operacion) {
 			case SUSCRIPCION:
 				break;
 
-			case DESUSCRIPCION:
+			case CONFIRMACION:
+				log_info(logger,"Confirmacion %d",paquete_socket->id_mensaje);
+
 				break;
 
 			case OP_ERROR:
@@ -83,15 +113,4 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			}
 	free(paquete_socket);
 	}
-}
-
-void desuscribir_gameboy(t_suscripcion* suscripcion, int conexion){
-	// Me desuscribo de la cola - structura nueva
-
-	suscripcion->cod_operacion = DESUSCRIPCION;
-
-	void *a_enviar = suscripcion;
-
-	log_info(logger, "Desuscribiendome del [Broker]");
-	enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 }
