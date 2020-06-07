@@ -35,9 +35,9 @@ $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 1
 Tamaño de rafaga: 3  Posicion del TCB (5, 5)
 WARNING: Error al conectar con IP:<...> Puerto:<...>
-[TCB-info] TID:0 Capturó pokemon. Total capturados:2
-[TCB-info] TID:0 Capturó máximo permitido(2)
-[TCB-info] TID:0 Pasó a lista Deadlock
+[TCB-info] TID:2 Capturó pokemon. Total capturados:2
+[TCB-info] TID:2 Capturó máximo permitido(2)
+[TCB-info] TID:2 Pasó a lista Deadlock
 ```
 
 #### Se agrega al Mapa -> Se planifica entrenador
@@ -49,8 +49,8 @@ TODO: Arreglar logs para que sean mas expresivos (En el codigo y luego en el tes
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 5)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:<...>, POSICION:(6, 6)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 5)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 6)<...>
 <...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)<...>
 ```
 
@@ -66,19 +66,19 @@ $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time
 [AGREGADO]: Pikachu 6 6 [TOTAL]: 2
 Tamaño de rafaga: 7  Posicion del TCB (3, 3)
 WARNING: Error al conectar con IP:<...> Puerto:<...>
-[TCB-info] TID:0 Capturó pokemon. Total capturados:2
-[TCB-info] TID:0 Pasó a lista Unblocked
+[TCB-info] TID:1 Capturó pokemon. Total capturados:2
+[TCB-info] TID:1 Pasó a lista Unblocked
 ```
 
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(4, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(5, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 4)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 5)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:0, POSICION:(6, 6)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(4, 3)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(5, 3)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 3)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 4)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 5)<...>
+<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 6)<...>
 <...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)<...>
 ```
 
