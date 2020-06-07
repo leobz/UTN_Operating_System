@@ -365,6 +365,17 @@ t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer) {
 	return mensaje_caught;
 }
 
+t_confirmacion* deserializar_confirmacion(void*mensaje){
+	t_confirmacion* confirmacion=malloc(sizeof(t_confirmacion));
+
+	int offset=0;
+
+	memcpy(&(confirmacion->confirmacion),mensaje,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(&(confirmacion->id_mensaje),mensaje+offset,sizeof(int));
+
+	return confirmacion;
+}
 /*-------------------------------------------------------------------------------------*/
 char* op_code_to_string(int enum_value) {
 	switch (enum_value) {

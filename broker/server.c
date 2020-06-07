@@ -71,8 +71,9 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 
 	pthread_mutex_lock(&global); //id_mensaje es una variable compartida
 
-	int identificador=id_mensaje++;
+	int identificador=++id_mensaje;
 	enviar_confirmacion(identificador,CONFIRMACION,paquete->socket_cliente);
+
 	mensaje_a_preparar->id_mensaje = identificador;
 
 	pthread_mutex_unlock(&global);
@@ -97,9 +98,10 @@ void enviar_confirmacion(int id,op_code confirmacion,int socket){
 		void*enviar=malloc(sizeof(int)*2);
 		memcpy(enviar,&confirmacion,sizeof(int));
 		offset+=sizeof(int);
-		memcpy(enviar,&id,sizeof(int));
+		memcpy(enviar+offset,&id,sizeof(int));
 
-		enviar_mensaje(socket,enviar,sizeof(int)*2); //le devuelve al proceso emisor el id del mensaje
+		enviar_mensaje(socket,enviar,sizeof(int)*2);
 
+		 //le devuelve al proceso emisor el id del mensaje
 }
 

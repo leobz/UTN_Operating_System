@@ -40,7 +40,7 @@ $ ../team/Debug/team &       # byexample: +fail-fast
 
 Suscripción
 
-```  bash
+```bash
 $ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 & # byexample: +timeout=100 +fail-fast +paste
 [<job-gameboy-id>] <gameboy-pid>
 ```

@@ -62,8 +62,8 @@ void extraer_new_pokemon(){
 			}
 
 
-			void enviar_a_suscriptores_new(int *socket){
-				enviar_mensaje_nofree(*socket,sent_package,bytes);
+			void enviar_a_suscriptores_new(int socket){
+				enviar_mensaje_nofree(socket,sent_package,bytes);
 			}
 
 			list_iterate(suscriptores[NEW_POKEMON],&enviar_a_suscriptores_new);
@@ -96,8 +96,8 @@ void extraer_get_pokemon(){
 			}
 
 
-			void enviar_a_suscriptores_get(int *socket){
-				enviar_mensaje_nofree(*socket,sent_package,bytes);
+			void enviar_a_suscriptores_get(int socket){
+				enviar_mensaje_nofree(socket,sent_package,bytes);
 			}
 
 			list_iterate(suscriptores[GET_POKEMON],&enviar_a_suscriptores_get);
@@ -131,8 +131,6 @@ void extraer_catch_pokemon(){
 
 
 		log_info(logger,"Mensaje recibido CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
-		free(mensaje_catch->pokemon);
-		free(mensaje_catch);
 
 
 		if(list_size(suscriptores[CATCH_POKEMON])==0){
@@ -141,12 +139,16 @@ void extraer_catch_pokemon(){
 
 
 		void enviar_a_suscriptores_catch(int socket){
+
 			enviar_mensaje_nofree(socket,sent_package,bytes);
 			log_info(logger,"Mensaje enviado CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
 
 		}
 
+
 		list_iterate(suscriptores[CATCH_POKEMON],&enviar_a_suscriptores_catch);
+		free(mensaje_catch->pokemon);
+		free(mensaje_catch);
 
 
 		free(sent_package);
@@ -173,8 +175,8 @@ void extraer_appeared_pokemon(){
 			}
 
 
-			void enviar_a_suscriptores_appeared(int *socket){
-				enviar_mensaje_nofree(*socket,sent_package,bytes);
+			void enviar_a_suscriptores_appeared(int socket){
+				enviar_mensaje_nofree(socket,sent_package,bytes);
 			}
 
 			list_iterate(suscriptores[APPEARED_POKEMON],&enviar_a_suscriptores_appeared);
@@ -205,8 +207,8 @@ void extraer_localized_pokemon(){
 			}
 
 
-			void enviar_a_suscriptores_localized(int *socket){
-				enviar_mensaje_nofree(*socket,sent_package,bytes);
+			void enviar_a_suscriptores_localized(int socket){
+				enviar_mensaje_nofree(socket,sent_package,bytes);
 			}
 
 			list_iterate(suscriptores[LOCALIZED_POKEMON],&enviar_a_suscriptores_localized);
@@ -237,8 +239,8 @@ void extraer_caught_pokemon(){
 			}
 
 
-			void enviar_a_suscriptores_caught(int *socket){
-				enviar_mensaje_nofree(*socket,sent_package,bytes);
+			void enviar_a_suscriptores_caught(int socket){
+				enviar_mensaje_nofree(socket,sent_package,bytes);
 			}
 
 			list_iterate(suscriptores[CAUGHT_POKEMON],&enviar_a_suscriptores_caught);

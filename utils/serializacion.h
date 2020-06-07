@@ -16,7 +16,7 @@ typedef enum {
 	APPEARED_POKEMON = 3,
 	LOCALIZED_POKEMON = 4,
 	CAUGHT_POKEMON = 5,
-	SUSCRIPCION = 6,
+	SUSCRIPCION =6,
 	CONFIRMACION = 7
 // TODO: Definir codigos de operacion restantes
 } op_code;
@@ -90,6 +90,11 @@ typedef struct {
 	t_buffer* buffer;
 } t_paquete_socket;
 
+typedef struct{
+	op_code confirmacion;
+	int id_mensaje;
+}t_confirmacion;
+
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer,
 		int id_correlativo);
@@ -130,6 +135,9 @@ void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
 t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer);
+//CONFIRMACION
+t_confirmacion* deserializar_confirmacion(void*mensaje);
+
 // UTILIDADES
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);

@@ -186,6 +186,8 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 
 	if (conexion == -1){
 
+		//printf("ERROR al conectar con BROKER");
+		//exit(1);
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
 		confirmar_caught(tcb);

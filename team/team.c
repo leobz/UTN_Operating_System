@@ -192,6 +192,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			break;
 
+		case CONFIRMACION:
+				log_info(logger,"Confirmacion %d",paquete->id_mensaje);
+				break;
+
 		default:
 			pthread_exit(NULL);
 			break;
