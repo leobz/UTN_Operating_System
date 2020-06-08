@@ -13,13 +13,13 @@ echo Compilo Broker:
 byexample -l shell compilo-broker.md
 
 echo
-echo Corro Tests Integración Team-Broker:
-byexample -l shell team-broker.md
+echo Corro Tests de Team:
+byexample -l shell team.md
 
 echo
 echo Corro Tests de Broker:
 byexample -l shell broker.md
 
 echo
-echo Corro Tests de Team:
-byexample -l shell team.md
+echo Corro Tests Integración Team-Broker:
+byexample -l shell team-broker.md
