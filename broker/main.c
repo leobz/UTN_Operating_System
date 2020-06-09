@@ -22,7 +22,7 @@ int main() {
 
 	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)extraer_new_pokemon,NULL);
 	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)extraer_get_pokemon,NULL);
-	pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)extraer_catch_pokemon,NULL);
+	pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
 	pthread_create(&sem_mensajes[APPEARED_POKEMON],NULL,(void*)extraer_appeared_pokemon,NULL);
 	pthread_create(&sem_mensajes[LOCALIZED_POKEMON],NULL,(void*)extraer_localized_pokemon,NULL);
 	pthread_create(&sem_mensajes[CAUGHT_POKEMON],NULL,(void*)extraer_caught_pokemon,NULL);
@@ -43,6 +43,47 @@ int main() {
 	finalizar_broker(broker_config,logger);
 	return 0;
 }
+
+
+
+
+void enviar_mensajes_en_cola(int codigo_de_operacion){
+	while(1){
+		sem_wait(&cola_vacia[codigo_de_operacion]); //existen mensajes en la cola
+
+		pthread_mutex_lock(&mutex[codigo_de_operacion]);
+		mensaje[codigo_de_operacion] = extraer_mensaje(codigo_de_operacion);
+		pthread_mutex_unlock(&mutex[codigo_de_operacion]);
+
+		int bytes=0;
+		void *sent_package=empaquetar_mensaje_broker(mensaje[codigo_de_operacion],&bytes);
+		t_mensaje_catch *mensaje_catch= deserializar_paquete_catch_pokemon(sent_package);
+
+		log_info(logger,"Mensaje recibido CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
+
+		if(list_size(suscriptores[codigo_de_operacion])==0){
+			sem_wait(&sem_proceso[codigo_de_operacion]);
+		}
+
+		void enviar_a_suscriptores_catch(int socket){
+
+			enviar_mensaje_nofree(socket,sent_package,bytes);
+			log_info(logger,"Mensaje enviado CATCH_POKEMON %s %d %d",mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
+
+		}
+
+		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores_catch);
+		free(mensaje_catch->pokemon);
+		free(mensaje_catch);
+
+
+		free(sent_package);
+		free(mensaje[codigo_de_operacion]->payload);
+		free(mensaje[codigo_de_operacion]);
+
+	}
+}
+
 
 void extraer_new_pokemon(){
 	while(1){

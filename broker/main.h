@@ -23,4 +23,5 @@ void extraer_catch_pokemon();
 void extraer_appeared_pokemon();
 void extraer_localized_pokemon();
 void extraer_caught_pokemon();
+void enviar_mensajes_en_cola(int);
 #endif /* MAIN_H_ */
