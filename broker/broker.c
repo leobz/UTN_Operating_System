@@ -46,12 +46,21 @@ void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
 	broker_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 
+	broker_config->tamanio_memoria = config_get_int_value(config, "TAMANO_MEMORIA");
+	broker_config->tamanio_minimo_particion = config_get_int_value(config, "TAMANO_MINIMO_PARTICION");
+	broker_config->algoritmo_memoria = strdup(config_get_string_value(config, "ALGORITMO_MEMORIA"));
+	broker_config->algoritmo_reemplazo = strdup(config_get_string_value(config, "ALGORITMO_REEMPLAZO"));
+	broker_config->algoritmo_particion_libre = strdup(config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE"));
+	broker_config->frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
 }
 
 
 void destruir_broker_config(t_broker_config *broker_config) {
 	free(broker_config->ip_broker);
 	free(broker_config->puerto_broker);
+	free(broker_config->algoritmo_memoria);
+	free(broker_config->algoritmo_reemplazo);
+	free(broker_config->algoritmo_particion_libre);
 	free(broker_config);
 }
 
@@ -69,13 +78,12 @@ t_broker_config *cargar_broker_config(char *path_archivo) {
 }
 
 
-void inicializar_broker(t_broker_config **broker_config, t_log **logger) {
-	*broker_config = cargar_broker_config("broker.config");
-	*logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
-
+void inicializar_broker() {
+	broker_config = cargar_broker_config("broker.config");
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 }
 
-void finalizar_broker(t_broker_config* broker_config, t_log* logger) {
+void finalizar_broker() {
 	destruir_broker_config(broker_config);
 	destruir_logger(logger);
 }
