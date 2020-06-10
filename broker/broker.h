@@ -18,8 +18,13 @@
 typedef struct {
 	char *ip_broker;
 	char *puerto_broker;
+	int tamanio_memoria;
+	int tamanio_minimo_particion;
+	char* algoritmo_memoria;
+	char* algoritmo_reemplazo;
+	char* algoritmo_particion_libre;
+	int frecuencia_compactacion;
 } t_broker_config;
-
 
 typedef struct mensaje{
 
@@ -43,13 +48,14 @@ typedef struct cola_proceso{
 	struct cola_proceso* siguiente;
 }t_cola_proceso;
 
-
+t_log* logger;
+t_broker_config* broker_config;
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);
 void destruir_broker_config(t_broker_config *broker_config);
-void inicializar_broker(t_broker_config **broker_config, t_log **logger);
-void finalizar_broker(t_broker_config* broker_config, t_log* logger);
+void inicializar_broker();
+void finalizar_broker();
 t_broker_config *cargar_broker_config(char *path_archivo);
 
 #endif /* BROKER_H_ */

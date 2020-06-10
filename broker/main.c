@@ -4,10 +4,13 @@ t_cola_proceso *proceso;
 
 int main() {
 
-	inicializar_broker(&broker_config,&logger);
+	inicializar_broker();
+	inicializar_memoria_cache();
+
 	char*ip=broker_config->ip_broker;
 	char*puerto=broker_config->puerto_broker;
 	int socket_servidor = iniciar_servidor(ip, puerto);
+
 
 	for(int i = 0; i < 6; i++)
 	     sem_init(&cola_vacia[i], 0, 0);
@@ -36,7 +39,9 @@ int main() {
 	pthread_detach(sem_mensajes[LOCALIZED_POKEMON]);
 	pthread_detach(sem_mensajes[CAUGHT_POKEMON]);
 
+	finalizar_memoria_cache();
 	finalizar_broker(broker_config,logger);
+
 	return 0;
 }
 
