@@ -11,6 +11,7 @@
 #include "colas.h"
 
 t_mensaje* mensaje[6];
+t_mensaje_catch *mensaje_catch;
 //t_broker_config* config_broker;
 //t_log* log_broker;
 

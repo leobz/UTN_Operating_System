@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
 					pos_y, cantidad, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -98,6 +99,7 @@ int main(int argc, char **argv) {
 					id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -123,6 +125,8 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,pos_y, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
+
 
 			liberar_conexion(conexion);
 		}
@@ -148,6 +152,7 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x,
 					pos_y, id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -179,8 +184,10 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_caught_pokemon(&bytes, estado,
 					id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
+
 		}
 
 	}

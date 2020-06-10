@@ -48,8 +48,8 @@ void loggear_mensaje_enviado(int socket, int codigo_de_operacion) {
 void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 	// Esta funcion no es de tanta prioridad, terminar solo despues de hacer la adminstracion de mensajes completa
 	switch (codigo_de_operacion) {
-	case CATCH_POKEMON: ;
-		t_mensaje_catch* mensaje_catch = deserializar_paquete_catch_pokemon(sent_package);
+	case CATCH_POKEMON:
+		mensaje_catch = deserializar_paquete_catch_pokemon(sent_package);
 		log_info(logger, "Mensaje recibido CATCH_POKEMON %s %d %d",
 				mensaje_catch->pokemon, mensaje_catch->posx,
 				mensaje_catch->posy);
@@ -58,8 +58,9 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 		free(mensaje_catch);
 		break;
 	default:
-		printf("ERROR, CODIGO DE OPERACION INCORRECTO\n");
-		exit(-1);
+		//printf("ERROR, CODIGO DE OPERACION INCORRECTO\n");
+		//exit(-1);
+		break;
 	}
 }
 
