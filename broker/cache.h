@@ -33,6 +33,8 @@ int ordenamiento;
 // Inicialización cache
 void inicializar_memoria_cache();
 void inicializar_mutex_cache();
+void inicializar_lista_particiones();
+void inicializar_particion_bs();
 void inicializar_particiones_dinamicas();
 
 // Funciones cache
@@ -53,6 +55,9 @@ t_particion_dinamica* crear_particion_dinamica_libre(int , int);
 
 // Finalización cache
 void finalizar_mutex_cache();
+void finalizar_lista_particiones();
+void finalizar_particion_bs();
+void finalizar_particiones_dinamicas();
 void finalizar_memoria_cache();
 
 #endif /* CACHE_H_ */
