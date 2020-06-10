@@ -95,22 +95,15 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		liberar_paquete_socket(paquete_socket);
 
 	}
-	else{
-		switch (paquete_socket->codigo_operacion) {
-			case SUSCRIPCION:
-				break;
+}
 
-			case CONFIRMACION:
-				log_info(logger,"Confirmacion %d",paquete_socket->id_mensaje);
+void recibir_id_correlativo(int socket_cliente) {
+	t_paquete_socket* paquete =  recibir_mensaje_servidor(socket_cliente);
 
-				break;
+	int length = snprintf( NULL, 0, "%d", paquete->id_mensaje);
+	char* id_correlativo_char = malloc( length + 1 );
+	snprintf(id_correlativo_char, length + 1, "%d", paquete->id_mensaje);
 
-			case OP_ERROR:
-				break;
+	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO: %s", id_correlativo_char);
 
-			default:
-				break;
-			}
-	free(paquete_socket);
-	}
 }
