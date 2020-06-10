@@ -254,15 +254,13 @@ void confirmar_caught(t_tcb_entrenador* tcb){
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
-	int id_correlativo_int;
+	t_paquete_socket* paquete =  recibir_mensaje_servidor(socket_cliente);
 
-	recv(socket_cliente, &id_correlativo_int, sizeof(int), 0);
-
-	int length = snprintf( NULL, 0, "%d", id_correlativo_int);
+	int length = snprintf( NULL, 0, "%d", paquete->id_correlativo);
 	char* id_correlativo_char = malloc( length + 1 );
-	snprintf(id_correlativo_char, length + 1, "%d", id_correlativo_int);
+	snprintf(id_correlativo_char, length + 1, "%d", paquete->id_correlativo);
 
-	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH enviado:%s", id_correlativo_char);
+	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:%s", id_correlativo_char);
 
 	return id_correlativo_char;
 }
