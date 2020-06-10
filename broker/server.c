@@ -42,8 +42,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		switch (paquete->codigo_operacion) {
 		case SUSCRIPCION:
 
+			proceso=malloc(sizeof(t_proceso));
+			proceso->id_proceso=paquete->id_proceso;
+			proceso->socket=paquete->socket_cliente;
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-			list_add(suscriptores[paquete->cola], paquete->socket_cliente);
+			list_add(suscriptores[paquete->cola], proceso);
 
 			sem_post(&sem_proceso[paquete->cola]);
 

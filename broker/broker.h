@@ -8,12 +8,21 @@
 #ifndef BROKER_H_
 #define BROKER_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/socket.h>
+#include<unistd.h>
+#include<netdb.h>
+#include<commons/log.h>
+#include<commons/collections/list.h>
+#include<pthread.h>
+#include<semaphore.h>
 #include <string.h>
 #include "../utils/config.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
+
 
 typedef struct {
 	char *ip_broker;
@@ -32,18 +41,21 @@ typedef struct mensaje{
 
 }t_mensaje;
 
-typedef struct cola_mensaje_recibido{
+typedef struct{
+
+	int id_proceso;
+	int socket;
+
+}t_proceso;
+
+typedef struct{
 	int id_mensaje;
-	int confirmacion; //boolean para saber si el receptor confirmo el mensaje
-	struct cola_mensaje_recibido* siguiente;
-}t_cola_mensaje_recibido;
-
-typedef struct cola_proceso{
-	int socket_cliente;
-	struct cola_proceso* siguiente;
-}t_cola_proceso;
-
-
+	op_code tipo_mensaje;
+	//t_particion* particion;
+	t_list* suscriptores_enviados;
+	t_list* suscriptores_confirmados;
+}
+t_adm_mensaje;
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);
@@ -51,5 +63,6 @@ void destruir_broker_config(t_broker_config *broker_config);
 void inicializar_broker(t_broker_config **broker_config, t_log **logger);
 void finalizar_broker(t_broker_config* broker_config, t_log* logger);
 t_broker_config *cargar_broker_config(char *path_archivo);
+int id_necesario(int id_mensaje,int id_correlativo,op_code codigo_operacion);
 
 #endif /* BROKER_H_ */

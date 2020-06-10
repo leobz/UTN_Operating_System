@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
+		int id_process=0;
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
@@ -29,11 +30,13 @@ int main(int argc, char **argv) {
 		t_suscripcion *suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = cola;
+		suscripcion->id_proceso=id_process;
 
-		void *a_enviar = suscripcion;
+
+		void *a_enviar = empaquetar_suscripcion(suscripcion);
 
 		log_info(logger, "Conexion establecida con [Broker]");
-		enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
+		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 
 		log_info(logger,
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos",

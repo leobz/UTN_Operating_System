@@ -9,16 +9,6 @@
 #define SERVER_H_
 
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/socket.h>
-#include<unistd.h>
-#include<netdb.h>
-#include<commons/log.h>
-#include<commons/collections/list.h>
-#include<string.h>
-#include<pthread.h>
-#include<semaphore.h>
 
 
 
@@ -30,7 +20,7 @@ t_log* logger;
 t_broker_config* broker_config;
 
 int id_mensaje; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
-
+t_proceso* proceso;
 
 pthread_mutex_t mutex[6];
 pthread_mutex_t global;

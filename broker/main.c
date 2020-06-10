@@ -1,6 +1,5 @@
 #include "main.h"
 
-t_cola_proceso *proceso;
 
 int main() {
 
@@ -77,13 +76,22 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 		loggear_mensaje_recibido(codigo_de_operacion, sent_package);
 
-		if(list_size(suscriptores[codigo_de_operacion])==0){
-			sem_wait(&sem_proceso[codigo_de_operacion]);
-		}
+		//t_adm_mensaje* administrator;
+				//administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
+		void enviar_a_suscriptores(t_proceso* proceso){
 
-		void enviar_a_suscriptores(int socket){
-			enviar_mensaje_nofree(socket,sent_package,bytes);
-			loggear_mensaje_enviado(socket, codigo_de_operacion);
+			int validez=enviar_mensaje_con_retorno(proceso->socket,sent_package,bytes);
+			log_info(logger,"Validez: %d",validez);
+			loggear_mensaje_enviado(proceso->socket, codigo_de_operacion);
+
+			/*if(validez!=1){
+				list_add(administrator->suscriptores_enviados,proceso);
+			loggear_mensaje_enviado(proceso->socket, codigo_de_operacion);}
+
+			bool recepcion=recibir_confirmacion(proceso);
+
+			if(recepcion==true)
+				list_add(administrator->suscriptores_confirmados,proceso);*/
 		}
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
@@ -95,4 +103,14 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 	}
 }
 
+t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
+
+	t_adm_mensaje *administrador=malloc(sizeof(administrador));
+		administrador->id_mensaje= id_necesario(mensaje->id_mensaje,mensaje->id_correlativo,mensaje->codigo_operacion);
+		administrador->tipo_mensaje=mensaje->codigo_operacion;
+		administrador->suscriptores_confirmados=list_create();
+		administrador->suscriptores_enviados=list_create();
+
+		return administrador;
+}
 

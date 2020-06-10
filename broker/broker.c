@@ -39,6 +39,13 @@ void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
 	return paquete_broker;
 }
 
+int id_necesario(int id_mensaje,int id_correlativo,op_code codigo_operacion){
+	if((codigo_operacion>=0)&&(codigo_operacion<=2))
+		return id_mensaje;
+	else
+		return id_correlativo;
+}
+
 void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
 	broker_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));

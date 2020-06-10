@@ -364,6 +364,19 @@ t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer) {
 	memcpy(&(mensaje_caught->resultado), buffer->stream ,sizeof(int));
 	return mensaje_caught;
 }
+/////////////////////////////////////////////////////////////////////////////////////
+void* empaquetar_suscripcion(t_suscripcion* suscripcion){
+	void*a_enviar=malloc(sizeof(int)*3);
+	int offset=0;
+
+	memcpy(a_enviar + offset, &suscripcion->cod_operacion, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar + offset, &suscripcion->cola_a_suscribir, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar + offset, &suscripcion->id_proceso, sizeof(int));
+	offset += sizeof(int);
+	return a_enviar;
+};
 
 t_confirmacion* deserializar_confirmacion(void*mensaje){
 	t_confirmacion* confirmacion=malloc(sizeof(t_confirmacion));
