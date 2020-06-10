@@ -1,9 +1,11 @@
 #include "cache.h"
 
+
 void inicializar_memoria_cache() {
 	memoria_cache = malloc(broker_config->tamanio_memoria);
 
 	inicializar_mutex_cache();
+	inicializar_lista_particiones();
 }
 
 void inicializar_mutex_cache() {
@@ -16,13 +18,51 @@ void inicializar_mutex_cache() {
 	}
 }
 
+void inicializar_lista_particiones() {
+	if (es_buddy_system()) {
+		// inicializacion bs
+	}
+	else if (es_particion_dinamica()) {
+		particiones_dinamicas = list_create();
+	}
+}
+
+int es_buddy_system() {
+	return strcmp(broker_config->algoritmo_memoria, "BS") == 0;
+}
+
+int es_particion_dinamica() {
+	return strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0;
+}
+
 void agregar_mensaje_memoria_cache(t_mensaje* mensaje) {
-	if (strcmp(broker_config->algoritmo_memoria, "BS") == 0) {
+	if (es_buddy_system()) {
 		// logica de buddy system
 	}
-	else if (strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0) {
-			// logica de particionamiento dinamico
+	else if (es_particion_dinamica()) {
+		t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre();
 	}
+}
+
+t_particion_dinamica* buscar_particion_dinamica_libre(){
+	if (list_is_empty(particiones_dinamicas)){
+		t_particion_dinamica* particion = crear_particion_dinamica(broker_config->tamanio_memoria);
+	}
+	else{
+		switch (ordenamiento){
+		case PRIMER_AJUSTE:
+
+			break;
+		case MEJOR_AJUSTE:
+			//
+			break;
+		}
+	}
+
+}
+
+t_particion_dinamica* crear_particion_dinamica(int tamanio){
+
 }
 
 void finalizar_mutex_cache() {
