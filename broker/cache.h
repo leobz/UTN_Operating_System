@@ -32,13 +32,17 @@ typedef enum {
 // Inicialización cache
 void inicializar_memoria_cache();
 void inicializar_mutex_cache();
+void inicializar_particiones_dinamicas();
 
 // Funciones cache
 void agregar_mensaje_memoria_cache(t_mensaje* mensaje);
+int es_particion_dinamica();
+int es_buddy_system();
 
 // Funciones particion dinamica
-t_particion_dinamica* buscar_particion_dinamica_libre();
-t_particion_dinamica* crear_particion_dinamica(int);
+t_particion_dinamica* buscar_particion_dinamica_libre(int);
+t_particion_dinamica* crear_particion_dinamica(int, int);
+t_particion_dinamica* crear_particion_dinamica_libre(int , int);
 
 // Finalización cache
 void finalizar_mutex_cache();
