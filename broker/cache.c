@@ -52,33 +52,68 @@ int es_particion_dinamica() {
 	return strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0;
 }
 
-void agregar_mensaje_memoria_cache(t_mensaje* mensaje) {
+t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje) {
+	t_list* hojas_libres = list_create();
+	t_particion_bs* particion_elegida = NULL;
+	void* payload = mensaje->payload;
+	int tamanio_particion_necesaria = obtener_tamanio_particion_necesaria(mensaje->payload_size);
+	bool sin_hojas_libres = true;
+	int cantidad_busquedas_fallidas = broker_config->frecuencia_compactacion;
+
+	while (sin_hojas_libres) {
+		obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion_bs, tamanio_particion_necesaria);
+
+		if (cantidad_busquedas_fallidas == 0) {
+			// TODO: compactar memoria cache
+			// TODO: reiniciar cantidad_busquedas_fallidas segun config
+		}
+		else {
+			if (list_size(hojas_libres) == 0) {
+				// TODO: eliminar particion segun algoritmo de reemplazo (LRU o FIFO)
+				// TODO: decrementar cantidad_busquedas_fallidas
+			}
+			else
+				sin_hojas_libres = false;
+		}
+	}
+
+	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
+	particion_elegida = dividir_particion_elegida (list_pop_first(hojas_libres), tamanio_particion_necesaria);
+	cargar_particion_elegida(particion_elegida, mensaje);
+	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->tamanio_particion);
+
+	return particion_elegida;
+}
+
+void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
 	//ESTA FUNCION DEBERIA RETORNAR UNA PARTICION O UN OFFSET A LA ADMINISTRACION DEL MENSAJE
 	void* payload = mensaje->payload;
 	int size = mensaje->payload_size;
 
-	if (es_buddy_system()) {
-		t_list* hojas_libres = list_create();
-
-		obtener_hojas_libres_bs(hojas_libres, particion_bs);
-		ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
-	}
-	else if (es_particion_dinamica()) {
-		t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
-		guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
-	}
+	t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
+	guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
 }
 
-void obtener_hojas_libres_bs(t_list* hojas_libres, t_particion_bs* particion) {
+int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
+	int tamanio_particion_necesaria = 2;
+
+	while (tamanio_particion_necesaria < tamanio_mensaje) {
+		tamanio_mensaje *= 2;
+	}
+
+	return tamanio_particion_necesaria;
+}
+
+void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria) {
 
 	if ((particion->primer_hijo != NULL || particion->segundo_hijo != NULL) && particion->esta_libre) {
 		if (particion->primer_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->primer_hijo);
+			obtener_hojas_libres_bs(hojas_libres, particion->primer_hijo, tamanio_particion_necesaria);
 
 		if (particion->segundo_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->segundo_hijo);
+			obtener_hojas_libres_bs(hojas_libres, particion->segundo_hijo, tamanio_particion_necesaria);
 	}
-	else if (particion->esta_libre) {
+	else if (particion->esta_libre && particion->tamanio_particion >= tamanio_particion_necesaria) {
 		list_add(hojas_libres, particion);
 	}
 }
@@ -99,6 +134,23 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 	else if (strcmp(broker_config->algoritmo_particion_libre, "BF") == 0) {
 		list_sort(hojas_libres, (void*)es_menor_tamanio);
 	}
+
+}
+
+t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria) {
+
+	if ((hoja_libre->tamanio_particion / 2) >= tamanio_particion_necesaria) {
+		// TODO: crear particiones hijas e aplicar recursividad
+	}
+
+	return hoja_libre;
+}
+
+void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje mensaje) {
+
+	particion_elegida->esta_libre = false;
+	particion_elegida->size_mensaje = mensaje->payload_size;
+
 }
 
 t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){

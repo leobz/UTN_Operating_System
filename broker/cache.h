@@ -38,17 +38,21 @@ void inicializar_particion_bs();
 void inicializar_particiones_dinamicas();
 
 // Funciones cache
-void agregar_mensaje_memoria_cache(t_mensaje* mensaje);
 int es_particion_dinamica();
 int es_buddy_system();
 
 // Funciones buddy system
-void obtener_hojas_libres_bs(t_list* hojas_libres, t_particion_bs* particion);
+t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje);
+int obtener_tamanio_particion_necesaria (int tamanio_mensaje);
+void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria);
 bool es_menor_offset(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre);
 bool es_menor_tamanio(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre);
 void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres);
+t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria);
+void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje mensaje);
 
 // Funciones particion dinamica
+void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
 t_particion_dinamica* crear_particion_dinamica(int, int);
 t_particion_dinamica* crear_particion_dinamica_libre(int , int);
