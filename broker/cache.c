@@ -108,10 +108,10 @@ void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_partici
 
 	if ((particion->primer_hijo != NULL || particion->segundo_hijo != NULL) && particion->esta_libre) {
 		if (particion->primer_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->primer_hijo, tamanio_particion_necesaria);
+			obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion->primer_hijo, tamanio_particion_necesaria);
 
 		if (particion->segundo_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->segundo_hijo, tamanio_particion_necesaria);
+			obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion->segundo_hijo, tamanio_particion_necesaria);
 	}
 	else if (particion->esta_libre && particion->tamanio_particion >= tamanio_particion_necesaria) {
 		list_add(hojas_libres, particion);
@@ -146,7 +146,7 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 	return hoja_libre;
 }
 
-void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje mensaje) {
+void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* mensaje) {
 
 	particion_elegida->esta_libre = false;
 	particion_elegida->size_mensaje = mensaje->payload_size;

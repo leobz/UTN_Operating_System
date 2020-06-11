@@ -49,7 +49,7 @@ bool es_menor_offset(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_
 bool es_menor_tamanio(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre);
 void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres);
 t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria);
-void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje mensaje);
+void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* mensaje);
 
 // Funciones particion dinamica
 void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
