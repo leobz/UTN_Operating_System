@@ -16,7 +16,7 @@ typedef struct particion_bs {
 typedef struct {
 	int offset;
 	int tamanio_particion;
-	bool esta_ocupado;
+	bool esta_libre;
 } t_particion_dinamica;
 
 typedef enum {
@@ -50,8 +50,13 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres);
 
 // Funciones particion dinamica
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
+t_list* obtener_particiones_libres_pd();
 t_particion_dinamica* crear_particion_dinamica(int, int);
 t_particion_dinamica* crear_particion_dinamica_libre(int , int);
+void ordenar_particiones_segun_algoritmo_particion_libre(t_list*);
+bool pd_es_menor_offset(t_particion_dinamica*, t_particion_dinamica*);
+bool pd_es_menor_tamanio(t_particion_dinamica*, t_particion_dinamica*);
+
 
 // Finalización cache
 void finalizar_mutex_cache();

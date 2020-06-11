@@ -101,22 +101,42 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 	}
 }
 
-t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
-	switch (ordenamiento){
-	case PRIMER_AJUSTE:
 
-		break;
-	case MEJOR_AJUSTE:
-		//
-		break;
+bool pd_es_menor_offset(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
+	return particion->offset < siguiente_particion->offset;
+}
+
+bool pd_es_menor_tamanio(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
+	return particion->tamanio_particion < siguiente_particion->tamanio_particion;
+}
+
+void ordenar_particiones_segun_algoritmo_particion_libre(t_list* particiones){
+	if (strcmp(broker_config->algoritmo_particion_libre, "FF") == 0) {
+		list_sort(particiones, (void*)pd_es_menor_offset);
 	}
+	else if (strcmp(broker_config->algoritmo_particion_libre, "BF") == 0) {
+		list_sort(particiones, (void*)pd_es_menor_tamanio);
+	}
+}
+
+t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
+	t_list* particiones_libres = obtener_particiones_libres_pd();
+
+}
+
+t_list* obtener_particiones_libres_pd() {
+	int particion_esta_libre(t_particion_dinamica* particion){
+		return particion->esta_libre;
+	}
+
+	return list_filter(particiones_dinamicas, (void*) particion_esta_libre);
 }
 
 t_particion_dinamica* crear_particion_dinamica(int offset, int tamanio){
 	t_particion_dinamica* particion = malloc(sizeof(t_particion_dinamica));
 	particion->offset = offset;
 	particion->tamanio_particion = tamanio;
-	particion->esta_ocupado = 1;
+	particion->esta_libre = false;
 
 	return particion;
 }
@@ -124,7 +144,7 @@ t_particion_dinamica* crear_particion_dinamica(int offset, int tamanio){
 
 t_particion_dinamica* crear_particion_dinamica_libre(int offset, int tamanio){
 	t_particion_dinamica* particion = crear_particion_dinamica(offset, tamanio);
-	particion->esta_ocupado = 0;
+	particion->esta_libre = true;
 
 	return particion;
 }
