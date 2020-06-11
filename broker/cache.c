@@ -102,15 +102,68 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 }
 
 
-bool pd_es_menor_offset(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
-	return particion->offset < siguiente_particion->offset;
+// PARTICIONES DINAMICAS
+
+
+t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
+	t_particion_dinamica* particion;
+	int particiones_eliminadas = 0;
+
+	t_list* particiones_libres = obtener_particiones_dinamicas_libres();
+	t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
+
+	while(list_is_empty(particiones_posibles)){
+		if (supero_limite_de_eliminaciones(particiones_eliminadas)) {
+			compactar_particiones_dinamicas();
+			particiones_eliminadas = 0;
+		}
+
+		t_list* particiones_libres = obtener_particiones_dinamicas_libres();
+		t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
+
+		if (list_is_empty(particiones_posibles)){
+			eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
+			particiones_eliminadas++;
+		}
+	}
+
+	ordenar_segun_algoritmo_de_particiones_libres(particiones_posibles);
+	particion = list_get(particiones_posibles, 0);
+
+	return particion;
 }
 
-bool pd_es_menor_tamanio(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
-	return particion->tamanio_particion < siguiente_particion->tamanio_particion;
+int supero_limite_de_eliminaciones(int particiones_eliminadas) {
+	return particiones_eliminadas >= broker_config->frecuencia_compactacion;
 }
 
-void ordenar_particiones_segun_algoritmo_particion_libre(t_list* particiones){
+void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
+	// TODO
+}
+
+void compactar_particiones_dinamicas() {
+	// TODO
+}
+
+t_list* filtrar_particiones_por_tamanio(t_list* particiones, int tamanio_payload) {
+
+	int particion_es_mayor_a_tamanio_de_payload(t_particion_dinamica* particion){
+		return particion->tamanio_particion >= tamanio_payload;
+	}
+
+	return list_filter(particiones, (void*) particion_es_mayor_a_tamanio_de_payload);
+}
+
+t_list* obtener_particiones_dinamicas_libres() {
+
+	int particion_esta_libre(t_particion_dinamica* particion){
+		return particion->esta_libre;
+	}
+
+	return list_filter(particiones_dinamicas, (void*) particion_esta_libre);
+}
+
+void ordenar_segun_algoritmo_de_particiones_libres(t_list* particiones){
 	if (strcmp(broker_config->algoritmo_particion_libre, "FF") == 0) {
 		list_sort(particiones, (void*)pd_es_menor_offset);
 	}
@@ -119,18 +172,16 @@ void ordenar_particiones_segun_algoritmo_particion_libre(t_list* particiones){
 	}
 }
 
-t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
-	t_list* particiones_libres = obtener_particiones_libres_pd();
-
+bool pd_es_menor_offset(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
+	return particion->offset < siguiente_particion->offset;
 }
 
-t_list* obtener_particiones_libres_pd() {
-	int particion_esta_libre(t_particion_dinamica* particion){
-		return particion->esta_libre;
-	}
-
-	return list_filter(particiones_dinamicas, (void*) particion_esta_libre);
+bool pd_es_menor_tamanio(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
+	return particion->tamanio_particion < siguiente_particion->tamanio_particion;
 }
+
+
+
 
 t_particion_dinamica* crear_particion_dinamica(int offset, int tamanio){
 	t_particion_dinamica* particion = malloc(sizeof(t_particion_dinamica));

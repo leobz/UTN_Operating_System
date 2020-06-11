@@ -50,12 +50,15 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres);
 
 // Funciones particion dinamica
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
-t_list* obtener_particiones_libres_pd();
+t_list* obtener_particiones_dinamicas_libres();
 t_particion_dinamica* crear_particion_dinamica(int, int);
 t_particion_dinamica* crear_particion_dinamica_libre(int , int);
-void ordenar_particiones_segun_algoritmo_particion_libre(t_list*);
+void ordenar_segun_algoritmo_de_particiones_libres(t_list*);
 bool pd_es_menor_offset(t_particion_dinamica*, t_particion_dinamica*);
 bool pd_es_menor_tamanio(t_particion_dinamica*, t_particion_dinamica*);
+t_list* filtrar_particiones_por_tamanio(t_list*, int);
+void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
+void compactar_particiones_dinamicas();
 
 
 // Finalización cache
