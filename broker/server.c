@@ -32,7 +32,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
 		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
-		agregar_mensaje_memoria_cache(mensaje_a_encolar);
+		if (es_buddy_system()) {
+			// TODO: guardar el mensaje en t_adm_mensaje
+			agregar_mensaje_memoria_cache_bs(mensaje_a_encolar);
+		}
+		else if (es_particion_dinamica()){
+			agregar_mensaje_memoria_cache_particion_dinamica(mensaje_a_encolar);
+		}
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
