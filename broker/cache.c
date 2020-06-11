@@ -20,11 +20,22 @@ void inicializar_mutex_cache() {
 
 void inicializar_lista_particiones() {
 	if (es_buddy_system()) {
-		// inicializacion bs
+		inicializar_particion_bs();
 	}
 	else if (es_particion_dinamica()) {
 		inicializar_particiones_dinamicas();
 	}
+}
+
+void inicializar_particion_bs() {
+	particion_bs = malloc(sizeof(t_particion_bs));
+
+	particion_bs->offset = 0;
+	particion_bs->tamanio_particion = broker_config->tamanio_memoria;
+	particion_bs->esta_libre = true;
+	particion_bs->size_mensaje = 0;
+	particion_bs->primer_hijo = NULL;
+	particion_bs->segundo_hijo = NULL;
 }
 
 void inicializar_particiones_dinamicas(){
@@ -47,11 +58,46 @@ void agregar_mensaje_memoria_cache(t_mensaje* mensaje) {
 	int size = mensaje->payload_size;
 
 	if (es_buddy_system()) {
-		// logica de buddy system
+		t_list* hojas_libres = list_create();
+
+		obtener_hojas_libres_bs(hojas_libres, particion_bs);
+		ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
 	}
 	else if (es_particion_dinamica()) {
 		t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
 		guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
+	}
+}
+
+void obtener_hojas_libres_bs(t_list* hojas_libres, t_particion_bs* particion) {
+
+	if ((particion->primer_hijo != NULL || particion->segundo_hijo != NULL) && particion->esta_libre) {
+		if (particion->primer_hijo != NULL)
+			obtener_hojas_libres_bs(hojas_libres, particion->primer_hijo);
+
+		if (particion->segundo_hijo != NULL)
+			obtener_hojas_libres_bs(hojas_libres, particion->segundo_hijo);
+	}
+	else if (particion->esta_libre) {
+		list_add(hojas_libres, particion);
+	}
+}
+
+bool es_menor_offset(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre) {
+	return hoja_libre->offset < siguiente_hoja_libre->offset;
+}
+
+bool es_menor_tamanio(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre) {
+	return hoja_libre->tamanio_particion < siguiente_hoja_libre->tamanio_particion;
+}
+
+void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) {
+
+	if (strcmp(broker_config->algoritmo_particion_libre, "FF") == 0) {
+		list_sort(hojas_libres, (void*)es_menor_offset);
+	}
+	else if (strcmp(broker_config->algoritmo_particion_libre, "BF") == 0) {
+		list_sort(hojas_libres, (void*)es_menor_tamanio);
 	}
 }
 
@@ -92,8 +138,27 @@ void finalizar_mutex_cache() {
 		pthread_mutex_destroy(&m_cache[i]);
 	}
 }
+
+void finalizar_lista_particiones() {
+	if (es_buddy_system()) {
+		finalizar_particion_bs();
+	}
+	else if (es_particion_dinamica()) {
+		finalizar_particiones_dinamicas();
+	}
+}
+
+void finalizar_particion_bs() {
+	// TODO: implementar logica eliminacion particion bs
+}
+
+void finalizar_particiones_dinamicas() {
+	// TODO: implementar logica eliminacion particiones dinamicas
+}
+
 void finalizar_memoria_cache() {
 	finalizar_mutex_cache();
+	finalizar_lista_particiones();
 
 	free(memoria_cache);
 }
