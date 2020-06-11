@@ -18,11 +18,7 @@ t_mensaje_catch *mensaje_catch;
 pthread_t sem_mensajes[6];
 pthread_mutex_t mutex[6];
 
-void extraer_new_pokemon();
-void extraer_get_pokemon();
-void extraer_catch_pokemon();
-void extraer_appeared_pokemon();
-void extraer_localized_pokemon();
-void extraer_caught_pokemon();
+
 void enviar_mensajes_en_cola(int);
+t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje);
 #endif /* MAIN_H_ */

@@ -22,6 +22,7 @@
 #include "../utils/config.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
+#include "../utils/diccionarios.h"
 
 
 typedef struct {
@@ -50,12 +51,20 @@ typedef struct{
 
 typedef struct{
 	int id_mensaje;
+	int id_correlativo;
 	op_code tipo_mensaje;
 	//t_particion* particion;
 	t_list* suscriptores_enviados;
 	t_list* suscriptores_confirmados;
 }
 t_adm_mensaje;
+
+t_adm_mensaje* admin_sus;
+int socket_confirmado;
+t_proceso* proceso_confirmado;
+
+t_dictionary* dic_administrador;
+t_dictionary* processes;
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);

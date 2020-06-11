@@ -69,6 +69,7 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	if(paquete->codigo_operacion==CONFIRMACION){
 		recv(socket_cliente, &(paquete->id_mensaje), sizeof(int), MSG_WAITALL);
+		recv(socket_cliente, &(paquete->id_proceso), sizeof(int), MSG_WAITALL);
 	}
 
 

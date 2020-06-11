@@ -184,8 +184,7 @@ int main(int argc, char **argv) {
 
 			int bytes;
 
-			void *a_enviar = serializar_caught_pokemon(&bytes, estado,
-					id_correlativo);
+			void *a_enviar = serializar_caught_pokemon(&bytes, estado,id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
 			recibir_id_correlativo(conexion);
 

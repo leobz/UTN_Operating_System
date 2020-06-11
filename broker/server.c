@@ -21,7 +21,7 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
-		loggear_nueva_conexion(logger, paquete);
+
 
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
@@ -32,6 +32,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
+		loggear_nueva_conexion(logger, paquete);
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
 		liberar_paquete_socket(paquete);
@@ -45,10 +46,24 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			proceso=malloc(sizeof(t_proceso));
 			proceso->id_proceso=paquete->id_proceso;
 			proceso->socket=paquete->socket_cliente;
+
+			//dictionary_put(processes,paquete->id_proceso,proceso);
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
 			list_add(suscriptores[paquete->cola], proceso);
 
 			sem_post(&sem_proceso[paquete->cola]);
+
+			break;
+
+		case CONFIRMACION:
+
+			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
+
+			admin_sus=dictionary_get(dic_administrador,paquete->id_mensaje);
+
+			proceso_confirmado=dictionary_get(processes,paquete->id_proceso);
+
+			list_add(admin_sus->suscriptores_confirmados,proceso_confirmado);
 
 			break;
 
@@ -97,13 +112,16 @@ void enviar_confirmacion(int id,op_code confirmacion,int socket){
 		//log_info(logger, "id %d",id);
 
 		int offset=0;
+		int id_falso=0;
 
-		void*enviar=malloc(sizeof(int)*2);
+		void*enviar=malloc(sizeof(int)*3);
 		memcpy(enviar,&confirmacion,sizeof(int));
 		offset+=sizeof(int);
 		memcpy(enviar+offset,&id,sizeof(int));
+		offset+=sizeof(int);
+		memcpy(enviar+offset,&id_falso,sizeof(int)); //valor nulo pq no es un id_proceso
 
-		enviar_mensaje(socket,enviar,sizeof(int)*2);
+		enviar_mensaje(socket,enviar,sizeof(int)*3);
 
 		 //le devuelve al proceso emisor el id del mensaje
 }

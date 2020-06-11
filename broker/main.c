@@ -17,6 +17,9 @@ int main() {
 	for(int j = 0; j < 6; j++)
 		inicializar_lista(j);
 
+	//dic_administrador=dictionary_create();
+	//processes=dictionary_create();
+
 	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
 	pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
@@ -74,25 +77,27 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		int bytes=0;
 		void *sent_package = empaquetar_mensaje_broker(mensaje[codigo_de_operacion],&bytes);
 
-		loggear_mensaje_recibido(codigo_de_operacion, sent_package);
+		loggear_mensaje_recibido(codigo_de_operacion, sent_package); //Por ahora de prueba
+
+		if(list_size(suscriptores[codigo_de_operacion])==0)
+			sem_wait(&sem_proceso[codigo_de_operacion]);
 
 		//t_adm_mensaje* administrator;
-				//administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
+		//administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
+
+////////////////////////////////////////////////////////////////////////////////////////////
 		void enviar_a_suscriptores(t_proceso* proceso){
 
 			int validez=enviar_mensaje_con_retorno(proceso->socket,sent_package,bytes);
-			log_info(logger,"Validez: %d",validez);
-			loggear_mensaje_enviado(proceso->socket, codigo_de_operacion);
+			/*log_info(logger,"Validez: %d",validez);
 
-			/*if(validez!=1){
+			if(validez!=1){ //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
 				list_add(administrator->suscriptores_enviados,proceso);
-			loggear_mensaje_enviado(proceso->socket, codigo_de_operacion);}
+				loggear_mensaje_enviado(proceso->socket, codigo_de_operacion); //Por ahora de prueba
+			}*/
 
-			bool recepcion=recibir_confirmacion(proceso);
-
-			if(recepcion==true)
-				list_add(administrator->suscriptores_confirmados,proceso);*/
 		}
+
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
 
@@ -106,10 +111,13 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
 
 	t_adm_mensaje *administrador=malloc(sizeof(administrador));
-		administrador->id_mensaje= id_necesario(mensaje->id_mensaje,mensaje->id_correlativo,mensaje->codigo_operacion);
+		administrador->id_mensaje= mensaje->id_mensaje;
+		administrador->id_correlativo=mensaje->id_correlativo;
 		administrador->tipo_mensaje=mensaje->codigo_operacion;
 		administrador->suscriptores_confirmados=list_create();
 		administrador->suscriptores_enviados=list_create();
+
+		dictionary_put(dic_administrador,mensaje->id_mensaje,administrador);
 
 		return administrador;
 }
