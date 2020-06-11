@@ -24,7 +24,7 @@ void destruir_gamecard_config(t_gamecard_config* gamecard_config) {
 	free(gamecard_config);
 }
 
-t_gamecard_config* cargar_gamecard_congif(char* path_archivo){
+t_gamecard_config* cargar_gamecard_config(char* path_archivo){
 	t_config* config;
 	t_gamecard_config* gamecard_config;
 
@@ -38,7 +38,7 @@ t_gamecard_config* cargar_gamecard_congif(char* path_archivo){
 }
 
 void inicializar_gamecard() {
-	gamecard_config = cargar_gamecard_congif("gamecard.config");
+	gamecard_config = cargar_gamecard_config("gamecard.config");
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
 }
 
