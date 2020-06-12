@@ -2,32 +2,18 @@
 
 int main(){
 	inicializar_gamecard();
+	suscribirme_al_broker(gamecard_config);
+	/* TODO Aca no me queda claro si no me suscribo porque tengo que seguir con lo demas.
+	   Que mensaje voy a esperar */
 
-	//NEW POKEMON
-	//TODO: Listado de pokemons, recorrer el objetivo general para ver los distintos pokemons que hay que tener
-	/*TODO:Si el pokemon no existe:
-	 1) crear directorio metada.bin (ver txt.c)
-	 2) Buscar bloque libre en bitmap-> recorrer buscando un 0, ese es el bloque libre --> mirar bitarray.c
-	 3) completar el metadata.bin
-	 */
-	/*TODO: Si el pokemon existe:
-	if(esta abierto) --> chequear Y/N
-		Busco el tiempo en archivo de configuracion
-	else
-		fopen archivo y unirlos todos
+	// Creo la conexion para escuchar
+	/*
+	char* ip = gamecard_config->ip_gamecard;
+	char* puerto = gamecard_config->puerto_gamecard;
+	int socket_servidor = iniciar_servidor(ip, puerto);
+	while (1){
+		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+	}
 	*/
-
-	/*TODO: If(Existe la posicion){cantidad+lo que sumo}
-	  	  	else{agrego una linea al final del archivo}
-	  	  	 sleep()
-	 	 	 fclose()
-	 */
-	/*TODO:
-	 	 Conecto Gamecard con broker
-	 	 recibo la respuesta
-	 	 en caso que hubo respuesta mando caught
-	 	 si no hubo respuesta logueo el error
-	 */
-
 	finalizar_gamecard();
 }
