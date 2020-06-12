@@ -449,4 +449,12 @@ char* value_to_state(int value){
 		return "FAIL";
 }
 
+char* pasar_a_char(int numero){
 
+	int length = snprintf( NULL, 0, "%d", numero);
+	char* numero_char = malloc( length + 1 );
+	snprintf(numero_char, length + 1, "%d", numero);
+
+	return numero_char;
+
+}

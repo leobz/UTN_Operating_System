@@ -14,11 +14,14 @@ int main() {
 	for(int j = 0; j < 6; j++)
 		     sem_init(&sem_proceso[j], 0, 0);
 
-	for(int j = 0; j < 6; j++)
-		inicializar_lista(j);
+	administracion_por_id=dictionary_create();
+	administracion_por_cod=dictionary_create();
+	dic_suscriptores=dictionary_create();
 
-	//dic_administrador=dictionary_create();
-	//processes=dictionary_create();
+
+	for(int j = 0; j < 6; j++)
+		inicializar_listas(j);
+
 
 	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
@@ -82,20 +85,20 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		if(list_size(suscriptores[codigo_de_operacion])==0)
 			sem_wait(&sem_proceso[codigo_de_operacion]);
 
-		//t_adm_mensaje* administrator;
-		//administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
+		t_adm_mensaje* administrator;
+		administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 		void enviar_a_suscriptores(t_proceso* proceso){
 
 			int validez=enviar_mensaje_con_retorno(proceso->socket,sent_package,bytes);
-			/*log_info(logger,"Validez: %d",validez);
+			//log_info(logger,"Validez: %d",validez);
 
 			if(validez!=1){ //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
 				list_add(administrator->suscriptores_enviados,proceso);
 				loggear_mensaje_enviado(proceso->socket, codigo_de_operacion); //Por ahora de prueba
-			}*/
-
+			}
+			//Agregar a cache
 		}
 
 
@@ -117,7 +120,9 @@ t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
 		administrador->suscriptores_confirmados=list_create();
 		administrador->suscriptores_enviados=list_create();
 
-		dictionary_put(dic_administrador,mensaje->id_mensaje,administrador);
+		meter_en_diccionario(administracion_por_id,mensaje->id_mensaje,administrador);
+
+		list_add(administradores[mensaje->codigo_operacion],administrador);
 
 		return administrador;
 }

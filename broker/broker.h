@@ -59,12 +59,13 @@ typedef struct{
 }
 t_adm_mensaje;
 
-t_adm_mensaje* admin_sus;
+t_adm_mensaje* administrador_confirmado;
 int socket_confirmado;
 t_proceso* proceso_confirmado;
 
-t_dictionary* dic_administrador;
-t_dictionary* processes;
+t_dictionary* administracion_por_id;
+t_dictionary* administracion_por_cod;
+t_dictionary* dic_suscriptores;
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);

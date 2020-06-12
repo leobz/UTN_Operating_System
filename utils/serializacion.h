@@ -155,5 +155,6 @@ t_confirmacion* deserializar_confirmacion(void*mensaje);
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);
 char* value_to_state(int value);
+char* pasar_a_char(int numero);
 void liberar_paquete_socket(t_paquete_socket* paquete);
 #endif /* SERIALIZACION_H_ */

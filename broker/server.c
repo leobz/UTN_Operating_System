@@ -26,7 +26,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
 
-		//log_info(logger, "id:%d",id_mensaje);
+
 
 		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
@@ -47,9 +47,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			proceso->id_proceso=paquete->id_proceso;
 			proceso->socket=paquete->socket_cliente;
 
-			//dictionary_put(processes,paquete->id_proceso,proceso);
+
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
 			list_add(suscriptores[paquete->cola], proceso);
+
+			meter_en_diccionario(dic_suscriptores,paquete->id_proceso,proceso);
 
 			sem_post(&sem_proceso[paquete->cola]);
 
@@ -59,11 +61,14 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
 
-			admin_sus=dictionary_get(dic_administrador,paquete->id_mensaje);
 
-			proceso_confirmado=dictionary_get(processes,paquete->id_proceso);
+			meter_en_diccionario(dic_suscriptores,paquete->id_proceso,proceso);
 
-			list_add(admin_sus->suscriptores_confirmados,proceso_confirmado);
+			administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
+
+			proceso_confirmado=obtener_de_diccionario(dic_suscriptores,paquete->id_proceso);
+
+			//list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
 
 			break;
 
