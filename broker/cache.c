@@ -142,7 +142,7 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 		tamanio_intermedio = broker_config->tamanio_memoria - particion_ocupada->tamanio_particion;
 	}
 
-	offset_intermedio = particion_ocupada->tamanio_particion + 1;
+	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
 	particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
 	list_add(particiones_dinamicas, particion_intermedia);
