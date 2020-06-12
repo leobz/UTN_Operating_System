@@ -43,17 +43,34 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		switch (paquete->codigo_operacion) {
 		case SUSCRIPCION:
 
-			proceso=malloc(sizeof(t_proceso));
-			proceso->id_proceso=paquete->id_proceso;
-			proceso->socket=paquete->socket_cliente;
 
+			if(esta_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso)){ //si el proceso ya estaba registrado
+
+				bool buscar_suscriptor(t_proceso* proceso){
+					return proceso->id_proceso==paquete->id_proceso;
+				}
+				t_proceso* proceso_encontrado=list_find(suscriptores[paquete->cola], &buscar_suscriptor);
+
+				proceso_encontrado->socket=paquete->socket_cliente;//le cambio el socket al suscriptor y actualizo los diccionarios
+				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso_encontrado);
+				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso_encontrado);
+
+			}
+
+			else{
+				proceso=malloc(sizeof(t_proceso)); //creo un nuevo proceso, lo meto en la lista y en los diccionarios
+				proceso->id_proceso=paquete->id_proceso;
+				proceso->socket=paquete->socket_cliente;
+				list_add(suscriptores[paquete->cola], proceso);
+				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
+				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso);
+			}
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-			list_add(suscriptores[paquete->cola], proceso);
-
-			meter_en_diccionario(dic_suscriptores,paquete->id_proceso,proceso);
 
 			sem_post(&sem_proceso[paquete->cola]);
+
+
 
 			break;
 
@@ -61,14 +78,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
 
-
-			meter_en_diccionario(dic_suscriptores,paquete->id_proceso,proceso);
-
 			administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
 
-			proceso_confirmado=obtener_de_diccionario(dic_suscriptores,paquete->id_proceso);
+			proceso_confirmado=obtener_de_diccionario(subscriptors,paquete->id_proceso);
 
-			//list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
+			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
 
 			break;
 

@@ -84,4 +84,9 @@ void*obtener_de_diccionario(t_dictionary*dictionary, int key){
 	void*value=dictionary_get(dictionary,char_key);
 	return value;
 }
-
+bool esta_en_diccionario(t_dictionary* dictionary,int key){
+	char*char_key=pasar_a_char(key);
+	bool verificacion=dictionary_has_key(dictionary,char_key);
+	free(char_key);
+	return verificacion;
+}

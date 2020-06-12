@@ -16,8 +16,7 @@ int main() {
 
 	administracion_por_id=dictionary_create();
 	administracion_por_cod=dictionary_create();
-	dic_suscriptores=dictionary_create();
-
+	subscriptors= dictionary_create();
 
 	for(int j = 0; j < 6; j++)
 		inicializar_listas(j);
