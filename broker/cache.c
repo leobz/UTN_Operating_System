@@ -103,8 +103,15 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 }
 
 
-
 // PARTICIONES DINAMICAS
+
+void* leer_particion_dinamica(t_particion_dinamica* particion){
+	void* payload = malloc(particion->tamanio_particion);
+
+	memcpy(payload, memoria_cache + particion->offset, particion->tamanio_particion);
+
+	return payload;
+}
 
 t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int tamanio){
 	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
