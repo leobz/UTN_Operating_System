@@ -80,7 +80,7 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje) {
 	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
 	particion_elegida = dividir_particion_elegida (list_pop_first(hojas_libres), tamanio_particion_necesaria);
 	cargar_particion_elegida(particion_elegida, mensaje);
-	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->tamanio_particion);
+	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->size_mensaje);
 
 	return particion_elegida;
 }
@@ -98,7 +98,7 @@ int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
 	int tamanio_particion_necesaria = 2;
 
 	while (tamanio_particion_necesaria < tamanio_mensaje) {
-		tamanio_mensaje *= 2;
+		tamanio_particion_necesaria *= 2;
 	}
 
 	return tamanio_particion_necesaria;
@@ -140,7 +140,27 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria) {
 
 	if ((hoja_libre->tamanio_particion / 2) >= tamanio_particion_necesaria) {
-		// TODO: crear particiones hijas e aplicar recursividad
+		t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+		t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+
+		primer_hijo->esta_libre = true;
+		primer_hijo->offset = hoja_libre->offset;
+		primer_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
+		primer_hijo->size_mensaje = 0;
+		primer_hijo->primer_hijo = NULL;
+		primer_hijo->segundo_hijo = NULL;
+
+		segundo_hijo->esta_libre = true;
+		segundo_hijo->offset = (hoja_libre->tamanio_particion / 2) + 1;
+		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
+		segundo_hijo->size_mensaje = 0;
+		segundo_hijo->primer_hijo = NULL;
+		segundo_hijo->segundo_hijo = NULL;
+
+		hoja_libre->primer_hijo = primer_hijo;
+		hoja_libre->segundo_hijo = segundo_hijo;
+
+		return dividir_particion_elegida(hoja_libre->primer_hijo, tamanio_particion_necesaria);
 	}
 
 	return hoja_libre;
@@ -193,15 +213,28 @@ void finalizar_mutex_cache() {
 
 void finalizar_lista_particiones() {
 	if (es_buddy_system()) {
-		finalizar_particion_bs();
+		elimimar_particiones_bs(particion_bs);
 	}
 	else if (es_particion_dinamica()) {
 		finalizar_particiones_dinamicas();
 	}
 }
 
-void finalizar_particion_bs() {
-	// TODO: implementar logica eliminacion particion bs
+void elimimar_particiones_bs(t_particion_bs* particion) {
+
+	if (particion->primer_hijo != NULL && particion->segundo_hijo != NULL) {
+		t_particion_bs* primer_hijo = particion->primer_hijo;
+		t_particion_bs* segundo_hijo = particion->segundo_hijo;
+
+		free(particion);
+
+		elimimar_particiones_bs(primer_hijo);
+		elimimar_particiones_bs(segundo_hijo);
+	}
+	else {
+		free(particion);
+	}
+
 }
 
 void finalizar_particiones_dinamicas() {

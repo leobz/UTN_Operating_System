@@ -40,6 +40,7 @@ void inicializar_particiones_dinamicas();
 // Funciones cache
 int es_particion_dinamica();
 int es_buddy_system();
+void guardar_en_cache(void* payload, int offset, int size);
 
 // Funciones buddy system
 t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje);
@@ -60,7 +61,7 @@ t_particion_dinamica* crear_particion_dinamica_libre(int , int);
 // Finalización cache
 void finalizar_mutex_cache();
 void finalizar_lista_particiones();
-void finalizar_particion_bs();
+void elimimar_particiones_bs(t_particion_bs* particion);
 void finalizar_particiones_dinamicas();
 void finalizar_memoria_cache();
 

@@ -9,6 +9,7 @@
 #define TEST_TESTING_H_
 
 #include "test_configuration.h"
+#include "test_buddy_system.h"
 
 void correrTests();
 
