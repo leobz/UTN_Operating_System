@@ -10,6 +10,7 @@ void inicializar_memoria_cache() {
 
 void inicializar_mutex_cache() {
 	for (int i = 0; i < 6; i++) {
+		// ERROR - TODO: Deberia ser un unico mutex, ya que la caché es una sola
 		if (pthread_mutex_init(&m_cache[i], NULL) != 0)
 		{
 			printf("Error en inicialización de mutex: %s (%d)\n", op_code_to_string(i), i);
@@ -103,8 +104,47 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 
 
 
-
 // PARTICIONES DINAMICAS
+
+t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int tamanio){
+	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
+
+	particion_destino->esta_libre = false;
+	particion_destino->tamanio_particion = tamanio;
+
+	crear_particion_intermedia(particion_destino);
+
+	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
+
+	return particion_destino;
+}
+
+void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
+	t_particion_dinamica* particion_intermedia;
+	t_particion_dinamica* siguiente_particion;
+	int tamanio_intermedio;
+	int offset_intermedio;
+
+	siguiente_particion = particion_ocupada->siguiente_particion;
+
+	if (siguiente_particion != NULL) {
+		tamanio_intermedio = calcular_tamanio_particion_intermedia(particion_ocupada, siguiente_particion);
+	}
+
+	else{
+		tamanio_intermedio = broker_config->tamanio_memoria - particion_ocupada->tamanio_particion;
+	}
+
+	offset_intermedio = particion_ocupada->tamanio_particion + 1;
+
+	particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
+	list_add(particiones_dinamicas, particion_intermedia);
+}
+
+int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion) {
+	return sig_particion->offset - (part_ocupada->offset + part_ocupada->tamanio_particion + 1);
+}
+
 
 t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
 	t_list* particiones_posibles = obtener_particiones_posibles(tamanio);
@@ -187,18 +227,15 @@ bool pd_es_menor_tamanio(t_particion_dinamica* particion, t_particion_dinamica* 
 	return particion->tamanio_particion < siguiente_particion->tamanio_particion;
 }
 
-
-
-
 t_particion_dinamica* crear_particion_dinamica(int offset, int tamanio){
 	t_particion_dinamica* particion = malloc(sizeof(t_particion_dinamica));
 	particion->offset = offset;
 	particion->tamanio_particion = tamanio;
 	particion->esta_libre = false;
+	particion->siguiente_particion = NULL;
 
 	return particion;
 }
-
 
 t_particion_dinamica* crear_particion_dinamica_libre(int offset, int tamanio){
 	t_particion_dinamica* particion = crear_particion_dinamica(offset, tamanio);

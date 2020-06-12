@@ -13,10 +13,11 @@ typedef struct particion_bs {
 	struct particion_bs* segundo_hijo;
 } t_particion_bs;
 
-typedef struct {
+typedef struct particion_dinamica {
 	int offset;
 	int tamanio_particion;
 	bool esta_libre;
+	struct particion_dinamica* siguiente_particion;
 } t_particion_dinamica;
 
 typedef enum {
@@ -41,6 +42,7 @@ void inicializar_particiones_dinamicas();
 void agregar_mensaje_memoria_cache(t_mensaje* mensaje);
 int es_particion_dinamica();
 int es_buddy_system();
+void guardar_en_cache(void* payload, int offset, int size);
 
 // Funciones buddy system
 void obtener_hojas_libres_bs(t_list* hojas_libres, t_particion_bs* particion);
