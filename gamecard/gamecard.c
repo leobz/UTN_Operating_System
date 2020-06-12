@@ -14,12 +14,16 @@ void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *confi
 	gamecard_config->punto_montaje_tallgrass = config_get_string_value(config, "PUNTO_MONTAJE_TALLGRASS");
 	gamecard_config->ip_broker = strdup((config_get_string_value(config, "IP_BROKER")));
 	gamecard_config->puerto_broker = strdup(config_get_string_value(config, "PUERTO_BROKER"));
+	gamecard_config->ip_gamecard = strdup((config_get_string_value(config, "IP_GAMECARD")));
+	gamecard_config->puerto_gamecard = strdup(config_get_string_value(config, "PUERTO_GAMECARD"));
 }
 
 
 void destruir_gamecard_config(t_gamecard_config* gamecard_config) {
 	free(gamecard_config->punto_montaje_tallgrass);
 	free(gamecard_config->ip_broker);
+	free(gamecard_config->puerto_broker);
+	free(gamecard_config->ip_gamecard);
 	free(gamecard_config->puerto_broker);
 	free(gamecard_config);
 }

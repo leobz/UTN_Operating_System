@@ -23,6 +23,8 @@ typedef struct {
 	char* punto_montaje_tallgrass;
 	char* ip_broker;
 	char* puerto_broker;
+	char* ip_gamecard;
+	char* puerto_gamecard;
 } t_gamecard_config;
 
 // Variables
