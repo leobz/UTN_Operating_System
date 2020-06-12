@@ -102,35 +102,42 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 }
 
 
+
+
 // PARTICIONES DINAMICAS
 
-
 t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
-	t_particion_dinamica* particion;
+	t_list* particiones_posibles = obtener_particiones_posibles(tamanio);
+	ordenar_segun_algoritmo_de_particiones_libres(particiones_posibles);
+
+	return list_first(particiones_posibles);
+}
+
+t_list* obtener_particiones_posibles(int tamanio) {
 	int particiones_eliminadas = 0;
+	t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 
-	t_list* particiones_libres = obtener_particiones_dinamicas_libres();
-	t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
-
-	while(list_is_empty(particiones_posibles)){
+	while (list_is_empty(particiones_posibles)) {
 		if (supero_limite_de_eliminaciones(particiones_eliminadas)) {
 			compactar_particiones_dinamicas();
 			particiones_eliminadas = 0;
 		}
+		t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 
-		t_list* particiones_libres = obtener_particiones_dinamicas_libres();
-		t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
-
-		if (list_is_empty(particiones_posibles)){
+		if (list_is_empty(particiones_posibles)) {
 			eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 			particiones_eliminadas++;
 		}
 	}
+	return particiones_posibles;
+}
 
-	ordenar_segun_algoritmo_de_particiones_libres(particiones_posibles);
-	particion = list_get(particiones_posibles, 0);
+t_list* filtar_particiones_libres_y_suficientes(int tamanio) {
+	t_list* particiones_libres = obtener_particiones_dinamicas_libres();
+	t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
 
-	return particion;
+	free(particiones_libres);
+	return particiones_posibles;
 }
 
 int supero_limite_de_eliminaciones(int particiones_eliminadas) {
