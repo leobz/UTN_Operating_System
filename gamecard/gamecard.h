@@ -32,7 +32,7 @@ t_log* logger;
 t_gamecard_config* gamecard_config;
 
 // Funciones
-t_gamecard_config* cargar_gamecard_congif(char* path_archivo);
+t_gamecard_config* cargar_gamecard_config(char* path_archivo);
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
 void finalizar_gamecard();
