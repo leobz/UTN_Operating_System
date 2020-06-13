@@ -21,7 +21,7 @@ void cargar_configuracion_puertos() {
 	t_broker_config *broker_config = cargar_broker_config(
 			"broker.config.sample");
 
-	CU_ASSERT_STRING_EQUAL(broker_config->puerto_broker, "4444");
+	CU_ASSERT_STRING_EQUAL(broker_config->puerto_broker, "5001");
 
 	destruir_broker_config(broker_config);
 }

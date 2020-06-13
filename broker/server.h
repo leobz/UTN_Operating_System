@@ -24,10 +24,8 @@
 
 #include "../utils/cliente.h"
 #include "broker.h"
+#include "cache.h"
 
-
-t_log* logger;
-t_broker_config* broker_config;
 
 int id_mensaje; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
 
@@ -39,11 +37,8 @@ sem_t sem_proceso[6];
 sem_t sem;
 
 
-
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
-
-
 
 #endif /* SERVER_H_ */
