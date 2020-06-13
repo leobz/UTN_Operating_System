@@ -17,9 +17,15 @@ void agregar_tests_particiones_dinamicas(){
 void inicalizar_test(){
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANIO_MEMORIA;
+	free(broker_config->algoritmo_memoria);
 	broker_config->algoritmo_memoria = strdup("PARTICIONES");
 
 	inicializar_memoria_cache();
+}
+
+void finalizar_test() {
+	finalizar_memoria_cache();
+	destruir_broker_config(broker_config);
 }
 
 void inicaliza_cache_con_particion_libre(){
@@ -30,7 +36,7 @@ void inicaliza_cache_con_particion_libre(){
 	assert_particion_esta_libre(particion_inical);
 	assert_particion_tiene_el_tamanio(particion_inical, TAMANIO_MEMORIA);
 
-	finalizar_memoria_cache();
+	finalizar_test();
 }
 
 void test_guardar_un_payload(){
@@ -45,8 +51,7 @@ void test_guardar_un_payload(){
 	assert_particion_tiene_el_tamanio(particion_de_guardado, tamanio);
 	assert_particion_tiene_offset(particion_de_guardado, 0);
 
-	free(particion_de_guardado);
-	finalizar_memoria_cache();
+	finalizar_test();
 }
 
 void test_leer_payload_desde_particion(){
@@ -56,12 +61,13 @@ void test_leer_payload_desde_particion(){
 	int tamanio = strlen(a_guardar) + 1;
 
 	t_particion_dinamica* particion_de_guardado = guardar_payload_en_particion_dinamica(a_guardar, tamanio);
+
 	char const *payload_leido = leer_particion_dinamica(particion_de_guardado);
 
 	CU_ASSERT_STRING_EQUAL(a_guardar, payload_leido);
 
-	free(particion_de_guardado);
-	finalizar_memoria_cache();
+	free(payload_leido);
+	finalizar_test();
 }
 
 void test_guardar_varias_particiones_no_afecta_particiones_previas(){
@@ -79,10 +85,7 @@ void test_guardar_varias_particiones_no_afecta_particiones_previas(){
 	CU_ASSERT_STRING_EQUAL(a_guardar_b, leer_particion_dinamica(particion_escrita_b));
 	CU_ASSERT_STRING_EQUAL(a_guardar_c, leer_particion_dinamica(particion_escrita_c));
 
-	free(particion_escrita_a);
-	free(particion_escrita_b);
-	free(particion_escrita_c);
-	finalizar_memoria_cache();
+	finalizar_test();
 }
 
 void test_guardar_crea_particion_intermedia(){
@@ -103,6 +106,9 @@ void test_guardar_crea_particion_intermedia(){
 			particion_intermedia,
 			particion->offset + particion->tamanio_particion
 			);
+
+	free(particion);
+	finalizar_test();
 }
 
 t_particion_dinamica* guardar_string_en_particion(const char* a_guardar) {
