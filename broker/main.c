@@ -2,47 +2,53 @@
 
 t_cola_proceso *proceso;
 
-int main() {
+int main(int argc, char ** argv) {
+	if (argc == 2) {
+		if (strcmp(argv[1], "test") == 0)
+			correrTests();
+	}
+	else {
+		inicializar_broker();
+		inicializar_memoria_cache();
 
-	inicializar_broker();
-	inicializar_memoria_cache();
-
-	char*ip=broker_config->ip_broker;
-	char*puerto=broker_config->puerto_broker;
-	int socket_servidor = iniciar_servidor(ip, puerto);
+		char*ip=broker_config->ip_broker;
+		char*puerto=broker_config->puerto_broker;
+		int socket_servidor = iniciar_servidor(ip, puerto);
 
 
-	for(int i = 0; i < 6; i++)
-	     sem_init(&cola_vacia[i], 0, 0);
+		for(int i = 0; i < 6; i++)
+		     sem_init(&cola_vacia[i], 0, 0);
 
-	for(int j = 0; j < 6; j++)
-		     sem_init(&sem_proceso[j], 0, 0);
+		for(int j = 0; j < 6; j++)
+			     sem_init(&sem_proceso[j], 0, 0);
 
-	for(int j = 0; j < 6; j++)
-		inicializar_lista(j);
+		for(int j = 0; j < 6; j++)
+			inicializar_lista(j);
 
-	pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
-	pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
-	pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
-	pthread_create(&sem_mensajes[APPEARED_POKEMON],NULL,(void*)enviar_mensajes_en_cola,APPEARED_POKEMON);
-	pthread_create(&sem_mensajes[LOCALIZED_POKEMON],NULL,(void*)enviar_mensajes_en_cola,LOCALIZED_POKEMON);
-	pthread_create(&sem_mensajes[CAUGHT_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CAUGHT_POKEMON);
+		pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
+		pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
+		pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
+		pthread_create(&sem_mensajes[APPEARED_POKEMON],NULL,(void*)enviar_mensajes_en_cola,APPEARED_POKEMON);
+		pthread_create(&sem_mensajes[LOCALIZED_POKEMON],NULL,(void*)enviar_mensajes_en_cola,LOCALIZED_POKEMON);
+		pthread_create(&sem_mensajes[CAUGHT_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CAUGHT_POKEMON);
 
-	while (1) {
-		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+		while (1) {
+			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+		}
+
+		pthread_detach(sem_mensajes[NEW_POKEMON]);
+		pthread_detach(sem_mensajes[GET_POKEMON]);
+		pthread_detach(sem_mensajes[CATCH_POKEMON]);
+		pthread_detach(sem_mensajes[APPEARED_POKEMON]);
+		pthread_detach(sem_mensajes[LOCALIZED_POKEMON]);
+		pthread_detach(sem_mensajes[CAUGHT_POKEMON]);
+
+		finalizar_memoria_cache();
+		finalizar_broker(broker_config,logger);
+
+		return 0;
 	}
 
-	pthread_detach(sem_mensajes[NEW_POKEMON]);
-	pthread_detach(sem_mensajes[GET_POKEMON]);
-	pthread_detach(sem_mensajes[CATCH_POKEMON]);
-	pthread_detach(sem_mensajes[APPEARED_POKEMON]);
-	pthread_detach(sem_mensajes[LOCALIZED_POKEMON]);
-	pthread_detach(sem_mensajes[CAUGHT_POKEMON]);
-
-	finalizar_memoria_cache();
-	finalizar_broker(broker_config,logger);
-
-	return 0;
 }
 
 
