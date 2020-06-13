@@ -4,7 +4,7 @@
 void agregar_tests_particiones_dinamicas(){
 	CU_pSuite suite_configuracion = CU_add_suite("Memoria Caché : Particiones Dinamicas", NULL, NULL);
 
-	CU_add_test(suite_configuracion, "Caché inicia con partición libre", inicaliza_cache_con_particion_libre);
+	CU_add_test(suite_configuracion, "Caché inicia con partición libre", test_inicializar_cache_crea_particion_libre);
 	CU_add_test(suite_configuracion, "Guardar payload en Partición", test_guardar_un_payload);
 	CU_add_test(suite_configuracion, "Leer payload desde Partición", test_leer_payload_desde_particion);
 	CU_add_test(suite_configuracion, "Guardar varios payloads no afecta a particiones anteriores",
@@ -14,7 +14,7 @@ void agregar_tests_particiones_dinamicas(){
 
 }
 
-void inicalizar_test(){
+void inicializar_test(){
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANIO_MEMORIA;
 	free(broker_config->algoritmo_memoria);
@@ -28,19 +28,19 @@ void finalizar_test() {
 	destruir_broker_config(broker_config);
 }
 
-void inicaliza_cache_con_particion_libre(){
-	inicalizar_test();
-	t_particion_dinamica* particion_inical = list_first(particiones_dinamicas);
+void test_inicializar_cache_crea_particion_libre(){
+	inicializar_test();
+	t_particion_dinamica* particion_inicial = list_first(particiones_dinamicas);
 
 	CU_ASSERT_EQUAL(list_size(particiones_dinamicas), 1);
-	assert_particion_esta_libre(particion_inical);
-	assert_particion_tiene_el_tamanio(particion_inical, TAMANIO_MEMORIA);
+	assert_particion_esta_libre(particion_inicial);
+	assert_particion_tiene_el_tamanio(particion_inicial, TAMANIO_MEMORIA);
 
 	finalizar_test();
 }
 
 void test_guardar_un_payload(){
-	inicalizar_test();
+	inicializar_test();
 
 	char const *a_guardar = "someString";
 	int tamanio = strlen(a_guardar) + 1;
@@ -55,7 +55,7 @@ void test_guardar_un_payload(){
 }
 
 void test_leer_payload_desde_particion(){
-	inicalizar_test();
+	inicializar_test();
 
 	char const *a_guardar = "someString";
 	int tamanio = strlen(a_guardar) + 1;
@@ -71,7 +71,7 @@ void test_leer_payload_desde_particion(){
 }
 
 void test_guardar_varias_particiones_no_afecta_particiones_previas(){
-	inicalizar_test();
+	inicializar_test();
 
 	char const *a_guardar_a = "first";
 	char const *a_guardar_b = "second";
@@ -89,7 +89,7 @@ void test_guardar_varias_particiones_no_afecta_particiones_previas(){
 }
 
 void test_guardar_crea_particion_intermedia(){
-	inicalizar_test();
+	inicializar_test();
 
 	t_particion_dinamica* particion;
 	t_particion_dinamica* particion_intermedia;
