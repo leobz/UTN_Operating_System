@@ -12,6 +12,12 @@
 #include <stdlib.h>
 
 /**
+ * @NAME: list_first
+ * @DESC: retorna el primer elemento de la lista
+ */
+void* list_first(t_list* lista);
+
+/**
  * @NAME: list_pop_first
  * @DESC: retorna el primer elemento y lo saca de la lista
  */

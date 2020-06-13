@@ -13,17 +13,18 @@ typedef struct particion_bs {
 	struct particion_bs* segundo_hijo;
 } t_particion_bs;
 
-typedef struct {
+typedef struct particion_dinamica {
 	int offset;
 	int tamanio_particion;
-	bool esta_ocupado;
+	bool esta_libre;
+	struct particion_dinamica* siguiente_particion;
 } t_particion_dinamica;
 
 typedef enum {
 	PRIMER_AJUSTE = 0, MEJOR_AJUSTE = 1
 } t_ordenamiento;
 
-pthread_mutex_t m_cache[6];
+pthread_mutex_t m_cache;
 
 t_particion_bs* particion_bs;
 void* memoria_cache;
@@ -55,8 +56,20 @@ void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* men
 // Funciones particion dinamica
 void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
+t_list* obtener_particiones_dinamicas_libres();
 t_particion_dinamica* crear_particion_dinamica(int, int);
 t_particion_dinamica* crear_particion_dinamica_libre(int , int);
+void ordenar_segun_algoritmo_de_particiones_libres(t_list*);
+bool pd_es_menor_offset(t_particion_dinamica*, t_particion_dinamica*);
+bool pd_es_menor_tamanio(t_particion_dinamica*, t_particion_dinamica*);
+t_list* filtrar_particiones_por_tamanio(t_list*, int);
+void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
+void compactar_particiones_dinamicas();
+t_list* filtar_particiones_libres_y_suficientes(int);
+t_list* obtener_particiones_posibles(int);
+t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
+void* leer_particion_dinamica(t_particion_dinamica*);
+
 
 // Finalización cache
 void finalizar_mutex_cache();

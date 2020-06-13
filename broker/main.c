@@ -5,23 +5,23 @@ t_cola_proceso *proceso;
 
 int main(int argc, char ** argv) {
 
-	inicializar_broker();
-	inicializar_memoria_cache();
-
-	char*ip=broker_config->ip_broker;
-	char*puerto=broker_config->puerto_broker;
-
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
-	} else {
+	}
+	else {
+		inicializar_broker();
+		inicializar_memoria_cache();
+
+		char*ip=broker_config->ip_broker;
+		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
 
 		for(int i = 0; i < 6; i++)
-			sem_init(&cola_vacia[i], 0, 0);
+		     sem_init(&cola_vacia[i], 0, 0);
 
 		for(int j = 0; j < 6; j++)
-			sem_init(&sem_proceso[j], 0, 0);
+			     sem_init(&sem_proceso[j], 0, 0);
 
 		for(int j = 0; j < 6; j++)
 			inicializar_lista(j);
