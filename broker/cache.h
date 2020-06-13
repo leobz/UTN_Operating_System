@@ -31,19 +31,22 @@ void* memoria_cache;
 t_list* particiones_dinamicas;
 int ordenamiento;
 
-// Inicialización cache
+// ********************************** INICIALIZACION MEMORIA CACHE ********************************** //
 void inicializar_memoria_cache();
 void inicializar_mutex_cache();
 void inicializar_lista_particiones();
 void inicializar_particion_bs();
 void inicializar_particiones_dinamicas();
+int obtener_tamanio_memoria_cache_bs();
 
-// Funciones cache
+
+// ********************************** FUNCIONES MEMORIA CACHE ********************************** //
 int es_particion_dinamica();
 int es_buddy_system();
 void guardar_en_cache(void* payload, int offset, int size);
 
-// Funciones buddy system
+
+// ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
 t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje);
 int obtener_tamanio_particion_necesaria (int tamanio_mensaje);
 void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria);
@@ -52,8 +55,10 @@ bool es_menor_tamanio(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja
 void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres);
 t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria);
 void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* mensaje);
+void* leer_particion_bs(t_particion_bs* particion);
 
-// Funciones particion dinamica
+
+// ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
 t_list* obtener_particiones_dinamicas_libres();
@@ -71,11 +76,12 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
 void* leer_particion_dinamica(t_particion_dinamica*);
 
 
-// Finalización cache
+// ********************************** FINALIZACION MEMORIA CACHE ********************************** //
 void finalizar_mutex_cache();
 void finalizar_lista_particiones();
 void elimimar_particiones_bs(t_particion_bs* particion);
 void finalizar_particiones_dinamicas();
 void finalizar_memoria_cache();
+
 
 #endif /* CACHE_H_ */

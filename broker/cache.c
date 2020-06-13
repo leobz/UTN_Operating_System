@@ -1,5 +1,6 @@
 #include "cache.h"
 
+// ********************************** INICIALIZACION MEMORIA CACHE ********************************** //
 
 void inicializar_memoria_cache() {
 	memoria_cache = malloc(broker_config->tamanio_memoria);
@@ -29,11 +30,26 @@ void inicializar_particion_bs() {
 	particion_bs = malloc(sizeof(t_particion_bs));
 
 	particion_bs->offset = 0;
-	particion_bs->tamanio_particion = broker_config->tamanio_memoria;
+	particion_bs->tamanio_particion = obtener_tamanio_memoria_cache_bs();
 	particion_bs->esta_libre = true;
 	particion_bs->size_mensaje = 0;
 	particion_bs->primer_hijo = NULL;
 	particion_bs->segundo_hijo = NULL;
+}
+
+int obtener_tamanio_memoria_cache_bs() {
+	int tamanio_memoria_cache_config = broker_config->tamanio_memoria;
+	int tamanio_memoria_cache_real = 2;
+	bool memoria_insuficiente = true;
+
+	while (memoria_insuficiente) {
+		if ((tamanio_memoria_cache_real * 2) <= tamanio_memoria_cache_config)
+			tamanio_memoria_cache_real *= 2;
+		else
+			memoria_insuficiente = false;
+	}
+
+	return tamanio_memoria_cache_real;
 }
 
 void inicializar_particiones_dinamicas(){
@@ -42,6 +58,8 @@ void inicializar_particiones_dinamicas(){
 	list_add(particiones_dinamicas, particion_inicial);
 }
 
+// ********************************** FUNCIONES MEMORIA CACHE ********************************** //
+
 int es_buddy_system() {
 	return strcmp(broker_config->algoritmo_memoria, "BS") == 0;
 }
@@ -49,6 +67,12 @@ int es_buddy_system() {
 int es_particion_dinamica() {
 	return strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0;
 }
+
+void guardar_en_cache(void* payload, int offset, int size){
+	memcpy(memoria_cache + offset, payload, size);
+}
+
+// ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
 
 t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje) {
 	t_list* hojas_libres = list_create();
@@ -76,20 +100,14 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje) {
 	}
 
 	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
-	particion_elegida = dividir_particion_elegida (list_pop_first(hojas_libres), tamanio_particion_necesaria);
+	particion_elegida = dividir_particion_elegida (list_first(hojas_libres), tamanio_particion_necesaria);
 	cargar_particion_elegida(particion_elegida, mensaje);
 	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->size_mensaje);
 
+	list_clean(hojas_libres);
+	free(hojas_libres);
+
 	return particion_elegida;
-}
-
-void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
-	//ESTA FUNCION DEBERIA RETORNAR UNA PARTICION O UN OFFSET A LA ADMINISTRACION DEL MENSAJE
-	void* payload = mensaje->payload;
-	int size = mensaje->payload_size;
-
-	t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
-	guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
 }
 
 int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
@@ -105,6 +123,7 @@ int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
 void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria) {
 
 	if ((particion->primer_hijo != NULL || particion->segundo_hijo != NULL) && particion->esta_libre) {
+
 		if (particion->primer_hijo != NULL)
 			obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion->primer_hijo, tamanio_particion_necesaria);
 
@@ -149,7 +168,7 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		primer_hijo->segundo_hijo = NULL;
 
 		segundo_hijo->esta_libre = true;
-		segundo_hijo->offset = (hoja_libre->tamanio_particion / 2) + 1;
+		segundo_hijo->offset = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->size_mensaje = 0;
 		segundo_hijo->primer_hijo = NULL;
@@ -171,8 +190,26 @@ void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* men
 
 }
 
+void* leer_particion_bs(t_particion_bs* particion) {
+	void* payload = malloc(particion->tamanio_particion);
 
-// PARTICIONES DINAMICAS
+	memcpy(payload, memoria_cache + particion->offset, particion->size_mensaje);
+
+	return payload;
+}
+
+
+// ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
+
+void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
+	//ESTA FUNCION DEBERIA RETORNAR UNA PARTICION O UN OFFSET A LA ADMINISTRACION DEL MENSAJE
+	void* payload = mensaje->payload;
+	int size = mensaje->payload_size;
+
+	t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
+	guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
+}
+
 
 void* leer_particion_dinamica(t_particion_dinamica* particion){
 	void* payload = malloc(particion->tamanio_particion);
@@ -320,9 +357,7 @@ t_particion_dinamica* crear_particion_dinamica_libre(int offset, int tamanio){
 	return particion;
 }
 
-void guardar_en_cache(void* payload, int offset, int size){
-	memcpy(memoria_cache + offset, payload, size);
-}
+// ********************************** FINALIZACION MEMORIA CACHE ********************************** //
 
 void finalizar_mutex_cache() {
 	pthread_mutex_destroy(&m_cache);
