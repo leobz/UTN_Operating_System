@@ -63,6 +63,8 @@ void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 void compactar_particiones_dinamicas();
 t_list* filtar_particiones_libres_y_suficientes(int);
 t_list* obtener_particiones_posibles(int);
+t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
+void* leer_particion_dinamica(t_particion_dinamica*);
 
 
 // Finalización cache
