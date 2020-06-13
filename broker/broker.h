@@ -31,6 +31,9 @@ typedef struct {
 } t_broker_config;
 
 
+t_log* logger;
+t_broker_config* broker_config;
+
 typedef struct mensaje{
 
 	op_code codigo_operacion;

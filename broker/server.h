@@ -16,8 +16,6 @@
 #include "broker.h"
 
 
-t_log* logger;
-t_broker_config* broker_config;
 
 int id_mensaje; //este es vector de contadores para cada cola cuando les llega un nuevo mensaje
 t_proceso* proceso;
