@@ -11,7 +11,7 @@ void empaquetar_y_desempaquetar_caught_pokemon() {
 	estado estado_actual = OK;
 
 	t_paquete* paquete = crear_paquete(CAUGHT_POKEMON,
-			buffer_caught_pokemon(estado_actual), 0);
+			buffer_caught_pokemon(estado_actual),0, 0);
 
 	t_mensaje_caught* mensaje_caught = deserializar_mensaje_caught_pokemon(
 			paquete->buffer);
@@ -28,8 +28,7 @@ void serializar_y_deserializar_caught_pokemon() {
 	int bytes;
 	int id_correlativo=0;
 
-	void* mensaje_serializado = serializar_caught_pokemon(&bytes, estado,
-			id_correlativo);
+	void* mensaje_serializado = serializar_caught_pokemon(&bytes, estado,0,0);
 
 	test_deserializar_buffer_caught_pokemon(mensaje_serializado, estado,
 			id_correlativo);

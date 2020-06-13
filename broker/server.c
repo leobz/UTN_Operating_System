@@ -39,6 +39,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	else {
 
 		switch (paquete->codigo_operacion) {
+
 		case SUSCRIPCION:{
 
 			t_proceso* proceso;
@@ -80,13 +81,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case CONFIRMACION:{
 
-			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
+			log_info(logger, "[MSG_RECIBIDO] CON ID_MENSAJE: %d", paquete->id_mensaje);
 
 			t_adm_mensaje*administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
 
 			t_proceso* proceso_confirmado=obtener_de_diccionario(subscribers,paquete->id_proceso);
 
-			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
+			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
 
 			break;}
 
@@ -199,9 +200,6 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 
 
 void enviar_confirmacion(int id,op_code confirmacion,int socket){
-
-		//log_info(logger, "socket %d",socket);
-		//log_info(logger, "id %d",id);
 
 		int offset=0;
 		int id_falso=0;

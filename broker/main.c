@@ -12,7 +12,7 @@ int main() {
 	     sem_init(&cola_vacia[i], 0, 0);
 
 	for(int j = 0; j < 6; j++)
-		     sem_init(&sem_proceso[j], 0, 0);
+		 sem_init(&sem_proceso[j], 0, 0);
 
 	administracion_por_id=dictionary_create();
 	administracion_por_cod=dictionary_create();
