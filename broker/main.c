@@ -16,7 +16,7 @@ int main() {
 
 	administracion_por_id=dictionary_create();
 	administracion_por_cod=dictionary_create();
-	subscriptors= dictionary_create();
+	subscribers= dictionary_create();
 
 	for(int j = 0; j < 6; j++)
 		inicializar_listas(j);
@@ -97,11 +97,12 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 				list_add(administrator->suscriptores_enviados,proceso);
 				loggear_mensaje_enviado(proceso->socket, codigo_de_operacion); //Por ahora de prueba
 			}
-			//Agregar a cache
 		}
 
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
+
+		//agregar_mensaje_memoria_cache(mensaje[codigo_de_operacion]);
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);
@@ -115,7 +116,7 @@ t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
 	t_adm_mensaje *administrador=malloc(sizeof(administrador));
 		administrador->id_mensaje= mensaje->id_mensaje;
 		administrador->id_correlativo=mensaje->id_correlativo;
-		administrador->tipo_mensaje=mensaje->codigo_operacion;
+		administrador->codigo_operacion=mensaje->codigo_operacion;
 		administrador->suscriptores_confirmados=list_create();
 		administrador->suscriptores_enviados=list_create();
 

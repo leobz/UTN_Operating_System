@@ -26,8 +26,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
 
-
-
 		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
@@ -41,8 +39,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	else {
 
 		switch (paquete->codigo_operacion) {
-		case SUSCRIPCION:
+		case SUSCRIPCION:{
 
+			t_proceso* proceso;
 
 			if(esta_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso)){ //si el proceso ya estaba registrado
 
@@ -52,19 +51,24 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				t_proceso* proceso_encontrado=list_find(suscriptores[paquete->cola], &buscar_suscriptor);
 
 				proceso_encontrado->socket=paquete->socket_cliente;//le cambio el socket al suscriptor y actualizo los diccionarios
-				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso_encontrado);
-				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso_encontrado);
-
+				proceso=proceso_encontrado;
 			}
 
-			else{
-				proceso=malloc(sizeof(t_proceso)); //creo un nuevo proceso, lo meto en la lista y en los diccionarios
+			else{			//si no existia ese proceso lo creo y lo meto en la lista y en los diccionarios
+				proceso=malloc(sizeof(t_proceso));
 				proceso->id_proceso=paquete->id_proceso;
 				proceso->socket=paquete->socket_cliente;
 				list_add(suscriptores[paquete->cola], proceso);
-				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
-				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso);
 			}
+
+			meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
+			meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
+
+			cola_paquete=paquete->cola;
+
+			/*pthread_t thread_subscribers;
+			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
+			pthread_detach(thread_subscribers);*/
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
 
@@ -72,19 +76,19 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 
-			break;
+			break;}
 
-		case CONFIRMACION:
+		case CONFIRMACION:{
 
 			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
 
-			administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
+			t_adm_mensaje*administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
 
-			proceso_confirmado=obtener_de_diccionario(subscriptors,paquete->id_proceso);
+			t_proceso* proceso_confirmado=obtener_de_diccionario(subscribers,paquete->id_proceso);
 
 			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
 
-			break;
+			break;}
 
 		case OP_ERROR:
 
@@ -101,6 +105,74 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		free(paquete);
 	}
 }
+
+
+void verificar_cache(t_proceso* proceso){
+
+	int id_suscriptor=proceso->id_proceso;
+	int socket=proceso->socket;
+	int num_cola=cola_paquete;
+
+
+
+	//leer primero iteracion ****
+
+			void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
+
+				bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
+
+					return proceso_a_comparar->id_proceso=id_suscriptor;
+				}
+
+				if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
+
+					//si ese proceso no se encuentra entre los procesos que habian confirmado el mensaje
+					int bytes=0;
+					void*mensaje_para_enviar=generar_mensaje(actual_administrator,&bytes);
+					int validez=enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
+					if(validez!=1) //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
+					list_add(actual_administrator->suscriptores_enviados,proceso);
+				}
+			}
+
+//***** primero itera
+			list_iterate(administradores[num_cola],&enviar_mensajes_cacheados); //checkeo por cada estructura de administracion si se le habia enviado ese mensaje
+
+}
+
+void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
+
+	void*payload; //para el mensaje en cache
+	int payload_size=0; //para el tamaño del mensaje en cache
+
+	if(strcmp(broker_config->algoritmo_memoria, "PARTICIONES")==0){ //aplicar funcion es_particion_dinamica
+		//payload=obtener_payload_particiones(actual_administrator->particion_dinamica);
+		payload_size=actual_administrator->particion_dinamica->tamanio_particion;
+	}
+
+	if(strcmp(broker_config->algoritmo_memoria, "BS")==0){ //aplicar funcion es_buddy_system
+		//payload=obtener_payload_bs(actual_administrator->particion_bs);
+		payload_size=actual_administrator->particion_bs->size_mensaje;
+	}
+
+
+	int offset=0;
+	*bytes=sizeof(int)*4 + payload_size;
+	void*mensaje_para_enviar=malloc(*bytes);
+
+	memcpy(mensaje_para_enviar,&actual_administrator->codigo_operacion,sizeof(int));
+		offset=sizeof(int);
+	memcpy(mensaje_para_enviar+offset,&actual_administrator->id_mensaje,sizeof(int));
+		offset=sizeof(int);
+	memcpy(mensaje_para_enviar+offset,&actual_administrator->id_correlativo,sizeof(int));
+		offset=sizeof(int);
+	memcpy(mensaje_para_enviar+offset,&payload_size,sizeof(int));
+		offset=sizeof(int);
+	memcpy(mensaje_para_enviar+offset,&payload,payload_size);
+
+		return mensaje_para_enviar;
+}
+
 
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 
@@ -125,6 +197,7 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 	return mensaje_a_preparar;
 }
 
+
 void enviar_confirmacion(int id,op_code confirmacion,int socket){
 
 		//log_info(logger, "socket %d",socket);
@@ -144,4 +217,3 @@ void enviar_confirmacion(int id,op_code confirmacion,int socket){
 
 		 //le devuelve al proceso emisor el id del mensaje
 }
-

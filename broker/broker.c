@@ -9,35 +9,29 @@
 void* empaquetar_mensaje_broker(t_mensaje* mensaje,int *bytes){
 
 
-	*bytes=mensaje->payload_size + sizeof(int)*3;
+	*bytes=mensaje->payload_size + sizeof(int)*4;
 	void* paquete_broker=malloc(*bytes);
 	int offset=0;
 
 	memcpy(paquete_broker + offset, &mensaje->codigo_operacion, sizeof(int));
-			offset += sizeof(int);
+		offset += sizeof(int);
 
-	if ((mensaje->codigo_operacion >= 0) && (mensaje->codigo_operacion <= 2)){ //si es un mensaje de accion le envio el id_mensaje
+	memcpy(paquete_broker + offset, &mensaje->id_mensaje, sizeof(int));
+		offset += sizeof(int);
 
-		memcpy(paquete_broker + offset, &mensaje->id_mensaje, sizeof(int));
-
-	}
-
-	if ((mensaje->codigo_operacion >= 3) && (mensaje->codigo_operacion <= 5)){ //si es un mensaje de respuesta le envio el id_correlativo
-
-		memcpy(paquete_broker + offset, &mensaje->id_correlativo, sizeof(int));
-
-
-	}
-	offset += sizeof(int);
+	memcpy(paquete_broker + offset, &mensaje->id_correlativo, sizeof(int));
+		offset += sizeof(int);
 
 	memcpy(paquete_broker + offset, &mensaje->payload_size, sizeof(int));
 		offset += sizeof(int);
+
 	memcpy(paquete_broker + offset, mensaje->payload, mensaje->payload_size);
 		offset += mensaje->payload_size;
 
 
 	return paquete_broker;
 }
+
 
 int id_necesario(int id_mensaje,int id_correlativo,op_code codigo_operacion){
 	if((codigo_operacion>=0)&&(codigo_operacion<=2))
@@ -53,12 +47,16 @@ void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
 	broker_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 
+	broker_config->algoritmo_memoria = strdup(
+			config_get_string_value(config, "ALGORITMO_MEMORIA"));
+
 }
 
 
 void destruir_broker_config(t_broker_config *broker_config) {
 	free(broker_config->ip_broker);
 	free(broker_config->puerto_broker);
+	free(broker_config->algoritmo_memoria);
 	free(broker_config);
 }
 
