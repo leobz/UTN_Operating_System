@@ -24,7 +24,7 @@ typedef enum {
 	PRIMER_AJUSTE = 0, MEJOR_AJUSTE = 1
 } t_ordenamiento;
 
-pthread_mutex_t m_cache[6];
+pthread_mutex_t m_cache;
 
 t_particion_bs* particion_bs;
 void* memoria_cache;

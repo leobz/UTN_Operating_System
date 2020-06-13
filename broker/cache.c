@@ -9,14 +9,11 @@ void inicializar_memoria_cache() {
 }
 
 void inicializar_mutex_cache() {
-	for (int i = 0; i < 6; i++) {
-		// ERROR - TODO: Deberia ser un unico mutex, ya que la caché es una sola
-		if (pthread_mutex_init(&m_cache[i], NULL) != 0)
-		{
-			printf("Error en inicialización de mutex: %s (%d)\n", op_code_to_string(i), i);
-			break;
-		}
+	if (pthread_mutex_init(&m_cache, NULL) != 0)
+	{
+		printf("Error en inicialización de mutex de caché\n");
 	}
+
 }
 
 void inicializar_lista_particiones() {
@@ -256,9 +253,7 @@ void guardar_en_cache(void* payload, int offset, int size){
 }
 
 void finalizar_mutex_cache() {
-	for (int i = 0; i < 6; i++) {
-		pthread_mutex_destroy(&m_cache[i]);
-	}
+	pthread_mutex_destroy(&m_cache);
 }
 
 void finalizar_lista_particiones() {
