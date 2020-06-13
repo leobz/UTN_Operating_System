@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
+		int id_process=0;
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
@@ -29,11 +30,13 @@ int main(int argc, char **argv) {
 		t_suscripcion *suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = cola;
+		suscripcion->id_proceso=id_process;
 
-		void *a_enviar = suscripcion;
+
+		void *a_enviar = empaquetar_suscripcion(suscripcion);
 
 		log_info(logger, "Conexion establecida con [Broker]");
-		enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
+		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 
 		log_info(logger,
 				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos",
@@ -74,6 +77,7 @@ int main(int argc, char **argv) {
 					pos_y, cantidad, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -98,6 +102,7 @@ int main(int argc, char **argv) {
 					id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -123,6 +128,8 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_catch_pokemon(&bytes, pokemon, pos_x,pos_y, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
+
 
 			liberar_conexion(conexion);
 		}
@@ -148,6 +155,7 @@ int main(int argc, char **argv) {
 			void *a_enviar = serializar_appeared_pokemon(&bytes, pokemon, pos_x,
 					pos_y, id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
 		}
@@ -176,11 +184,12 @@ int main(int argc, char **argv) {
 
 			int bytes;
 
-			void *a_enviar = serializar_caught_pokemon(&bytes, estado,
-					id_correlativo);
+			void *a_enviar = serializar_caught_pokemon(&bytes, estado,id_correlativo);
 			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
 
 			liberar_conexion(conexion);
+
 		}
 
 	}

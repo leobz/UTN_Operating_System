@@ -32,6 +32,10 @@ void enviar_mensaje(int socket_cliente, void* a_enviar, int bytes) {
 void enviar_mensaje_nofree(int socket_cliente, void* a_enviar, int bytes) {
 	send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
 }
+int enviar_mensaje_con_retorno(int socket_cliente, void* a_enviar, int bytes){
+	int verificacion=send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
+	return verificacion;
+}
 
 int recibir_mensaje(int socket_cliente, t_buffer *buffer_recibido) {
 	//TODO: Testear este metodo

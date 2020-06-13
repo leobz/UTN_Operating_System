@@ -15,18 +15,15 @@
 
 
 t_list* suscriptores[6];
-
+t_list* administradores[6];
 
 t_mensaje*mensajes[6][3];
 
 
 
-typedef enum{VACIA,ULTIMO}process;
-
 typedef enum{FRENTE,FIN,ACTUAL}men;
 
 void inicializar_listas(int cola);
-
 void encolar_proceso(int socket, int cola);
 void desencolar_proceso(int cola);
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje);
