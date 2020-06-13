@@ -8,7 +8,6 @@
 #include"colas.h"
 
 
-
 void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
@@ -30,7 +29,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
+
 		loggear_nueva_conexion(logger, paquete);
+
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
 		liberar_paquete_socket(paquete);

@@ -10,6 +10,7 @@
 
 #include "../utils/cliente.h"
 #include "broker.h"
+#include "cache.h"
 
 
 
@@ -24,11 +25,9 @@ sem_t sem_proceso[6];
 sem_t sem;
 
 
-
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
-
 
 void verificar_cache(t_proceso* proceso);
 void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes);
