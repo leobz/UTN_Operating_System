@@ -274,8 +274,12 @@ void finalizar_particion_bs() {
 	// TODO: implementar logica eliminacion particion bs
 }
 
+static void particion_dinamica_destroy(t_particion_dinamica* particion) {
+    free(particion);
+}
+
 void finalizar_particiones_dinamicas() {
-	// TODO: implementar logica eliminacion particiones dinamicas
+	list_destroy_and_destroy_elements(particiones_dinamicas, particion_dinamica_destroy);
 }
 
 void finalizar_memoria_cache() {
