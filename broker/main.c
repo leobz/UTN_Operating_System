@@ -1,7 +1,9 @@
 #include "main.h"
+#include "test/testing.h"
 
 
 int main(int argc, char ** argv) {
+
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
@@ -13,7 +15,6 @@ int main(int argc, char ** argv) {
 		char*ip=broker_config->ip_broker;
 		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
-
 
 		for(int i = 0; i < 6; i++)
 		     sem_init(&cola_vacia[i], 0, 0);
@@ -54,7 +55,6 @@ int main(int argc, char ** argv) {
 
 		return 0;
 	}
-
 }
 
 
