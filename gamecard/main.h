@@ -9,5 +9,6 @@
 #define MAIN_H_
 
 #include "gamecard.h"
+#include "directorios.h"
 
 #endif /* MAIN_H_ */

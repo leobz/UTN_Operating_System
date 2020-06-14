@@ -2,7 +2,8 @@
 
 int main(){
 	inicializar_gamecard();
-	suscribirme_al_broker(gamecard_config);
+	//suscribirme_al_broker(gamecard_config);
+	inicializar_directorios(gamecard_config);
 	/* TODO Aca no me queda claro si no me suscribo porque tengo que seguir con lo demas.
 	   Que mensaje voy a esperar */
 
