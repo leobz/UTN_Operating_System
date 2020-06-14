@@ -20,18 +20,18 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
-		loggear_nueva_conexion(logger, paquete);
+
 
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
 
-		//log_info(logger, "id:%d",id_mensaje);
+
 
 		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
-		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
+		pthread_mutex_lock(&m_cache);
 		if (es_buddy_system()) {
 			// TODO: guardar el mensaje en t_adm_mensaje
 			agregar_mensaje_memoria_cache_bs(mensaje_a_encolar);
@@ -39,7 +39,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		else if (es_particion_dinamica()){
 			agregar_mensaje_memoria_cache_particion_dinamica(mensaje_a_encolar);
 		}
-		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
+		pthread_mutex_unlock(&m_cache);
+
+		loggear_nueva_conexion(logger, paquete);
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
 		liberar_paquete_socket(paquete);
@@ -50,10 +52,46 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		switch (paquete->codigo_operacion) {
 		case SUSCRIPCION:
 
+
+			if(esta_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso)){ //si el proceso ya estaba registrado
+
+				bool buscar_suscriptor(t_proceso* proceso){
+					return proceso->id_proceso==paquete->id_proceso;
+				}
+				t_proceso* proceso_encontrado=list_find(suscriptores[paquete->cola], &buscar_suscriptor);
+
+				proceso_encontrado->socket=paquete->socket_cliente;//le cambio el socket al suscriptor y actualizo los diccionarios
+				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso_encontrado);
+				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso_encontrado);
+
+			}
+
+			else{
+				proceso=malloc(sizeof(t_proceso)); //creo un nuevo proceso, lo meto en la lista y en los diccionarios
+				proceso->id_proceso=paquete->id_proceso;
+				proceso->socket=paquete->socket_cliente;
+				list_add(suscriptores[paquete->cola], proceso);
+				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
+				meter_en_diccionario(subscriptors,paquete->id_proceso,proceso);
+			}
+
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
-			list_add(suscriptores[paquete->cola], paquete->socket_cliente);
 
 			sem_post(&sem_proceso[paquete->cola]);
+
+
+
+			break;
+
+		case CONFIRMACION:
+
+			log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
+
+			administrador_confirmado=obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
+
+			proceso_confirmado=obtener_de_diccionario(subscriptors,paquete->id_proceso);
+
+			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado);
 
 			break;
 
@@ -102,13 +140,16 @@ void enviar_confirmacion(int id,op_code confirmacion,int socket){
 		//log_info(logger, "id %d",id);
 
 		int offset=0;
+		int id_falso=0;
 
-		void*enviar=malloc(sizeof(int)*2);
+		void*enviar=malloc(sizeof(int)*3);
 		memcpy(enviar,&confirmacion,sizeof(int));
 		offset+=sizeof(int);
 		memcpy(enviar+offset,&id,sizeof(int));
+		offset+=sizeof(int);
+		memcpy(enviar+offset,&id_falso,sizeof(int)); //valor nulo pq no es un id_proceso
 
-		enviar_mensaje(socket,enviar,sizeof(int)*2);
+		enviar_mensaje(socket,enviar,sizeof(int)*3);
 
 		 //le devuelve al proceso emisor el id del mensaje
 }

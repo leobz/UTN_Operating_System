@@ -82,7 +82,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		case CAUGHT_POKEMON:
 			mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
 
-			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s",value_to_state(mensaje_caught->resultado));
+			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s con ID_CORRELATIVO: %d",value_to_state(mensaje_caught->resultado),paquete_socket->id_correlativo);
 
 				free(mensaje_caught);
 
@@ -113,4 +113,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			}
 	free(paquete_socket);
 	}
+}
+
+void recibir_id_correlativo(int socket_cliente) {
+	t_paquete_socket* paquete =  recibir_mensaje_servidor(socket_cliente);
+
+	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
+
 }
