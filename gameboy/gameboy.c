@@ -228,8 +228,8 @@ int main(int argc, char **argv) {
 			int cantidad = atoi(argv[6]);
 			int id_mensaje = atoi(argv[7]);
 
-			int conexion = crear_conexion(gameboy_config->ip_team,
-					gameboy_config->puerto_team);
+			int conexion = crear_conexion(gameboy_config->ip_gamecard,
+					gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
 				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
