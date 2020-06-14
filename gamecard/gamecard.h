@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "../utils/config.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
@@ -30,9 +31,11 @@ typedef struct {
 // Variables
 t_log* logger;
 t_gamecard_config* gamecard_config;
+pthread_t suscripcion_broker;
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
+void suscribirme_al_broker(t_gamecard_config* gamecard_config);
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
 void finalizar_gamecard();

@@ -54,16 +54,15 @@ void finalizar_gamecard() {
 void suscribirme_al_broker(t_gamecard_config* gamecard_config){
 	printf("Suscribiendome al broker...\n");
 
-
 	int colas_a_suscribir[] = {NEW_POKEMON, GET_POKEMON, CATCH_POKEMON};
 	int i;
 	for (i=0; i<(&colas_a_suscribir)[1]-colas_a_suscribir; i++){
 		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-		if (conexion == -1){
+		while (conexion == -1) {
 			printf("ERROR: Conexion con [Broker] no establecida\n");
-			exit(-1);
+			sleep(gamecard_config->tiempo_reintento_conexion);
+			conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
 		}
-
 		t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = colas_a_suscribir[i];
