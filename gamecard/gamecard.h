@@ -30,6 +30,7 @@ typedef struct {
 // Variables
 t_log* logger;
 t_gamecard_config* gamecard_config;
+pthread_t sem_mensajes[3];
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
