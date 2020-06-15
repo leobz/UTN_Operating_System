@@ -15,7 +15,7 @@ void empaquetar_y_desempaquetar_new_pokemon() {
 	int id_correlativo = 1;
 
 	t_paquete *paquete = crear_paquete(NEW_POKEMON,
-			buffer_new_pokemon(pokemon, pos_x, pos_y, cantidad), 0);
+			buffer_new_pokemon(pokemon, pos_x, pos_y, cantidad), 0,0);
 
 	t_mensaje_new *mensaje_new = deserializar_mensaje_new_pokemon(
 			paquete->buffer);
@@ -40,7 +40,7 @@ void serializar_y_deserializar_new_pokemon() {
 	int bytes;
 
 	void* mensaje_serializado = serializar_new_pokemon(&bytes, pokemon, pos_x,
-			pos_y, cantidad, id_correlativo);
+			pos_y, cantidad, 0,id_correlativo);
 
 	test_deserializar_buffer_new_pokemon(mensaje_serializado, pokemon, pos_x,
 			pos_y, cantidad, id_correlativo);

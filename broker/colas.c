@@ -15,7 +15,6 @@ void inicializar_listas(int cola){
 }
 
 
-
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
 	printf("Insertando mensaje %s\n",op_code_to_string(cola_mensaje));
 	if(mensajes[cola_mensaje][FRENTE] == NULL){
@@ -34,4 +33,6 @@ t_mensaje* extraer_mensaje(int cola_mensaje){
 	}
 	return mensajes[cola_mensaje][ACTUAL];
 }
+
+
 

@@ -16,19 +16,22 @@ int main(int argc, char ** argv) {
 		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
 
-		for(int i = 0; i < 6; i++)
+
+for(int i = 0; i < 6; i++)
 		     sem_init(&cola_vacia[i], 0, 0);
 
-    for(int j = 0; j < 6; j++)
-			 sem_init(&sem_proceso[j], 0, 0);
-    
-    
+	for(int j = 0; j < 6; j++)
+		 sem_init(&sem_proceso[j], 0, 0);
+
 	administracion_por_id=dictionary_create();
 	administracion_por_cod=dictionary_create();
-	subscriptors= dictionary_create();
+	subscribers= dictionary_create();
 
 	for(int j = 0; j < 6; j++)
-		  inicializar_listas(j);
+
+		inicializar_listas(j);
+
+
 
 		
     
@@ -110,11 +113,12 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 				list_add(administrator->suscriptores_enviados,proceso);
 				loggear_mensaje_enviado(proceso->socket, codigo_de_operacion); //Por ahora de prueba
 			}
-			//Agregar a cache
 		}
 
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
+
+		//agregar_mensaje_memoria_cache(mensaje[codigo_de_operacion]);
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);
@@ -123,19 +127,4 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 	}
 }
 
-t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
-
-	t_adm_mensaje *administrador=malloc(sizeof(administrador));
-		administrador->id_mensaje= mensaje->id_mensaje;
-		administrador->id_correlativo=mensaje->id_correlativo;
-		administrador->tipo_mensaje=mensaje->codigo_operacion;
-		administrador->suscriptores_confirmados=list_create();
-		administrador->suscriptores_enviados=list_create();
-
-		meter_en_diccionario(administracion_por_id,mensaje->id_mensaje,administrador);
-
-		list_add(administradores[mensaje->codigo_operacion],administrador);
-
-		return administrador;
-}
 

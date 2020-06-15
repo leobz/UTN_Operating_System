@@ -5,8 +5,8 @@
  *      Author: diego
  */
 
-#ifndef BROKER_H_
-#define BROKER_H_
+#ifndef BROKER_COMMONS_H_
+#define BROKER_COMMONS_H_
 
 
 #include<stdio.h>
@@ -24,7 +24,6 @@
 #include "../utils/servidor.h"
 #include "../utils/diccionarios.h"
 
-
 typedef struct {
 	char *ip_broker;
 	char *puerto_broker;
@@ -37,9 +36,9 @@ typedef struct {
 } t_broker_config;
 
 
-
 t_log* logger;
 t_broker_config* broker_config;
+
 
 
 typedef struct mensaje{
@@ -54,31 +53,26 @@ typedef struct mensaje{
 }t_mensaje;
 
 typedef struct{
+	op_code codigo_operacion;
+	int id_necesario;
+	int payload_size;
+	void* payload;
+}t_mensaje_global;
+
+typedef struct{
 
 	int id_proceso;
 	int socket;
 
 }t_proceso;
 
-typedef struct{
-	int id_mensaje;
-	int id_correlativo;
-	op_code tipo_mensaje;
-	//t_particion* particion;
-	t_list* suscriptores_enviados;
-	t_list* suscriptores_confirmados;
-}
-t_adm_mensaje;
 
-
-t_adm_mensaje* administrador_confirmado;
 int socket_confirmado;
-t_proceso* proceso_confirmado;
 
 t_dictionary* administracion_por_id;
 t_dictionary* administracion_por_cod;
 t_dictionary* dic_suscriptores[6];
-t_dictionary* subscriptors;
+t_dictionary* subscribers;
 
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);

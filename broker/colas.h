@@ -19,8 +19,6 @@ t_list* administradores[6];
 
 t_mensaje*mensajes[6][3];
 
-
-
 typedef enum{FRENTE,FIN,ACTUAL}men;
 
 void inicializar_listas(int cola);

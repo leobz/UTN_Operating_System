@@ -5,8 +5,8 @@ void cargar_configuracion_ip() {
 			"gameboy.config.sample");
 
 	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_broker, "127.0.0.1");
-	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_team, "127.0.0.2");
-	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_gamecard, "127.0.0.3");
+	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_team, "127.0.0.1");
+	CU_ASSERT_STRING_EQUAL(gameboy_config->ip_gamecard, "127.0.0.1");
 
 	destruir_gameboy_config(gameboy_config);
 }
@@ -16,7 +16,7 @@ void cargar_configuracion_puertos() {
 			"gameboy.config.sample");
 
 	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_broker, "5001");
-	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_team, "5002");
+	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_team, "4444");
 	CU_ASSERT_STRING_EQUAL(gameboy_config->puerto_gamecard, "5003");
 
 	destruir_gameboy_config(gameboy_config);
