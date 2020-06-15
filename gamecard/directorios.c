@@ -27,12 +27,26 @@ void inicializar_directorios(t_gamecard_config* gamecard_config){
 
 	//Creo archivo Bitmap.bin
 		FILE *bitmap;
-		bitmap=fopen("/home/utnso/tall-grass/Metadata/Bitmap.bin","w+");
+		bitmap=fopen("/home/utnso/tall-grass/Metadata/Bitmap.bin","wb");
 		fclose(bitmap);
 
 	//Creo archivo Metadata.bin
-		FILE *metadata;
-		metadata=fopen("/home/utnso/tall-grass/Metadata/Metadata.bin","w+");
-		fclose(metadata);
 
+		t_file_metadata* metadata;
+		metadata{
+					block_size=64;
+					blocks=5192;
+					magic_number="TALL_GRASS";
+				}
+		FILE *file=fopen("/home/utnso/tall-grass/Metadata/Metadata.bin","wb");
+		fwrite(&metadata->block_size,sizeof(int),1,file);
+		fwrite(&metadata->blocks,sizeof(metadata->blocks),1,file);
+		fwrite(&metadata->magic_number,sizeof(metadata->magic_number),1,file);
+		fclose(file);
+		free(metadata);
+
+		//EXISTENCIA POKEMON-> NO CREAR CARPETA CREAR CARPETA
+		//
 }
+
+
