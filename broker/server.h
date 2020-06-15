@@ -9,7 +9,9 @@
 #define SERVER_H_
 
 #include "../utils/cliente.h"
-#include "broker.h"
+
+#include "broker-commons.h"
+#include "administracion-de-mensajes.h"
 #include "cache.h"
 
 
@@ -30,6 +32,5 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
 
 void verificar_cache(t_proceso* proceso);
-void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes);
 
 #endif /* SERVER_H_ */

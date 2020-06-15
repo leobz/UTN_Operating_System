@@ -9,6 +9,7 @@
 #define MAIN_H_
 
 #include "colas.h"
+#include "administracion-de-mensajes.h"
 
 t_mensaje* mensaje[6];
 t_mensaje_catch *mensaje_catch;
@@ -20,5 +21,4 @@ pthread_mutex_t mutex[6];
 
 
 void enviar_mensajes_en_cola(int);
-t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje);
 #endif /* MAIN_H_ */

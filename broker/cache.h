@@ -1,7 +1,7 @@
 #ifndef CACHE_H_
 #define CACHE_H_
 
-#include "broker.h"
+#include "broker-commons.h"
 #include "../utils/listas.h"
 
 typedef struct particion_bs {

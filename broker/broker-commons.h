@@ -5,8 +5,8 @@
  *      Author: diego
  */
 
-#ifndef BROKER_H_
-#define BROKER_H_
+#ifndef BROKER_COMMONS_H_
+#define BROKER_COMMONS_H_
 
 
 #include<stdio.h>
@@ -24,9 +24,6 @@
 #include "../utils/servidor.h"
 #include "../utils/diccionarios.h"
 
-
-
-
 typedef struct {
 	char *ip_broker;
 	char *puerto_broker;
@@ -40,7 +37,6 @@ typedef struct {
 
 t_log* logger;
 t_broker_config* broker_config;
-
 
 typedef struct mensaje{
 
@@ -60,7 +56,6 @@ typedef struct{
 	void* payload;
 }t_mensaje_global;
 
-
 typedef struct{
 
 	int id_proceso;
@@ -68,41 +63,12 @@ typedef struct{
 
 }t_proceso;
 
-
-
-typedef struct particion_bs {
-	int tamanio_particion;
-	bool esta_libre;
-	int offset;
-	int size_mensaje;
-	struct particion_bs* primer_hijo;
-	struct particion_bs* segundo_hijo;
-} t_particion_bs;
-
-typedef struct {
-	int offset;
-	int tamanio_particion;
-	bool esta_ocupado;
-} t_particion_dinamica;
-
-typedef struct{
-	int id_mensaje;
-	int id_correlativo;
-	op_code codigo_operacion;
-	t_particion_bs* particion_bs;
-	t_particion_dinamica *particion_dinamica;
-	t_list* suscriptores_enviados;
-	t_list* suscriptores_confirmados;
-}
-t_adm_mensaje;
-
 int socket_confirmado;
 
 t_dictionary* administracion_por_id;
 t_dictionary* administracion_por_cod;
 t_dictionary* dic_suscriptores[6];
 t_dictionary* subscribers;
-
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);

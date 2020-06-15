@@ -121,19 +121,4 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 	}
 }
 
-t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
-
-	t_adm_mensaje *administrador=malloc(sizeof(administrador));
-		administrador->id_mensaje= mensaje->id_mensaje;
-		administrador->id_correlativo=mensaje->id_correlativo;
-		administrador->codigo_operacion=mensaje->codigo_operacion;
-		administrador->suscriptores_confirmados=list_create();
-		administrador->suscriptores_enviados=list_create();
-
-		meter_en_diccionario(administracion_por_id,mensaje->id_mensaje,administrador);
-
-		list_add(administradores[mensaje->codigo_operacion],administrador);
-
-		return administrador;
-}
 
