@@ -23,6 +23,8 @@ typedef struct{
 }
 t_adm_mensaje;
 
+t_adm_mensaje* administrador_confirmado;
+
 t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje);
 void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes);
 

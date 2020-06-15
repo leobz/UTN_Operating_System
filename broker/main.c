@@ -1,7 +1,9 @@
 #include "main.h"
+#include "test/testing.h"
 
 
 int main(int argc, char ** argv) {
+
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
@@ -14,6 +16,7 @@ int main(int argc, char ** argv) {
 		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
 
+
 for(int i = 0; i < 6; i++)
 		     sem_init(&cola_vacia[i], 0, 0);
 
@@ -25,9 +28,13 @@ for(int i = 0; i < 6; i++)
 	subscribers= dictionary_create();
 
 	for(int j = 0; j < 6; j++)
+
 		inicializar_listas(j);
 
 
+
+		
+    
 		pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 		pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
 		pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
@@ -51,7 +58,6 @@ for(int i = 0; i < 6; i++)
 
 		return 0;
 	}
-
 }
 
 
