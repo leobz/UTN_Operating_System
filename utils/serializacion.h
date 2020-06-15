@@ -86,6 +86,7 @@ typedef struct {
 	int id_correlativo;
 	int id_mensaje;
 	int socket_cliente;
+	int id_proceso;
 	int cola; //Solo para el caso q sea una suscripcion
 	t_buffer* buffer;
 } t_paquete_socket;
@@ -94,6 +95,14 @@ typedef struct{
 	op_code confirmacion;
 	int id_mensaje;
 }t_confirmacion;
+
+
+typedef struct {
+	int cod_operacion;
+	int cola_a_suscribir;
+	int id_proceso;
+} t_suscripcion;
+
 
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer,
@@ -135,6 +144,10 @@ void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 void* serializar_caught_pokemon(int* bytes, int estado, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
 t_mensaje_caught* deserializar_mensaje_caught_pokemon(t_buffer* buffer);
+
+//SUSCRIPCION
+void* empaquetar_suscripcion(t_suscripcion* suscripcion);
+
 //CONFIRMACION
 t_confirmacion* deserializar_confirmacion(void*mensaje);
 
@@ -142,5 +155,6 @@ t_confirmacion* deserializar_confirmacion(void*mensaje);
 char* op_code_to_string(int enum_value);
 int string_to_op_code(char* enum_cola);
 char* value_to_state(int value);
+char* pasar_a_char(int numero);
 void liberar_paquete_socket(t_paquete_socket* paquete);
 #endif /* SERIALIZACION_H_ */

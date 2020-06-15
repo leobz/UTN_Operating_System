@@ -9,6 +9,8 @@
 #define TEST_TESTING_H_
 
 #include "test_configuration.h"
+#include "test_buddy_system.h"
+#include "test_cache_particiones_dinamicas.h"
 
 void correrTests();
 
