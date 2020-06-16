@@ -18,23 +18,22 @@ t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje){
 
 void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 
-	void*payload; //para el mensaje en cache
-	int payload_size=0; //para el tamaño del mensaje en cache
+	void* payload; //para el mensaje en cache
+	int payload_size = 0; //para el tamaño del mensaje en cache
 
-	if(strcmp(broker_config->algoritmo_memoria, "PARTICIONES")==0){ //aplicar funcion es_particion_dinamica
-		//payload=obtener_payload_particiones(actual_administrator->particion_dinamica);
-		payload_size=actual_administrator->particion_dinamica->tamanio_particion;
+	if (es_particion_dinamica()){ //aplicar funcion es_particion_dinamica
+		payload = leer_particion_dinamica(actual_administrator->particion_dinamica);
+		payload_size = actual_administrator->particion_dinamica->tamanio_particion;
 	}
 
-	if(strcmp(broker_config->algoritmo_memoria, "BS")==0){ //aplicar funcion es_buddy_system
-		//payload=obtener_payload_bs(actual_administrator->particion_bs);
-		payload_size=actual_administrator->particion_bs->size_mensaje;
+	if(es_buddy_system()){ //aplicar funcion es_buddy_system
+		payload = leer_particion_bs(actual_administrator->particion_bs);
+		payload_size = actual_administrator->particion_bs->size_mensaje;
 	}
 
-
-	int offset=0;
-	*bytes=sizeof(int)*4 + payload_size;
-	void*mensaje_para_enviar=malloc(*bytes);
+	int offset = 0;
+	*bytes = sizeof(int)*4 + payload_size;
+	void* mensaje_para_enviar = malloc(*bytes);
 
 	memcpy(mensaje_para_enviar,&actual_administrator->codigo_operacion,sizeof(int));
 		offset=sizeof(int);
@@ -44,9 +43,9 @@ void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 		offset=sizeof(int);
 	memcpy(mensaje_para_enviar+offset,&payload_size,sizeof(int));
 		offset=sizeof(int);
-	memcpy(mensaje_para_enviar+offset,&payload,payload_size);
+	memcpy(mensaje_para_enviar+offset,payload,payload_size);
 
-		return mensaje_para_enviar;
+	return mensaje_para_enviar;
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {

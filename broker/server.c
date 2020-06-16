@@ -82,9 +82,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			cola_paquete=paquete->cola;
 
-			/*pthread_t thread_subscribers;
+			pthread_t thread_subscribers;
 			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
-			pthread_detach(thread_subscribers);*/
+			pthread_detach(thread_subscribers);
 
 			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
 
