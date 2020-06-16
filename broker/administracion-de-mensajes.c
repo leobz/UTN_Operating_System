@@ -48,3 +48,12 @@ void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 
 		return mensaje_para_enviar;
 }
+
+void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
+	if (es_particion_dinamica()){
+		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica(mensaje);
+	}
+	else if(es_buddy_system()){
+		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs(mensaje);
+	}
+}

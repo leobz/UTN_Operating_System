@@ -118,7 +118,8 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
 
-		//agregar_mensaje_memoria_cache(mensaje[codigo_de_operacion]);
+
+		agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);
