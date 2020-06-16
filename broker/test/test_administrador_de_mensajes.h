@@ -4,7 +4,6 @@
 #include "CUnit/Basic.h"
 #include "../administracion-de-mensajes.h"
 
-
 void agregar_tests_administrador_de_mensaje();
-void test_guardar_mensaje_en_cache();
+void test_guardar_mensaje_en_cache_dinamica();
 #endif /* TEST_TEST_ADMINISTRADOR_DE_MENSAJES_H_ */
