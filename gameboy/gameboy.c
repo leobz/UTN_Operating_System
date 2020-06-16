@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
-		int id_process=0;
+		int id_process = atoi(argv[4]);
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
