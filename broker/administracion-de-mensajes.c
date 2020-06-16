@@ -16,7 +16,7 @@ t_adm_mensaje* iniciar_administracion(t_mensaje*mensaje){
 	return administrador;
 }
 
-void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
+void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 
 	void* payload; //para el mensaje en cache
 	int payload_size = 0; //para el tamaño del mensaje en cache
