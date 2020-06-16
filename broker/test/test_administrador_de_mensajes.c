@@ -23,6 +23,8 @@ t_mensaje* mensaje_generico() {
 
 void test_guardar_mensaje_en_cache_dinamica() {
 	inicializar_test_con_particion_dinamica();
+	inicializar_diccionarios();
+	inicalizar_lista_de_todos_las_colas();
 
 	t_adm_mensaje* administrator = iniciar_administracion(mensaje_generico());
 
