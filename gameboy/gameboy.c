@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
-		int id_process = atoi(argv[4]);
+		int id_process = getpid();
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
@@ -27,6 +27,10 @@ int main(int argc, char **argv) {
 		// TODO: funcion de alarm
 		// TODO: buscar como terminar un hilo por cierto tiempo
 
+		pthread_t hilo_gameboy;
+		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,conexion);
+		pthread_detach(hilo_gameboy);
+
 		t_suscripcion *suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = cola;
@@ -35,17 +39,15 @@ int main(int argc, char **argv) {
 
 		void *a_enviar = empaquetar_suscripcion(suscripcion);
 
-		log_info(logger, "Conexion establecida con [Broker]");
+		log_info(logger, "%ld Conexion establecida con [Broker]", (long)getpid());
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 
 		log_info(logger,
-				"Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos",
+				"%ld Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos", (long)getpid(),
 				cola, tiempo);
 
 
-		pthread_t hilo_gameboy;
-		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,conexion);
-		pthread_detach(hilo_gameboy);
+
 
 		sleep(tiempo);
 
