@@ -14,7 +14,7 @@ void agregar_tests_particiones_dinamicas(){
 
 }
 
-void inicializar_test(){
+void inicializar_test_con_particion_dinamica(){
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANIO_MEMORIA;
 	free(broker_config->algoritmo_memoria);
@@ -29,7 +29,7 @@ void finalizar_test() {
 }
 
 void test_inicializar_cache_crea_particion_libre(){
-	inicializar_test();
+	inicializar_test_con_particion_dinamica();
 	t_particion_dinamica* particion_inicial = list_first(particiones_dinamicas);
 
 	CU_ASSERT_EQUAL(list_size(particiones_dinamicas), 1);
@@ -40,7 +40,7 @@ void test_inicializar_cache_crea_particion_libre(){
 }
 
 void test_guardar_un_payload(){
-	inicializar_test();
+	inicializar_test_con_particion_dinamica();
 
 	char const *a_guardar = "someString";
 	int tamanio = strlen(a_guardar) + 1;
@@ -55,7 +55,7 @@ void test_guardar_un_payload(){
 }
 
 void test_leer_payload_desde_particion(){
-	inicializar_test();
+	inicializar_test_con_particion_dinamica();
 
 	char const *a_guardar = "someString";
 	int tamanio = strlen(a_guardar) + 1;
@@ -71,7 +71,7 @@ void test_leer_payload_desde_particion(){
 }
 
 void test_guardar_varias_particiones_no_afecta_particiones_previas(){
-	inicializar_test();
+	inicializar_test_con_particion_dinamica();
 
 	char const *a_guardar_a = "first";
 	char const *a_guardar_b = "second";
@@ -89,7 +89,7 @@ void test_guardar_varias_particiones_no_afecta_particiones_previas(){
 }
 
 void test_guardar_crea_particion_intermedia(){
-	inicializar_test();
+	inicializar_test_con_particion_dinamica();
 
 	t_particion_dinamica* particion;
 	t_particion_dinamica* particion_intermedia;

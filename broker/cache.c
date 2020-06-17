@@ -201,13 +201,11 @@ void* leer_particion_bs(t_particion_bs* particion) {
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 
-void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
-	//ESTA FUNCION DEBERIA RETORNAR UNA PARTICION O UN OFFSET A LA ADMINISTRACION DEL MENSAJE
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
 	void* payload = mensaje->payload;
 	int size = mensaje->payload_size;
 
-	t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
-	guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
+	return guardar_payload_en_particion_dinamica(payload, size);
 }
 
 

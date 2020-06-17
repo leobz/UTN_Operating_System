@@ -1,6 +1,20 @@
 #include "main.h"
 #include "test/testing.h"
 
+void inicializar_diccionarios() {
+	administracion_por_id = dictionary_create();
+	administracion_por_cod = dictionary_create();
+	subscribers = dictionary_create();
+}
+
+void inicalizar_lista_de_todos_las_colas() {
+	for (int i = 0; i < 6; i++)
+		sem_init(&cola_vacia[i], 0, 0);
+	for (int j = 0; j < 6; j++)
+		sem_init(&sem_proceso[j], 0, 0);
+	for (int j = 0; j < 6; j++)
+		inicializar_listas(j);
+}
 
 int main(int argc, char ** argv) {
 
@@ -11,30 +25,15 @@ int main(int argc, char ** argv) {
 	else {
 		inicializar_broker();
 		inicializar_memoria_cache();
+		inicializar_diccionarios();
+		inicalizar_lista_de_todos_las_colas();
 
 		char*ip=broker_config->ip_broker;
 		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
 
 
-for(int i = 0; i < 6; i++)
-		     sem_init(&cola_vacia[i], 0, 0);
 
-	for(int j = 0; j < 6; j++)
-		 sem_init(&sem_proceso[j], 0, 0);
-
-	administracion_por_id=dictionary_create();
-	administracion_por_cod=dictionary_create();
-	subscribers= dictionary_create();
-
-	for(int j = 0; j < 6; j++)
-
-		inicializar_listas(j);
-
-
-
-		
-    
 		pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 		pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
 		pthread_create(&sem_mensajes[CATCH_POKEMON],NULL,(void*)enviar_mensajes_en_cola,CATCH_POKEMON);
@@ -118,7 +117,8 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
 
-		//agregar_mensaje_memoria_cache(mensaje[codigo_de_operacion]);
+
+		agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);

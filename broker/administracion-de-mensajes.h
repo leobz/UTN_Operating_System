@@ -27,6 +27,7 @@ t_adm_mensaje* administrador_confirmado;
 
 t_adm_mensaje*iniciar_administracion(t_mensaje*mensaje);
 void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes);
+void agregar_mensaje_memoria_cache(t_adm_mensaje*, t_mensaje*);
 
 
 
