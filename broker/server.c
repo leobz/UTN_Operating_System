@@ -9,9 +9,7 @@
 
 void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
-	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
-			op_code_to_string(paquete->codigo_operacion),
-			paquete->id_correlativo);
+	log_info(logger, "[CONEXION] COD_OP:%s",op_code_to_string(paquete->codigo_operacion));
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {

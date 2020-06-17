@@ -57,7 +57,7 @@ Compruebo recepción del mensaje con Código de Operación e ID
 
 ```bash
 $ cat broker.log
-<...>[CONEXION] COD_OP:APPEARED_POKEMON ID:10
+<...>[CONEXION] COD_OP:APPEARED_POKEMON
 <...>
 ```
 
