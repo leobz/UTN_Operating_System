@@ -74,6 +74,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				list_add(suscriptores[paquete->cola], proceso);
 			}
 
+			t_proceso* proceso_viejo=sacar_de_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso);
+			free(proceso_viejo);//elimino anterior proceso para actualizarlo
 			meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
 			meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 
