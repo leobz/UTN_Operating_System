@@ -31,21 +31,14 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 		payload_size = actual_administrator->particion_bs->size_mensaje;
 	}
 
-	int offset = 0;
-	*bytes = sizeof(int)*4 + payload_size;
-	void* mensaje_para_enviar = malloc(*bytes);
+	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
+	mensaje->codigo_operacion = actual_administrator->codigo_operacion;
+	mensaje->id_mensaje = actual_administrator->id_mensaje;
+	mensaje->id_correlativo = actual_administrator->id_correlativo;
+	mensaje->payload_size = payload_size;
+	mensaje->payload = payload;
 
-	memcpy(mensaje_para_enviar,&actual_administrator->codigo_operacion,sizeof(int));
-		offset=sizeof(int);
-	memcpy(mensaje_para_enviar+offset,&actual_administrator->id_mensaje,sizeof(int));
-		offset=sizeof(int);
-	memcpy(mensaje_para_enviar+offset,&actual_administrator->id_correlativo,sizeof(int));
-		offset=sizeof(int);
-	memcpy(mensaje_para_enviar+offset,&payload_size,sizeof(int));
-		offset=sizeof(int);
-	memcpy(mensaje_para_enviar+offset,payload,payload_size);
-
-	return mensaje_para_enviar;
+	return empaquetar_mensaje_broker(mensaje, bytes);
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
