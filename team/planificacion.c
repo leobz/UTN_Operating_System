@@ -93,7 +93,8 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
 		cantidad_de_instrucciones++;
-		if (cantidad_de_instrucciones == team_config->quantum){
+		if (cantidad_de_instrucciones >= team_config->quantum){
+			cantidad_de_instrucciones = 0;
 			break;
 		}
 	}
