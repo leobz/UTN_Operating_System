@@ -4,13 +4,8 @@
 
 t_dictionary* enviaron_catch;
 
-// TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
-//pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
-ALGORITMO_PLANIFICACION = FIFO;
-
+// TODO: SLEEP_TIME  se deben cargar por configuracion, Borrar esto al obtener configuracion
 int SLEEP_TIME = 0;
-int SLEEP_TIME_CONEXION = 10;
-int QUANTUM = 3;
 
 void inicializar_listas() {
 	ready = list_create();
@@ -61,7 +56,10 @@ void planificar() {
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	t_tcb_entrenador* siguiente_tcb;
-	switch (ALGORITMO_PLANIFICACION) {
+
+	int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
+
+	switch (algoritmo) {
 	case FIFO:
 		siguiente_tcb = list_pop_first(ready);
 		break;
@@ -95,7 +93,7 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
 		cantidad_de_instrucciones++;
-		if (cantidad_de_instrucciones == QUANTUM){
+		if (cantidad_de_instrucciones == team_config->quantum){
 			break;
 		}
 	}
@@ -109,7 +107,9 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
 	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
 
-	switch (ALGORITMO_PLANIFICACION) {
+	int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
+
+	switch (algoritmo) {
 	case FIFO:
 		ejecutar_rafaga(tcb);
 		break;
@@ -117,6 +117,7 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 		ejecutar_rafaga_con_desalojo(tcb);
 		pasar_a_ready(tcb);
 		break;
+
 	case SJF_CD:
 		// TODO
 		break;
@@ -221,7 +222,7 @@ void reintentar_conexion(int conexion) {
 
 		log_info(logger,
 				"[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.");
-		sleep(SLEEP_TIME_CONEXION);
+		sleep(team_config->tiempoDeReconexion);
 		conexion = crear_conexion(team_config->ip_broker,
 				team_config->puerto_broker);
 
@@ -348,4 +349,19 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
 	list_add(deadlock, tcb);
 	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
+}
+
+int string_to_algoritmo_de_planificacion(char* algoritmo) {
+
+	if (strcmp(algoritmo, "FIFO") == 0)
+		return FIFO;
+
+	else if (strcmp(algoritmo, "RR") == 0)
+		return RR;
+
+	else if (strcmp(algoritmo, "SJF-CD") == 0)
+		return SJF_CD;
+
+	else if (strcmp(algoritmo, "SJF-SD") == 0)
+		return SJF_SD;
 }

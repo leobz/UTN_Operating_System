@@ -58,4 +58,7 @@ void reintentar_conexion(int conexion);
 // Acciones
 void asignar_pokemon(t_tcb_entrenador*);
 
+// Utilidades
+int string_to_algoritmo_de_planificacion(char*);
+
 #endif /* PLANIFICACION_H_ */
