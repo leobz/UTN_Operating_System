@@ -79,6 +79,44 @@ void inicializar_semaforo_tcb(t_tcb_entrenador* tcb, sem_t* semaforo_tcb) {
 	tcb->semaforo = semaforo_tcb;
 }
 
+void ejecutar_rafaga(t_tcb_entrenador* tcb) {
+	sem_t semaforo_tcb;
+	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
+	sem_wait(tcb->semaforo);
+
+	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
+	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+	}
+}
+
+void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
+	switch (instruccion) {
+	case MOVERSE:
+		sleep(SLEEP_TIME);
+		actualizar_posicion(tcb);
+
+		log_info(logger, "[MOVIMIENTO] ID_ENTRENADOR:%d, POSICION:(%d, %d)", tcb->tid,
+				tcb->posicion->x, tcb->posicion->y);
+		break;
+	case CATCH:
+		log_info(logger, "[CATCH] POKEMON: %s, POSICION:(%d, %d)",
+				tcb->pokemon_a_capturar->pokemon,
+				tcb->pokemon_a_capturar->posicion->x,
+				tcb->pokemon_a_capturar->posicion->y);
+		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
+		// a que me devuelvan un id_correlativo y eso puede tardar
+		ejecutar_catch(tcb);
+
+		break;
+	case INTERCAMBIAR:
+		//TODO
+		break;
+	}
+}
+
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 	cargar_rafaga_captura(tcb, pokemon->posicion);
 	tcb->pokemon_a_capturar = pokemon;
@@ -134,44 +172,6 @@ void actualizar_posicion(t_tcb_entrenador* tcb) {
 		}
 	}
 
-}
-
-void ejecutar_rafaga(t_tcb_entrenador* tcb) {
-	sem_t semaforo_tcb;
-	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
-	sem_wait(tcb->semaforo);
-
-	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
-	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
-	while (!queue_is_empty(tcb->rafaga)) {
-		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
-		queue_pop(tcb->rafaga);
-	}
-}
-
-void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
-	switch (instruccion) {
-	case MOVERSE:
-		sleep(SLEEP_TIME);
-		actualizar_posicion(tcb);
-
-		log_info(logger, "[MOVIMIENTO] ID_ENTRENADOR:%d, POSICION:(%d, %d)", tcb->tid,
-				tcb->posicion->x, tcb->posicion->y);
-		break;
-	case CATCH:
-		log_info(logger, "[CATCH] POKEMON: %s, POSICION:(%d, %d)",
-				tcb->pokemon_a_capturar->pokemon,
-				tcb->pokemon_a_capturar->posicion->x,
-				tcb->pokemon_a_capturar->posicion->y);
-		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
-		// a que me devuelvan un id_correlativo y eso puede tardar
-		ejecutar_catch(tcb);
-
-		break;
-	case INTERCAMBIAR:
-		//TODO
-		break;
-	}
 }
 
 void lanzar_reintentar_conexion(int conexion){
