@@ -24,15 +24,28 @@ void inicializar_diccionarios() {
 	enviaron_catch = dictionary_create();
 }
 
+void inicializar_hilos_tcbs() {
+	void cargar_semaforo_y_thread_al_tcb(t_tcb_entrenador* entrenador) {
+		pthread_t thread_tcb;
+		pthread_create(&thread_tcb, NULL, (void*)ejecutar_rafaga, entrenador);
+		entrenador->entrenador = &thread_tcb;
+	}
+
+	list_iterate(new, (void*)cargar_semaforo_y_thread_al_tcb);
+}
+
 void iniciar_planificador() {
+	inicializar_hilos_tcbs();
 	pthread_create(&planificador, NULL, (void*) planificar, NULL);
 	pthread_detach(planificador);
 }
 
-void planificar() {
-	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(
-			sizeof(t_tcb_entrenador));
+void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
+	sem_post(tcb_exec->semaforo);
+}
 
+void planificar() {
+	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 	tcb_exec = NULL;
 
 	while (1)
@@ -40,7 +53,7 @@ void planificar() {
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 
 			tcb_exec = siguiente_tcb_a_ejecutar();
-			ejecutar_rafaga(tcb_exec);
+			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
 		}
 }
@@ -59,6 +72,11 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 		break;
 	}
 	return siguiente_tcb;
+}
+
+void inicializar_semaforo_tcb(t_tcb_entrenador* tcb, sem_t* semaforo_tcb) {
+	sem_init(semaforo_tcb, 0, 0);
+	tcb->semaforo = semaforo_tcb;
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -119,7 +137,10 @@ void actualizar_posicion(t_tcb_entrenador* tcb) {
 }
 
 void ejecutar_rafaga(t_tcb_entrenador* tcb) {
-	//TODO: Esta funcion la tiene que correr el hilo entrenador
+	sem_t semaforo_tcb;
+	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
+	sem_wait(tcb->semaforo);
+
 	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
 	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
 	while (!queue_is_empty(tcb->rafaga)) {
@@ -152,7 +173,6 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		break;
 	}
 }
-
 
 void lanzar_reintentar_conexion(int conexion){
 	pthread_create(&reintentador_de_conexion, NULL, (void*) planificar, conexion);
