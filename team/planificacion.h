@@ -14,7 +14,7 @@
 t_dictionary* enviaron_catch;
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
-int quantum;
+int cantidad_de_instrucciones;
 // ESTRUCTURAS
 
 typedef enum {

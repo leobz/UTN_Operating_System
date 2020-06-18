@@ -10,6 +10,7 @@ ALGORITMO_PLANIFICACION = FIFO;
 
 int SLEEP_TIME = 0;
 int SLEEP_TIME_CONEXION = 10;
+int QUANTUM = 3;
 
 void inicializar_listas() {
 	ready = list_create();
@@ -47,7 +48,6 @@ void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 void planificar() {
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 	tcb_exec = NULL;
-	quantum = 0;
 
 	while (1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
@@ -90,6 +90,17 @@ void ejecutar_rafaga(t_tcb_entrenador* tcb) {
 	}
 }
 
+void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+		cantidad_de_instrucciones++;
+		if (cantidad_de_instrucciones == QUANTUM){
+			break;
+		}
+	}
+}
+
 void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	sem_t semaforo_tcb;
 	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
@@ -103,7 +114,8 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 		ejecutar_rafaga(tcb);
 		break;
 	case RR:
-		// TODO
+		ejecutar_rafaga_con_desalojo(tcb);
+		pasar_a_ready(tcb);
 		break;
 	case SJF_CD:
 		// TODO
@@ -314,6 +326,7 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 void pasar_a_ready(t_tcb_entrenador* tcb) {
 	list_add(ready, tcb);
 	tcb->estado_tcb = READY;
+	log_info(logger,"[TCB-info] TID:%d Pasó a lista Ready\n", tcb->tid);
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
