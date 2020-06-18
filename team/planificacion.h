@@ -14,13 +14,14 @@
 t_dictionary* enviaron_catch;
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
-
+int quantum;
 // ESTRUCTURAS
 
 typedef enum {
 	FIFO = 1,
 	RR = 2,
-	SJF = 3,
+	SJF_SD = 3,
+	SJF_CD = 4,
 } tipo_de_planificacion;
 
 
@@ -43,7 +44,7 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino);
 
 // Ejecucion de TCB
 t_tcb_entrenador* siguiente_tcb_a_ejecutar();
-void ejecutar_rafaga(t_tcb_entrenador*);
+void ejecutar_tcb(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
 
 // Mensajes

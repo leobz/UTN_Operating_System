@@ -27,7 +27,7 @@ void inicializar_diccionarios() {
 void inicializar_hilos_tcbs() {
 	void cargar_semaforo_y_thread_al_tcb(t_tcb_entrenador* entrenador) {
 		pthread_t thread_tcb;
-		pthread_create(&thread_tcb, NULL, (void*)ejecutar_rafaga, entrenador);
+		pthread_create(&thread_tcb, NULL, (void*)ejecutar_tcb, entrenador);
 		entrenador->entrenador = &thread_tcb;
 	}
 
@@ -47,6 +47,7 @@ void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 void planificar() {
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 	tcb_exec = NULL;
+	quantum = 0;
 
 	while (1)
 		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
@@ -65,10 +66,13 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 		siguiente_tcb = list_pop_first(ready);
 		break;
 	case RR:
+		siguiente_tcb = list_pop_first(ready);
+		break;
+	case SJF_CD:
 		// TODO
 		break;
-	case SJF:
-		// TODO
+	case SJF_SD:
+		//TODO
 		break;
 	}
 	return siguiente_tcb;
@@ -80,15 +84,33 @@ void inicializar_semaforo_tcb(t_tcb_entrenador* tcb, sem_t* semaforo_tcb) {
 }
 
 void ejecutar_rafaga(t_tcb_entrenador* tcb) {
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+	}
+}
+
+void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	sem_t semaforo_tcb;
 	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
 	sem_wait(tcb->semaforo);
 
 	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
 	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
-	while (!queue_is_empty(tcb->rafaga)) {
-		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
-		queue_pop(tcb->rafaga);
+
+	switch (ALGORITMO_PLANIFICACION) {
+	case FIFO:
+		ejecutar_rafaga(tcb);
+		break;
+	case RR:
+		// TODO
+		break;
+	case SJF_CD:
+		// TODO
+		break;
+	case SJF_SD:
+		//TODO
+		break;
 	}
 }
 
