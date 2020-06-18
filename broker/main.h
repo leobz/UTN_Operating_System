@@ -12,7 +12,12 @@
 #include "administracion-de-mensajes.h"
 
 t_mensaje* mensaje[6];
-t_mensaje_catch *mensaje_catch;
+
+t_mensaje_new *mensaje_new_recibido;
+t_mensaje_get *mensaje_get_recibido;
+t_mensaje_catch *mensaje_catch_recibido;
+t_mensaje_appeared *mensaje_appeared_recibido;
+t_mensaje_caught *mensaje_caught_recibido;
 //t_broker_config* config_broker;
 //t_log* log_broker;
 

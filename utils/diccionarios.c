@@ -79,6 +79,13 @@ void meter_en_diccionario(t_dictionary* dictionary,int key,void*value){
 	free(char_key);
 }
 
+void* sacar_de_diccionario(t_dictionary* dictionary,int key){
+	char*char_key=pasar_a_char(key);
+	void*eliminar=dictionary_remove(dictionary,char_key);
+	free(char_key);
+	return eliminar;
+}
+
 void*obtener_de_diccionario(t_dictionary*dictionary, int key){
 	char*char_key=pasar_a_char(key);
 	void*value=dictionary_get(dictionary,char_key);

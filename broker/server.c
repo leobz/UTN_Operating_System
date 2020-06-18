@@ -9,9 +9,7 @@
 
 void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
-	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
-			op_code_to_string(paquete->codigo_operacion),
-			paquete->id_correlativo);
+	log_info(logger, "[CONEXION] COD_OP:%s",op_code_to_string(paquete->codigo_operacion));
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
@@ -41,9 +39,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		}
 		pthread_mutex_unlock(&m_cache);
 
-		loggear_nueva_conexion(logger, paquete);
-
-
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
 		liberar_paquete_socket(paquete);
 	}
@@ -53,6 +48,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		switch (paquete->codigo_operacion) {
 
 		case SUSCRIPCION:{
+
+
+			log_info(logger, "[SUSCRIPCION] Cola:%s ID_Proceso:%d", op_code_to_string(paquete->cola),paquete->id_proceso);
 
 			t_proceso* proceso;
 
@@ -74,6 +72,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				list_add(suscriptores[paquete->cola], proceso);
 			}
 
+			t_proceso* proceso_viejo=sacar_de_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso);
+			free(proceso_viejo);//elimino anterior proceso para actualizarlo
 			meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
 			meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 
@@ -83,7 +83,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
 			pthread_detach(thread_subscribers);
 
-			log_info(logger, "[SUSCRIPCION] Cola:%s", op_code_to_string(paquete->cola));
 
 			sem_post(&sem_proceso[paquete->cola]);
 

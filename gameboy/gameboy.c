@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
-		int id_process = getpid();
+		int id_process = atoi(argv[4]);
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,
 				gameboy_config->puerto_broker);
@@ -42,12 +42,7 @@ int main(int argc, char **argv) {
 		log_info(logger, "%ld Conexion establecida con [Broker]", (long)getpid());
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 
-		log_info(logger,
-				"%ld Mensaje enviado a [Broker]: SUSCRIPCION cola %d por %d segundos", (long)getpid(),
-				cola, tiempo);
-
-
-
+		log_info(logger,"%ld Mensaje enviado a [Broker]: SUSCRIPCION id_proceso %d cola %d por %d segundos", (long)getpid(), id_process, cola, tiempo);
 
 		sleep(tiempo);
 
@@ -227,10 +222,6 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger,
-					"Mensaje enviado a [Team]: APPEARED_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y);
-
 			liberar_conexion(conexion);
 		}
 	}
@@ -262,10 +253,6 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger,
-					"Mensaje enviado a [GAMECARD]: NEW_POKEMON %s %d %d",
-					pokemon, pos_x, pos_y);
-
 			liberar_conexion(conexion);
 		}
 
@@ -293,9 +280,6 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
-			log_info(logger,
-					"Mensaje enviado a [GAMECARD]: CATCH_POKEMON %s %d %d %d",
-					pokemon, pos_x, pos_y, id_mensaje);
 
 			liberar_conexion(conexion);
 		}
@@ -317,13 +301,9 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [GAMECARD]");
 
 			int bytes;
-			void *a_enviar = serializar_get_pokemon(&bytes, pokemon,
-					id_mensaje,id_correlativo);
+			void *a_enviar = serializar_get_pokemon(&bytes, pokemon,id_mensaje,id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
-
-			log_info(logger, "Mensaje enviado a [GAMECARD]: GET_POKEMON %s %d",
-					pokemon, id_mensaje);
 
 			liberar_conexion(conexion);
 		}

@@ -23,7 +23,7 @@ $ ../broker/Debug/broker &
 Suscripción a CATCH_POKEMON
 
 ```  bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 & # byexample: +timeout=100 +fail-fast +paste
+$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 120 & # byexample: +timeout=100 +fail-fast +paste
 [<job-gameboy-id>] <gameboy-pid>
 ```
 
@@ -31,7 +31,7 @@ Comprobación de suscripción
 
 ```bash
 $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
-<...>[SUSCRIPCION] Cola:CATCH_POKEMON<...>
+<...>[SUSCRIPCION] Cola:CATCH_POKEMON ID_Proceso:120<...>
 ```
 
 Envió Catch Pokemon y compruebo que le haya llegado al gameboy que estaba suscripto
@@ -53,7 +53,7 @@ $ sleep <sleep-time>; cat gameboy.log   # byexample: +timeout=10 +fail-fast +pas
 Ahora hacemos que otro gameboy se suscriba a la cola Catch, al detectar un nuevo suscriptor, el broker le enviará el mensaje anterior, que estarpa guardado en la memoria caché.
 
 ```  bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 & # byexample: +timeout=100 +fail-fast +paste
+$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 121 & # byexample: +timeout=100 +fail-fast +paste
 [<job-gameboy-id2>] <gameboy-pid2>
 ```
 

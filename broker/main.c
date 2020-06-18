@@ -67,14 +67,61 @@ void loggear_mensaje_enviado(int socket, int codigo_de_operacion) {
 void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 	// Esta funcion no es de tanta prioridad, terminar solo despues de hacer la adminstracion de mensajes completa
 	switch (codigo_de_operacion) {
-	case CATCH_POKEMON:
-		mensaje_catch = deserializar_paquete_catch_pokemon(sent_package);
-		log_info(logger, "Mensaje recibido CATCH_POKEMON %s %d %d",
-				mensaje_catch->pokemon, mensaje_catch->posx,
-				mensaje_catch->posy);
 
-		free(mensaje_catch->pokemon);
-		free(mensaje_catch);
+
+	case NEW_POKEMON:
+		mensaje_new_recibido = deserializar_paquete_new_pokemon(sent_package);
+
+			log_info(logger,"Mensaje recibido NEW_POKEMON %s %d %d %d",mensaje_new_recibido->pokemon,
+					mensaje_new_recibido->posx,mensaje_new_recibido->posy,mensaje_new_recibido->cantidad);
+
+			free(mensaje_new_recibido->pokemon);
+			free(mensaje_new_recibido);
+
+		break;
+
+	case GET_POKEMON:
+		mensaje_get_recibido= deserializar_paquete_get_pokemon(sent_package);
+
+			log_info(logger,"Mensaje recibido GET_POKEMON %s",mensaje_get_recibido->pokemon);
+
+			free(mensaje_get_recibido->pokemon);
+			free(mensaje_get_recibido);
+
+
+				break;
+
+	case CATCH_POKEMON:
+		mensaje_catch_recibido = deserializar_paquete_catch_pokemon(sent_package);
+		log_info(logger, "Mensaje recibido CATCH_POKEMON %s %d %d",
+				mensaje_catch_recibido->pokemon, mensaje_catch_recibido->posx,
+				mensaje_catch_recibido->posy);
+
+		free(mensaje_catch_recibido->pokemon);
+		free(mensaje_catch_recibido);
+		break;
+
+	case APPEARED_POKEMON:
+
+		mensaje_appeared_recibido= deserializar_paquete_appeared_pokemon(sent_package);
+
+		log_info(logger,"Mensaje recibido APPEARED_POKEMON %s %d %d",mensaje_appeared_recibido->pokemon,
+				mensaje_appeared_recibido->posx,mensaje_appeared_recibido->posy);
+
+		free(mensaje_appeared_recibido->pokemon);
+		free(mensaje_appeared_recibido);
+
+
+				break;
+
+	case CAUGHT_POKEMON:
+		mensaje_caught_recibido= deserializar_paquete_caught_pokemon(sent_package);
+
+		log_info(logger,"Mensaje recibido CAUGHT_POKEMON %d %s",mensaje_caught_recibido->id_correlativo,
+				value_to_state(mensaje_caught_recibido->resultado));
+
+			free(mensaje_caught_recibido);
+
 		break;
 	default:
 		//printf("ERROR, CODIGO DE OPERACION INCORRECTO\n");
