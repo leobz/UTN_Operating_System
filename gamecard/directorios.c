@@ -14,9 +14,9 @@ void inicializar_directorios(t_gamecard_config* gamecard_config){
 	string_append(&creacion_path_directorio,gamecard_config->punto_montaje_tallgrass);
 	string_append(&creacion_path_directorio,"/Metadata");
 	mkdir(creacion_path_directorio,0777);
+	creacion_path_directorio=NULL;
 
 	//Creo Files
-	creacion_path_directorio=NULL;
 	creacion_path_directorio = string_new();
 	string_append(&creacion_path_directorio,gamecard_config->punto_montaje_tallgrass);
 	string_append(&creacion_path_directorio,"/Files");
