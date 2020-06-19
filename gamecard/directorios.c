@@ -1,5 +1,11 @@
 #include "directorios.h"
 
+typedef struct Metadata{
+	int block_size;
+	int blocks;
+	char* magic_number;
+}Metadata;
+
 //Inicializar directorios-> t config
 void inicializar_directorios(t_gamecard_config* gamecard_config){
 
@@ -26,27 +32,27 @@ void inicializar_directorios(t_gamecard_config* gamecard_config){
 	free(creacion_path_directorio);
 
 	//Creo archivo Bitmap.bin
-		FILE *bitmap;
-		bitmap=fopen("/home/utnso/tall-grass/Metadata/Bitmap.bin","wb");
-		fclose(bitmap);
+	FILE *bitmap;
+	bitmap=fopen("/home/utnso/tall-grass/Metadata/Bitmap.bin","wb");
+	fclose(bitmap);
 
 	//Creo archivo Metadata.bin
 
-		t_file_metadata* metadata;
-		metadata{
-					block_size=64;
-					blocks=5192;
-					magic_number="TALL_GRASS";
-				}
-		FILE *file=fopen("/home/utnso/tall-grass/Metadata/Metadata.bin","wb");
-		fwrite(&metadata->block_size,sizeof(int),1,file);
-		fwrite(&metadata->blocks,sizeof(metadata->blocks),1,file);
-		fwrite(&metadata->magic_number,sizeof(metadata->magic_number),1,file);
+	Metadata *metadata=malloc(sizeof(Metadata));
+	metadata->block_size=64;
+	metadata->blocks=5192;
+	metadata->magic_number="TALL_GRASS";
+
+	FILE *file=fopen("/home/utnso/tall-grass/Metadata/Metadata","wb");
+	if(file!=NULL){
+		fwrite(metadata,sizeof(Metadata),1,file);
 		fclose(file);
-		free(metadata);
+	}
+	FILE *file2=fopen("/home/utnso/tall-grass/Metadata/Metadata","rb");
+	if(file2!=NULL){
+		fread(metadata,sizeof(Metadata),1,file);
+		fclose(file);
+	}
+	printf("%d %d %s",metadata->block_size,metadata->blocks,metadata->magic_number);
 
-		//EXISTENCIA POKEMON-> NO CREAR CARPETA CREAR CARPETA
-		//
 }
-
-
