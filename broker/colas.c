@@ -7,9 +7,14 @@
 
 #include "colas.h"
 
-void inicializar_lista(int cola){
+void inicializar_listas(int cola){
 	suscriptores[cola]=list_create();
+	administradores[cola]=list_create();
+	meter_en_diccionario(administracion_por_cod,cola,administradores[cola]);
+	dic_suscriptores[cola]=dictionary_create();
 }
+
+
 
 void insertar_mensaje(t_mensaje* nuevo_mensaje, int cola_mensaje){
 	printf("Insertando mensaje %s\n",op_code_to_string(cola_mensaje));
