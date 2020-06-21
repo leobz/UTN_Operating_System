@@ -4,9 +4,6 @@
 
 t_dictionary* enviaron_catch;
 
-// TODO: SLEEP_TIME  se deben cargar por configuracion, Borrar esto al obtener configuracion
-int SLEEP_TIME = 0;
-
 void inicializar_listas() {
 	ready = list_create();
 	blocked = list_create();
@@ -103,35 +100,38 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	sem_t semaforo_tcb;
 	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
-	sem_wait(tcb->semaforo);
 
-	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
-	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+	while(true){
+		sem_wait(tcb->semaforo);
 
-	int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
+		printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
+		printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
 
-	switch (algoritmo) {
-	case FIFO:
-		ejecutar_rafaga(tcb);
-		break;
-	case RR:
-		ejecutar_rafaga_con_desalojo(tcb);
-		pasar_a_ready(tcb);
-		break;
+		int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
 
-	case SJF_CD:
-		// TODO
-		break;
-	case SJF_SD:
-		//TODO
-		break;
+		switch (algoritmo) {
+		case FIFO:
+			ejecutar_rafaga(tcb);
+			break;
+		case RR:
+			ejecutar_rafaga_con_desalojo(tcb);
+			pasar_a_ready(tcb);
+			break;
+
+		case SJF_CD:
+			// TODO
+			break;
+		case SJF_SD:
+			//TODO
+			break;
+		}
 	}
 }
 
 void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 	switch (instruccion) {
 	case MOVERSE:
-		sleep(SLEEP_TIME);
+		sleep(team_config->retardo_ciclo_cpu);
 		actualizar_posicion(tcb);
 
 		log_info(logger, "[MOVIMIENTO] ID_ENTRENADOR:%d, POSICION:(%d, %d)", tcb->tid,
