@@ -32,7 +32,7 @@ void iniciar_planificador();
 void planificar();
 
 // Carga de TCB
-void pasar_a_ready(t_tcb_entrenador* tcb);
+void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo);
 void cargar_instruccion(t_tcb_entrenador* tcb, int instruccion);
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb);
@@ -60,5 +60,5 @@ void asignar_pokemon(t_tcb_entrenador*);
 
 // Utilidades
 int string_to_algoritmo_de_planificacion(char*);
-
+char* cola_planificacion_a_string(int);
 #endif /* PLANIFICACION_H_ */
