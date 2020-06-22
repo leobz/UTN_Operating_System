@@ -1,5 +1,11 @@
 # Test Team con Round Robin
 
+1) Se envian 2 Pokemons a Team
+2) Se planifican dos entrenadores, que pasan a la cola de Ready
+3) Se ejecuta el primero, finaliza por quantum y entra el segundo
+4) Se ejecuta el segundo, como la rafaga es menor al quantum, finaliza.
+5) Se vuelve a ejecutar el primero y finaliza
+
 ## Inicializacion
 
 Cargo configuración del test
@@ -15,6 +21,12 @@ Modifico Archivo de configuracion para que el algoritmo sea Round Robin y no FIF
 $ sed -i 's/FIFO/RR/g' team.config
 ```
 
+Modifico Archivo de configuracion para que el retardo del cpu no sea 0, de otro modo, el primer entrenador realizaria todas sus instrucciones antes del envio del 2do pokemon
+
+```bash
+$ sed -i 's/RETARDO_CICLO_CPU=0/RETARDO_CICLO_CPU=1/g' team.config
+```
+
 Levanto Team en segundo plano.
 
 ```bash
@@ -22,62 +34,54 @@ $ ../team/Debug/team &
 [<job-id>] <pid>
 ```
 
-## Tests
+## Precondiciones
 
-En el **Objetivo Global** hay: **3 Pikachus** y **2 Squirtles**
+En el **Objetivo Global** hay: **3 Pikachus**
 
-Posición entrenadores: (1,1) (3,3) (5,5)
-
-### APPEARED_POKEMON 1
-
+Posición entrenadores: TID 0:(1,1) TID 1:(3,3) TID 2:(5,5)
 - - -
 
-#### Pokemon Pertenece a Objetivo Global -> Se agrega al Mapa
+### Envio pokemones a Team
 
-Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al mapa.
+Envío Pikachu en posicion (6,6), el mas cercano es el TCB 2
 
 ```bash
-$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
-[AGREGADO]: Pikachu 6 6 [TOTAL]: 1
-Tamaño de rafaga: 3  Posicion del TCB (5, 5)
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6 ; # byexample: +timeout=4 +paste +fail-fast
+<...>
 ```
 
-#### Se agrega al Mapa -> Se planifica entrenador
-
-El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
-Cómo la ráfaga es de 3 instrucciones y el Quantum es de 2, el tcb no termina de ejecutar toda su ráfaga, y pasará a Ready con una instrucción pendiente.
-
-TODO: Arreglar logs para que sean mas expresivos (En el codigo y luego en el test)
+Luego envio otro Pikachu (1,1). El TID 0 se encuentra en la misma posicion por lo que va a capturarlo.
 
 ```bash
-$ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 5)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 6)<...>
-<...>[TCB-info] TID:2 Pasó a lista Ready<...>
+$ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 1 1  # byexample: +timeout=4 +fail-fast
+<...>
 ```
 
-### APPEARED_POKEMON 2
+### Test de Round Robin
 
-#### Misma especie -> Se aumenta cantidad
-
-Envio otro Pikachu (6,6). Como ya habia uno, la cantidad aumenta a dos.
-Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
+Comprobamos que llegaron los mensajes y los entrenadores pasan a ready:
 
 ```bash
-$  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
-[AGREGADO]: Pikachu 6 6 [TOTAL]: 2
-Tamaño de rafaga: 7  Posicion del TCB (3, 3)
+$ sleep <sleep-time> ; cat team.log  # byexample: +timeout=4 +fail-fast +paste
+<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA
+<...>
+<...>[CAMBIO DE COLA] TID:0 (New->Ready) (1, 1) Motivo:CAPTURA
+<...>
 ```
 
-Cómo la ráfaga es de 7 instrucciones pero el quantum de 2, el entrenador ejecuta y pasa a Ready con 5 instrucciones pendientes.
+a) El entrenador mas cercano al primer pokemon (6,6) es el que tiene TID 2, asi que se ejecuta  
+b) Cómo la ráfaga es del entrenador con TID 2 es de 3 instrucciones y el Quantum es de 2, el tcb no termina de ejecutar toda su ráfaga, y pasará a Ready con una instrucción pendiente.  
+c) El entrenador con TID 0 pasa a ejecutar. Va a atrapar al pokemon (1,1), y como ya esta en la posicion, ejecuta la instruccion Catch, y finaliza  
+d) El entrenador con TID 2 vuelve a ejecutarse, realiza su catch y finaliza
 
 ```bash
-$ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(4, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(5, 3)<...>
-<...>[TCB-info] TID:1 Pasó a lista Ready<...>
+$ sleep 4; cat team.log  # byexample: +timeout=20 +fail-fast
+<...>
+<...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)<...>
+<...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)<...>
+<...>[CAMBIO DE COLA] TID:2 (Exec->Ready) (6, 6) Motivo:QUANTUM
+<...>[INSTRUCCION] TID:0, CATCH Pikachu 1 1<...>
+<...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6<...>
 ```
 
 ## Finalizacion
@@ -92,5 +96,9 @@ $ rm *.log; kill %% ; wait                    # byexample: +timeout=4 +norm-ws +
 Restauro Archivo de configuración a su estado original
 
 ```bash
-$ sed -i 's/RR/FIFO/g' team.config
+$ sed -i 's/RR/FIFO/g' team.config           # byexample: +timeout=4 +norm-ws +paste -skip
+```
+
+```bash
+$ sed -i 's/RETARDO_CICLO_CPU=1/RETARDO_CICLO_CPU=0/g' team.config  # byexample: +timeout=4 +norm-ws +paste -skip
 ```
