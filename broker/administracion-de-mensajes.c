@@ -47,7 +47,31 @@ void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaj
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
 	}
 	else if(es_buddy_system()){
-		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs(mensaje);
+		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs(mensaje, actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
 	}
+}
+
+void eliminar_adm_mensaje_para_particion(t_adm_mensaje* adm_mensaje){
+
+	list_clean(adm_mensaje->suscriptores_enviados);
+	list_clean(adm_mensaje->suscriptores_confirmados);
+
+	free(adm_mensaje->suscriptores_enviados);
+	free(adm_mensaje->suscriptores_enviados);
+	free(adm_mensaje);
+}
+
+void eliminar_adm_mensaje_particion_by_id(t_adm_mensaje* adm_mensaje){
+	dictionary_remove_and_destroy(administracion_por_id, pasar_a_char(adm_mensaje->id_mensaje), (void*)eliminar_adm_mensaje_para_particion);
+}
+
+void eliminar_adm_mensaje_particion_by_cod(t_adm_mensaje* adm_mensaje){
+	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(adm_mensaje->codigo_operacion));
+
+	bool tiene_mismo_id_mensaje(t_adm_mensaje* elem_adm_mensaje){
+		return elem_adm_mensaje->id_mensaje == adm_mensaje->id_mensaje;
+	}
+
+	list_remove_and_destroy_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje, (void*)eliminar_adm_mensaje_para_particion);
 }

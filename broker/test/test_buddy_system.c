@@ -28,6 +28,10 @@ void agregar_tests_buddy_system() {
 			test_division_particion_elegida_acorde_a_tamanio_mensaje);
 
 	CU_add_test(suite_configuracion,
+				"Obtener las hojas que pueden ser posibles victimas para reemplazo",
+				test_obtener_posibles_victimas_reemplazo);
+
+	CU_add_test(suite_configuracion,
 			"Agregar mensaje a memoria cache mediante bs",
 			test_agregar_mensaje_a_memoria_cache_bs);
 
@@ -220,36 +224,97 @@ void test_division_particion_elegida_acorde_a_tamanio_mensaje() {
 	finalizar_test_bs();
 }
 
+void test_obtener_posibles_victimas_reemplazo(){
+	inicializar_test_bs();
+
+	t_list* hojas_posibles_victimas = list_create();
+	t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_segundo_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo_primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo_segundo_hijo = malloc(sizeof(t_particion_bs));
+
+	primer_hijo_primer_hijo->esta_libre = true;
+	primer_hijo_primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_primer_hijo->primer_hijo = NULL;
+	primer_hijo_primer_hijo->segundo_hijo = NULL;
+	primer_hijo_segundo_hijo->esta_libre = false;
+	primer_hijo_segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_segundo_hijo->size_mensaje = 30;
+	primer_hijo_segundo_hijo->primer_hijo = NULL;
+	primer_hijo_segundo_hijo->segundo_hijo = NULL;
+
+	primer_hijo->esta_libre = true;
+	primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	primer_hijo->primer_hijo = primer_hijo_primer_hijo;
+	primer_hijo->segundo_hijo = primer_hijo_segundo_hijo;
+
+	segundo_hijo_primer_hijo->esta_libre = false;
+	segundo_hijo_primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	segundo_hijo_primer_hijo->size_mensaje = 40;
+	segundo_hijo_primer_hijo->primer_hijo = NULL;
+	segundo_hijo_primer_hijo->segundo_hijo = NULL;
+	segundo_hijo_segundo_hijo->esta_libre = true;
+	segundo_hijo_segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	segundo_hijo_segundo_hijo->primer_hijo = NULL;
+	segundo_hijo_segundo_hijo->segundo_hijo = NULL;
+
+	segundo_hijo->esta_libre = true;
+	segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	segundo_hijo->primer_hijo = segundo_hijo_primer_hijo;
+	segundo_hijo->segundo_hijo = segundo_hijo_segundo_hijo;
+
+	particion_bs->primer_hijo = primer_hijo;
+	particion_bs->segundo_hijo = segundo_hijo;
+
+	obtener_hojas_posibles_victimas(hojas_posibles_victimas, particion_bs);
+
+	CU_ASSERT_EQUAL_FATAL(list_size(hojas_posibles_victimas), 2);
+	CU_ASSERT_EQUAL_FATAL(list_get(hojas_posibles_victimas, 0), primer_hijo_segundo_hijo);
+	CU_ASSERT_EQUAL_FATAL(list_get(hojas_posibles_victimas, 1), segundo_hijo_primer_hijo);
+
+	list_clean(hojas_posibles_victimas);
+	free(hojas_posibles_victimas);
+
+	finalizar_test_bs();
+}
+
+
 void test_agregar_mensaje_a_memoria_cache_bs() {
 	inicializar_test_bs();
 
+	t_adm_mensaje* adm_mensaje = malloc(sizeof(t_adm_mensaje));
 	t_particion_bs* particion_elegida = NULL;
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
 	mensaje->payload = "Mensaje para guardar en la memoria cache segun algoritmo BS";
 	mensaje->payload_size = strlen(mensaje->payload) + 1;
 
-	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje);
+	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje, adm_mensaje);
 
 	CU_ASSERT_NOT_EQUAL_FATAL(particion_elegida, NULL);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->esta_libre, false);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->offset, 0);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida->adm_mensaje, adm_mensaje);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->size_mensaje, mensaje->payload_size);
 	CU_ASSERT_TRUE_FATAL(particion_elegida->tamanio_particion >= mensaje->payload_size);
 
 	free(mensaje);
+	free(adm_mensaje);
 	finalizar_test_bs();
 }
 
 void test_leer_mensaje_de_memoria_cache_bs() {
 	inicializar_test_bs();
 
+	t_adm_mensaje* adm_mensaje = malloc(sizeof(t_adm_mensaje));
 	t_particion_bs* particion_elegida = NULL;
 	void* mensaje_leido = NULL;
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
 	mensaje->payload = "Mensaje para guardar en la memoria cache segun algoritmo BS";
 	mensaje->payload_size = strlen(mensaje->payload) + 1;
 
-	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje);
+	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje, adm_mensaje);
 
 	mensaje_leido = leer_particion_bs(particion_elegida);
 
@@ -259,5 +324,6 @@ void test_leer_mensaje_de_memoria_cache_bs() {
 
 	free(mensaje_leido);
 	free(mensaje);
+	free(adm_mensaje);
 	finalizar_test_bs();
 }

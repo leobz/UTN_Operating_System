@@ -15,6 +15,7 @@ void test_hojas_libres_para_guardar_mensaje();
 void test_hojas_libres_ordenadas_segun_algoritmo_particion_libre_FF();
 void test_hojas_libres_ordenadas_segun_algoritmo_particion_libre_BF();
 void test_division_particion_elegida_acorde_a_tamanio_mensaje();
+void test_obtener_posibles_victimas_reemplazo();
 void test_agregar_mensaje_a_memoria_cache_bs();
 void test_leer_mensaje_de_memoria_cache_bs();
 
