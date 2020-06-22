@@ -199,7 +199,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		int pos_x = pokemon->posicion->x;
 		int pos_y = pokemon->posicion->y;
 
-		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0);
+		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0,0);
 		enviar_mensaje(conexion, a_enviar, bytes);
 
 		char* id_correlativo = recibir_id_correlativo(conexion);

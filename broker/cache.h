@@ -1,7 +1,7 @@
 #ifndef CACHE_H_
 #define CACHE_H_
 
-#include "broker.h"
+#include "broker-commons.h"
 #include "../utils/listas.h"
 
 typedef struct particion_bs {
@@ -59,7 +59,7 @@ void* leer_particion_bs(t_particion_bs* particion);
 
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
-void agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
 t_list* obtener_particiones_dinamicas_libres();
 t_particion_dinamica* crear_particion_dinamica(int, int);

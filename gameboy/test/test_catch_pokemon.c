@@ -18,10 +18,9 @@ void empaquetar_y_desempaquetar_catch_pokemon(){
 	int pos_y = 2;
 
 	t_paquete* paquete = crear_paquete(CATCH_POKEMON,
-			buffer_catch_pokemon(pokemon, pos_x, pos_y), 0);
+			buffer_catch_pokemon(pokemon, pos_x, pos_y),0, 0);
 
-	t_mensaje_catch* mensaje_catch = deserializar_mensaje_catch_pokemon(
-			paquete->buffer);
+	t_mensaje_catch* mensaje_catch = deserializar_mensaje_catch_pokemon(paquete->buffer);
 
 	CU_ASSERT_EQUAL(mensaje_catch->length_pokemon, strlen(pokemon) + 1);
 	CU_ASSERT_STRING_EQUAL(mensaje_catch->pokemon, pokemon);
@@ -39,7 +38,7 @@ void serializar_y_deserializar_catch_pokemon() {
 	int bytes;
 
 	void* mensaje_serializado = serializar_catch_pokemon(&bytes, pokemon, pos_x,
-			pos_y, 0);
+			pos_y,0, 0);
 
 	test_deserializar_buffer_catch_pokemon(mensaje_serializado, pokemon, pos_x,
 			pos_y);
@@ -49,7 +48,7 @@ void serializar_y_deserializar_catch_pokemon() {
 void test_deserializar_buffer_catch_pokemon(void* mensaje_serializado,
 		char* pokemon, int pos_x, int pos_y) {
 	t_paquete* paquete = crear_paquete_desde_mensaje(mensaje_serializado);
-	t_mensaje_appeared* mensaje_catch;
+	t_mensaje_catch* mensaje_catch;
 
 	// ESTA ES LA FUNCION QUE SE TESTEA
 	mensaje_catch = deserializar_mensaje_catch_pokemon(paquete->buffer);

@@ -10,8 +10,7 @@
 void empaquetar_y_desempaquetar_get_pokemon() {
 	char* pokemon = "pikachu";
 
-	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer_get_pokemon(pokemon),
-			0);
+	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer_get_pokemon(pokemon),0,0);
 
 	t_mensaje_get *mensaje_get = deserializar_mensaje_get_pokemon(
 			paquete->buffer);
@@ -29,8 +28,7 @@ void serializar_y_deserializar_get_pokemon() {
 	int id_correlativo = 1;
 	int bytes;
 
-	void* mensaje_serializado = serializar_get_pokemon(&bytes, pokemon,
-			id_correlativo);
+	void* mensaje_serializado = serializar_get_pokemon(&bytes, pokemon,0,id_correlativo);
 
 	test_deserializar_buffer_get_pokemon(mensaje_serializado, pokemon);
 

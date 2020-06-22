@@ -7,7 +7,7 @@
 t_broker_config* broker_config;
 
 void agregar_tests_particiones_dinamicas();
-void inicializar_test();
+void inicializar_test_con_particion_dinamica();
 void test_inicializar_cache_crea_particion_libre();
 void test_guardar_un_payload();
 void test_leer_payload_desde_particion();
