@@ -11,5 +11,5 @@ byexample -l shell team.md
 
 echo
 echo Corro Tests de Team con algoritmo RR:
-byexample -l shell team_rr.md
+byexample -l shell team-rr.md
 

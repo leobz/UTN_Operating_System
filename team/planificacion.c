@@ -335,7 +335,6 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
-	list_add(ready, tcb);
 	int estado_original = tcb->estado_tcb;
 	tcb->estado_tcb = cola_destino;
 	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
@@ -345,6 +344,7 @@ void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
 			tcb->posicion->x,
 			tcb->posicion->y,
 			motivo);
+	list_add(ready, tcb);
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
