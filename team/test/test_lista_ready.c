@@ -33,7 +33,7 @@ void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 }
 
 void pasar_a_ready_cambia_estado_tcb_a_ready() {
-	t_tcb_entrenador* tcb = tcb_generico(NULL);
+	t_tcb_entrenador* tcb = tcb_generico(1);
 	list_clean(ready);
 
 	CU_ASSERT_EQUAL(tcb->estado_tcb, NEW);
