@@ -55,6 +55,7 @@ void suscribirme_al_broker(t_gamecard_config* gamecard_config){
 	printf("Suscribiendome al broker...\n");
 
 	int colas_a_suscribir[] = {NEW_POKEMON, GET_POKEMON, CATCH_POKEMON};
+	int id_process = 0;
 	int i;
 	for (i=0; i<(&colas_a_suscribir)[1]-colas_a_suscribir; i++){
 		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
@@ -66,8 +67,9 @@ void suscribirme_al_broker(t_gamecard_config* gamecard_config){
 		t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = colas_a_suscribir[i];
+		suscripcion->id_proceso = id_process;
 
-		void* a_enviar = suscripcion;
+		void *a_enviar = empaquetar_suscripcion(suscripcion);
 		printf("Enviando mensaje de cola %d...\n", suscripcion->cola_a_suscribir);
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 2);
 
