@@ -91,6 +91,8 @@ void cargar_objetivo_global(t_team_config* team_config) {
 			team_config->objetivos_entrenadores);
 }
 
+
+
 // CARGA DE TCBs
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
