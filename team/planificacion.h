@@ -14,6 +14,8 @@
 t_dictionary* enviaron_catch;
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
+pthread_mutex_t mutex_lista_ready;
+pthread_mutex_t mutex_tcb_exec;
 
 
 // ESTRUCTURAS

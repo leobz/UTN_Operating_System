@@ -11,6 +11,8 @@ void inicializar_listas() {
 	unblocked = list_create();
 	deadlock = list_create();
 	l_exit = list_create();
+
+	pthread_mutex_init(&mutex_lista_ready, NULL);
 }
 
 void inicializar_diccionarios() {
@@ -40,14 +42,16 @@ void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 void planificar() {
 	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 	tcb_exec = NULL;
+	pthread_mutex_init(&mutex_tcb_exec, NULL);
 
 	while (1)
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
-
+			pthread_mutex_lock(&mutex_tcb_exec);
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			tcb_exec->estado_tcb = EXEC;
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
+
 		}
 }
 
@@ -127,13 +131,14 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			//TODO
 			break;
 		}
+		pthread_mutex_unlock(&mutex_tcb_exec);
+
 	}
 }
 
 void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 	switch (instruccion) {
 	case MOVERSE:
-		sleep(team_config->retardo_ciclo_cpu);
 		actualizar_posicion(tcb);
 
 		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
@@ -154,6 +159,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		//TODO
 		break;
 	}
+	sleep(team_config->retardo_ciclo_cpu);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -329,6 +335,7 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
+	list_add(ready, tcb);
 	int estado_original = tcb->estado_tcb;
 	tcb->estado_tcb = cola_destino;
 	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
@@ -338,12 +345,12 @@ void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
 			tcb->posicion->x,
 			tcb->posicion->y,
 			motivo);
-
-	list_add(ready, tcb);
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
+	pthread_mutex_lock(&mutex_lista_ready);
 	pasar_a_cola(tcb, READY, motivo);
+	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
