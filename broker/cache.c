@@ -5,7 +5,7 @@
 void inicializar_memoria_cache() {
 	memoria_cache = malloc(broker_config->tamanio_memoria);
 	contador_uso = 0;
-	order_creacion = 0;
+	orden_creacion = 0;
 
 	inicializar_mutex_cache();
 	inicializar_lista_particiones();
@@ -36,7 +36,7 @@ void inicializar_particion_bs() {
 	particion_bs->esta_libre = true;
 	particion_bs->size_mensaje = 0;
 	particion_bs->contador_uso = 0;
-	particion_bs->order_creacion = 0;
+	particion_bs->orden_creacion = 0;
 	particion_bs->adm_mensaje = NULL;
 	particion_bs->padre = NULL;
 	particion_bs->primer_hijo = NULL;
@@ -160,27 +160,27 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
 		t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
 
-		order_creacion++;
+		orden_creacion++;
 
 		primer_hijo->esta_libre = true;
 		primer_hijo->offset = hoja_libre->offset;
 		primer_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		primer_hijo->size_mensaje = 0;
 		primer_hijo->contador_uso = 0;
-		primer_hijo->order_creacion = order_creacion;
+		primer_hijo->orden_creacion = orden_creacion;
 		primer_hijo->adm_mensaje = NULL;
 		primer_hijo->padre = hoja_libre;
 		primer_hijo->primer_hijo = NULL;
 		primer_hijo->segundo_hijo = NULL;
 
-		order_creacion++;
+		orden_creacion++;
 
 		segundo_hijo->esta_libre = true;
 		segundo_hijo->offset = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->size_mensaje = 0;
-		segundo_hijo->contador_uso = order_creacion;
-		segundo_hijo->order_creacion = 0;
+		segundo_hijo->contador_uso = 0;
+		segundo_hijo->orden_creacion = orden_creacion;
 		segundo_hijo->adm_mensaje = NULL;
 		segundo_hijo->padre = hoja_libre;
 		segundo_hijo->primer_hijo = NULL;
@@ -239,7 +239,7 @@ void obtener_hojas_posibles_victimas(t_list* hojas_posibles_victimas, t_particio
 }
 
 bool es_menor_orden_creacion(t_particion_bs* hoja_posible_victima, t_particion_bs* siguiente_hoja_posible_victima) {
-	return hoja_posible_victima->order_creacion < siguiente_hoja_posible_victima->order_creacion;
+	return hoja_posible_victima->orden_creacion < siguiente_hoja_posible_victima->orden_creacion;
 }
 
 bool es_menor_contador_uso(t_particion_bs* hoja_posible_victima, t_particion_bs* siguiente_hoja_posible_victima) {
@@ -259,11 +259,11 @@ void ordenar_hojas_posibles_victimas_segun_algoritmo_reemplazo(t_list* hojas_pos
 void liberar_particion_victima(t_particion_bs* particion_victima){
 	t_adm_mensaje* adm_mensaje = particion_victima->adm_mensaje;
 
-	eliminar_adm_mensaje_particion_by_id(adm_mensaje);
-	eliminar_adm_mensaje_particion_by_cod(adm_mensaje);
+	eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
 
 	particion_victima->esta_libre = true;
 	particion_victima->size_mensaje = 0;
+	particion_victima->adm_mensaje = NULL;
 }
 
 void consolidar_particiones_companieros(t_particion_bs* particion_victima){

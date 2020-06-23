@@ -21,7 +21,7 @@ typedef struct particion_bs {
 	int offset;
 	int size_mensaje;
 	int contador_uso;
-	int order_creacion;
+	int orden_creacion;
 	t_adm_mensaje* adm_mensaje;
 	struct particion_bs* padre;
 	struct particion_bs* primer_hijo;
@@ -46,7 +46,7 @@ void* memoria_cache;
 t_list* particiones_dinamicas;
 int ordenamiento;
 int contador_uso;
-int order_creacion;
+int orden_creacion;
 
 // ********************************** INICIALIZACION MEMORIA CACHE ********************************** //
 void inicializar_memoria_cache();
@@ -79,6 +79,7 @@ bool es_menor_orden_creacion(t_particion_bs* hoja_posible_victima, t_particion_b
 bool es_menor_contador_uso(t_particion_bs* hoja_posible_victima, t_particion_bs* siguiente_hoja_posible_victima);
 void ordenar_hojas_posibles_victimas_segun_algoritmo_reemplazo(t_list* hojas_posibles_victimas);
 void liberar_particion_victima(t_particion_bs* particion_victima);
+void consolidar_particiones_companieros(t_particion_bs* particion_victima);
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
