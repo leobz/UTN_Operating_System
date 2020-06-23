@@ -64,15 +64,18 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	if(paquete->codigo_operacion==SUSCRIPCION){
 		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);
+		recv(socket_cliente, &(paquete->id_proceso), sizeof(int), MSG_WAITALL);
 	}
 
 	if(paquete->codigo_operacion==CONFIRMACION){
 		recv(socket_cliente, &(paquete->id_mensaje), sizeof(int), MSG_WAITALL);
+		recv(socket_cliente, &(paquete->id_proceso), sizeof(int), MSG_WAITALL);
 	}
 
 
 	if ((paquete->codigo_operacion != OP_ERROR)&&(paquete->codigo_operacion !=SUSCRIPCION)&&(paquete->codigo_operacion !=CONFIRMACION)) {
 		// si lo que recivo es un mensaje
+		recv(socket_cliente, &(paquete->id_mensaje), sizeof(int), MSG_WAITALL);
 		recv(socket_cliente, &(paquete->id_correlativo), sizeof(int), MSG_WAITALL);
 		recv(socket_cliente, &(size_buffer), sizeof(int), MSG_WAITALL);
 
@@ -85,6 +88,5 @@ t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
 
 	return paquete;
 }
-
 
 

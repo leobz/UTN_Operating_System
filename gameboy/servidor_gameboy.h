@@ -38,4 +38,5 @@ t_mensaje_caught* mensaje_caught;
 void servidor_gameboy(int conexion);
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket);
 void recibir_id_correlativo(int socket_cliente);
+
 #endif /* SERVIDOR_GAMEBOY_H_ */

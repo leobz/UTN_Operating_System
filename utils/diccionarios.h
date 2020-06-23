@@ -11,6 +11,7 @@
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
 #include <stdlib.h>
+#include "../utils/serializacion.h"
 
 /**
 * @NAME: strings_to_dictionary
@@ -70,5 +71,9 @@ int sum_dictionary_values(t_dictionary* );
 */
 
 int dictionaries_are_equals(t_dictionary*, t_dictionary*);
+void meter_en_diccionario(t_dictionary* dictionary,int key,void*value);
+void*obtener_de_diccionario(t_dictionary*dictionary, int key);
+bool esta_en_diccionario(t_dictionary* dictionary,int key);
+void *sacar_de_diccionario(t_dictionary* dictionary,int key);
 
 #endif /* DICCIONARIOS_H_ */

@@ -17,6 +17,8 @@ t_paquete* crear_paquete_desde_mensaje(void* mensaje){
 
 	memcpy(&(paquete->codigo_operacion), mensaje + offset, sizeof(int));
 	offset += sizeof(int);
+	memcpy(&(paquete->id_mensaje), mensaje + offset, sizeof(int));
+	offset += sizeof(int);
 	memcpy(&(paquete->id_correlativo), mensaje + offset, sizeof(int));
 	offset += sizeof(int);
 	memcpy(&(size), mensaje + offset, sizeof(int));

@@ -1,5 +1,6 @@
 #include "cache.h"
 
+// ********************************** INICIALIZACION MEMORIA CACHE ********************************** //
 
 void inicializar_memoria_cache() {
 	memoria_cache = malloc(broker_config->tamanio_memoria);
@@ -29,11 +30,26 @@ void inicializar_particion_bs() {
 	particion_bs = malloc(sizeof(t_particion_bs));
 
 	particion_bs->offset = 0;
-	particion_bs->tamanio_particion = broker_config->tamanio_memoria;
+	particion_bs->tamanio_particion = obtener_tamanio_memoria_cache_bs();
 	particion_bs->esta_libre = true;
 	particion_bs->size_mensaje = 0;
 	particion_bs->primer_hijo = NULL;
 	particion_bs->segundo_hijo = NULL;
+}
+
+int obtener_tamanio_memoria_cache_bs() {
+	int tamanio_memoria_cache_config = broker_config->tamanio_memoria;
+	int tamanio_memoria_cache_real = 2;
+	bool memoria_insuficiente = true;
+
+	while (memoria_insuficiente) {
+		if ((tamanio_memoria_cache_real * 2) <= tamanio_memoria_cache_config)
+			tamanio_memoria_cache_real *= 2;
+		else
+			memoria_insuficiente = false;
+	}
+
+	return tamanio_memoria_cache_real;
 }
 
 void inicializar_particiones_dinamicas(){
@@ -41,6 +57,8 @@ void inicializar_particiones_dinamicas(){
 	t_particion_dinamica* particion_inicial = crear_particion_dinamica_libre(0, broker_config->tamanio_memoria);
 	list_add(particiones_dinamicas, particion_inicial);
 }
+
+// ********************************** FUNCIONES MEMORIA CACHE ********************************** //
 
 int es_buddy_system() {
 	return strcmp(broker_config->algoritmo_memoria, "BS") == 0;
@@ -50,33 +68,69 @@ int es_particion_dinamica() {
 	return strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0;
 }
 
-void agregar_mensaje_memoria_cache(t_mensaje* mensaje) {
-	//ESTA FUNCION DEBERIA RETORNAR UNA PARTICION O UN OFFSET A LA ADMINISTRACION DEL MENSAJE
-	void* payload = mensaje->payload;
-	int size = mensaje->payload_size;
-
-	if (es_buddy_system()) {
-		t_list* hojas_libres = list_create();
-
-		obtener_hojas_libres_bs(hojas_libres, particion_bs);
-		ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
-	}
-	else if (es_particion_dinamica()) {
-		t_particion_dinamica* particion_libre = buscar_particion_dinamica_libre(size);
-		guardar_en_cache(payload, particion_libre->offset, particion_libre->tamanio_particion);
-	}
+void guardar_en_cache(void* payload, int offset, int size){
+	memcpy(memoria_cache + offset, payload, size);
 }
 
-void obtener_hojas_libres_bs(t_list* hojas_libres, t_particion_bs* particion) {
+// ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
+
+t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje) {
+	t_list* hojas_libres = list_create();
+	t_particion_bs* particion_elegida = NULL;
+	void* payload = mensaje->payload;
+	int tamanio_particion_necesaria = obtener_tamanio_particion_necesaria(mensaje->payload_size);
+	bool sin_hojas_libres = true;
+	int cantidad_busquedas_fallidas = broker_config->frecuencia_compactacion;
+
+	while (sin_hojas_libres) {
+		obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion_bs, tamanio_particion_necesaria);
+
+		if (cantidad_busquedas_fallidas == 0) {
+			// TODO: compactar memoria cache
+			// TODO: reiniciar cantidad_busquedas_fallidas segun config
+		}
+		else {
+			if (list_size(hojas_libres) == 0) {
+				// TODO: eliminar particion segun algoritmo de reemplazo (LRU o FIFO)
+				// TODO: decrementar cantidad_busquedas_fallidas
+			}
+			else
+				sin_hojas_libres = false;
+		}
+	}
+
+	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
+	particion_elegida = dividir_particion_elegida (list_first(hojas_libres), tamanio_particion_necesaria);
+	cargar_particion_elegida(particion_elegida, mensaje);
+	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->size_mensaje);
+
+	list_clean(hojas_libres);
+	free(hojas_libres);
+
+	return particion_elegida;
+}
+
+int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
+	int tamanio_particion_necesaria = 2;
+
+	while (tamanio_particion_necesaria < tamanio_mensaje) {
+		tamanio_particion_necesaria *= 2;
+	}
+
+	return tamanio_particion_necesaria;
+}
+
+void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria) {
 
 	if ((particion->primer_hijo != NULL || particion->segundo_hijo != NULL) && particion->esta_libre) {
+
 		if (particion->primer_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->primer_hijo);
+			obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion->primer_hijo, tamanio_particion_necesaria);
 
 		if (particion->segundo_hijo != NULL)
-			obtener_hojas_libres_bs(hojas_libres, particion->segundo_hijo);
+			obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion->segundo_hijo, tamanio_particion_necesaria);
 	}
-	else if (particion->esta_libre) {
+	else if (particion->esta_libre && particion->tamanio_particion >= tamanio_particion_necesaria) {
 		list_add(hojas_libres, particion);
 	}
 }
@@ -97,10 +151,63 @@ void ordenar_hojas_libres_segun_algoritmo_particion_libre(t_list* hojas_libres) 
 	else if (strcmp(broker_config->algoritmo_particion_libre, "BF") == 0) {
 		list_sort(hojas_libres, (void*)es_menor_tamanio);
 	}
+
+}
+
+t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int tamanio_particion_necesaria) {
+
+	if ((hoja_libre->tamanio_particion / 2) >= tamanio_particion_necesaria) {
+		t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+		t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+
+		primer_hijo->esta_libre = true;
+		primer_hijo->offset = hoja_libre->offset;
+		primer_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
+		primer_hijo->size_mensaje = 0;
+		primer_hijo->primer_hijo = NULL;
+		primer_hijo->segundo_hijo = NULL;
+
+		segundo_hijo->esta_libre = true;
+		segundo_hijo->offset = hoja_libre->tamanio_particion / 2;
+		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
+		segundo_hijo->size_mensaje = 0;
+		segundo_hijo->primer_hijo = NULL;
+		segundo_hijo->segundo_hijo = NULL;
+
+		hoja_libre->primer_hijo = primer_hijo;
+		hoja_libre->segundo_hijo = segundo_hijo;
+
+		return dividir_particion_elegida(hoja_libre->primer_hijo, tamanio_particion_necesaria);
+	}
+
+	return hoja_libre;
+}
+
+void cargar_particion_elegida (t_particion_bs* particion_elegida, t_mensaje* mensaje) {
+
+	particion_elegida->esta_libre = false;
+	particion_elegida->size_mensaje = mensaje->payload_size;
+
+}
+
+void* leer_particion_bs(t_particion_bs* particion) {
+	void* payload = malloc(particion->tamanio_particion);
+
+	memcpy(payload, memoria_cache + particion->offset, particion->size_mensaje);
+
+	return payload;
 }
 
 
-// PARTICIONES DINAMICAS
+// ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
+
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
+	void* payload = mensaje->payload;
+	int size = mensaje->payload_size;
+
+	return guardar_payload_en_particion_dinamica(payload, size);
+}
+
 
 void* leer_particion_dinamica(t_particion_dinamica* particion){
 	void* payload = malloc(particion->tamanio_particion);
@@ -129,20 +236,26 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	int tamanio_intermedio;
 	int offset_intermedio;
 
+
 	siguiente_particion = particion_ocupada->siguiente_particion;
+	particion_intermedia=NULL;
 
 	if (siguiente_particion != NULL) {
 		tamanio_intermedio = calcular_tamanio_particion_intermedia(particion_ocupada, siguiente_particion);
 	}
 
 	else{
-		tamanio_intermedio = broker_config->tamanio_memoria - particion_ocupada->tamanio_particion;
+		tamanio_intermedio = broker_config->tamanio_memoria - (particion_ocupada->offset + particion_ocupada->tamanio_particion);
 	}
 
 	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
-	particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
-	list_add(particiones_dinamicas, particion_intermedia);
+	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
+	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
+		particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
+		list_add(particiones_dinamicas, particion_intermedia);}
+
+	particion_ocupada->siguiente_particion=particion_intermedia;
 }
 
 int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion) {
@@ -192,8 +305,32 @@ void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 	// TODO
 }
 
-void compactar_particiones_dinamicas() {
-	// TODO
+void compactar_particiones_dinamicas(){
+
+	int hueco_particiones=0;
+	int tamanio_particion_final=0;
+
+	list_sort(particiones_dinamicas, (void*)pd_es_menor_offset);
+
+	void compactar(t_particion_dinamica* particion_din){
+		reubicar_particion(particion_din,hueco_particiones);
+		particion_din->offset=hueco_particiones;
+		hueco_particiones=particion_din->offset + particion_din->tamanio_particion; //para la proxima particion a compactar
+		tamanio_particion_final=particion_din->tamanio_particion; //me quedo con el tamanio de la ultima particion
+	}
+
+	list_iterate(particiones_dinamicas,&compactar);
+
+	int offset_libre=hueco_particiones+tamanio_particion_final; // ubico el offset al final
+	int tamanio_restante=broker_config->tamanio_memoria-offset_libre; //de la ultima particion
+
+	if(tamanio_restante>=broker_config->tamanio_minimo_particion){
+			t_particion_dinamica*particion_final = crear_particion_dinamica_libre(offset_libre, tamanio_restante);
+			list_add(particiones_dinamicas, particion_final);}
+}
+
+void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones){
+	memmove(memoria_cache+hueco_particiones,memoria_cache+particion_din->offset,particion_din->tamanio_particion);
 }
 
 t_list* filtrar_particiones_por_tamanio(t_list* particiones, int tamanio_payload) {
@@ -248,9 +385,7 @@ t_particion_dinamica* crear_particion_dinamica_libre(int offset, int tamanio){
 	return particion;
 }
 
-void guardar_en_cache(void* payload, int offset, int size){
-	memcpy(memoria_cache + offset, payload, size);
-}
+// ********************************** FINALIZACION MEMORIA CACHE ********************************** //
 
 void finalizar_mutex_cache() {
 	pthread_mutex_destroy(&m_cache);
@@ -258,15 +393,28 @@ void finalizar_mutex_cache() {
 
 void finalizar_lista_particiones() {
 	if (es_buddy_system()) {
-		finalizar_particion_bs();
+		elimimar_particiones_bs(particion_bs);
 	}
 	else if (es_particion_dinamica()) {
 		finalizar_particiones_dinamicas();
 	}
 }
 
-void finalizar_particion_bs() {
-	// TODO: implementar logica eliminacion particion bs
+void elimimar_particiones_bs(t_particion_bs* particion) {
+
+	if (particion->primer_hijo != NULL && particion->segundo_hijo != NULL) {
+		t_particion_bs* primer_hijo = particion->primer_hijo;
+		t_particion_bs* segundo_hijo = particion->segundo_hijo;
+
+		free(particion);
+
+		elimimar_particiones_bs(primer_hijo);
+		elimimar_particiones_bs(segundo_hijo);
+	}
+	else {
+		free(particion);
+	}
+
 }
 
 static void particion_dinamica_destroy(t_particion_dinamica* particion) {
