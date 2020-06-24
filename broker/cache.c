@@ -68,6 +68,13 @@ int es_particion_dinamica() {
 	return strcmp(broker_config->algoritmo_memoria, "PARTICIONES") == 0;
 }
 
+int es_fifo(){
+	return strcmp(broker_config->algoritmo_reemplazo, "FIFO") == 0;}
+
+int es_lru(){
+	return strcmp(broker_config->algoritmo_reemplazo, "LRU") == 0;}
+
+
 void guardar_en_cache(void* payload, int offset, int size){
 	memcpy(memoria_cache + offset, payload, size);
 }
@@ -302,7 +309,11 @@ int supero_limite_de_eliminaciones(int particiones_eliminadas) {
 }
 
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
-	// TODO
+
+	if(es_fifo()){
+
+	}
+
 }
 void compactar_particiones_dinamicas(){
 

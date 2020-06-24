@@ -43,6 +43,8 @@ int obtener_tamanio_memoria_cache_bs();
 // ********************************** FUNCIONES MEMORIA CACHE ********************************** //
 int es_particion_dinamica();
 int es_buddy_system();
+int es_fifo();
+int es_lru();
 void guardar_en_cache(void* payload, int offset, int size);
 
 
