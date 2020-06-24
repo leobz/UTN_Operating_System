@@ -71,11 +71,13 @@ t_list* filtrar_particiones_por_tamanio(t_list*, int);
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion);
 void compactar_particiones_dinamicas();
+void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones);
 t_list* filtar_particiones_libres_y_suficientes(int);
 t_list* obtener_particiones_posibles(int);
 t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
 void* leer_particion_dinamica(t_particion_dinamica*);
 int supero_limite_de_eliminaciones(int particiones_eliminadas);
+
 
 
 // ********************************** FINALIZACION MEMORIA CACHE ********************************** //
