@@ -48,10 +48,11 @@ TODO: Arreglar logs para que sean mas expresivos (En el codigo y luego en el tes
 
 ```bash
 $ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 5)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:2, POSICION:(6, 6)<...>
-<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)<...>
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA
+<...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)
+<...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)
+<...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
 ```
 
 ### APPEARED_POKEMON 2
@@ -67,19 +68,21 @@ $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time
 Tamaño de rafaga: 7  Posicion del TCB (3, 3)
 WARNING: Error al conectar con IP:<...> Puerto:<...>
 [TCB-info] TID:1 Capturó pokemon. Total capturados:2
-[TCB-info] TID:1 Pasó a lista Unblocked
+[CAMBIO DE COLA] TID:1 Pasó a lista Unblocked
 ```
 
 ```bash
 $ cat team.log
-<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(4, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(5, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 3)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 4)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 5)<...>
-<...>[MOVIMIENTO] ID_ENTRENADOR:1, POSICION:(6, 6)<...>
-<...>[CATCH] POKEMON: Pikachu, POSICION:(6, 6)<...>
+<...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
+<...>[CAMBIO DE COLA] TID:1 (New->Ready) (3, 3) Motivo:CAPTURA
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(4, 3)
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(5, 3)
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 3)
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 4)
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 5)
+<...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 6)
+<...>[INSTRUCCION] TID:1, CATCH Pikachu 6 6
+
 ```
 
 #### Pokemon No Pertenece a Objetivo Global -> No se agrega
