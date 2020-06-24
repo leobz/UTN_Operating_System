@@ -14,8 +14,6 @@
 
 
 
-t_list* suscriptores[6];
-t_list* administradores[6];
 
 t_mensaje*mensajes[6][3];
 
