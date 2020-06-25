@@ -13,6 +13,7 @@ void agregar_tests_administrador_de_mensaje() {
 }
 
 void test_guardar_mensaje_en_cache_dinamica() {
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 	inicializar_test_con_particion_dinamica();
 	inicializar_test_con_administracion_de_mensajes();
 
@@ -33,6 +34,7 @@ void inicializar_test_con_administracion_de_mensajes(){
 
 t_mensaje* mensaje_generico() {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
+	mensaje->codigo_operacion = NEW_POKEMON;
 	mensaje->payload = payload_string;
 	mensaje->payload_size = payload_string_size;
 
