@@ -324,8 +324,8 @@ void test_obtener_posibles_victimas_reemplazo(){
 
 void test_ordenar_hojas_posibles_victimas_segun_FIFO(){
 	inicializar_test_bs();
-	free(broker_config->algoritmo_particion_libre);
-	broker_config->algoritmo_particion_libre = strdup("FIFO");
+	free(broker_config->algoritmo_reemplazo);
+	broker_config->algoritmo_reemplazo = strdup("FIFO");
 
 	t_list* hojas_posibles_victimas = list_create();
 	t_particion_bs* primer_hoja = malloc(sizeof(t_particion_bs));
@@ -355,8 +355,8 @@ void test_ordenar_hojas_posibles_victimas_segun_FIFO(){
 
 void test_ordenar_hojas_posibles_victimas_segun_LRU(){
 	inicializar_test_bs();
-	free(broker_config->algoritmo_particion_libre);
-	broker_config->algoritmo_particion_libre = strdup("LRU");
+	free(broker_config->algoritmo_reemplazo);
+	broker_config->algoritmo_reemplazo = strdup("LRU");
 
 	t_list* hojas_posibles_victimas = list_create();
 	t_particion_bs* primer_hoja = malloc(sizeof(t_particion_bs));
