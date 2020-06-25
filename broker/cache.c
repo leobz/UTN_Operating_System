@@ -214,7 +214,9 @@ void cargar_particion_elegida (t_particion_bs* particion_elegida, int payload_si
 
 void* leer_particion_bs(t_particion_bs* particion) {
 	void* payload = malloc(particion->tamanio_particion);
+	contador_uso++;
 
+	particion->contador_uso = contador_uso;
 	memcpy(payload, memoria_cache + particion->offset, particion->size_mensaje);
 
 	return payload;

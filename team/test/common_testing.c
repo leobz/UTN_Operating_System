@@ -5,6 +5,10 @@ t_tcb_entrenador* tcb_generico(int tid) {
 	tcb->estado_tcb = NEW;
 	tcb->tid = tid;
 	tcb->rafaga = queue_create();
+	tcb->posicion = malloc(sizeof(t_posicion));
+	tcb->posicion->x = 0;
+	tcb->posicion->y = 0;
+
 
 	return tcb;
 }

@@ -4,13 +4,6 @@
 
 t_dictionary* enviaron_catch;
 
-// TODO: ALGORITMO_PLANIFICACION, SLEEP_TIME  y SLEEP_TIME_CONEXION se deben cargar por configuracion,
-//pero como no tengo esa parte lo hardcodeo. Borrar esto al obtener configuracion
-ALGORITMO_PLANIFICACION = FIFO;
-
-int SLEEP_TIME = 0;
-int SLEEP_TIME_CONEXION = 10;
-
 void inicializar_listas() {
 	ready = list_create();
 	blocked = list_create();
@@ -18,47 +11,155 @@ void inicializar_listas() {
 	unblocked = list_create();
 	deadlock = list_create();
 	l_exit = list_create();
+
+	pthread_mutex_init(&mutex_lista_ready, NULL);
 }
 
 void inicializar_diccionarios() {
 	enviaron_catch = dictionary_create();
 }
 
+void inicializar_hilos_tcbs() {
+	void cargar_semaforo_y_thread_al_tcb(t_tcb_entrenador* entrenador) {
+		pthread_t thread_tcb;
+		pthread_create(&thread_tcb, NULL, (void*)ejecutar_tcb, entrenador);
+		entrenador->entrenador = &thread_tcb;
+	}
+
+	list_iterate(new, (void*)cargar_semaforo_y_thread_al_tcb);
+}
+
 void iniciar_planificador() {
+	inicializar_hilos_tcbs();
 	pthread_create(&planificador, NULL, (void*) planificar, NULL);
 	pthread_detach(planificador);
 }
 
-void planificar() {
-	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(
-			sizeof(t_tcb_entrenador));
+void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
+	sem_post(tcb_exec->semaforo);
+}
 
+void planificar() {
+	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
 	tcb_exec = NULL;
+	pthread_mutex_init(&mutex_tcb_exec, NULL);
 
 	while (1)
-		//TODO: Poner semaforo en todos los hilos de ejecución que llamen a Ready
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
-
+			pthread_mutex_lock(&mutex_tcb_exec);
 			tcb_exec = siguiente_tcb_a_ejecutar();
-			ejecutar_rafaga(tcb_exec);
+			tcb_exec->estado_tcb = EXEC;
+			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
+
 		}
 }
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 	t_tcb_entrenador* siguiente_tcb;
-	switch (ALGORITMO_PLANIFICACION) {
+
+	int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
+
+	switch (algoritmo) {
 	case FIFO:
 		siguiente_tcb = list_pop_first(ready);
 		break;
 	case RR:
+		siguiente_tcb = list_pop_first(ready);
+		break;
+	case SJF_CD:
 		// TODO
 		break;
-	case SJF:
-		// TODO
+	case SJF_SD:
+		//TODO
 		break;
 	}
 	return siguiente_tcb;
+}
+
+void inicializar_semaforo_tcb(t_tcb_entrenador* tcb, sem_t* semaforo_tcb) {
+	sem_init(semaforo_tcb, 0, 0);
+	tcb->semaforo = semaforo_tcb;
+}
+
+void ejecutar_rafaga(t_tcb_entrenador* tcb) {
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+	}
+}
+
+void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
+	int cantidad_de_instrucciones = 0;
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+		cantidad_de_instrucciones++;
+		if (cantidad_de_instrucciones >= team_config->quantum){
+			cantidad_de_instrucciones = 0;
+			break;
+		}
+	}
+}
+
+void ejecutar_tcb(t_tcb_entrenador* tcb) {
+	sem_t semaforo_tcb;
+	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
+
+	while(true){
+		sem_wait(tcb->semaforo);
+
+		printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
+		printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+
+		int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
+
+		switch (algoritmo) {
+		case FIFO:
+			ejecutar_rafaga(tcb);
+			break;
+		case RR:
+			ejecutar_rafaga_con_desalojo(tcb);
+			if (!queue_is_empty(tcb->rafaga))
+				pasar_a_ready(tcb, "QUANTUM");
+			break;
+
+		case SJF_CD:
+			// TODO
+			break;
+		case SJF_SD:
+			//TODO
+			break;
+		}
+		pthread_mutex_unlock(&mutex_tcb_exec);
+
+	}
+}
+
+void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
+	switch (instruccion) {
+	case MOVERSE:
+		actualizar_posicion(tcb);
+
+		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
+				tcb->posicion->x, tcb->posicion->y);
+		break;
+	case CATCH:
+		log_info(logger, "[INSTRUCCION] TID:%d, CATCH %s %d %d",
+				tcb->tid,
+				tcb->pokemon_a_capturar->pokemon,
+				tcb->pokemon_a_capturar->posicion->x,
+				tcb->pokemon_a_capturar->posicion->y);
+		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
+		// a que me devuelvan un id_correlativo y eso puede tardar
+		ejecutar_catch(tcb);
+
+		break;
+	case INTERCAMBIAR:
+		//TODO
+		break;
+	}
+	sleep(team_config->retardo_ciclo_cpu);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -118,42 +219,6 @@ void actualizar_posicion(t_tcb_entrenador* tcb) {
 
 }
 
-void ejecutar_rafaga(t_tcb_entrenador* tcb) {
-	//TODO: Esta funcion la tiene que correr el hilo entrenador
-	printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
-	printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
-	while (!queue_is_empty(tcb->rafaga)) {
-		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
-		queue_pop(tcb->rafaga);
-	}
-}
-
-void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
-	switch (instruccion) {
-	case MOVERSE:
-		sleep(SLEEP_TIME);
-		actualizar_posicion(tcb);
-
-		log_info(logger, "[MOVIMIENTO] ID_ENTRENADOR:%d, POSICION:(%d, %d)", tcb->tid,
-				tcb->posicion->x, tcb->posicion->y);
-		break;
-	case CATCH:
-		log_info(logger, "[CATCH] POKEMON: %s, POSICION:(%d, %d)",
-				tcb->pokemon_a_capturar->pokemon,
-				tcb->pokemon_a_capturar->posicion->x,
-				tcb->pokemon_a_capturar->posicion->y);
-		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
-		// a que me devuelvan un id_correlativo y eso puede tardar
-		ejecutar_catch(tcb);
-
-		break;
-	case INTERCAMBIAR:
-		//TODO
-		break;
-	}
-}
-
-
 void lanzar_reintentar_conexion(int conexion){
 	pthread_create(&reintentador_de_conexion, NULL, (void*) planificar, conexion);
 	pthread_detach(reintentador_de_conexion);
@@ -167,7 +232,7 @@ void reintentar_conexion(int conexion) {
 
 		log_info(logger,
 				"[REINTENTO_COMUNICACION] Inicio de proceso de reintento de comunicación con el Broker.");
-		sleep(SLEEP_TIME_CONEXION);
+		sleep(team_config->tiempoDeReconexion);
 		conexion = crear_conexion(team_config->ip_broker,
 				team_config->puerto_broker);
 
@@ -269,28 +334,74 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
 
-void pasar_a_ready(t_tcb_entrenador* tcb) {
+void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
+	int estado_original = tcb->estado_tcb;
+	tcb->estado_tcb = cola_destino;
+	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
+			tcb->tid,
+			cola_planificacion_a_string(estado_original),
+			cola_planificacion_a_string(tcb->estado_tcb),
+			tcb->posicion->x,
+			tcb->posicion->y,
+			motivo);
 	list_add(ready, tcb);
-	tcb->estado_tcb = READY;
+}
+
+void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
+	pthread_mutex_lock(&mutex_lista_ready);
+	pasar_a_cola(tcb, READY, motivo);
+	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
-	log_info(logger,"[TCB-info] TID:%d Pasó a lista Blocked\n", tcb->tid);
+	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	list_add(unblocked, tcb);
-	printf("[TCB-info] TID:%d Pasó a lista Unblocked\n", tcb->tid);
+	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Unblocked\n", tcb->tid);
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	list_add(l_exit, tcb);
-	printf("[TCB-info] TID:%d Pasó a lista Exit\n", tcb->tid);
+	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }
 
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
 	list_add(deadlock, tcb);
 	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
+}
+
+int string_to_algoritmo_de_planificacion(char* algoritmo) {
+
+	if (strcmp(algoritmo, "FIFO") == 0)
+		return FIFO;
+
+	else if (strcmp(algoritmo, "RR") == 0)
+		return RR;
+
+	else if (strcmp(algoritmo, "SJF-CD") == 0)
+		return SJF_CD;
+
+	else if (strcmp(algoritmo, "SJF-SD") == 0)
+		return SJF_SD;
+}
+
+char* cola_planificacion_a_string(int cola_planificacion){
+	switch (cola_planificacion) {
+	case READY:
+		return "Ready";
+	case NEW:
+		return "New";
+	case BLOCKED:
+		return "Blocked";
+	case EXEC:
+		return "Exec";
+	case EXIT:
+		return "Exit";
+	default:
+		return "NULL";
+	}
 }
