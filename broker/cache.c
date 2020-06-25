@@ -321,6 +321,7 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int t
 
 	particion_destino->esta_libre = false;
 	particion_destino->tamanio_particion = tamanio;
+	particion_destino->contador_uso=++contador_uso;
 
 	crear_particion_intermedia(particion_destino);
 
@@ -400,8 +401,22 @@ int supero_limite_de_eliminaciones(int particiones_eliminadas) {
 	return particiones_eliminadas >= broker_config->frecuencia_compactacion;
 }
 
+bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion) {
+	return particion->contador_uso < siguiente_particion->contador_uso;
+}
+
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 
+	list_sort(particiones_dinamicas, (void*)pd_es_menor_contador_uso);
+	t_particion_dinamica* particion_dinamica= list_first(particiones_dinamicas);
+
+	if(es_fifo){
+
+	}
+
+	if(es_lru){
+
+	}
 
 }
 void compactar_particiones_dinamicas(){
