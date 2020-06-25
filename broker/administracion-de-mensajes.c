@@ -43,7 +43,7 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
 	if (es_particion_dinamica()){
-		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica(mensaje);
+		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica(mensaje,actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
 	}
 	else if(es_buddy_system()){

@@ -302,15 +302,19 @@ void consolidar_particiones_companieros(t_particion_bs* particion_victima){
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 
-t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje) {
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje, t_adm_mensaje* admin) {
 	void* payload = mensaje->payload;
 	int size = mensaje->payload_size;
+	t_adm_mensaje* administrador_a_guardar=admin;
 
-
-	return guardar_payload_en_particion_dinamica(payload, size);
+	return guardar_payload_con_adm_mensaje(payload, size, administrador_a_guardar);
 }
 
 void* leer_particion_dinamica(t_particion_dinamica* particion){
+
+	if(es_lru())
+		particion->contador_uso=++contador_uso;
+
 	void* payload = malloc(particion->tamanio_particion);
 
 	memcpy(payload, memoria_cache + particion->offset, particion->tamanio_particion);
@@ -318,12 +322,26 @@ void* leer_particion_dinamica(t_particion_dinamica* particion){
 	return payload;
 }
 
-t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int tamanio){
+t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin){
 	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
 
 	particion_destino->esta_libre = false;
 	particion_destino->tamanio_particion = tamanio;
 	particion_destino->contador_uso=++contador_uso;
+	particion_destino->adm_mensaje=admin;
+
+	crear_particion_intermedia(particion_destino);
+
+	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
+
+	return particion_destino;
+}
+//ESTA FUNCION ES SOLO PARA EL TEST POR DIFERENCIA DE PARAMETROS
+t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int tamanio){
+	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
+
+	particion_destino->esta_libre = false;
+	particion_destino->tamanio_particion = tamanio;
 
 	crear_particion_intermedia(particion_destino);
 
@@ -410,17 +428,19 @@ bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinam
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 
 	list_sort(particiones_dinamicas, (void*)pd_es_menor_contador_uso);
-	t_particion_dinamica* particion_dinamica= list_first(particiones_dinamicas);
+	t_particion_dinamica* particion_victima= list_first(particiones_dinamicas);
 
-	if(es_fifo){
-
-	}
-
-	if(es_lru){
-
-	}
-
+	liberar_particion_dinamica(particion_victima);
 }
+
+void liberar_particion_dinamica(t_particion_dinamica* particion_victima){
+	t_adm_mensaje* adm_mensaje = particion_victima->adm_mensaje;
+
+	eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
+	particion_victima->esta_libre = true;
+	particion_victima->adm_mensaje = NULL;
+}
+
 void compactar_particiones_dinamicas(){
 
 	int hueco_particiones=0;
