@@ -35,8 +35,8 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 	mensaje->codigo_operacion = actual_administrator->codigo_operacion;
 	mensaje->id_mensaje = actual_administrator->id_mensaje;
 	mensaje->id_correlativo = actual_administrator->id_correlativo;
+	mensaje->payload= serializar_segun_codigo_con_barra(payload,mensaje->codigo_operacion,&payload_size);
 	mensaje->payload_size = payload_size;
-	mensaje->payload = payload;
 
 	return empaquetar_mensaje_broker(mensaje, bytes);
 }

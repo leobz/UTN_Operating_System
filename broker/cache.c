@@ -303,8 +303,9 @@ void consolidar_particiones_companieros(t_particion_bs* particion_victima){
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje, t_adm_mensaje* admin) {
-	void* payload = mensaje->payload;
-	int size = mensaje->payload_size;
+
+	int size=mensaje->payload_size;
+	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
 	t_adm_mensaje* administrador_a_guardar=admin;
 
 	return guardar_payload_con_adm_mensaje(payload, size, administrador_a_guardar);
