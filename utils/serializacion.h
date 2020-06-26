@@ -123,12 +123,13 @@ void* deserializar_buffer_de_un_string(t_buffer* buffer);
 // NEW_POKEMON
 void* serializar_new_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y, int cantidad,int id_mensaje, int id_correlativo);
-t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,
-		int cantidad);
+t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
 t_mensaje_new* deserializar_mensaje_new_pokemon(t_buffer* buffer);
 void eliminar_mensaje_new(t_mensaje_new* mensaje_new);
-t_mensaje_new* deserializar_paquete_new_pokemon(void* package) ;
-t_buffer* buffer_new_sin_barra(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
+t_mensaje_new* deserializar_paquete_new_pokemon(void* package);
+t_mensaje_new* deserializar_payload_new_pokemon(void*payload);
+void* payload_new_con_barra(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
+void* payload_new_sin_barra(char* nombre_pokemon, int pos_x, int pos_y,int cantidad);
 
 // GET_POKEMON
 void* serializar_get_pokemon(int* bytes, char* nombre_pokemon,int id_mensaje,int id_correlativo);
@@ -143,12 +144,14 @@ t_buffer* buffer_get_(char* pokemon);
 t_mensaje_get* deserializar_payload_get_pokemon(void *payload);
 //CATCH_POKEMON
 void* serializar_catch_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
-		int pos_y, int id_mensaje,int id_correlativo);
+int pos_y, int id_mensaje,int id_correlativo);
 t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 t_mensaje_catch* deserializar_mensaje_catch_pokemon(t_buffer* buffer);
 t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package);
 void eliminar_mensaje_catch(t_mensaje_catch* mensaje_catch);
-t_buffer* buffer_catch_sin_barra(char* nombre_pokemon, int pos_x, int pos_y);
+void* payload_catch_sin_barra(char* nombre_pokemon, int pos_x, int pos_y);
+void* payload_catch_con_barra(char* nombre_pokemon, int pos_x, int pos_y);
+t_mensaje_catch* deserializar_payload_catch_pokemon(void*payload);
 
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
@@ -157,7 +160,9 @@ t_buffer* buffer_appeared_pokemon(char* nombre_pokemon, int pos_x, int pos_y);
 t_mensaje_appeared* deserializar_mensaje_appeared_pokemon(t_buffer* buffer);
 void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package);
-t_buffer* buffer_appeared_sin_barra(char* nombre_pokemon, int pos_x, int pos_y);
+void* payload_appeared_sin_barra(char* nombre_pokemon, int pos_x, int pos_y);
+void* payload_appeared_con_barra(char* nombre_pokemon, int pos_x, int pos_y);
+t_mensaje_appeared* deserializar_payload_appeared_pokemon(void*payload);
 
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado,int id_mensaje, int id_correlativo);
