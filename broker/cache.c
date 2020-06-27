@@ -82,7 +82,7 @@ int es_lru(){
 
 
 void guardar_en_cache(void* payload, int offset, int size){
-	memcpy(memoria_cache + offset, payload, size);
+	memmove(memoria_cache + offset, payload, size);
 }
 
 // ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
@@ -335,6 +335,9 @@ t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio
 
 	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
 
+
+	printf("Almacenando mensaje en cache en posicion %d\n", particion_destino->offset);
+
 	return particion_destino;
 }
 //ESTA FUNCION ES SOLO PARA EL TEST POR DIFERENCIA DE PARAMETROS
@@ -347,6 +350,7 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int t
 	crear_particion_intermedia(particion_destino);
 
 	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
+
 
 	return particion_destino;
 }
@@ -374,9 +378,11 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
 	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
 		particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
-		list_add(particiones_dinamicas, particion_intermedia);}
+		list_add(particiones_dinamicas, particion_intermedia);
+		particion_intermedia->siguiente_particion=particion_ocupada->siguiente_particion;
+		particion_ocupada->siguiente_particion=particion_intermedia;
+	}
 
-	particion_ocupada->siguiente_particion=particion_intermedia;
 }
 
 int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion) {
