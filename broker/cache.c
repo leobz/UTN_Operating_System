@@ -378,9 +378,9 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
 	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
 		particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
-		list_add(particiones_dinamicas, particion_intermedia);
 		particion_intermedia->siguiente_particion=particion_ocupada->siguiente_particion;
 		particion_ocupada->siguiente_particion=particion_intermedia;
+		list_add(particiones_dinamicas, particion_intermedia);
 	}
 
 }
