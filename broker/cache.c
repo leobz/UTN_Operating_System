@@ -222,6 +222,7 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int t
 
 	particion_destino->esta_libre = false;
 	particion_destino->tamanio_particion = tamanio;
+	printf("Almacenando mensaje en cache en posicion %d\n",particion_destino->offset);
 
 	crear_particion_intermedia(particion_destino);
 
@@ -259,7 +260,7 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 }
 
 int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion) {
-	return sig_particion->offset - (part_ocupada->offset + part_ocupada->tamanio_particion + 1);
+	return sig_particion->offset - (part_ocupada->offset + part_ocupada->tamanio_particion);
 }
 
 
