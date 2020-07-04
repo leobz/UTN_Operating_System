@@ -168,7 +168,6 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
 		pthread_mutex_unlock(&m_cache);
 
-
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);
 		free(mensaje[codigo_de_operacion]);

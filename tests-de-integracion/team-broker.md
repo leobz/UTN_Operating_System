@@ -66,7 +66,7 @@ Comprobación de recepción de mensaje Appeared Pokemon, selección de TCB, movi
 ```bash
 $  sleep <sleep-time>; cat team.log     # byexample: +timeout=10 +fail-fast +paste
 <...>[MSG_RECIBIDO] APPEARED_POKEMON:<...>
-<...>[CATCH] POKEMON<...>
+<...>[INSTRUCCION]<...>CATCH<...>
 <...>[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:<...>
 ```
 

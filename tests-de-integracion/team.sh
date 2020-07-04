@@ -6,5 +6,10 @@ echo Compilo Team:
 byexample -l shell compilo-team.md
 
 echo
-echo Corro Tests de Team:
+echo Corro Tests de Team con algoritmo FIFO:
 byexample -l shell team.md
+
+echo
+echo Corro Tests de Team con algoritmo RR:
+byexample -l shell team-rr.md
+

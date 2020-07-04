@@ -22,7 +22,7 @@ void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 	t_tcb_entrenador* tcb_1 = tcb_generico(1);
 	list_clean(ready);
 
-	pasar_a_ready(tcb_1);
+	pasar_a_ready(tcb_1, "");
 	CU_ASSERT_PTR_EQUAL(list_get(ready, 0), tcb_1);
 
 	t_tcb_entrenador* tcb_sig = siguiente_tcb_a_ejecutar();
@@ -33,12 +33,12 @@ void siguiente_entrenador_a_ejecutar_extrae_tcb_de_ready() {
 }
 
 void pasar_a_ready_cambia_estado_tcb_a_ready() {
-	t_tcb_entrenador* tcb = tcb_generico(NULL);
+	t_tcb_entrenador* tcb = tcb_generico(1);
 	list_clean(ready);
 
 	CU_ASSERT_EQUAL(tcb->estado_tcb, NEW);
 
-	pasar_a_ready(tcb);
+	pasar_a_ready(tcb, "");
 	CU_ASSERT_EQUAL(tcb->estado_tcb, READY);
 	//TODO: liberar memoria
 }
@@ -47,7 +47,7 @@ void pasar_a_ready_agrega_tcb_a_ready() {
 	t_tcb_entrenador* tcb = tcb_generico(NULL);
 	list_clean(ready);
 
-	pasar_a_ready(tcb);
+	pasar_a_ready(tcb, "");
 	t_tcb_entrenador* tcb_en_ready = list_get(ready, 0);
 
 	CU_ASSERT_PTR_EQUAL(tcb_en_ready, tcb);

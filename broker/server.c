@@ -24,8 +24,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
 		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
 
-
-
 		loggear_nueva_conexion(logger, paquete);
 
 		sem_post(&cola_vacia[paquete->codigo_operacion]);
@@ -103,7 +101,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 void verificar_cache(t_proceso* proceso){
-	printf("Entro a hilo verificar cache\n");
+	//printf("Entro a hilo verificar cache\n");
 	int id_suscriptor=proceso->id_proceso;
 	int socket=proceso->socket;
 	int num_cola=cola_paquete;
@@ -123,6 +121,7 @@ void verificar_cache(t_proceso* proceso){
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
 			if(validez!=1) //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
+			//verificar pq puede que ese proceso ya exista en esa lista
 			list_add(actual_administrator->suscriptores_enviados,proceso);
 		}
 	}

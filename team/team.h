@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <semaphore.h>
 #include <commons/config.h>
 #include <commons/string.h>
 #include "../utils/listas.h"
@@ -87,6 +88,7 @@ typedef struct{
 	t_dictionary* pokemones_capturados;
 	estado_tcb estado_tcb;
 	t_pokemon* pokemon_a_capturar;
+	sem_t* semaforo;
 }t_tcb_entrenador;
 
 
