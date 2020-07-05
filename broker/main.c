@@ -16,6 +16,16 @@ void inicalizar_lista_de_todos_las_colas() {
 		inicializar_listas(j);
 }
 
+void guardar_pid(){
+	FILE* file;
+
+	file = fopen("pid.txt", "w");
+
+	fprintf(file, "%d", getpid());
+
+	fclose(file);
+}
+
 int main(int argc, char ** argv) {
 
 	if (argc == 2) {
@@ -32,7 +42,8 @@ int main(int argc, char ** argv) {
 		char*puerto=broker_config->puerto_broker;
 		int socket_servidor = iniciar_servidor(ip, puerto);
 
-
+		guardar_pid();
+		signal(SIGUSR1, dump_cache);
 
 		pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 		pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);

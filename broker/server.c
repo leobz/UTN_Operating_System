@@ -16,7 +16,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 
-
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
 
