@@ -1,58 +1,70 @@
 #include "directorios.h"
 
-typedef struct Metadata{
-	int block_size;
-	int blocks;
-	char* magic_number;
-}Metadata;
-
 //Inicializar directorios-> t config
-void inicializar_directorios(t_gamecard_config* gamecard_config){
+void inicializar_directorios(){
 
-	char* creacion_path_directorio = string_new();
 	//Creo Metadata
-	string_append(&creacion_path_directorio,gamecard_config->punto_montaje_tallgrass);
-	string_append(&creacion_path_directorio,"/Metadata");
-	mkdir(creacion_path_directorio,0777);
-	creacion_path_directorio=NULL;
+	path_directorio_metadata = string_new();
+	string_append(&path_directorio_metadata,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_metadata,"/Metadata");
+	mkdir(path_directorio_metadata,0777);
 
 	//Creo Files
-	creacion_path_directorio = string_new();
-	string_append(&creacion_path_directorio,gamecard_config->punto_montaje_tallgrass);
-	string_append(&creacion_path_directorio,"/Files");
-	mkdir(creacion_path_directorio,0777);
-	creacion_path_directorio=NULL;
+	path_directorio_files = string_new();
+	string_append(&path_directorio_files,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_files,"/Files");
+	mkdir(path_directorio_files,0777);
 
 	//Creo Blocks
-	creacion_path_directorio = string_new();
-	string_append(&creacion_path_directorio,gamecard_config->punto_montaje_tallgrass);
-	string_append(&creacion_path_directorio,"/Blocks");
-	mkdir(creacion_path_directorio,0777);
-	creacion_path_directorio=NULL;
-	free(creacion_path_directorio);
+	path_directorio_blocks = string_new();
+	string_append(&path_directorio_blocks,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_blocks,"/Blocks");
+	mkdir(path_directorio_blocks,0777);
+
+	t_metadata* metadata = malloc(sizeof(t_metadata));
+	metadata->block_size = 64;
+	metadata->blocks = 5192;
+	metadata->magic_number = "TALL_GRASS";
+	t_metadata* metadata_aux = malloc(sizeof(t_metadata));
 
 	//Creo archivo Bitmap.bin
-	FILE *bitmap;
-	bitmap=fopen("/home/utnso/tall-grass/Metadata/Bitmap.bin","wb");
-	fclose(bitmap);
+	FILE* bitmap_file;
+	char* path_bitmap = string_new();
+	string_append(&path_bitmap, path_directorio_metadata);
+	string_append(&path_bitmap, "/Bitmap.bin");
+	bitmap_file = fopen(path_bitmap, "wb");
+	free(path_bitmap);
+	fclose(bitmap_file);
 
 	//Creo archivo Metadata.bin
+	FILE* metadata_file;
+	char* path_metadata = string_new();
+	string_append(&path_metadata, path_directorio_metadata);
+	string_append(&path_metadata, "/Metadata.bin");
+	metadata_file = fopen(path_metadata, "wb");
 
-	Metadata *metadata=malloc(sizeof(Metadata));
-	metadata->block_size=64;
-	metadata->blocks=5192;
-	metadata->magic_number="TALL_GRASS";
+	char* metada_chars = string_new();
+	string_append(&metada_chars, "BLOCK_SIZE=");
+	string_append_with_format(&metada_chars, "%d\n", metadata->block_size);
+	string_append(&metada_chars, "BLOCKS=");
+	string_append_with_format(&metada_chars, "%d\n", metadata->blocks);
+	string_append(&metada_chars, "MAGIC_NUMBER=");
+	string_append_with_format(&metada_chars, "%s\n", metadata->magic_number);
+	fputs(metada_chars, metadata_file);
 
-	FILE *file=fopen("/home/utnso/tall-grass/Metadata/Metadata","wb");
-	if(file!=NULL){
-		fwrite(metadata,sizeof(Metadata),1,file);
-		fclose(file);
-	}
-	FILE *file2=fopen("/home/utnso/tall-grass/Metadata/Metadata","rb");
-	if(file2!=NULL){
-		fread(metadata,sizeof(Metadata),1,file);
-		fclose(file);
-	}
-	printf("%d %d %s",metadata->block_size,metadata->blocks,metadata->magic_number);
+	free(metada_chars);
+	free(metada_chars);
+	free(metadata);
+	free(metadata_aux);
+	free(path_metadata);
+	fclose(metadata_file);
 
+	liberar_paths();
+
+}
+
+void liberar_paths(){
+	free(path_directorio_metadata);
+	free(path_directorio_files);
+	free(path_directorio_blocks);
 }

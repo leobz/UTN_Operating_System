@@ -10,7 +10,20 @@ typedef struct{
 	t_list* blocks;
 	char* magic_number;
 }t_file_metadata;
-void inicializar_directorios(t_gamecard_config* gamecard_config);
+
+typedef struct{
+	int block_size;
+	int blocks;
+	char* magic_number;
+}t_metadata;
+
+//Variables
+char* path_directorio_metadata;
+char* path_directorio_files;
+char* path_directorio_blocks;
+
+//Funciones
+void inicializar_directorios();
 int size_metadata_blocks(t_list* lista);
 
 #endif  //DIRECTORIOS_H_

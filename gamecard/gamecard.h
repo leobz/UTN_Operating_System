@@ -26,6 +26,7 @@ typedef struct {
 	char* puerto_broker;
 	char* ip_gamecard;
 	char* puerto_gamecard;
+	int id_proceso;
 } t_gamecard_config;
 
 // Variables
@@ -35,7 +36,7 @@ pthread_t suscripcion_broker;
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
-void suscribirme_al_broker(t_gamecard_config* gamecard_config);
+void suscribirme_al_broker();
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
 void finalizar_gamecard();

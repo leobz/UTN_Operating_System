@@ -16,6 +16,7 @@ void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *confi
 	gamecard_config->puerto_broker = strdup(config_get_string_value(config, "PUERTO_BROKER"));
 	gamecard_config->ip_gamecard = strdup(config_get_string_value(config, "IP_GAMECARD"));
 	gamecard_config->puerto_gamecard = strdup(config_get_string_value(config, "PUERTO_GAMECARD"));
+	gamecard_config->id_proceso = config_get_int_value(config, "ID_PROCESO");
 }
 
 
@@ -24,7 +25,7 @@ void destruir_gamecard_config(t_gamecard_config* gamecard_config) {
 	free(gamecard_config->ip_broker);
 	free(gamecard_config->puerto_broker);
 	free(gamecard_config->ip_gamecard);
-	free(gamecard_config->puerto_broker);
+	free(gamecard_config->puerto_gamecard);
 	free(gamecard_config);
 }
 
@@ -51,28 +52,3 @@ void finalizar_gamecard() {
 	destruir_logger(logger);
 }
 
-void suscribirme_al_broker(t_gamecard_config* gamecard_config){
-	printf("Suscribiendome al broker...\n");
-
-	int colas_a_suscribir[] = {NEW_POKEMON, GET_POKEMON, CATCH_POKEMON};
-	int id_proceso = 0;
-	int i;
-	for (i=0; i<(&colas_a_suscribir)[1]-colas_a_suscribir; i++){
-		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-		while (conexion == -1) {
-			printf("ERROR: Conexion con [Broker] no establecida\n");
-			sleep(gamecard_config->tiempo_reintento_conexion);
-			conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-		}
-		t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
-		suscripcion->cod_operacion = SUSCRIPCION;
-		suscripcion->cola_a_suscribir = colas_a_suscribir[i];
-		suscripcion->id_proceso = id_proceso;
-
-		void *a_enviar = empaquetar_suscripcion(suscripcion);
-		printf("Enviando mensaje de cola %d...\n", suscripcion->cola_a_suscribir);
-		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
-
-		liberar_conexion(conexion);
-	}
-}

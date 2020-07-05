@@ -2,8 +2,8 @@
 
 int main(){
 	inicializar_gamecard();
-	inicializar_directorios(gamecard_config);
-	pthread_create(&suscripcion_broker, NULL, (void*)suscribirme_al_broker, gamecard_config);
+	inicializar_directorios();
+/*	pthread_create(&suscripcion_broker, NULL, (void*)suscribirme_al_broker, NULL);
 
 	// Creo la conexion para escuchar
 	char* ip = gamecard_config->ip_gamecard;
@@ -14,7 +14,7 @@ int main(){
 		esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 	}
 
-	pthread_detach(suscripcion_broker);
+	pthread_detach(suscripcion_broker);*/
 
 	finalizar_gamecard();
 }
