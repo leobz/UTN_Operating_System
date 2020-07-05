@@ -10,6 +10,10 @@ echo Corro Tests de Team con algoritmo FIFO:
 byexample -l shell team.md
 
 echo
+echo Corro Test Suscripcion de cola APPEARED
+byexample -l shell team-suscripcion-localized.md
+
+echo
 echo Corro Tests de Team con algoritmo RR:
 byexample -l shell team-rr.md
 
