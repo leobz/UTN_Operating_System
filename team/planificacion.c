@@ -319,7 +319,7 @@ void confirmar_caught(t_tcb_entrenador* tcb){
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
-	t_paquete_socket* paquete =  recibir_mensaje_servidor(socket_cliente);
+	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
 
 	int length = snprintf( NULL, 0, "%d", paquete->id_correlativo);
 	char* id_correlativo_char = malloc( length + 1 );
