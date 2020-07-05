@@ -179,20 +179,22 @@ void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 			cantidad);
 }
 
+void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_socket* paquete) {
+	mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+	loggear_appeared_recibido(mensaje_appeared);
+	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
+		agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
+		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+	}
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared;
 
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
-			mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
-			loggear_appeared_recibido(mensaje_appeared);
-
-			if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)){
-				agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
-				pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
-			}
-
+		procesar_mensaje_appeared(mensaje_appeared, paquete);
 			break;
 
 		case CONFIRMACION:

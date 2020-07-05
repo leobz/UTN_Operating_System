@@ -8,45 +8,42 @@ t_suscripcion* crear_t_suscripcion(int id_proceso, int cola) {
 	return suscripcion;
 }
 
-void iniciar_suscripcion_get(int id_proceso, char* ip, char* puerto) {
-	int conexion_get = crear_conexion(ip, puerto);
-	if (conexion_get == -1) {
-		printf("ERROR: Conexion GET con [Broker] no establecida");
+void iniciar_suscripcion_appeared(int id_proceso, char* ip, char* puerto) {
+	int conexion = crear_conexion(ip, puerto);
+	if (conexion == -1) {
+		printf("ERROR: Conexion APPEARED con [Broker] no establecida");
 	}
 	else {
-		pthread_t hilo_get;
-		pthread_create(&hilo_get, NULL, (void*) recibir_mensaje_get, conexion_get);
-		pthread_detach(hilo_get);
+		pthread_t hilo_appeared;
+		pthread_create(&hilo_appeared, NULL, (void*) recibir_mensaje_appeared, conexion);
+		pthread_detach(hilo_appeared);
 
-		t_suscripcion* suscripcion_get = crear_t_suscripcion(id_proceso, GET_POKEMON);
+		t_suscripcion* suscripcion_get = crear_t_suscripcion(id_proceso, APPEARED_POKEMON);
 		void* a_enviar = empaquetar_suscripcion(suscripcion_get);
-		log_info(logger, "%ld Conexion GET establecida con [Broker]",
+		log_info(logger, "%ld Conexion APPEARED establecida con [Broker]",
 				(long) getpid());
-		enviar_mensaje(conexion_get, a_enviar, sizeof(int) * 3);
+		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 	}
 }
 
-void recibir_mensaje_get(int conexion) {
+void recibir_mensaje_appeared(int conexion) {
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_get(paquete);
-	}
-}
+		t_mensaje_appeared* mensaje_appeared;
 
-void procesar_mensaje_get(t_paquete_socket* paquete_socket){
-	if ( paquete_socket->codigo_operacion == GET_POKEMON){
-		mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
-		log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
+		switch(paquete->codigo_operacion) {
+		case APPEARED_POKEMON:
+			procesar_mensaje_appeared(mensaje_appeared, paquete);
+			break;
 
-		free(mensaje_get->pokemon);
-		free(mensaje_get);
+		case CONFIRMACION:
+			log_info(logger,"Confirmacion %d",paquete->id_mensaje);
+			break;
+
+		default:
+			pthread_exit(NULL);
+			break;
+		}
 	}
-	else if ( paquete_socket->codigo_operacion == CONFIRMACION) {
-		log_info(logger,"Confirmacion %d",paquete_socket->id_mensaje);
-	}
-	else {
-		printf("\nERROR, Servidor GET recibio codigo de operacion : %s \n", paquete_socket->codigo_operacion);
-	}
-	liberar_paquete_socket(paquete_socket);
 }

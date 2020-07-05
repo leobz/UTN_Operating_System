@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
 
 		iniciar_planificador();
 
-		iniciar_suscripcion_get(id_proceso, ip, puerto);
+		iniciar_suscripcion_appeared(id_proceso, ip, puerto);
 
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);

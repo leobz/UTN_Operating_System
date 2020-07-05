@@ -16,5 +16,5 @@ t_mensaje_appeared* mensaje_appeared;
 t_mensaje_localized* mensaje_localized;
 t_mensaje_caught* mensaje_caught;
 
-void recibir_mensaje_get(int conexion);
+void recibir_mensaje_appeared(int conexion);
 #endif /* TEAM_SUSCRIPCION_H_ */
