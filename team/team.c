@@ -182,10 +182,26 @@ void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_socket* paquete) {
 	mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
 	loggear_appeared_recibido(mensaje_appeared);
+
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
 		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
 	}
+}
+
+void procesar_mensaje_caught(t_paquete_socket* paquete) {
+	t_mensaje_caught* mensaje_caught  = deserializar_mensaje_caught_pokemon(paquete->buffer);
+
+	//TODO: Si id correlativo esta en diccionario "enviaron_catch"
+	if (mensaje_caught->id_correlativo) {
+		// loggear recepcion y resultado
+		// si se confirma => asignar pokemon => pasar a cola correspondiente
+		// si no se asigna => pasar a cola correspondiente
+	}
+
+	// TODO: Fijarse si se tiene que loggear cualquier caught, sea de id correlativo correcto o no
+
+
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
@@ -194,12 +210,16 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
-		procesar_mensaje_appeared(mensaje_appeared, paquete);
+			procesar_mensaje_appeared(mensaje_appeared, paquete);
 			break;
 
 		case CONFIRMACION:
-				log_info(logger,"Confirmacion %d",paquete->id_mensaje);
-				break;
+			log_info(logger,"Confirmacion %d",paquete->id_mensaje);
+			break;
+
+		case CAUGHT_POKEMON:
+			procesar_mensaje_caught(paquete);
+			break;
 
 		default:
 			pthread_exit(NULL);

@@ -34,13 +34,13 @@ void recibir_mensaje_appeared(int conexion) {
 
 		switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
+			// TODO: Generar mensaje_appeared
 			procesar_mensaje_appeared(mensaje_appeared, paquete);
 			break;
 
 		case CONFIRMACION:
 			log_info(logger,"Confirmacion %d",paquete->id_mensaje);
 			break;
-
 		default:
 			pthread_exit(NULL);
 			break;
