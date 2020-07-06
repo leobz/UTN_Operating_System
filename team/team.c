@@ -91,6 +91,8 @@ void cargar_objetivo_global(t_team_config* team_config) {
 			team_config->objetivos_entrenadores);
 }
 
+
+
 // CARGA DE TCBs
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
@@ -256,12 +258,6 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 
 	cargar_tcb_captura(entrenador_cercano, pokemon);
 
-	pasar_a_ready(entrenador_cercano);
+	pasar_a_ready(entrenador_cercano, "CAPTURA");
 	list_remove_element(new, entrenador_cercano);
-
-	log_info(
-			logger, "[CAMBIO ENTRENADOR] (NEW -> READY) MOTIVO:CAPTURA ID_ENTRENADOR:%d POSICION:(%d,%d)",
-			entrenador_cercano->tid,
-			entrenador_cercano->posicion->x,
-			entrenador_cercano->posicion->y);
 }

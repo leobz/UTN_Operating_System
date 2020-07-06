@@ -39,9 +39,7 @@ void mostrar_lista_entrenadores(t_team_config* team_config) {
 
 		printf("  Capturados:\n");
 		imprimir_diccionario(entrenador->pokemones_capturados);
-
 	}
-
 }
 
 void correrTests() {
