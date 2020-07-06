@@ -4,6 +4,7 @@
 
 void inicializar_memoria_cache() {
 	memoria_cache = malloc(broker_config->tamanio_memoria);
+	id_particion = 0;
 	contador_uso = 0;
 	orden_creacion = 0;
 
@@ -31,6 +32,9 @@ void inicializar_lista_particiones() {
 void inicializar_particion_bs() {
 	particion_bs = malloc(sizeof(t_particion_bs));
 
+	id_particion++;
+
+	particion_bs->id = id_particion;
 	particion_bs->offset = 0;
 	particion_bs->tamanio_particion = obtener_tamanio_memoria_cache_bs();
 	particion_bs->esta_libre = true;
@@ -78,6 +82,43 @@ void guardar_en_cache(void* payload, int offset, int size){
 	memcpy(memoria_cache + offset, payload, size);
 }
 
+void dump_cache(int senial){
+	switch(senial){
+		case SIGUSR1:
+			if (es_buddy_system())
+				generar_archivo_dump_bs();
+			else if (es_particion_dinamica())
+				generar_archivo_dump_particion_dinamica();
+			break;
+		default:
+			break;
+	}
+}
+
+char* obtener_fecha_actual(){
+	time_t t;
+	struct tm* local_time;
+	char* fecha = malloc(sizeof(20));
+
+	t = time(NULL);
+	local_time = localtime(&t);
+	strftime(fecha, 20, "%d/%m/%Y", local_time);
+
+	return fecha;
+}
+
+char* obtener_hora_actual(){
+	time_t t;
+	struct tm* local_time;
+	char* hora = malloc(sizeof(20));
+
+	t = time(NULL);
+	local_time = localtime(&t);
+	strftime(hora, 20, "%H:%M:%S", local_time);
+
+	return hora;
+}
+
 // ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
 
 t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje, t_adm_mensaje* adm_mensaje) {
@@ -98,7 +139,6 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje, t_adm_mensa
 			sin_hojas_libres = false;
 		}
 	}
-
 	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
 	particion_elegida = dividir_particion_elegida (list_first(hojas_libres), tamanio_particion_necesaria);
 	cargar_particion_elegida(particion_elegida, payload_size, adm_mensaje);
@@ -160,8 +200,10 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
 		t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
 
+		id_particion++;
 		orden_creacion++;
 
+		primer_hijo->id = id_particion;
 		primer_hijo->esta_libre = true;
 		primer_hijo->offset = hoja_libre->offset;
 		primer_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
@@ -173,10 +215,12 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		primer_hijo->primer_hijo = NULL;
 		primer_hijo->segundo_hijo = NULL;
 
+		id_particion++;
 		orden_creacion++;
 
+		segundo_hijo->id = id_particion;
 		segundo_hijo->esta_libre = true;
-		segundo_hijo->offset = hoja_libre->tamanio_particion / 2;
+		segundo_hijo->offset = hoja_libre->offset + hoja_libre->tamanio_particion / 2;
 		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->size_mensaje = 0;
 		segundo_hijo->contador_uso = 0;
@@ -263,6 +307,9 @@ void liberar_particion_victima(t_particion_bs* particion_victima){
 
 	eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
 
+	orden_creacion++;
+
+	particion_victima->orden_creacion = orden_creacion;
 	particion_victima->esta_libre = true;
 	particion_victima->size_mensaje = 0;
 	particion_victima->adm_mensaje = NULL;
@@ -291,6 +338,73 @@ void consolidar_particiones_companieros(t_particion_bs* particion_victima){
 			consolidar_particiones_companieros(particion_padre);
 		}
 	}
+}
+
+void generar_archivo_dump_bs(){
+	FILE* archivo_dump;
+	char* fecha_actual = obtener_fecha_actual();
+	char* hora_actual = obtener_hora_actual();
+
+	archivo_dump = fopen("dump_cache.txt", "a+");
+
+	if (archivo_dump != NULL){
+		t_list* hojas_particion_bs = list_create();
+
+		fputs("---------------------------------------------------------------------------------------------------------------------------------------\n", archivo_dump);
+		fprintf(archivo_dump, "Dump:\t\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t\t%s\n", fecha_actual, hora_actual);
+
+		obtener_hojas_bs(hojas_particion_bs, particion_bs);
+		agregar_contenido_bs_archivo_dump(archivo_dump, hojas_particion_bs);
+
+		fputs("---------------------------------------------------------------------------------------------------------------------------------------\n", archivo_dump);
+	}
+
+	free(hora_actual);
+	free(fecha_actual);
+
+	fclose(archivo_dump);
+}
+
+void obtener_hojas_bs(t_list* hojas_particion_bs, t_particion_bs* particion){
+	if (particion->primer_hijo != NULL || particion->segundo_hijo != NULL) {
+
+		if (particion->primer_hijo != NULL)
+			obtener_hojas_bs(hojas_particion_bs, particion->primer_hijo);
+
+		if (particion->segundo_hijo != NULL)
+			obtener_hojas_bs(hojas_particion_bs, particion->segundo_hijo);
+	}
+	else {
+		list_add(hojas_particion_bs, particion);
+	}
+}
+
+void agregar_contenido_bs_archivo_dump(FILE* archivo_dump, t_list* hojas_particion_bs){
+	int i = 1;
+
+	char obtener_caracter_libre(t_particion_bs* particion){
+		if (particion->esta_libre)
+			return 'L';
+		else
+			return 'X';
+	}
+
+	void escribir_archivo_dump(t_particion_bs* particion){
+
+		if (particion->esta_libre)
+			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\n",
+						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+						particion->tamanio_particion);
+		else
+			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\t\tLRU:%d\t\tCola:%d\t\tID:%d\n",
+						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+						particion->tamanio_particion, particion->contador_uso, particion->adm_mensaje->codigo_operacion,
+						particion->id);
+
+		i++;
+	}
+
+	list_iterate(hojas_particion_bs, (void*) escribir_archivo_dump);
 }
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
@@ -447,6 +561,70 @@ t_particion_dinamica* crear_particion_dinamica_libre(int offset, int tamanio){
 	particion->esta_libre = true;
 
 	return particion;
+}
+
+void generar_archivo_dump_particion_dinamica() {
+	FILE* archivo_dump;
+	char* fecha_actual = obtener_fecha_actual();
+	char* hora_actual = obtener_hora_actual();
+
+	archivo_dump = fopen("dump_cache.txt", "a+");
+
+	if (archivo_dump != NULL){
+		t_list* hojas_particion_bs = list_create();
+
+		fputs("---------------------------------------------------------------------------------------------------------------------------------------\n", archivo_dump);
+		fprintf(archivo_dump, "Dump:\t\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t\t%s\n", fecha_actual, hora_actual);
+
+		agregar_contenido_particion_dinamica_archivo_dump(archivo_dump);
+
+		fputs("---------------------------------------------------------------------------------------------------------------------------------------\n", archivo_dump);
+	}
+
+	free(hora_actual);
+	free(fecha_actual);
+
+	fclose(archivo_dump);
+}
+
+void agregar_contenido_particion_dinamica_archivo_dump(FILE* archivo_dump){
+	int i = 1;
+
+	char obtener_caracter_libre(t_particion_dinamica* particion){
+		if (particion->esta_libre)
+			return 'L';
+		else
+			return 'X';
+	}
+
+	void escribir_archivo_dump(t_particion_dinamica* particion){
+
+		if (particion->esta_libre)
+			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\n",
+						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+						particion->tamanio_particion);
+		else
+			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\n",
+									i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+									particion->tamanio_particion);
+//			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\t\tLRU:%d\t\tCola:%d\t\tID:%d\n",
+//						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+//						particion->tamanio_particion, particion->contador_uso, particion->adm_mensaje->codigo_operacion,
+//						particion->id);
+
+		/*
+		 * TODO: Agregar los siguientes campos en el struct 't_particion_dinamica'
+		 * - contador_uso (o similar): usado en algoritmo LRU
+		 * - adm_mensaje
+		 * - id: correspondiente a la particion
+		 *
+		 * Una vez agregados, eliminar el codigo del 'else' y usar el codigo comentado
+		*/
+
+		i++;
+	}
+
+	list_iterate(particiones_dinamicas, (void*) escribir_archivo_dump);
 }
 
 // ********************************** FINALIZACION MEMORIA CACHE ********************************** //
