@@ -86,9 +86,14 @@ void destruir_team_config(t_team_config *team_config) {
 
 // OBJETIVO GLOBAL
 
-void cargar_objetivo_global(t_team_config* team_config) {
+void inicializar_objetivo_global(t_team_config* team_config) {
 	objetivo_global = sum_dictionaries_values(
 			team_config->objetivos_entrenadores);
+}
+
+void inicializar_pokemones_atrapados(t_team_config* team_config) {
+	pokemones_atrapados = sum_dictionaries_values(
+			team_config->pokemon_entrenadores);
 }
 
 
@@ -132,21 +137,21 @@ void destruir_objetivo_global() {
 	dictionary_destroy(objetivo_global);
 }
 
-void crear_pokemon_requeridos() {
-	pokemon_requeridos = dictionary_create();
+void inicializar_pokemones_en_mapa() {
+	pokemones_en_mapa = dictionary_create();
 }
 
-void agregar_pokemon_a_pokemon_requeridos(char* pokemon,
+void agregar_pokemon_a_mapa(char* pokemon,
 		t_list* lista_posiciones) {
-	dictionary_put(pokemon_requeridos, pokemon, lista_posiciones);
+	dictionary_put(pokemones_en_mapa, pokemon, lista_posiciones);
 }
 
-bool existe_pokemon_en_pokemon_requeridos(char* pokemon) {
-	return dictionary_has_key(pokemon_requeridos, pokemon);
+bool existe_pokemon_en_mapa(char* pokemon) {
+	return dictionary_has_key(pokemones_en_mapa, pokemon);
 }
 
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char* pokemon) {
-	return dictionary_get(pokemon_requeridos, pokemon);
+	return dictionary_get(pokemones_en_mapa, pokemon);
 }
 
 void destruir_posicion(t_posicion* posicion) {
@@ -166,7 +171,7 @@ void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
 }
 
 void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
-	t_list* de_la_especie_en_mapa = dictionary_get(pokemon_requeridos,
+	t_list* de_la_especie_en_mapa = dictionary_get(pokemones_en_mapa,
 			mensaje->pokemon);
 
 	int cantidad = list_size(de_la_especie_en_mapa);
@@ -194,29 +199,29 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 	t_mensaje_caught* mensaje_caught  = deserializar_mensaje_caught_pokemon(paquete->buffer);
 
 	char* id_correlativo = pasar_a_char(mensaje_caught->id_correlativo);
-
-	if (dictionary_has_key(enviaron_catch, id_correlativo)) {
-		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d resultado:%d",
-					mensaje_caught->id_correlativo,
-					mensaje_caught->resultado);
-
-		t_tcb_entrenador* entrenador = dictionary_get(enviaron_catch, id_correlativo);
-
-		switch (mensaje_caught->resultado){
-		case 0:
-			pasar_a_unblocked(entrenador);
-			objetivo_global;
-			entrenador->pokemon_a_capturar = NULL;
-			break;
-		case 1:
-			break;
-		}
-		// si se confirma => asignar pokemon => pasar a cola correspondiente
-		// si no se asigna => pasar a cola correspondiente
-	}
-	else{
-		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d ignorado", mensaje_caught->id_correlativo);
-	}
+//
+//	if (dictionary_has_key(enviaron_catch, id_correlativo)) {
+//		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d resultado:%d",
+//					mensaje_caught->id_correlativo,
+//					mensaje_caught->resultado);
+//
+//		t_tcb_entrenador* entrenador = dictionary_get(enviaron_catch, id_correlativo);
+//
+//		switch (mensaje_caught->resultado){
+//		case 0:
+//			pasar_a_unblocked(entrenador);
+//			objetivo_global;
+//			entrenador->pokemon_a_capturar = NULL;
+//			break;
+//		case 1:
+//			break;
+//		}
+//		// si se confirma => asignar pokemon => pasar a cola correspondiente
+//		// si no se asigna => pasar a cola correspondiente
+//	}
+//	else{
+//		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d ignorado", mensaje_caught->id_correlativo);
+//	}
 	// TODO: Fijarse si se tiene que loggear cualquier caught, sea de id correlativo correcto o no
 	free(id_correlativo);
 
@@ -248,7 +253,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
 	t_list* lista_posiciones;
 
-	if (existe_pokemon_en_pokemon_requeridos(mensaje->pokemon))
+	if (existe_pokemon_en_mapa(mensaje->pokemon))
 		lista_posiciones = obtener_lista_posiciones_by_pokemon_requerido(
 				mensaje->pokemon);
 	else
@@ -261,7 +266,7 @@ void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) 
 
 	list_add(lista_posiciones, posicion);
 
-	agregar_pokemon_a_pokemon_requeridos(mensaje->pokemon, lista_posiciones);
+	agregar_pokemon_a_mapa(mensaje->pokemon, lista_posiciones);
 	imprimir_pokemon_agregado(mensaje);
 }
 

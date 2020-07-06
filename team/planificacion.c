@@ -15,7 +15,12 @@ void inicializar_listas() {
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 }
 
-void inicializar_diccionarios() {
+void inicializar_diccionarios(t_team_config* team_config) {
+	inicializar_objetivo_global(team_config);
+	inicializar_pokemones_atrapados(team_config);
+	inicializar_pokemones_en_mapa();
+	pokemones_planificados = dictionary_create();
+
 	enviaron_catch = dictionary_create();
 }
 

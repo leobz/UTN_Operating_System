@@ -12,18 +12,14 @@ int main(int argc, char ** argv) {
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
 
-
 	char* puerto = team_config->puerto_broker;
 	char* ip = team_config->ip_broker;
 
 	char* puerto_gameboy = "4444";
 
 	inicializar_listas();
-	inicializar_diccionarios();
-	cargar_objetivo_global(team_config);
-
+	inicializar_diccionarios(team_config);
 	crear_tcb_entrenadores(team_config);
-	crear_pokemon_requeridos();
 
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
