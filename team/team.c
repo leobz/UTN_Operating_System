@@ -183,6 +183,7 @@ void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_s
 	mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
 	loggear_appeared_recibido(mensaje_appeared);
 
+
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
 		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
@@ -192,15 +193,32 @@ void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_s
 void procesar_mensaje_caught(t_paquete_socket* paquete) {
 	t_mensaje_caught* mensaje_caught  = deserializar_mensaje_caught_pokemon(paquete->buffer);
 
-	//TODO: Si id correlativo esta en diccionario "enviaron_catch"
-	if (mensaje_caught->id_correlativo) {
-		// loggear recepcion y resultado
+	char* id_correlativo = pasar_a_char(mensaje_caught->id_correlativo);
+
+	if (dictionary_has_key(enviaron_catch, id_correlativo)) {
+		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d resultado:%d",
+					mensaje_caught->id_correlativo,
+					mensaje_caught->resultado);
+
+		t_tcb_entrenador* entrenador = dictionary_get(enviaron_catch, id_correlativo);
+
+		switch (mensaje_caught->resultado){
+		case 0:
+			pasar_a_unblocked(entrenador);
+			objetivo_global;
+			entrenador->pokemon_a_capturar = NULL;
+			break;
+		case 1:
+			break;
+		}
 		// si se confirma => asignar pokemon => pasar a cola correspondiente
 		// si no se asigna => pasar a cola correspondiente
 	}
-
+	else{
+		log_info(logger, "[MSG_RECIBIDO] CAUGHT_POKEMON: id_correlativo:%d ignorado", mensaje_caught->id_correlativo);
+	}
 	// TODO: Fijarse si se tiene que loggear cualquier caught, sea de id correlativo correcto o no
-
+	free(id_correlativo);
 
 }
 
