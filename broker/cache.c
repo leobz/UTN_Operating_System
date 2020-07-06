@@ -444,26 +444,20 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	int tamanio_intermedio;
 	int offset_intermedio;
 
-
 	siguiente_particion = particion_ocupada->siguiente_particion;
-	particion_intermedia=NULL;
 
 	if (siguiente_particion != NULL) {
 		tamanio_intermedio = calcular_tamanio_particion_intermedia(particion_ocupada, siguiente_particion);
 	}
 
 	else{
-		tamanio_intermedio = broker_config->tamanio_memoria - (particion_ocupada->offset + particion_ocupada->tamanio_particion);
+		tamanio_intermedio = broker_config->tamanio_memoria - particion_ocupada->tamanio_particion;
 	}
 
 	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
-	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
-	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
-		particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
-		list_add(particiones_dinamicas, particion_intermedia);}
-
-	particion_ocupada->siguiente_particion=particion_intermedia;
+	particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
+	list_add(particiones_dinamicas, particion_intermedia);
 }
 
 int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_particion_dinamica* sig_particion) {
@@ -512,32 +506,9 @@ int supero_limite_de_eliminaciones(int particiones_eliminadas) {
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 	// TODO
 }
-void compactar_particiones_dinamicas(){
 
-	int hueco_particiones=0;
-	int tamanio_particion_final=0;
-
-	list_sort(particiones_dinamicas, (void*)pd_es_menor_offset);
-
-	void compactar(t_particion_dinamica* particion_din){
-		reubicar_particion(particion_din,hueco_particiones);
-		particion_din->offset=hueco_particiones;
-		hueco_particiones=particion_din->offset + particion_din->tamanio_particion; //para la proxima particion a compactar
-		tamanio_particion_final=particion_din->tamanio_particion; //me quedo con el tamanio de la ultima particion
-	}
-
-	list_iterate(particiones_dinamicas,&compactar);
-
-	int offset_libre=hueco_particiones+tamanio_particion_final; // ubico el offset al final
-	int tamanio_restante=broker_config->tamanio_memoria-offset_libre; //de la ultima particion
-
-	if(tamanio_restante>=broker_config->tamanio_minimo_particion){
-			t_particion_dinamica*particion_final = crear_particion_dinamica_libre(offset_libre, tamanio_restante);
-			list_add(particiones_dinamicas, particion_final);}
-}
-
-void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones){
-	memmove(memoria_cache+hueco_particiones,memoria_cache+particion_din->offset,particion_din->tamanio_particion);
+void compactar_particiones_dinamicas() {
+	// TODO
 }
 
 t_list* filtrar_particiones_por_tamanio(t_list* particiones, int tamanio_payload) {
