@@ -5,8 +5,13 @@ t_log* logger;
 t_team_config* team_config;
 
 int main(int argc, char ** argv) {
+
+	//TODO: Tomar id proceso por archivo de configuracion
+	int id_proceso = 999;
+
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
+
 
 	char* puerto = team_config->puerto_broker;
 	char* ip = team_config->ip_broker;
@@ -29,6 +34,9 @@ int main(int argc, char ** argv) {
 		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
 
 		iniciar_planificador();
+
+		iniciar_suscripcion_appeared(id_proceso, ip, puerto);
+
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 
