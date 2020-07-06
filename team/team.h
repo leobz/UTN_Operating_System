@@ -117,7 +117,7 @@ void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
-void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
+void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 
 

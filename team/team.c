@@ -184,14 +184,37 @@ void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 			cantidad);
 }
 
+bool planificacion_del_pokemon_esta_cubierta(char* pokemon) {
+	int cantidad_de_especie_en_planificados = dictionary_get(pokemones_atrapados, pokemon);
+	int cantidad_de_especie_en__atrapados = dictionary_get(pokemones_planificados, pokemon);
+
+	int cantidad_de_especie_planificada_y_atrapada =
+			cantidad_de_especie_en_planificados + cantidad_de_especie_en__atrapados;
+
+	int cantidad_de_especie_en_objetivo_global =
+			dictionary_get(objetivo_global, pokemon);
+
+	return cantidad_de_especie_planificada_y_atrapada >= cantidad_de_especie_en_objetivo_global;
+}
+
+bool planificacion_del_pokemon_no_esta_cubierta(char* pokemon) {
+	return !planificacion_del_pokemon_esta_cubierta(pokemon);
+}
+
+void pasar_a_ready_si_corresponde(t_mensaje_appeared* mensaje_appeared) {
+	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon))
+		dictionary_increment_value(pokemones_planificados, mensaje_appeared->pokemon);
+		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+
+}
+
 void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_socket* paquete) {
 	mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
 	loggear_appeared_recibido(mensaje_appeared);
 
-
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
-		agregar_pokemon_requerido_by_mensaje_appeared(mensaje_appeared);
-		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
+		pasar_a_ready_si_corresponde(mensaje_appeared);
 	}
 }
 
@@ -250,7 +273,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	}
 }
 
-void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
+void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
 	t_list* lista_posiciones;
 
 	if (existe_pokemon_en_mapa(mensaje->pokemon))

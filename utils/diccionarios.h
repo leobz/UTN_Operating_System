@@ -69,8 +69,8 @@ int sum_dictionary_values(t_dictionary* );
 * {"A":2} {"A":2} -> 1
 * {"A":2} {"A":0} -> 0
 */
-
 int dictionaries_are_equals(t_dictionary*, t_dictionary*);
+
 void meter_en_diccionario(t_dictionary* dictionary,int key,void*value);
 void*obtener_de_diccionario(t_dictionary*dictionary, int key);
 bool esta_en_diccionario(t_dictionary* dictionary,int key);
