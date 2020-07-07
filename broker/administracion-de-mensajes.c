@@ -52,7 +52,7 @@ void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaj
 	}
 }
 
-
+/*
 void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* adm_mensaje){
 	int id_mensaje = adm_mensaje->id_mensaje;
 	int cod_op = adm_mensaje->codigo_operacion;
@@ -74,8 +74,41 @@ void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* adm_mensaje){
 	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(cod_op));
 
 	bool tiene_mismo_id_mensaje(t_adm_mensaje* elem_adm_mensaje){
-		return elem_adm_mensaje->id_mensaje == adm_mensaje->id_mensaje;
+		return elem_adm_mensaje->id_mensaje == id_mensaje;
 	}
 
 	list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
+
+	list_remove_by_condition(administradores[cod_op], (void*)tiene_mismo_id_mensaje);
+}
+*/
+
+void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaje){
+
+	int id_mensajee = admins_mensaje->id_mensaje;
+
+	op_code cod_ope = admins_mensaje->codigo_operacion;
+
+	dictionary_remove(administracion_por_id, pasar_a_char(id_mensajee));
+
+
+	//Elimino adm_mensaje de la lista asociada al diccionario 'administracion_por_cod'
+	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(cod_ope));
+
+
+	bool tiene_mismo_id_mensaje(t_adm_mensaje* elem_adm_mensaje){
+		return elem_adm_mensaje->id_mensaje == id_mensajee;
+	}
+
+	t_adm_mensaje* men=list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
+
+	printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
+
+	list_clean(admins_mensaje->suscriptores_enviados);
+	list_clean(admins_mensaje->suscriptores_confirmados);
+
+
+	free(admins_mensaje->suscriptores_enviados);
+	free(admins_mensaje->suscriptores_confirmados);
+	free(admins_mensaje);
 }

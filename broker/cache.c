@@ -75,14 +75,24 @@ int es_particion_dinamica() {
 }
 
 int es_fifo(){
-	return strcmp(broker_config->algoritmo_reemplazo, "FIFO") == 0;}
+	return strcmp(broker_config->algoritmo_reemplazo, "FIFO") == 0;
+}
 
 int es_lru(){
-	return strcmp(broker_config->algoritmo_reemplazo, "LRU") == 0;}
+	return strcmp(broker_config->algoritmo_reemplazo, "LRU") == 0;
+}
+
+int es_first_fit(){
+	return strcmp(broker_config->algoritmo_particion_libre, "FF") == 0;
+}
+
+int es_best_fit(){
+	return strcmp(broker_config->algoritmo_particion_libre, "BF") == 0;
+}
 
 
 void guardar_en_cache(void* payload, int offset, int size){
-	memcpy(memoria_cache + offset, payload, size);
+	memmove(memoria_cache + offset, payload, size);
 }
 
 // ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
@@ -323,8 +333,9 @@ void* leer_particion_dinamica(t_particion_dinamica* particion){
 }
 
 t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void *payload, int tamanio, t_adm_mensaje *admin){
+	//printf("entro a buscar libre\n");
 	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
-
+	//printf("pude entrar a buscar libre\n");
 	particion_destino->esta_libre = false;
 	particion_destino->tamanio_particion = tamanio;
 	particion_destino->contador_uso=++contador_uso;
@@ -362,7 +373,7 @@ t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
 
 	return list_first(particiones_posibles);
 }
-
+/*
 t_list* obtener_particiones_posibles(int tamanio) {
 	int particiones_eliminadas = 0;
 	t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
@@ -389,7 +400,44 @@ t_list* filtar_particiones_libres_y_suficientes(int tamanio) {
 	free(particiones_libres);
 	return particiones_posibles;
 }
+*/
+t_list* obtener_particiones_posibles(int tamanio) {
+	int particiones_eliminadas = 0;
 
+	t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
+
+	while (particiones_posibles==NULL) {
+		if (supero_limite_de_eliminaciones(particiones_eliminadas)) {
+			compactar_particiones_dinamicas();
+			particiones_eliminadas = 0;
+		}
+		//printf("Sep");
+		particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
+		//printf("Particiones posibles %d",list_size(particiones_posibles));
+
+		if (particiones_posibles==NULL) {
+			eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
+			particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
+			particiones_eliminadas++;
+		}
+	}
+	return particiones_posibles;
+}
+t_list* filtar_particiones_libres_y_suficientes(int tamanio) {
+	t_list* particiones_libres = obtener_particiones_dinamicas_libres();
+	if(list_is_empty(particiones_libres)){
+		free(particiones_libres);
+		return NULL;}
+
+	t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
+
+	if(list_is_empty(particiones_posibles)){
+		free(particiones_posibles);
+		return NULL;}
+
+	free(particiones_libres);
+	return particiones_posibles;
+}
 
 void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	t_particion_dinamica* particion_intermedia;
@@ -411,6 +459,9 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 
 	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
+	printf("Offset restante %d\n",offset_intermedio);
+	printf("Tamanio restante %d\n",tamanio_intermedio);
+
 	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
 	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
 		particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
@@ -418,6 +469,8 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 		particion_ocupada->siguiente_particion=particion_intermedia;
 		list_add(particiones_dinamicas, particion_intermedia);
 	}
+	else
+		printf("No hay mas espacio");
 
 }
 
@@ -430,21 +483,39 @@ bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinam
 }
 
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
-	list_sort(particiones_dinamicas, (void*)pd_es_menor_contador_uso);
-		t_particion_dinamica* particion_victima= list_first(particiones_dinamicas);
+
+	int particion_esta_libre(t_particion_dinamica* particion){
+			return !particion->esta_libre;
+		}
+
+	t_list* particiones_ocupadas=list_filter(particiones_dinamicas, (void*) particion_esta_libre);
+	list_sort(particiones_ocupadas, (void*)pd_es_menor_contador_uso);
+	t_particion_dinamica* particion_victima= list_first(particiones_ocupadas);
 
 		liberar_particion_dinamica(particion_victima);
-	}
 
-	void liberar_particion_dinamica(t_particion_dinamica* particion_victima){
+}
+
+void liberar_particion_dinamica(t_particion_dinamica* particion_victima){
 		t_adm_mensaje* adm_mensaje = particion_victima->adm_mensaje;
 
 		eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
+
+
 		particion_victima->esta_libre = true;
 		particion_victima->adm_mensaje = NULL;
+
+		/*if(particion_victima->siguiente_particion->esta_libre){
+			particion_intermedia = crear_particion_dinamica_libre(offset_intermedio, tamanio_intermedio);
+
+		}*/
+		t_list* libres=obtener_particiones_dinamicas_libres();
+		printf("Particiones libres %d\n",list_size(libres));
+
 }
 void compactar_particiones_dinamicas(){
 
+	printf("Entro a compactar\n");
 	int hueco_particiones=0;
 	int tamanio_particion_final=0;
 
@@ -465,6 +536,7 @@ void compactar_particiones_dinamicas(){
 	if(tamanio_restante>=broker_config->tamanio_minimo_particion){
 			t_particion_dinamica*particion_final = crear_particion_dinamica_libre(offset_libre, tamanio_restante);
 			list_add(particiones_dinamicas, particion_final);}
+
 }
 
 void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones){
@@ -490,10 +562,10 @@ t_list* obtener_particiones_dinamicas_libres() {
 }
 
 void ordenar_segun_algoritmo_de_particiones_libres(t_list* particiones){
-	if (strcmp(broker_config->algoritmo_particion_libre, "FF") == 0) {
+	if (es_first_fit()){
 		list_sort(particiones, (void*)pd_es_menor_offset);
 	}
-	else if (strcmp(broker_config->algoritmo_particion_libre, "BF") == 0) {
+	else if (es_best_fit()) {
 		list_sort(particiones, (void*)pd_es_menor_tamanio);
 	}
 }
