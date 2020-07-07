@@ -47,8 +47,7 @@ void suscribirme_al_broker(){
 		printf("Enviando mensaje de cola %d...\n", suscripcion->cola_a_suscribir);
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 
-		// TODO sleep(1000);
-		liberar_conexion(conexion);
+		//TODO liberar_conexion(conexion);
 	}
 }
 
