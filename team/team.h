@@ -24,6 +24,7 @@ t_objetivo_global* objetivo_global;
 t_pokemon_requeridos* pokemones_en_mapa;
 t_dictionary* pokemones_atrapados;
 t_dictionary* pokemones_planificados;
+t_dictionary* enviaron_catch;
 
 t_list* ready;
 t_list* new;

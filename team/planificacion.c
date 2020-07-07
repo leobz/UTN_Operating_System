@@ -261,6 +261,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
 		confirmar_caught(tcb);
+		definir_cola_post_caught(tcb);
 	}
 	else{
 
@@ -317,10 +318,14 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 	}
 }
 
+void agregar_pokemon_a_atrapados(t_tcb_entrenador* tcb) {
+	dictionary_increment_value(pokemones_atrapados, tcb->pokemon_a_capturar->pokemon);
+}
+
 void confirmar_caught(t_tcb_entrenador* tcb){
+	agregar_pokemon_a_atrapados(tcb);
 	asignar_pokemon(tcb);
 	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
-	definir_cola_post_caught(tcb);
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
