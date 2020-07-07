@@ -224,6 +224,11 @@ void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught) {
 			mensaje_caught->id_correlativo, mensaje_caught->resultado);
 }
 
+void quitar_pokemon_del_mapa(t_tcb_entrenador* entrenador) {
+	dictionary_decrement_value(pokemones_en_mapa,
+			entrenador->pokemon_a_capturar->pokemon);
+}
+
 void procesar_mensaje_caught(t_paquete_socket* paquete) {
 	t_mensaje_caught* mensaje_caught  = deserializar_mensaje_caught_pokemon(paquete->buffer);
 
@@ -237,6 +242,7 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 			confirmar_caught(entrenador);
 		}
 
+		quitar_pokemon_del_mapa(entrenador);
 		definir_cola_post_caught(entrenador);
 
 	}

@@ -44,6 +44,15 @@ void dictionary_increment_value(t_dictionary* dictionary, char* key);
 */
 void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amount);
 
+/**
+* @NAME: dictionary_decrement_value
+* @DESC: Si la key ya existe, decrementa la cantidad del valor en 1.
+* Si la clave no existe, la agrega y la inicializa en 0.
+*
+* Ejemplo:
+* dictionary_increment_value("Pikachu"): {"Pikachu":2} -> {"Pikachu":1}
+*/
+void dictionary_decrement_value(t_dictionary* dictionary, char* key);
 
 /**
 * @NAME: sum_dictionaries_values
