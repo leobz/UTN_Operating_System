@@ -9,7 +9,6 @@
 
 void servidor_gameboy(int conexion) {
 
-
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
 		procesar_mensaje_recibido(paquete);
@@ -92,6 +91,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			break;
 		}
 
+
 		liberar_paquete_socket(paquete_socket);
 
 	}
@@ -121,3 +121,4 @@ void recibir_id_correlativo(int socket_cliente) {
 	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH: %d", paquete->id_mensaje);
 
 }
+

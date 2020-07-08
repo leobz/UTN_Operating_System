@@ -9,6 +9,7 @@
 
 #include "servidor_gameboy.h"
 
+
 // CONFIGURACION
 void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
 void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);

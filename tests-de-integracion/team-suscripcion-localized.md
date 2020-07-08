@@ -4,16 +4,22 @@
 
 En este test demostramos:
 
-### Suscripcion de TEAM a cola APPEARED del broker
+### Suscripcion de TEAM a colas APPEARED y CAUGHT del broker
 
-1) Suscripcion automatica de Team a la cola APPEARED del Broker
-2) Envio de mensaje APPEARED de Gameboy a Broker
-3) Broker reenvia el mensaje APPEARED hacia Team
+1) Suscripcion automatica de Team a las colas APPEARED y CAUGHT del Broker
 
-### Normal ejecucion de TEAM
+### Normal ejecucion de TEAM para APPEARED
 
-1) Team recibe mensaje APPEARED, envia al entrenador mas cercano y hace un CATCH a Broker
+1) Envio de mensaje APPEARED de: Gameboy => Broker => Team
+2) Team recibe mensaje APPEARED, envia al entrenador mas cercano y hace un CATCH a Broker
+3) Team recibe ID_CORRELATIVO
 
+### Normal ejecucion de TEAM para CAUGHT
+
+1) Envio de mensaje CAUGHT de: Gameboy => Broker => Team
+2) Team recibe CAUGHT con ID_CORRELATIVO invalido y lo ignora
+3) Team recibe CAUGHT con ID_CORRELATIVO invalido y asigna pokemon a entrenador
+ 
 ## Inicializacion del Test
 
 Cargo configuración del test
@@ -32,46 +38,60 @@ $ ../broker/Debug/broker &   # byexample: +fail-fast
 
 - - - - - - - - - - - - -
 
-## Test 1: Suscripcion de TEAM a cola APPEARED del broker
+## TEST 1: Suscripcion de TEAM a colas APPEARED y CAUGHT del broker
 
-Levanto Team en segundo plano => Suscripcion automatica de Team a la cola APPEARED del Broker
+Levanto Team en segundo plano
 
 ```bash
 $ ../team/Debug/team &       # byexample: +fail-fast
 <...>[<job-team-id>] <team-pid>
 ```
 
-Comprobación
+Comprobación : Suscripcion automatica de Team a la cola APPEARED_POKEMON
 
 ```bash
 $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
 <...>[SUSCRIPCION] Cola:APPEARED_POKEMON ID_Proceso:<...>
 ```
 
-Envio de mensaje APPEARED de Gameboy a Broker => Broker reenvia el mensaje APPEARED a Team
+Comprobación : Suscripcion automatica de Team a la cola CAUGHT_POKEMON
+
+```bash
+$ cat broker.log
+<...>[SUSCRIPCION] Cola:CAUGHT_POKEMON ID_Proceso:<...>
+```
+
+## TEST 2: Normal ejecucion de TEAM para APPEARE
+
+Envio de mensaje APPEARED de: Gameboy => Broker => Team
 
 ```bash
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy BROKER APPEARED_POKEMON Pikachu 6 6 10; sleep <sleep-time> # byexample: +timeout=8 +paste
 <...>
 ```
 
-Comprobación
+Comprobación:  
+Team recibe mensaje APPEARED, envia al entrenador mas cercano y hace un CATCH a Broker  
+Team recibe ID_CORRELATIVO
 
 ```bash
 $  sleep <sleep-time>; cat team.log     # byexample: +timeout=10 +fail-fast +paste
 <...>[MSG_RECIBIDO] APPEARED_POKEMON:<...>
+<...>[INSTRUCCION]<...>CATCH<...>
+<...>[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:<ID_CORRELATIVO>
 ```
-
-## Test 2: Normal ejecucion de Team
-
-1) Team recibe mensaje APPEARED, envia al entrenador mas cercano y hace un CATCH a Broker
-
-Comprobación de recepción de APPEARED y envio de CATCH
 
 ```bash
 $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
 <...>recibido CATCH_POKEMON<...>
 ```
+
+### TEST 3: Normal ejecucion de TEAM para CAUGHT
+
+1) Envio de mensaje CAUGHT de: Gameboy => Broker => Team
+2) Team recibe CAUGHT con ID_CORRELATIVO invalido y lo ignora
+3) Team recibe CAUGHT con ID_CORRELATIVO invalido y asigna pokemon a entrenador
+
 
 ## Finalización de Tests
 
