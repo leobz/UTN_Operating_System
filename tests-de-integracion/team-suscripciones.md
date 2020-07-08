@@ -17,8 +17,7 @@ En este test demostramos:
 ### Normal ejecucion de TEAM para CAUGHT
 
 1) Envio de mensaje CAUGHT de: Gameboy => Broker => Team
-2) Team recibe CAUGHT con ID_CORRELATIVO invalido y lo ignora
-3) Team recibe CAUGHT con ID_CORRELATIVO invalido y asigna pokemon a entrenador
+2) Team recibe CAUGHT con ID_CORRELATIVO valido y asigna pokemon a entrenador
  
 ## Inicializacion del Test
 
@@ -58,9 +57,8 @@ Comprobación : Suscripcion automatica de Team a la cola CAUGHT_POKEMON
 
 ```bash
 $ cat broker.log
-<...>
-```
 <...>[SUSCRIPCION] Cola:CAUGHT_POKEMON ID_Proceso:<...>
+```
 
 ## TEST 2: Normal ejecucion de TEAM para APPEARE
 
@@ -90,10 +88,19 @@ $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
 
 ### TEST 3: Normal ejecucion de TEAM para CAUGHT
 
-1) Envio de mensaje CAUGHT de: Gameboy => Broker => Team
-2) Team recibe CAUGHT con ID_CORRELATIVO invalido y lo ignora
-3) Team recibe CAUGHT con ID_CORRELATIVO invalido y asigna pokemon a entrenador
+Envio de mensaje CAUGHT de: Gameboy => Broker => Team
 
+```bash
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy BROKER CAUGHT_POKEMON <ID-CORRELATIVO> OK; sleep <sleep-time> # byexample: +timeout=8 +paste
+<...>
+```
+Team recibe CAUGHT con ID_CORRELATIVO invalido y asigna pokemon a entrenador
+
+```bash
+$ sleep 1; cat team.log    # byexample: +timeout=10 +paste
+<...>[MSG_RECIBIDO] CAUGHT_POKEMON: ID_Correlativo:<ID-CORRELATIVO> Resultado:1
+<...>[CAMBIO DE COLA]<...>
+```
 
 ## Finalización de Tests
 

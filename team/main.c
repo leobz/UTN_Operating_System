@@ -31,10 +31,10 @@ int main(int argc, char ** argv) {
 		iniciar_planificador();
 
 		int conexion_appeared = crear_conexion(ip, puerto);
-		//nt conexion_caught = crear_conexion(ip, puerto);
+		int conexion_caught = crear_conexion(ip, puerto);
 
 		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
-		//iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
+		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
 
 
 		while (1)
