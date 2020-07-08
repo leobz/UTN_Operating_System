@@ -82,8 +82,7 @@ void* deserializar_buffer_de_un_string(t_buffer* buffer) {
 }
 
 // NEW_POKEMON
-t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,
-		int cantidad) {
+t_buffer* buffer_new_pokemon(char* nombre_pokemon, int pos_x, int pos_y,int cantidad) {
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 
 	char *pokemon = strdup(nombre_pokemon);
