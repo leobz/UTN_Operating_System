@@ -32,6 +32,7 @@ typedef struct particion_dinamica {
 	int offset;
 	int tamanio_particion;
 	int contador_uso;
+	int orden_creacion;
 	bool esta_libre;
 	t_adm_mensaje* adm_mensaje;
 	struct particion_dinamica* siguiente_particion;
@@ -107,6 +108,8 @@ void* leer_particion_dinamica(t_particion_dinamica*);
 int supero_limite_de_eliminaciones(int particiones_eliminadas);
 bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
 t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin);
+void unir_particiones_dinamicas_libres();
+t_list* obtener_particiones_dinamicas_ocupadas();
 
 
 // ********************************** FINALIZACION MEMORIA CACHE ********************************** //
