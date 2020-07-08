@@ -29,13 +29,11 @@ void iniciar_suscripcion_appeared(int id_proceso, char* ip, char* puerto) {
 void recibir_mensaje_appeared(int conexion) {
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		t_mensaje_appeared* mensaje_appeared;
-
 
 		switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
 			// TODO: Generar mensaje_appeared
-			procesar_mensaje_appeared(mensaje_appeared, paquete);
+			procesar_mensaje_appeared (paquete);
 			break;
 
 		case CONFIRMACION:

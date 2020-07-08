@@ -53,7 +53,7 @@ void planificar() {
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
 			tcb_exec = siguiente_tcb_a_ejecutar();
-			tcb_exec->estado_tcb = EXEC;
+			pasar_a_exec(tcb_exec);
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
 
@@ -361,6 +361,12 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
+void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
+	tcb_exec->estado_tcb = EXEC;
+	list_remove_element(ready, tcb_exec);
+
+}
+
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
@@ -380,9 +386,7 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_lista_ready);
 	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
-	list_remove_element(ready, tcb);
 	pthread_mutex_unlock(&mutex_lista_ready);
-
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
