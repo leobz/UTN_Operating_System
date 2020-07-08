@@ -48,6 +48,7 @@ typedef enum {
 	EXIT = 5,
 	//estado_tcbS INTERMEDIOS
 	READY_TO_EXCHANGE = 6,
+	DEADLOCK = 7,
 } estado_tcb;
 
 

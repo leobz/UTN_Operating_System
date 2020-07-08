@@ -342,7 +342,7 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
 
-void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
+void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* motivo) {
 	int estado_original = tcb->estado_tcb;
 	tcb->estado_tcb = cola_destino;
 	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
@@ -352,12 +352,12 @@ void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
 			tcb->posicion->x,
 			tcb->posicion->y,
 			motivo);
-	list_add(ready, tcb);
+	list_add(lista, tcb);
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_lock(&mutex_lista_ready);
-	pasar_a_cola(tcb, READY, motivo);
+	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
@@ -378,8 +378,11 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
-	list_add(deadlock, tcb);
-	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
+	pthread_mutex_lock(&mutex_lista_ready);
+	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
+	list_remove_element(ready, tcb);
+	pthread_mutex_unlock(&mutex_lista_ready);
+
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
@@ -409,6 +412,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Exec";
 	case EXIT:
 		return "Exit";
+	case DEADLOCK:
+		return "Deadlock";
 	default:
 		return "NULL";
 	}
