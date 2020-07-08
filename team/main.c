@@ -30,7 +30,12 @@ int main(int argc, char ** argv) {
 
 		iniciar_planificador();
 
-		iniciar_suscripcion_appeared(id_proceso, ip, puerto);
+		int conexion_appeared = crear_conexion(ip, puerto);
+		//nt conexion_caught = crear_conexion(ip, puerto);
+
+		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
+		//iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
+
 
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);

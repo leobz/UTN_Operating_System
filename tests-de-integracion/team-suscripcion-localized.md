@@ -58,8 +58,9 @@ Comprobación : Suscripcion automatica de Team a la cola CAUGHT_POKEMON
 
 ```bash
 $ cat broker.log
-<...>[SUSCRIPCION] Cola:CAUGHT_POKEMON ID_Proceso:<...>
+<...>
 ```
+<...>[SUSCRIPCION] Cola:CAUGHT_POKEMON ID_Proceso:<...>
 
 ## TEST 2: Normal ejecucion de TEAM para APPEARE
 
@@ -78,7 +79,8 @@ Team recibe ID_CORRELATIVO
 $  sleep <sleep-time>; cat team.log     # byexample: +timeout=10 +fail-fast +paste
 <...>[MSG_RECIBIDO] APPEARED_POKEMON:<...>
 <...>[INSTRUCCION]<...>CATCH<...>
-<...>[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:<ID_CORRELATIVO>
+<...>[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:<ID-CORRELATIVO>
+<...>
 ```
 
 ```bash

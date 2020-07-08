@@ -32,10 +32,10 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 
 ```bash
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
-<...>[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1
-<...>Tamaño de rafaga: 3  Posicion del TCB (5, 5)
-<...>[TCB-info] TID:2 Capturó pokemon. Total capturados:2
-<...>[TCB-info] TID:2 Capturó máximo permitido(2)
+<...>[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1<...>
+<...>Tamaño de rafaga: 3  Posicion del TCB (5, 5)<...>
+<...>[TCB-info] TID:2 Capturó pokemon. Total capturados:2<...>
+<...>[TCB-info] TID:2 Capturó máximo permitido(2)<...>
 ```
 
 #### Se agrega al Mapa -> Se planifica entrenador
