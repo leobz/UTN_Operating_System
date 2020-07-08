@@ -261,7 +261,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
 		confirmar_caught(tcb);
-		definir_cola_post_caught(tcb);
+		aplicar_acciones_caught(tcb);
 	}
 	else{
 
@@ -294,8 +294,6 @@ void asignar_pokemon(t_tcb_entrenador* tcb) {
 	dictionary_increment_value(
 			tcb->pokemones_capturados,
 			tcb->pokemon_a_capturar->pokemon);
-
-	tcb->pokemon_a_capturar = NULL;
 }
 
 int cumplio_objetivo(t_tcb_entrenador* tcb) {

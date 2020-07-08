@@ -177,7 +177,7 @@ void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 	int cantidad = list_size(de_la_especie_en_mapa);
 	t_posicion* posicion = list_get(de_la_especie_en_mapa, cantidad - 1);
 
-	printf("[AGREGADO]: %s %d %d [TOTAL]: %d\n",
+	printf("[AGREGADO]: %s %d %d [TOTAL EN MAPA]: %d\n",
 			mensaje->pokemon,
 			posicion->x,
 			posicion->y,
@@ -208,8 +208,8 @@ void pasar_a_ready_si_corresponde(t_mensaje_appeared* mensaje_appeared) {
 
 }
 
-void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared, t_paquete_socket* paquete) {
-	mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+void procesar_mensaje_appeared(t_paquete_socket* paquete) {
+	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
 	loggear_appeared_recibido(mensaje_appeared);
 
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
@@ -224,9 +224,35 @@ void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught) {
 			mensaje_caught->id_correlativo, mensaje_caught->resultado);
 }
 
-void quitar_pokemon_del_mapa(t_tcb_entrenador* entrenador) {
-	dictionary_decrement_value(pokemones_en_mapa,
+void quitar_pokemon_de_planificados(t_tcb_entrenador* entrenador) {
+	dictionary_decrement_value(pokemones_planificados,
 			entrenador->pokemon_a_capturar->pokemon);
+}
+
+void quitar_pokemon_de_mapa(t_tcb_entrenador* entrenador) {
+	t_pokemon* pokemon_a_eliminar = entrenador->pokemon_a_capturar;
+	t_posicion* posicion_a_eliminar;
+	t_list* posiciones_de_la_especie =
+			dictionary_get(pokemones_en_mapa, pokemon_a_eliminar->pokemon);
+
+	void posicion_victima(t_posicion* posicion) {
+		if (posicion->x == pokemon_a_eliminar->posicion->x){
+			if (posicion->y == pokemon_a_eliminar->posicion->y){
+				posicion_a_eliminar = posicion;
+			}
+		}
+
+	}
+
+	list_iterate(posiciones_de_la_especie, posicion_victima);
+	list_remove_element(posiciones_de_la_especie,posicion_a_eliminar);
+}
+
+void aplicar_acciones_caught(t_tcb_entrenador* entrenador) {
+	quitar_pokemon_de_planificados(entrenador);
+	quitar_pokemon_de_mapa(entrenador);
+	definir_cola_post_caught(entrenador);
+	entrenador->pokemon_a_capturar = NULL;
 }
 
 void procesar_mensaje_caught(t_paquete_socket* paquete) {
@@ -242,21 +268,17 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 			confirmar_caught(entrenador);
 		}
 
-		quitar_pokemon_del_mapa(entrenador);
-		definir_cola_post_caught(entrenador);
-
+		aplicar_acciones_caught(entrenador);
 	}
 	free(id_correlativo);
 
 }
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
-	t_mensaje_appeared* mensaje_appeared;
-
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:
-			procesar_mensaje_appeared(mensaje_appeared, paquete);
+			procesar_mensaje_appeared(paquete);
 			break;
 
 		case CONFIRMACION:
