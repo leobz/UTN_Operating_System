@@ -12,30 +12,30 @@ int main(int argc, char ** argv) {
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
 
-
 	char* puerto = team_config->puerto_broker;
 	char* ip = team_config->ip_broker;
 
 	char* puerto_gameboy = "4444";
 
 	inicializar_listas();
-	inicializar_diccionarios();
-	cargar_objetivo_global(team_config);
-
+	inicializar_diccionarios(team_config);
 	crear_tcb_entrenadores(team_config);
-	crear_pokemon_requeridos();
 
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
-			correrTests();
 			mostrar_lista_entrenadores(team_config);
-
+			correrTests();
 	} else {
 		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
 
 		iniciar_planificador();
 
-		iniciar_suscripcion_appeared(id_proceso, ip, puerto);
+		int conexion_appeared = crear_conexion(ip, puerto);
+		int conexion_caught = crear_conexion(ip, puerto);
+
+		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
+		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
+
 
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);

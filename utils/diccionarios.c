@@ -49,6 +49,11 @@ void dictionary_increment_value(t_dictionary* dictionary, char* key) {
 	dictionary_increment_value_in(dictionary, key, 1);
 }
 
+
+void dictionary_decrement_value(t_dictionary* dictionary, char* key) {
+	dictionary_increment_value_in(dictionary, key, -1);
+}
+
 void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amount) {
 	if (key != NULL) {
 		if (dictionary_has_key(dictionary,key)){
@@ -58,6 +63,10 @@ void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amou
 		}
 		else
 			dictionary_put(dictionary, key, amount);
+	}
+
+	if (dictionary_get(dictionary, key) < 0) {
+		dictionary_put(dictionary, key, 0);
 	}
 }
 

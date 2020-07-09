@@ -19,8 +19,12 @@
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
 
+
 t_objetivo_global* objetivo_global;
-t_pokemon_requeridos* pokemon_requeridos;
+t_pokemon_requeridos* pokemones_en_mapa;
+t_dictionary* pokemones_atrapados;
+t_dictionary* pokemones_planificados;
+t_dictionary* enviaron_catch;
 
 t_list* ready;
 t_list* new;
@@ -44,6 +48,7 @@ typedef enum {
 	EXIT = 5,
 	//estado_tcbS INTERMEDIOS
 	READY_TO_EXCHANGE = 6,
+	DEADLOCK = 7,
 } estado_tcb;
 
 
@@ -93,8 +98,8 @@ typedef struct{
 
 
 // INICIALIZACIONES TEAM
-void cargar_objetivo_global(t_team_config*);
-void crear_pokemon_requeridos();
+void inicializar_objetivo_global(t_team_config*);
+void inicializar_pokemones_en_mapa();
 void agregar_pokemones_de_entrenador_a_objetivo_global(
 		char** objetivos_entrenadores);
 void agregar_pokemon_a_objetivo_global(char *pokemon);
@@ -105,8 +110,8 @@ int obtener_cantidad_global_por_pokemon(char* pokemon);
 bool existe_pokemon_en_objetivo_global(char* pokemon);
 void destruir_objetivo_global();
 
-void agregar_pokemon_a_pokemon_requeridos(char* pokemon, t_list* lista_posiciones);
-bool existe_pokemon_en_pokemon_requeridos(char* pokemon);
+void agregar_pokemon_a_mapa(char* pokemon, t_list* lista_posiciones);
+bool existe_pokemon_en_mapa(char* pokemon);
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char *pokemon);
 void destruir_pokemon_requeridos();
 void destruir_lista_posiciones(t_list* posiciones);
@@ -114,7 +119,7 @@ void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
-void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
+void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 
 

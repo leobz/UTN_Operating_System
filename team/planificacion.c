@@ -15,7 +15,12 @@ void inicializar_listas() {
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 }
 
-void inicializar_diccionarios() {
+void inicializar_diccionarios(t_team_config* team_config) {
+	inicializar_objetivo_global(team_config);
+	inicializar_pokemones_atrapados(team_config);
+	inicializar_pokemones_en_mapa();
+	pokemones_planificados = dictionary_create();
+
 	enviaron_catch = dictionary_create();
 }
 
@@ -48,7 +53,7 @@ void planificar() {
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
 			tcb_exec = siguiente_tcb_a_ejecutar();
-			tcb_exec->estado_tcb = EXEC;
+			pasar_a_exec(tcb_exec);
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
 
@@ -256,6 +261,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
 		confirmar_caught(tcb);
+		aplicar_acciones_caught(tcb);
 	}
 	else{
 
@@ -288,8 +294,6 @@ void asignar_pokemon(t_tcb_entrenador* tcb) {
 	dictionary_increment_value(
 			tcb->pokemones_capturados,
 			tcb->pokemon_a_capturar->pokemon);
-
-	tcb->pokemon_a_capturar = NULL;
 }
 
 int cumplio_objetivo(t_tcb_entrenador* tcb) {
@@ -312,10 +316,14 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 	}
 }
 
+void agregar_pokemon_a_atrapados(t_tcb_entrenador* tcb) {
+	dictionary_increment_value(pokemones_atrapados, tcb->pokemon_a_capturar->pokemon);
+}
+
 void confirmar_caught(t_tcb_entrenador* tcb){
+	agregar_pokemon_a_atrapados(tcb);
 	asignar_pokemon(tcb);
 	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
-	definir_cola_post_caught(tcb);
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
@@ -334,7 +342,7 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
 
-void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
+void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* motivo) {
 	int estado_original = tcb->estado_tcb;
 	tcb->estado_tcb = cola_destino;
 	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
@@ -344,13 +352,19 @@ void pasar_a_cola(t_tcb_entrenador* tcb, int cola_destino, char* motivo) {
 			tcb->posicion->x,
 			tcb->posicion->y,
 			motivo);
-	list_add(ready, tcb);
+	list_add(lista, tcb);
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_lock(&mutex_lista_ready);
-	pasar_a_cola(tcb, READY, motivo);
+	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
+}
+
+void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
+	tcb_exec->estado_tcb = EXEC;
+	list_remove_element(ready, tcb_exec);
+
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
@@ -370,8 +384,9 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
-	list_add(deadlock, tcb);
-	printf("[TCB-info] TID:%d Pasó a lista Deadlock\n", tcb->tid);
+	pthread_mutex_lock(&mutex_lista_ready);
+	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
+	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
@@ -401,6 +416,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Exec";
 	case EXIT:
 		return "Exit";
+	case DEADLOCK:
+		return "Deadlock";
 	default:
 		return "NULL";
 	}

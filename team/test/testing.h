@@ -8,6 +8,7 @@
 #include "test_entrenador_cercano_a_ready.h"
 #include "test_movimiento_entrenador.h"
 #include "test_lista_blocked.h"
+#include "test_caught.h"
 
 void correrTests();
 
