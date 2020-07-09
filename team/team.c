@@ -274,6 +274,10 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 
 }
 
+void procesar_mensaje_localized(t_paquete_socket* paquete) {
+	procesar_mensaje_appeared(paquete);
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
@@ -287,6 +291,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case CAUGHT_POKEMON:
 			procesar_mensaje_caught(paquete);
+			break;
+
+		case LOCALIZED_POKEMON:
+			procesar_mensaje_localized(paquete);
 			break;
 
 		default:
