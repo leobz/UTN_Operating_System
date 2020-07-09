@@ -25,6 +25,7 @@ t_pokemon_requeridos* pokemones_en_mapa;
 t_dictionary* pokemones_atrapados;
 t_dictionary* pokemones_planificados;
 t_dictionary* enviaron_catch;
+t_dictionary* enviaron_get;
 
 t_list* ready;
 t_list* new;

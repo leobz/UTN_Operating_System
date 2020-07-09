@@ -36,7 +36,7 @@ int main(int argc, char ** argv) {
 		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
 		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
 
-
+		enviar_get_pokemon();
 		while (1)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 

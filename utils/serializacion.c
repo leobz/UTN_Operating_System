@@ -209,7 +209,7 @@ void* serializar_get_pokemon(int* bytes, char* nombre_pokemon,int id_mensaje,
 		int id_correlativo) {
 
 	t_buffer* buffer = buffer_get_pokemon(nombre_pokemon);
-	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer,id_mensaje, id_correlativo);
+	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer, id_mensaje, id_correlativo);
 
 	*bytes = paquete->buffer->size + sizeof(int) * 4;
 	void* a_enviar = serializar_paquete(paquete, *bytes);

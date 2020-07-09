@@ -22,6 +22,8 @@ void inicializar_diccionarios(t_team_config* team_config) {
 	pokemones_planificados = dictionary_create();
 
 	enviaron_catch = dictionary_create();
+	enviaron_get = dictionary_create();
+
 }
 
 void inicializar_hilos_tcbs() {
