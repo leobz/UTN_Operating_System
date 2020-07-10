@@ -70,9 +70,9 @@ void test_primer_tcb_no_posee_menor_proxima_estimacion_segundo_tcb() {
 void test_obtener_tcb_menor_proxima_estimacion() {
 	team_config->alpha = 0.8;
 
-	t_tcb_entrenador* primer_tcb = malloc(sizeof(t_tcb_entrenador));
-	t_tcb_entrenador* segundo_tcb = malloc(sizeof(t_tcb_entrenador));
-	t_tcb_entrenador* tercer_tcb = malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* primer_tcb = tcb_generico(NULL);
+	t_tcb_entrenador* segundo_tcb = tcb_generico(NULL);
+	t_tcb_entrenador* tercer_tcb = tcb_generico(NULL);
 
 	t_tcb_entrenador* tcb_menor_proxima_estimacion = NULL;
 
