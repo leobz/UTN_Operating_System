@@ -22,5 +22,8 @@ void *generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes);
 void agregar_mensaje_memoria_cache(t_adm_mensaje*, t_mensaje*);
 void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* adm_mensaje);
 
+void leer_particion_dinamica_sin_payload(t_particion_dinamica* particion);
+void leer_particiones_de_cola(int num_cola);
+
 
 #endif /* ADMINISTRACION_DE_MENSAJES_H_ */

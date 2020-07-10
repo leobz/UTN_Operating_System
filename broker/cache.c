@@ -341,11 +341,11 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void *payloa
 	particion_destino->contador_uso=++contador_uso;
 	particion_destino->adm_mensaje=admin;
 
-	printf("Almacenando mensaje en cache en posicion %d\n",particion_destino->offset);
+	//printf("Almacenando mensaje en cache en posicion %d\n",particion_destino->offset);
 	crear_particion_intermedia(particion_destino);
 
 	t_list* particiones_libres=obtener_particiones_dinamicas_libres();
-		printf("Particiones libres: %d\n",list_size(particiones_libres));
+		//printf("Particiones libres: %d\n",list_size(particiones_libres));
 
 	free(particiones_libres);
 
@@ -438,8 +438,8 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 
 	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
-	printf("Offset restante %d\n",offset_intermedio);
-	printf("Tamanio restante %d\n",tamanio_intermedio);
+	//printf("Offset restante %d\n",offset_intermedio);
+	//printf("Tamanio restante %d\n",tamanio_intermedio);
 
 	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
 	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
@@ -450,7 +450,8 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	}
 	else{
 		particion_ocupada->siguiente_particion=NULL;
-		printf("No hay mas espacio\n");}
+		//printf("No hay mas espacio\n");
+		}
 
 }
 
@@ -519,36 +520,10 @@ void unir_particiones_dinamicas_libres(){
 
 	free(particiones_libres);
 }
-/*
-void compactar_particiones_dinamicas(){
-
-	printf("Entro a compactar\n");
-	int hueco_particiones=0;
-	int tamanio_particion_final=0;
-
-	list_sort(particiones_dinamicas, (void*)pd_es_menor_offset);
-
-	void compactar(t_particion_dinamica* particion_din){
-		reubicar_particion(particion_din,hueco_particiones);
-		particion_din->offset=hueco_particiones;
-		hueco_particiones=particion_din->offset + particion_din->tamanio_particion; //para la proxima particion a compactar
-		tamanio_particion_final=particion_din->tamanio_particion; //me quedo con el tamanio de la ultima particion
-	}
-
-	list_iterate(particiones_dinamicas,&compactar);
-
-	int offset_libre=hueco_particiones+tamanio_particion_final; // ubico el offset al final
-	int tamanio_restante=broker_config->tamanio_memoria-offset_libre; //de la ultima particion
-
-	if(tamanio_restante>=broker_config->tamanio_minimo_particion){
-			t_particion_dinamica*particion_final = crear_particion_dinamica_libre(offset_libre, tamanio_restante);
-			list_add(particiones_dinamicas, particion_final);}
-
-}*/
 
 void compactar_particiones_dinamicas(){
 
-	printf("Entro a compactar\n");
+	//printf("Entro a compactar\n");
 	int offset_hueco=0;
 
 	t_list* particiones_ocupadas=obtener_particiones_dinamicas_ocupadas();
@@ -621,11 +596,11 @@ t_list* obtener_particiones_dinamicas_libres() {
 
 t_list* obtener_particiones_dinamicas_ocupadas() {
 
-	int particion_esta_libre(t_particion_dinamica* particion){
+	int particion_esta_ocupada(t_particion_dinamica* particion){
 		return !particion->esta_libre;
 	}
 
-	return list_filter(particiones_dinamicas, (void*) particion_esta_libre);
+	return list_filter(particiones_dinamicas, (void*) particion_esta_ocupada);
 }
 
 void ordenar_segun_algoritmo_de_particiones_libres(t_list* particiones){

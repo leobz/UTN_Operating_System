@@ -102,13 +102,34 @@ void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaj
 
 	t_adm_mensaje* men=list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
 
-	printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
+	//printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
 
-	list_clean(admins_mensaje->suscriptores_enviados);
-	list_clean(admins_mensaje->suscriptores_confirmados);
+
+	if(list_size(admins_mensaje->suscriptores_enviados)!=0)
+		list_clean(admins_mensaje->suscriptores_enviados);
+	if(list_size(admins_mensaje->suscriptores_confirmados)!=0)
+		list_clean(admins_mensaje->suscriptores_confirmados);
 
 
 	free(admins_mensaje->suscriptores_enviados);
 	free(admins_mensaje->suscriptores_confirmados);
 	free(admins_mensaje);
 }
+
+
+void leer_particion_dinamica_sin_payload(t_particion_dinamica* particion){
+
+	if(es_lru()){
+			particion->contador_uso=++contador_uso;
+	}
+}
+
+void leer_particiones_de_cola(int num_cola){
+
+	void leer_su_particion(t_adm_mensaje*adm){
+		leer_particion_dinamica_sin_payload(adm->particion_dinamica);
+	}
+
+	list_iterate(administradores[num_cola],&leer_su_particion);
+}
+

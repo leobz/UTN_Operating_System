@@ -18,6 +18,12 @@
 void* list_first(t_list* lista);
 
 /**
+ * @NAME: list_last
+ * @DESC: retorna el ultimo elemento de la lista
+ */
+void* list_last(t_list* lista);
+
+/**
  * @NAME: list_pop_first
  * @DESC: retorna el primer elemento y lo saca de la lista
  */

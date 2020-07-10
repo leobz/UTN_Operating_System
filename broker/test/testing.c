@@ -12,6 +12,7 @@ void correrTests() {
 	agregar_tests_configuracion();
 	agregar_tests_particiones_dinamicas();
 	//agregar_tests_new_pokemon();
+	agregar_tests_algoritmos();
 	agregar_tests_buddy_system();
 	agregar_tests_administrador_de_mensaje();
 
