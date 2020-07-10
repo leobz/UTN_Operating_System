@@ -68,7 +68,8 @@ typedef struct{
 	int retardo_ciclo_cpu;
 	char *algoritmo_de_planificacion;
 	int quantum;
-	int estimacion_inicial;
+	double alpha;
+	double estimacion_inicial;
 	char *ip_broker;
 	char *puerto_broker;
 	char *log_file;
@@ -94,12 +95,17 @@ typedef struct{
 	estado_tcb estado_tcb;
 	t_pokemon* pokemon_a_capturar;
 	sem_t* semaforo;
+	int rafaga_anterior;
+	double estimacion_anterior;
 }t_tcb_entrenador;
 
 
 // INICIALIZACIONES TEAM
 void inicializar_objetivo_global(t_team_config*);
+void inicializar_pokemones_atrapados(t_team_config*);
 void inicializar_pokemones_en_mapa();
+void inicializar_pokemones_planificados();
+void inicializar_tcbs_enviaron_catch();
 void agregar_pokemones_de_entrenador_a_objetivo_global(
 		char** objetivos_entrenadores);
 void agregar_pokemon_a_objetivo_global(char *pokemon);

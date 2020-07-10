@@ -45,6 +45,7 @@ void correrTests() {
 	agregar_tests_movimiento_entrenador();
 	agregar_tests_lista_blocked();
 	agregar_tests_caught();
+	agregar_tests_algoritmos_sjf();
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
 	CU_cleanup_registry();
