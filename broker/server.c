@@ -14,22 +14,21 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
+	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)){
 
-
-		t_mensaje* mensaje_a_encolar;
-		mensaje_a_encolar = preparar_mensaje(paquete);
-
-		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
-			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
-		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
-
-		loggear_nueva_conexion(logger, paquete);
-
-		sem_post(&cola_vacia[paquete->codigo_operacion]);
-		liberar_paquete_socket(paquete);
+		if(paquete->id_correlativo==0){
+			ingresar_en_cola_y_cache(paquete);
+		}
+		else{
+			if(esta_en_diccionario(mensajes_iguales,paquete->id_correlativo)){
+				enviar_confirmacion(++id_mensaje,CONFIRMACION,paquete->socket_cliente);
+			}
+			else{
+				ingresar_en_cola_y_cache(paquete);
+				meter_en_diccionario(mensajes_iguales,pasar_a_char(paquete->id_correlativo),paquete->id_proceso);
+			}
+		}
 	}
-
 	else {
 
 		switch (paquete->codigo_operacion) {
@@ -81,6 +80,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			t_proceso* proceso_confirmado = obtener_de_diccionario(subscribers,paquete->id_proceso);
 
 			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
+
+			//printf("Recibida confirmacion de proceso: %d\n",paquete->id_proceso);
 
 			break;}
 
@@ -151,6 +152,22 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 	mensaje_a_preparar->siguiente = NULL;
 
 	return mensaje_a_preparar;
+}
+
+void ingresar_en_cola_y_cache(t_paquete_socket* paquete){
+
+	t_mensaje* mensaje_a_encolar;
+	mensaje_a_encolar = preparar_mensaje(paquete);
+
+	pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
+		insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
+	pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
+
+	loggear_nueva_conexion(logger, paquete);
+
+	sem_post(&cola_vacia[paquete->codigo_operacion]);
+
+	liberar_paquete_socket(paquete);
 }
 
 
