@@ -78,6 +78,35 @@ int sum_dictionary_values(t_dictionary* );
 * {"A":2} {"A":2} -> 1
 * {"A":2} {"A":0} -> 0
 */
+
+/**
+* @NAME: dictionary_substract
+* @DESC: Devuelve la resta entre 2 diccionarios
+*
+* Ejemplo:
+* {x:1, y:2} - {x:1, c:2} => {y:2}
+* {x:2, y:2} - {x:1, c:2} => {x:1, y:2}
+*/
+t_dictionary* dictionary_substract(t_dictionary* dic1, t_dictionary* dic2);
+
+/**
+* @NAME: dictionaries_are_equals
+* @DESC: Compara 2 diccionarios, si son iguales retorna true
+*
+* Ejemplo:
+* {"A":2} {"A":2} -> 1
+* {"A":2} {"A":0} -> 0
+*/
+
+/**
+* @NAME: dictionary_keys_to_list
+* @DESC: Devuelve una lista con todas las keys de un diccionario
+*
+* Ejemplo:
+* {"x":1, "y":2}  => ["x", "y"]
+*/
+t_list* dictionary_keys_to_list(t_dictionary* dictionary);
+
 int dictionaries_are_equals(t_dictionary*, t_dictionary*);
 
 void meter_en_diccionario(t_dictionary* dictionary,int key,void*value);
