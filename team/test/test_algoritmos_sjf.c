@@ -1,7 +1,7 @@
-#include "test_algoritmos_planificacion.h"
+#include "test_algoritmos_sjf.h"
 
-void agregar_tests_algoritmos_planificacion() {
-	CU_pSuite suite_configuracion = CU_add_suite("Algoritmos de planificacion", NULL, NULL);
+void agregar_tests_algoritmos_sjf() {
+	CU_pSuite suite_configuracion = CU_add_suite("Algoritmos de planificacion SJF SD", NULL, NULL);
 
 	CU_add_test(suite_configuracion,
 			"El primer tcb posee una proxima estimacion menor al segundo tcb",
