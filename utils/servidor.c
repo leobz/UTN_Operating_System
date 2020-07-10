@@ -44,14 +44,14 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-	t_paquete_socket* paquete = recibir_mensaje_servidor(socket_cliente);
+	t_paquete_socket* paquete = recibir_mensajes(socket_cliente);
 
 	pthread_t thread;
 	pthread_create(&thread,NULL,(void*)procesar_mensaje_recibido,paquete);
 	pthread_detach(thread);
 }
 
-t_paquete_socket* recibir_mensaje_servidor(int socket_cliente) {
+t_paquete_socket* recibir_mensajes(int socket_cliente) {
 	t_paquete_socket* paquete = (t_paquete_socket*) malloc(sizeof(t_paquete_socket));
 	int size_buffer = 0;
 

@@ -10,8 +10,9 @@
 
 #include "../utils/cliente.h"
 
+#include "broker-commons.h"
 #include "administracion-de-mensajes.h"
-
+#include "cache.h"
 
 
 

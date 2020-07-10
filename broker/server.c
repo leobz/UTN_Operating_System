@@ -16,7 +16,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
 
-
 		t_mensaje* mensaje_a_encolar;
 		mensaje_a_encolar = preparar_mensaje(paquete);
 
@@ -57,10 +56,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				proceso->id_proceso=paquete->id_proceso;
 				proceso->socket=paquete->socket_cliente;
 				list_add(suscriptores[paquete->cola], proceso);
-				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
-				meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
-
 			}
+
+			t_proceso* proceso_viejo=sacar_de_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso);
+			free(proceso_viejo);//elimino anterior proceso para actualizarlo
+			meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
+			meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 
 			cola_paquete=paquete->cola;
 
@@ -86,7 +87,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		case OP_ERROR:
 
-			printf("Error al recibir mensaje del socket: %d\n",paquete->socket_cliente);
+			printf("Error al recibir mensaje del socket: %d\n",
+					paquete->socket_cliente);
 			pthread_exit(NULL);
 			break;
 
@@ -111,7 +113,7 @@ void verificar_cache(t_proceso* proceso){
 	void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
 
 		bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
-			return proceso_a_comparar->id_proceso==id_suscriptor;
+			return proceso_a_comparar->id_proceso=id_suscriptor;
 		}
 
 		if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
@@ -121,6 +123,7 @@ void verificar_cache(t_proceso* proceso){
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
 			if(validez!=1) //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
+
 			//verificar pq puede que ese proceso ya exista en esa lista
 			list_add(actual_administrator->suscriptores_enviados,proceso);
 		}
