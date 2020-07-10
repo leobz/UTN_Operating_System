@@ -30,9 +30,10 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->algoritmo_de_planificacion = strdup(
 			config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
 	team_config->quantum = config_get_int_value(config, "QUANTUM");
+	team_config->alpha = config_get_double_value(config, "ALPHA");
 	team_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
-	team_config->estimacion_inicial = config_get_int_value(config,
+	team_config->estimacion_inicial = config_get_double_value(config,
 			"ESTIMACION_INICIAL");
 	team_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
@@ -96,7 +97,17 @@ void inicializar_pokemones_atrapados(t_team_config* team_config) {
 			team_config->pokemon_entrenadores);
 }
 
+void inicializar_pokemones_en_mapa() {
+	pokemones_en_mapa = dictionary_create();
+}
 
+void inicializar_pokemones_planificados() {
+	pokemones_planificados = dictionary_create();
+}
+
+void inicializar_tcbs_enviaron_catch() {
+	enviaron_catch = dictionary_create();
+}
 
 // CARGA DE TCBs
 
@@ -105,9 +116,6 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 
 	for (int i = 0; i < cant_entrenadores; i++) {
 		t_tcb_entrenador* entrenador = malloc(sizeof(t_tcb_entrenador));
-		t_posicion* posicion = malloc(sizeof(t_posicion));
-		t_dictionary* objetivo = dictionary_create();
-		t_dictionary* pokemones_capturados = dictionary_create();
 
 		entrenador->posicion = list_get(team_config->posiciones_entrenadores,
 				i);
@@ -119,6 +127,8 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->rafaga = queue_create();
 		entrenador->pokemones_max = sum_dictionary_values(entrenador->objetivos);
 		entrenador->tid = i;
+		entrenador->rafaga_anterior = 0;
+		entrenador->estimacion_anterior = team_config->estimacion_inicial;
 
 		list_add(new, entrenador);
 	}
@@ -135,10 +145,6 @@ bool existe_pokemon_en_objetivo_global(char* pokemon) {
 
 void destruir_objetivo_global() {
 	dictionary_destroy(objetivo_global);
-}
-
-void inicializar_pokemones_en_mapa() {
-	pokemones_en_mapa = dictionary_create();
 }
 
 void agregar_pokemon_a_mapa(char* pokemon,
@@ -202,9 +208,10 @@ bool planificacion_del_pokemon_no_esta_cubierta(char* pokemon) {
 }
 
 void pasar_a_ready_si_corresponde(t_mensaje_appeared* mensaje_appeared) {
-	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon))
+	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon)){
 		dictionary_increment_value(pokemones_planificados, mensaje_appeared->pokemon);
 		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+	}
 
 }
 

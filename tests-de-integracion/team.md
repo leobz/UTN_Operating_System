@@ -65,7 +65,6 @@ $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time
 [AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1
 <...>Tamaño de rafaga: 7  Posicion del TCB (3, 3)
 <...>[TCB-info] TID:1 Capturó pokemon. Total capturados:2
-<...>[CAMBIO DE COLA] TID:1 Pasó a lista Unblocked
 ```
 
 ```bash
@@ -79,6 +78,7 @@ $ cat team.log
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:1, CATCH Pikachu 6 6
+<...>[CAMBIO DE COLA] TID:1 (Exec->Unblocked) (6, 6) Motivo:Capturó pokemon y puede seguir capturando
 
 ```
 

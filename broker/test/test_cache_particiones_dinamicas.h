@@ -18,5 +18,6 @@ t_particion_dinamica* guardar_string_en_particion(const char*);
 void assert_primer_particion_esta_libre();
 void assert_particion_esta_libre(t_particion_dinamica*);
 void assert_particion_tiene_el_tamanio(t_particion_dinamica*,int);
+void assert_particiones_libres(t_list* lista_libres,int cantidad);
 
 #endif /* TEST_TEST_CACHE_PARTICIONES_DINAMICAS_H_ */

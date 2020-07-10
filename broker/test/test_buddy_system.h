@@ -21,7 +21,10 @@ void test_ordenar_hojas_posibles_victimas_segun_FIFO();
 void test_ordenar_hojas_posibles_victimas_segun_LRU();
 void test_liberar_particion_victima();
 void test_consolidar_particion_victima_companieros();
+void test_liberar_hoja_sin_compactacion_segun_algoritmo_reemplazo();
+void test_liberar_hoja_con_compactacion_segun_algoritmo_reemplazo();
 void test_agregar_mensaje_a_memoria_cache_bs();
+void test_agregar_mensaje_con_reemplazo_consolidacion_a_memoria_cache_bs();
 void test_leer_mensaje_de_memoria_cache_bs();
 
 #endif /* TEST_TEST_BUDDY_SYSTEM_H_ */

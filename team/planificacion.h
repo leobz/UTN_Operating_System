@@ -51,6 +51,9 @@ int distancia_entre(t_posicion* inicio, t_posicion* destino);
 
 // Ejecucion de TCB
 t_tcb_entrenador* siguiente_tcb_a_ejecutar();
+t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion();
+bool tiene_menor_proxima_estimacion(t_tcb_entrenador*, t_tcb_entrenador*);
+double obtener_proxima_estimacion(t_tcb_entrenador*);
 void ejecutar_tcb(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
 
