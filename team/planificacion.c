@@ -19,9 +19,8 @@ void inicializar_diccionarios(t_team_config* team_config) {
 	inicializar_objetivo_global(team_config);
 	inicializar_pokemones_atrapados(team_config);
 	inicializar_pokemones_en_mapa();
-	pokemones_planificados = dictionary_create();
-
-	enviaron_catch = dictionary_create();
+	inicializar_pokemones_planificados();
+	inicializar_tcbs_enviaron_catch();
 }
 
 void inicializar_hilos_tcbs() {
@@ -56,7 +55,6 @@ void planificar() {
 			pasar_a_exec(tcb_exec);
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
-
 		}
 }
 
@@ -76,10 +74,38 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 		// TODO
 		break;
 	case SJF_SD:
-		//TODO
+		siguiente_tcb = obtener_tcb_menor_proxima_estimacion();
 		break;
 	}
 	return siguiente_tcb;
+}
+
+t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion() {
+	t_tcb_entrenador* tcb_menor_estimacion = NULL;
+	double estimacion_anterior = 0;
+
+	void elegir_tcb_menor_proxima_estimacion(t_tcb_entrenador* tcb) {
+		if (tcb_menor_estimacion == NULL)
+			tcb_menor_estimacion = tcb;
+		else if (tiene_menor_proxima_estimacion(tcb, tcb_menor_estimacion))
+			tcb_menor_estimacion = tcb;
+	}
+
+	list_iterate(ready, (void*)elegir_tcb_menor_proxima_estimacion);
+
+	estimacion_anterior = obtener_proxima_estimacion(tcb_menor_estimacion);
+	tcb_menor_estimacion->estimacion_anterior = estimacion_anterior;
+	tcb_menor_estimacion->rafaga_anterior = queue_size(tcb_menor_estimacion->rafaga);
+
+	return tcb_menor_estimacion;
+}
+
+bool tiene_menor_proxima_estimacion(t_tcb_entrenador* tcb_posible_menor_estimacion, t_tcb_entrenador* tcb_actual_menor_estimacion){
+	return obtener_proxima_estimacion(tcb_posible_menor_estimacion) < obtener_proxima_estimacion(tcb_actual_menor_estimacion);
+}
+
+double obtener_proxima_estimacion(t_tcb_entrenador* tcb) {
+	return team_config->alpha * tcb->rafaga_anterior + (1 - team_config->alpha) * tcb->estimacion_anterior;
 }
 
 void inicializar_semaforo_tcb(t_tcb_entrenador* tcb, sem_t* semaforo_tcb) {
@@ -133,7 +159,7 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			// TODO
 			break;
 		case SJF_SD:
-			//TODO
+			ejecutar_rafaga(tcb);
 			break;
 		}
 		pthread_mutex_unlock(&mutex_tcb_exec);
@@ -377,8 +403,7 @@ void pasar_a_blocked(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
-	list_add(unblocked, tcb);
-	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Unblocked\n", tcb->tid);
+	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
@@ -421,6 +446,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Exit";
 	case DEADLOCK:
 		return "Deadlock";
+	case UNBLOCKED:
+		return "Unblocked";
 	default:
 		return "NULL";
 	}
