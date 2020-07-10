@@ -65,4 +65,10 @@ void list_remove_element(t_list* lista, void* element);
 */
 bool list_include(t_list* lista, void* element);
 
+/**
+* @NAME: list_intersection
+* @DESC: Retorna la interseccion entre dos listas
+*/
+t_list* list_intersection(t_list* lista_a, t_list* lista_b);
+
 #endif /* LISTAS_H_ */
