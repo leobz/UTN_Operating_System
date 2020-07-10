@@ -10,6 +10,8 @@
 #include "test_movimiento_entrenador.h"
 #include "test_lista_blocked.h"
 #include "test_caught.h"
+#include "test_appeared.h"
+
 
 void correrTests();
 
