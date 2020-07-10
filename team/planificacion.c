@@ -9,7 +9,7 @@ void inicializar_listas() {
 	blocked = list_create();
 	new = list_create();
 	unblocked = list_create();
-	deadlock = list_create();
+	lista_deadlock = list_create();
 	l_exit = list_create();
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
@@ -385,22 +385,60 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 }
 
 
-t_deadlock* detectar_deadlock() {
-
+t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
+	//TODO
 }
 
-void ejecutar_manejador_de_deadlocks() {
+t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
+	//TODO
+}
+
+bool no_necesita_ningun_pokemon(t_tcb_entrenador* tcb, t_list* necesitados){
+	//TODO
+}
+
+bool necesita_alguno(t_tcb_entrenador* tcb, t_list* no_necesitados){
+	//TODO
+}
+
+t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb) {
+	t_deadlock* deadlock;
+	t_list* necesitados = pokemones_necesitados(tcb);
+	t_list* no_necesitados = pokemones_no_necesitados(tcb);
+
+	t_deadlock* detectar_espera_circular(t_tcb_entrenador* potencial_cambiador) {
+		t_deadlock* deadlock = NULL;
+		if (no_necesita_ningun_pokemon(potencial_cambiador, necesitados)) {
+			if (necesita_alguno(potencial_cambiador, no_necesitados)) {
+				t_deadlock* deadlock = malloc(sizeof(t_deadlock));
+				deadlock->tcb1 = tcb;
+				deadlock->tcb2 = potencial_cambiador;
+			}
+		}
+		return deadlock;
+	}
+
+	for(int i = 0; i< list_size(lista_deadlock); i++) {
+		t_tcb_entrenador* potencial_cambiador = list_get(lista_deadlock, i);
+		deadlock = detectar_espera_circular(potencial_cambiador);
+
+		if(deadlock != NULL){ break; }
+	}
+	return deadlock;
+}
+
+void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
-	t_deadlock* deadlock = detectar_deadlock();
+	t_deadlock* lista_deadlock = detectar_deadlock(tcb);
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
 
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_lista_ready);
-	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
+	pasar_a_cola(tcb, lista_deadlock, DEADLOCK, "Deadlock");
 	pthread_mutex_unlock(&mutex_lista_ready);
 
-	ejecutar_manejador_de_deadlocks();
+	ejecutar_manejador_de_deadlocks(tcb);
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
