@@ -368,9 +368,7 @@ void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
 
-
 void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* motivo) {
-
 	int estado_original = tcb->estado_tcb;
 	tcb->estado_tcb = cola_destino;
 	log_info(logger, "[CAMBIO DE COLA] TID:%d (%s->%s) (%d, %d) Motivo:%s",
@@ -380,13 +378,11 @@ void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* m
 			tcb->posicion->x,
 			tcb->posicion->y,
 			motivo);
-
 	list_add(lista, tcb);
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_lock(&mutex_lista_ready);
-
 	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
 }
@@ -394,6 +390,7 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
 	tcb_exec->estado_tcb = EXEC;
 	list_remove_element(ready, tcb_exec);
+
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
@@ -448,38 +445,6 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Deadlock";
 	case UNBLOCKED:
 		return "Unblocked";
-	default:
-		return "NULL";
-	}
-}
-
-int string_to_algoritmo_de_planificacion(char* algoritmo) {
-
-	if (strcmp(algoritmo, "FIFO") == 0)
-		return FIFO;
-
-	else if (strcmp(algoritmo, "RR") == 0)
-		return RR;
-
-	else if (strcmp(algoritmo, "SJF-CD") == 0)
-		return SJF_CD;
-
-	else if (strcmp(algoritmo, "SJF-SD") == 0)
-		return SJF_SD;
-}
-
-char* cola_planificacion_a_string(int cola_planificacion){
-	switch (cola_planificacion) {
-	case READY:
-		return "Ready";
-	case NEW:
-		return "New";
-	case BLOCKED:
-		return "Blocked";
-	case EXEC:
-		return "Exec";
-	case EXIT:
-		return "Exit";
 	default:
 		return "NULL";
 	}
