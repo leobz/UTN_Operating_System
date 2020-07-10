@@ -47,6 +47,7 @@ void correrTests() {
 	agregar_tests_appeared();
 	agregar_tests_caught();
 	agregar_tests_algoritmos_sjf();
+	agregar_tests_deadlock();
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
 	CU_cleanup_registry();

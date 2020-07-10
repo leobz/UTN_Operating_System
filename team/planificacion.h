@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
+#include "../utils/diccionarios.h"
 
 
 pthread_t planificador;
