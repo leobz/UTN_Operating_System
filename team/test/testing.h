@@ -9,6 +9,7 @@
 #include "test_movimiento_entrenador.h"
 #include "test_lista_blocked.h"
 #include "test_caught.h"
+#include "test_algoritmos_planificacion.h"
 
 void correrTests();
 
