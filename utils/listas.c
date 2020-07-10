@@ -33,6 +33,10 @@ void* list_first(t_list* lista){
 	return list_get(lista, 0);
 }
 
+void* list_last(t_list* lista){
+	return list_get(lista, list_size(lista)-1);
+}
+
 void* list_pop(t_list* lista, int index){
 	void* elemento = list_get(lista, index);
 	list_remove(lista, index);
