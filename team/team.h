@@ -91,7 +91,7 @@ typedef struct{
 	t_dictionary* objetivos;
 	t_queue* rafaga;
 	struct t_tcb_entrenador* entrenador_a_intercambiar;
-	t_pokemon* pokemon_a_intercambiar;
+	t_pokemon* pokemon_a_dar_en_intercambio;
 	int pokemones_max;
 	t_dictionary* pokemones_capturados;
 	estado_tcb estado_tcb;

@@ -409,7 +409,6 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }
 
-
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
 	t_dictionary* necesitados =  dictionary_substract(tcb->objetivos, tcb->pokemones_capturados);
 	return dictionary_keys_to_list(necesitados);
@@ -420,28 +419,42 @@ t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
 	return dictionary_keys_to_list(necesitados);
 }
 
-bool no_necesita_ningun_pokemon(t_tcb_entrenador* tcb, t_list* necesitados){
-	//TODO
+t_deadlock* crear_deadlock
+(t_tcb_entrenador* tcb_1, t_tcb_entrenador* tcb_2, t_list* puede_dar_tcb_1, t_list* puede_dar_tcb_2){
+	t_deadlock* deadlock = malloc(sizeof(t_deadlock));
+
+	deadlock->tcb_1 = tcb_1;
+	deadlock->tcb_2 = tcb_2;
+
+	deadlock->tcb_1->entrenador_a_intercambiar = deadlock->tcb_2;
+	deadlock->tcb_1->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_1);
+	//deadlock->tcb_1->estado_tcb = DEADLOCK;
+	//deadlock->tcb_2->estado_tcb = DEADLOCK;
+
+	deadlock->tcb_2->entrenador_a_intercambiar = deadlock->tcb_1;
+	deadlock->tcb_2->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_2);
+
+
+	return deadlock;
 }
 
-bool necesita_alguno(t_tcb_entrenador* tcb, t_list* no_necesitados){
-	//TODO
-}
-
-t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb) {
+t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 	t_deadlock* deadlock;
-	t_list* necesitados = pokemones_necesitados(tcb);
-	t_list* no_necesitados = pokemones_no_necesitados(tcb);
+	t_list* necesitados_tcb_1 = pokemones_necesitados(tcb_1);
+	t_list* no_necesitados_tcb_1 = pokemones_no_necesitados(tcb_1);
 
-	t_deadlock* detectar_espera_circular(t_tcb_entrenador* potencial_cambiador) {
+
+
+	t_deadlock* detectar_espera_circular(t_tcb_entrenador* tcb_2) {
 		t_deadlock* deadlock = NULL;
-		if (no_necesita_ningun_pokemon(potencial_cambiador, necesitados)) {
-			if (necesita_alguno(potencial_cambiador, no_necesitados)) {
-				t_deadlock* deadlock = malloc(sizeof(t_deadlock));
-				deadlock->tcb1 = tcb;
-				deadlock->tcb2 = potencial_cambiador;
-			}
+
+		t_list* puede_dar_tcb_1 = list_intersection(pokemones_necesitados(tcb_2), no_necesitados_tcb_1);
+		t_list* puede_dar_tcb_2 = list_intersection(pokemones_no_necesitados(tcb_2), necesitados_tcb_1);
+
+		if(list_size(puede_dar_tcb_1) > 0 && list_size(puede_dar_tcb_2) >0)  {
+			crear_deadlock(tcb_1, tcb_2, puede_dar_tcb_1, puede_dar_tcb_2);
 		}
+
 		return deadlock;
 	}
 
@@ -451,6 +464,7 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb) {
 
 		if(deadlock != NULL){ break; }
 	}
+
 	return deadlock;
 }
 

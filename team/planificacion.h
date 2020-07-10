@@ -18,8 +18,8 @@ pthread_mutex_t mutex_tcb_exec;
 pthread_mutex_t mutex_manejar_deadlock;
 
 typedef struct {
-	t_tcb_entrenador* tcb1;
-	t_tcb_entrenador* tcb2;
+	t_tcb_entrenador* tcb_1;
+	t_tcb_entrenador* tcb_2;
 } t_deadlock;
 
 // ESTRUCTURAS
