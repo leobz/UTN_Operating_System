@@ -15,7 +15,12 @@ pthread_t planificador;
 pthread_t reintentador_de_conexion;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_tcb_exec;
+pthread_mutex_t mutex_manejar_deadlock;
 
+typedef struct {
+	t_tcb_entrenador* tcb1;
+	t_tcb_entrenador* tcb2;
+} t_deadlock;
 
 // ESTRUCTURAS
 

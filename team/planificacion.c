@@ -13,6 +13,7 @@ void inicializar_listas() {
 	l_exit = list_create();
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
+	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -383,10 +384,23 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }
 
+
+t_deadlock* detectar_deadlock() {
+
+}
+
+void ejecutar_manejador_de_deadlocks() {
+	pthread_mutex_lock(&mutex_manejar_deadlock);
+	t_deadlock* deadlock = detectar_deadlock();
+	pthread_mutex_unlock(&mutex_manejar_deadlock);
+}
+
 void pasar_a_deadlock(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_lista_ready);
 	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
 	pthread_mutex_unlock(&mutex_lista_ready);
+
+	ejecutar_manejador_de_deadlocks();
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
