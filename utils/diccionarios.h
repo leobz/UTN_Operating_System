@@ -9,9 +9,10 @@
 #define DICCIONARIOS_H_
 
 #include <commons/collections/dictionary.h>
-#include <commons/collections/list.h>
 #include <stdlib.h>
 #include "../utils/serializacion.h"
+#include "../utils/listas.h"
+
 
 /**
 * @NAME: strings_to_dictionary
