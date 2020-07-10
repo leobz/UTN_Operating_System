@@ -400,8 +400,7 @@ void pasar_a_blocked(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
-	list_add(unblocked, tcb);
-	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Unblocked\n", tcb->tid);
+	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
@@ -444,6 +443,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Exit";
 	case DEADLOCK:
 		return "Deadlock";
+	case UNBLOCKED:
+		return "Unblocked";
 	default:
 		return "NULL";
 	}

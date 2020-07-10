@@ -49,6 +49,7 @@ typedef enum {
 	//estado_tcbS INTERMEDIOS
 	READY_TO_EXCHANGE = 6,
 	DEADLOCK = 7,
+	UNBLOCKED = 8,
 } estado_tcb;
 
 
