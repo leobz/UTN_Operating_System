@@ -386,11 +386,13 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 
 
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
-	//TODO
+	t_dictionary* necesitados =  dictionary_substract(tcb->objetivos, tcb->pokemones_capturados);
+	return dictionary_keys_to_list(necesitados);
 }
 
 t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
-	//TODO
+	t_dictionary* necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
+	return dictionary_keys_to_list(necesitados);
 }
 
 bool no_necesita_ningun_pokemon(t_tcb_entrenador* tcb, t_list* necesitados){
