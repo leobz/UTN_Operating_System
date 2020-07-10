@@ -54,3 +54,13 @@ void list_remove_element(t_list* lista, void* element){
 			list_remove(lista, i);
 	}
 }
+
+bool list_include(t_list* lista, void* element) {
+	bool include = false;
+	for(int i = 0;  i < list_size(lista); i++){
+		if  (list_get(lista, i) == element)
+			include = true;
+	}
+
+	return include;
+}

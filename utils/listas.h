@@ -59,4 +59,10 @@ t_list* strings_to_list(char** strings);
 */
 void list_remove_element(t_list* lista, void* element);
 
+/**
+* @NAME: list_include
+* @DESC: Si la lista contiene el elemento retorna true, sino, retorna false
+*/
+bool list_include(t_list* lista, void* element);
+
 #endif /* LISTAS_H_ */
