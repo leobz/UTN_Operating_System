@@ -11,7 +11,7 @@
 #include "test_lista_blocked.h"
 #include "test_caught.h"
 #include "test_appeared.h"
-
+#include "test_deadlock.h"
 
 void correrTests();
 
