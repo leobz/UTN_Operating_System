@@ -428,8 +428,8 @@ t_deadlock* crear_deadlock
 
 	deadlock->tcb_1->entrenador_a_intercambiar = deadlock->tcb_2;
 	deadlock->tcb_1->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_1);
-	//deadlock->tcb_1->estado_tcb = DEADLOCK;
-	//deadlock->tcb_2->estado_tcb = DEADLOCK;
+	deadlock->tcb_1->estado_tcb = DEADLOCK;
+	deadlock->tcb_2->estado_tcb = DEADLOCK;
 
 	deadlock->tcb_2->entrenador_a_intercambiar = deadlock->tcb_1;
 	deadlock->tcb_2->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_2);
@@ -442,8 +442,6 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 	t_deadlock* deadlock;
 	t_list* necesitados_tcb_1 = pokemones_necesitados(tcb_1);
 	t_list* no_necesitados_tcb_1 = pokemones_no_necesitados(tcb_1);
-
-
 
 	t_deadlock* detectar_espera_circular(t_tcb_entrenador* tcb_2) {
 		t_deadlock* deadlock = NULL;
@@ -462,7 +460,7 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 
 		t_tcb_entrenador* potencial_cambiador = list_get(ready_to_exchange, i);
 
-		if (tcb_1 != potencial_cambiador) {
+		if (tcb_1 != potencial_cambiador && potencial_cambiador->estado_tcb != DEADLOCK) {
 			deadlock = detectar_espera_circular(potencial_cambiador);
 		}
 
@@ -472,9 +470,18 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 	return deadlock;
 }
 
+void despachar_resolucion_de_deadlock(t_deadlock* deadlock) {
+	//cargar_rafaga_intercambio(tcb);
+	//pasar_a_ready(tcb);
+}
+
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
-	t_deadlock* ready_to_exchange = detectar_deadlock(tcb);
+	t_deadlock* deadlock = detectar_deadlock(tcb);
+
+	if (deadlock != NULL) {
+		despachar_resolucion_de_deadlock(deadlock);
+	}
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
 
