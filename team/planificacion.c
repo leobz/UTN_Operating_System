@@ -439,7 +439,7 @@ t_deadlock* crear_deadlock
 }
 
 t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
-	t_deadlock* deadlock;
+	t_deadlock* deadlock = NULL;
 	t_list* necesitados_tcb_1 = pokemones_necesitados(tcb_1);
 	t_list* no_necesitados_tcb_1 = pokemones_no_necesitados(tcb_1);
 

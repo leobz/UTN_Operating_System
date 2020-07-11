@@ -21,7 +21,7 @@ void agregar_tests_deadlock() {
 			test_crear_deadlock);
 
 	CU_add_test(suite_configuracion,
-			"Detectar deadlock ",
+			"Detectar posible deadlock de un tcb",
 			test_detectar_deadlock);
 }
 
@@ -100,8 +100,8 @@ void test_list_intersection(){
 	inserseccion_pokemones = list_intersection(primeros_pokemones, segundos_pokemones);
 
 	CU_ASSERT_EQUAL_FATAL(list_size(inserseccion_pokemones), 2);
-	CU_ASSERT_EQUAL_FATAL(list_get(inserseccion_pokemones, 0), "Pikachu");
-	CU_ASSERT_EQUAL_FATAL(list_get(inserseccion_pokemones, 1), "Charmander");
+	CU_ASSERT_STRING_EQUAL_FATAL(list_get(inserseccion_pokemones, 0), "Pikachu");
+	CU_ASSERT_STRING_EQUAL_FATAL(list_get(inserseccion_pokemones, 1), "Charmander");
 
 	list_clean(primeros_pokemones);
 	list_destroy(primeros_pokemones);
@@ -129,10 +129,12 @@ void test_crear_deadlock() {
 	CU_ASSERT_TRUE_FATAL(deadlock != NULL);
 	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, primer_tcb);
 	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_2, segundo_tcb);
+	CU_ASSERT_EQUAL_FATAL(primer_tcb->estado_tcb, DEADLOCK);
+	CU_ASSERT_EQUAL_FATAL(segundo_tcb->estado_tcb, DEADLOCK);
 	CU_ASSERT_EQUAL_FATAL(primer_tcb->entrenador_a_intercambiar, segundo_tcb);
 	CU_ASSERT_EQUAL_FATAL(segundo_tcb->entrenador_a_intercambiar, primer_tcb);
-	CU_ASSERT_EQUAL_FATAL(primer_tcb->pokemon_a_dar_en_intercambio, list_get(primeros_pokemones, 0));
-	CU_ASSERT_EQUAL_FATAL(segundo_tcb->pokemon_a_dar_en_intercambio, list_get(segundos_pokemones, 0));
+	CU_ASSERT_STRING_EQUAL_FATAL(primer_tcb->pokemon_a_dar_en_intercambio, list_get(primeros_pokemones, 0));
+	CU_ASSERT_STRING_EQUAL_FATAL(segundo_tcb->pokemon_a_dar_en_intercambio, list_get(segundos_pokemones, 0));
 
 	free(deadlock);
 	list_clean(primeros_pokemones);
@@ -150,12 +152,15 @@ void test_detectar_deadlock() {
 
 	t_dictionary* primer_tcb_objetivos = dictionary_create();
 	t_dictionary* primer_tcb_pokemones_capturados = dictionary_create();
-	t_list* dif_pokemones;
+	t_dictionary* tercer_tcb_objetivos = dictionary_create();
+	t_dictionary* tercer_tcb_pokemones_capturados = dictionary_create();
+
+	t_deadlock* deadlock = NULL;
 
 	/*
 	 * Primer tcb:
 	 * - Pokemones necesarios: "Squirtle"
-	 * - Ponemones no necesarios: "Alakazam"
+	 * - Pokemones no necesarios: "Alakazam"
 	*/
 
 	dictionary_put(primer_tcb_objetivos, "Pikachu", 1);
@@ -164,18 +169,54 @@ void test_detectar_deadlock() {
 	dictionary_put(primer_tcb_pokemones_capturados, "Alakazam", 2);
 	dictionary_put(primer_tcb_pokemones_capturados, "Pikachu", 1);
 
+	primer_tcb->estado_tcb = READY_TO_EXCHANGE;
 	primer_tcb->objetivos = primer_tcb_objetivos;
 	primer_tcb->pokemones_capturados = primer_tcb_pokemones_capturados;
 
 	/*
-	 * Primer tcb:
-	 * - Pokemones necesarios: "Squirtle"
-	 * - Ponemones no necesarios: "Alakazam"
+	 * Segundo tcb: No se tomará en cuenta debido a su estado DEADLOCK
 	*/
 
-	list_add(lista_deadlock, segundo_tcb);
-	list_add(lista_deadlock, tercer_tcb);
+	segundo_tcb->estado_tcb = DEADLOCK;
 
+	/*
+	 * Tercer tcb:
+	 * - Pokemones necesarios: "Alakazam"
+	 * - Pokemones no necesarios: "Squirtle", "Pidgey"
+	*/
+
+	dictionary_put(tercer_tcb_objetivos, "Charmander", 1);
+	dictionary_put(tercer_tcb_objetivos, "Alakazam", 2);
+
+	dictionary_put(tercer_tcb_pokemones_capturados, "Squirtle", 1);
+	dictionary_put(tercer_tcb_pokemones_capturados, "Charmander", 1);
+	dictionary_put(tercer_tcb_pokemones_capturados, "Pidgey", 1);
+
+	tercer_tcb->estado_tcb = READY_TO_EXCHANGE;
+	tercer_tcb->objetivos = tercer_tcb_objetivos;
+	tercer_tcb->pokemones_capturados = tercer_tcb_pokemones_capturados;
+
+	list_add(ready_to_exchange, primer_tcb);
+	list_add(ready_to_exchange, segundo_tcb);
+	list_add(ready_to_exchange, tercer_tcb);
+
+	deadlock = detectar_deadlock(primer_tcb);
+
+	CU_ASSERT_TRUE_FATAL(deadlock != NULL);
+	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, primer_tcb);
+	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_2, tercer_tcb);
+	CU_ASSERT_EQUAL_FATAL(primer_tcb->estado_tcb, DEADLOCK);
+	CU_ASSERT_EQUAL_FATAL(tercer_tcb->estado_tcb, DEADLOCK);
+	CU_ASSERT_EQUAL_FATAL(primer_tcb->entrenador_a_intercambiar, tercer_tcb);
+	CU_ASSERT_EQUAL_FATAL(tercer_tcb->entrenador_a_intercambiar, primer_tcb);
+	CU_ASSERT_STRING_EQUAL_FATAL(primer_tcb->pokemon_a_dar_en_intercambio, "Alakazam");
+	CU_ASSERT_STRING_EQUAL_FATAL(tercer_tcb->pokemon_a_dar_en_intercambio, "Squirtle");
+
+	free(deadlock);
+	dictionary_clean(tercer_tcb_pokemones_capturados);
+	dictionary_destroy(tercer_tcb_pokemones_capturados);
+	dictionary_clean(tercer_tcb_objetivos);
+	dictionary_destroy(tercer_tcb_objetivos);
 	dictionary_clean(primer_tcb_pokemones_capturados);
 	dictionary_destroy(primer_tcb_pokemones_capturados);
 	dictionary_clean(primer_tcb_objetivos);
