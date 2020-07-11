@@ -115,4 +115,6 @@ void*obtener_de_diccionario(t_dictionary*dictionary, int key);
 bool esta_en_diccionario(t_dictionary* dictionary,int key);
 void *sacar_de_diccionario(t_dictionary* dictionary,int key);
 
+void remover_decrementar_value_en_diccionario(t_dictionary* dic, char* key);
+
 #endif /* DICCIONARIOS_H_ */

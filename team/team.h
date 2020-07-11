@@ -57,6 +57,7 @@ typedef enum {
 	MOVERSE = 1,
 	CATCH = 2,
 	INTERCAMBIAR = 3,
+	MOVERSE_A_ENTRENADOR = 4
 } instruccion;
 
 

@@ -140,3 +140,11 @@ t_list* dictionary_keys_to_list(t_dictionary* dictionary){
 	return list;
 }
 
+void remover_decrementar_value_en_diccionario(t_dictionary* dic, char* key) {
+	if (dictionary_has_key(dic, key)) {
+		if (dictionary_get(dic, key) == 1)
+			dictionary_remove(dic, key);
+		else
+			dictionary_decrement_value(dic, key);
+	}
+}
