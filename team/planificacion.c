@@ -9,7 +9,7 @@ void inicializar_listas() {
 	blocked = list_create();
 	new = list_create();
 	unblocked = list_create();
-	lista_deadlock = list_create();
+	ready_to_exchange = list_create();
 	l_exit = list_create();
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
@@ -336,7 +336,7 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
-			pasar_a_deadlock(tcb);
+			pasar_a_ready_to_exchange(tcb);
 		}
 	} else {
 		pasar_a_unblocked(tcb);
@@ -458,8 +458,8 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 		return deadlock;
 	}
 
-	for(int i = 0; i< list_size(lista_deadlock); i++) {
-		t_tcb_entrenador* potencial_cambiador = list_get(lista_deadlock, i);
+	for(int i = 0; i< list_size(ready_to_exchange); i++) {
+		t_tcb_entrenador* potencial_cambiador = list_get(ready_to_exchange, i);
 		deadlock = detectar_espera_circular(potencial_cambiador);
 
 		if(deadlock != NULL){ break; }
@@ -470,14 +470,12 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
-	t_deadlock* lista_deadlock = detectar_deadlock(tcb);
+	t_deadlock* ready_to_exchange = detectar_deadlock(tcb);
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
 
-void pasar_a_deadlock(t_tcb_entrenador* tcb) {
-	pthread_mutex_lock(&mutex_lista_ready);
-	pasar_a_cola(tcb, lista_deadlock, DEADLOCK, "Deadlock");
-	pthread_mutex_unlock(&mutex_lista_ready);
+void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb) {
+	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, "Atrapó el máximo permitido");
 
 	ejecutar_manejador_de_deadlocks(tcb);
 }
@@ -513,6 +511,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Deadlock";
 	case UNBLOCKED:
 		return "Unblocked";
+	case READY_TO_EXCHANGE:
+		return "Ready to Exchange";
 	default:
 		return "NULL";
 	}

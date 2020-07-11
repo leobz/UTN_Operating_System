@@ -30,7 +30,7 @@ t_list* ready;
 t_list* new;
 t_list* blocked;
 t_list* unblocked;
-t_list* lista_deadlock;
+t_list* ready_to_exchange;
 t_list* l_exit;
 
 t_log* logger;
