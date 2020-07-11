@@ -23,6 +23,10 @@ void agregar_tests_deadlock() {
 	CU_add_test(suite_configuracion,
 			"Detectar posible deadlock de un tcb",
 			test_detectar_deadlock);
+
+	CU_add_test(suite_configuracion,
+			"Despachar deadlock carga rafaga de TCB y lo envia a ready",
+			test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready);
 }
 
 void test_pokemones_necesitados() {
@@ -225,3 +229,32 @@ void test_detectar_deadlock() {
 	free(segundo_tcb);
 	free(primer_tcb);
 }
+
+void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready() {
+	t_tcb_entrenador* tcb_1 = tcb_generico(NULL);
+	t_tcb_entrenador* tcb_2 = tcb_generico(NULL);
+
+	tcb_1->posicion->x = 0;
+	tcb_1->posicion->y = 0;
+
+	tcb_2->posicion->x = 1;
+	tcb_2->posicion->y = 1;
+
+	t_deadlock* deadlock = crear_deadlock(tcb_1, tcb_2, list_create(), list_create());
+	ready = list_create();
+
+	despachar_resolucion_de_deadlock(deadlock);
+
+	CU_ASSERT_EQUAL(queue_size(deadlock->tcb_1->rafaga), 3);
+	test_leer_instrucciones(deadlock->tcb_1, 2, MOVERSE);
+	CU_ASSERT_EQUAL(queue_peek(deadlock->tcb_1->rafaga), INTERCAMBIAR);
+
+	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, list_first(ready));
+
+	free(deadlock->tcb_1->posicion);
+	free(deadlock->tcb_2->posicion);
+	free(deadlock->tcb_1);
+	free(deadlock->tcb_2);
+	free(deadlock);
+}
+

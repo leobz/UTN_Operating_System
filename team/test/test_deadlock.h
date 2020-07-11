@@ -4,6 +4,7 @@
 #include "CUnit/Basic.h"
 #include "../planificacion.h"
 #include "common_testing.h"
+#include "test_rafagas.h"
 
 void agregar_tests_deadlock();
 
@@ -12,5 +13,6 @@ void test_pokemones_no_necesitados();
 void test_list_intersection();
 void test_crear_deadlock();
 void test_detectar_deadlock();
+void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready();
 
 #endif /* TEST_TEST_DEADLOCK_H_ */
