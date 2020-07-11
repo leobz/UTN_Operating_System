@@ -459,8 +459,12 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 	}
 
 	for(int i = 0; i< list_size(ready_to_exchange); i++) {
+
 		t_tcb_entrenador* potencial_cambiador = list_get(ready_to_exchange, i);
-		deadlock = detectar_espera_circular(potencial_cambiador);
+
+		if (tcb_1 != potencial_cambiador) {
+			deadlock = detectar_espera_circular(potencial_cambiador);
+		}
 
 		if(deadlock != NULL){ break; }
 	}
