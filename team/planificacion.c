@@ -452,7 +452,7 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 		t_list* puede_dar_tcb_2 = list_intersection(pokemones_no_necesitados(tcb_2), necesitados_tcb_1);
 
 		if(list_size(puede_dar_tcb_1) > 0 && list_size(puede_dar_tcb_2) >0)  {
-			crear_deadlock(tcb_1, tcb_2, puede_dar_tcb_1, puede_dar_tcb_2);
+			deadlock = crear_deadlock(tcb_1, tcb_2, puede_dar_tcb_1, puede_dar_tcb_2);
 		}
 
 		return deadlock;
