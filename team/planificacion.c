@@ -206,7 +206,7 @@ void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) 
 }
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
-	// TODO
+	cargar_rafaga_movimiento(tcb, tcb->entrenador_a_intercambiar->posicion);
 }
 
 void cargar_rafaga_movimiento(t_tcb_entrenador* tcb,
