@@ -329,15 +329,20 @@ int cumplio_objetivo(t_tcb_entrenador* tcb) {
 	return dictionaries_are_equals(tcb->pokemones_capturados, tcb->objetivos);
 }
 
+char* string_maximo_permitido(t_tcb_entrenador* tcb) {
+	int length = strlen("Capturó máximo permitido()") + 10;
+	char* string_maximo_permitido = malloc(length);
+	snprintf(string_maximo_permitido, length, "Capturó máximo permitido(%d)", tcb->pokemones_max);
+	return string_maximo_permitido;
+}
+
 void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 	if (capturo_maximo_permitido(tcb)) {
-		printf("[TCB-info] TID:%d Capturó máximo permitido(%d)\n", tcb->tid, tcb->pokemones_max);
-
 		if (cumplio_objetivo(tcb)) {
 			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
-			pasar_a_ready_to_exchange(tcb);
+			pasar_a_ready_to_exchange(tcb, string_maximo_permitido(tcb));
 		}
 	} else {
 		pasar_a_unblocked(tcb);
@@ -351,7 +356,8 @@ void agregar_pokemon_a_atrapados(t_tcb_entrenador* tcb) {
 void confirmar_caught(t_tcb_entrenador* tcb){
 	agregar_pokemon_a_atrapados(tcb);
 	asignar_pokemon(tcb);
-	printf("[TCB-info] TID:%d Capturó pokemon. Total capturados:%d\n", tcb->tid, total_capturados(tcb));
+
+	log_info(logger, "[CAPTURA] TID:%d Capturó pokemon. Total capturados:%d", tcb->tid, total_capturados(tcb));
 }
 
 char* recibir_id_correlativo(int socket_cliente) {
@@ -487,8 +493,8 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
 
-void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb) {
-	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, "Atrapó el máximo permitido");
+void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb, char* motivo) {
+	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, motivo);
 
 	ejecutar_manejador_de_deadlocks(tcb);
 }
