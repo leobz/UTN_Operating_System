@@ -207,6 +207,7 @@ void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) 
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
 	cargar_rafaga_movimiento(tcb, tcb->entrenador_a_intercambiar->posicion);
+	cargar_instruccion(tcb, INTERCAMBIAR);
 }
 
 void cargar_rafaga_movimiento(t_tcb_entrenador* tcb,
@@ -471,8 +472,8 @@ t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 }
 
 void despachar_resolucion_de_deadlock(t_deadlock* deadlock) {
-	//cargar_rafaga_intercambio(tcb);
-	//pasar_a_ready(tcb);
+	cargar_rafaga_intercambio(deadlock->tcb_1);
+	pasar_a_ready(deadlock->tcb_1, "Entrenador va a intercambiar");
 }
 
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
@@ -482,6 +483,7 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	if (deadlock != NULL) {
 		despachar_resolucion_de_deadlock(deadlock);
 	}
+	free(deadlock);
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
 
