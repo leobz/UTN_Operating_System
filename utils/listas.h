@@ -66,6 +66,12 @@ void list_remove_element(t_list* lista, void* element);
 bool list_include(t_list* lista, void* element);
 
 /**
+* @NAME: list_include_string
+* @DESC: Si la lista contiene el string retorna true, sino, retorna false
+*/
+bool list_include_string(t_list* lista, char* element);
+
+/**
 * @NAME: list_intersection
 * @DESC: Retorna la interseccion entre dos listas
 */
