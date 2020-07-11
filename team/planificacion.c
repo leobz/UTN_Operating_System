@@ -446,6 +446,8 @@ t_deadlock* crear_deadlock
 }
 
 t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
+	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock");
+
 	t_deadlock* deadlock = NULL;
 	t_list* necesitados_tcb_1 = pokemones_necesitados(tcb_1);
 	t_list* no_necesitados_tcb_1 = pokemones_no_necesitados(tcb_1);
@@ -482,13 +484,28 @@ void despachar_resolucion_de_deadlock(t_deadlock* deadlock) {
 	pasar_a_ready(deadlock->tcb_1, "Entrenador va a intercambiar");
 }
 
+void loggear_deteccion_de_deadlock(t_deadlock* deadlock) {
+	log_info(logger,
+			"[DEADLOCK] Se detectó espera circular entre TCB: %d -> Pokemon: %s y TCB: %d -> Pokemon: %s",
+			deadlock->tcb_1->tid,
+			deadlock->tcb_1->pokemon_a_dar_en_intercambio,
+			deadlock->tcb_2->tid,
+			deadlock->tcb_2->pokemon_a_dar_en_intercambio);
+}
+
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
 	t_deadlock* deadlock = detectar_deadlock(tcb);
 
 	if (deadlock != NULL) {
+		loggear_deteccion_de_deadlock(deadlock);
 		despachar_resolucion_de_deadlock(deadlock);
 	}
+	else
+	{
+		log_info(logger,"[DEADLOCK] No se detectó espera circular entre los TCBs");
+	}
+
 	free(deadlock);
 	pthread_mutex_unlock(&mutex_manejar_deadlock);
 }
