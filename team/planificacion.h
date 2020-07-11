@@ -9,13 +9,19 @@
 #include <pthread.h>
 #include <commons/collections/list.h>
 #include "../utils/listas.h"
+#include "../utils/diccionarios.h"
 
 
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_tcb_exec;
+pthread_mutex_t mutex_manejar_deadlock;
 
+typedef struct {
+	t_tcb_entrenador* tcb_1;
+	t_tcb_entrenador* tcb_2;
+} t_deadlock;
 
 // ESTRUCTURAS
 
@@ -66,4 +72,14 @@ void asignar_pokemon(t_tcb_entrenador*);
 // Utilidades
 int string_to_algoritmo_de_planificacion(char*);
 char* cola_planificacion_a_string(int);
+
+//Deadlock
+t_list* pokemones_necesitados(t_tcb_entrenador* tcb);
+t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb);
+t_deadlock* detectar_deadlock(t_tcb_entrenador*);
+t_deadlock* crear_deadlock
+(t_tcb_entrenador*, t_tcb_entrenador*, t_list*, t_list*);
+void ejecutar_manejador_de_deadlocks(t_tcb_entrenador*);
+
+
 #endif /* PLANIFICACION_H_ */

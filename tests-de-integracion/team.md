@@ -41,7 +41,7 @@ $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6
 #### Se agrega al Mapa -> Se planifica entrenador
 
 El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
-Luego de capturarlo, pasa a la cola de deadlock, ya que capturo su maximo permitido
+Luego de capturarlo, pasa a la cola de ReadyToExchange, ya que capturo su maximo permitido
 
 ```bash
 $ cat team.log
@@ -50,7 +50,7 @@ $ cat team.log
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:2 (Exec->Deadlock) (6, 6) Motivo:Deadlock
+<...>[CAMBIO DE COLA] TID:2 (Exec->Ready to Exchange) (6, 6) Motivo:Atrapó el máximo permitido
 ```
 
 ### APPEARED_POKEMON 2

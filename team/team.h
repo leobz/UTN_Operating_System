@@ -30,7 +30,7 @@ t_list* ready;
 t_list* new;
 t_list* blocked;
 t_list* unblocked;
-t_list* deadlock;
+t_list* ready_to_exchange;
 t_list* l_exit;
 
 t_log* logger;
@@ -84,13 +84,14 @@ typedef struct{
 }t_pokemon;
 
 
-typedef struct{
+typedef struct t_tcb{
 	pthread_t* entrenador;
 	int tid;
 	t_posicion* posicion;
 	t_dictionary* objetivos;
 	t_queue* rafaga;
-	struct t_tcb_entrenador* entrenador_a_intercambiar;
+	struct t_tcb* entrenador_a_intercambiar;
+	char* pokemon_a_dar_en_intercambio;
 	int pokemones_max;
 	t_dictionary* pokemones_capturados;
 	estado_tcb estado_tcb;

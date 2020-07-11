@@ -9,10 +9,11 @@ void inicializar_listas() {
 	blocked = list_create();
 	new = list_create();
 	unblocked = list_create();
-	deadlock = list_create();
+	ready_to_exchange = list_create();
 	l_exit = list_create();
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
+	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -205,7 +206,8 @@ void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) 
 }
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
-	// TODO
+	cargar_rafaga_movimiento(tcb, tcb->entrenador_a_intercambiar->posicion);
+	cargar_instruccion(tcb, INTERCAMBIAR);
 }
 
 void cargar_rafaga_movimiento(t_tcb_entrenador* tcb,
@@ -335,7 +337,7 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
-			pasar_a_deadlock(tcb);
+			pasar_a_ready_to_exchange(tcb);
 		}
 	} else {
 		pasar_a_unblocked(tcb);
@@ -408,10 +410,87 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }
 
-void pasar_a_deadlock(t_tcb_entrenador* tcb) {
-	pthread_mutex_lock(&mutex_lista_ready);
-	pasar_a_cola(tcb, deadlock, DEADLOCK, "Deadlock");
-	pthread_mutex_unlock(&mutex_lista_ready);
+t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
+	t_dictionary* necesitados =  dictionary_substract(tcb->objetivos, tcb->pokemones_capturados);
+	return dictionary_keys_to_list(necesitados);
+}
+
+t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
+	t_dictionary* necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
+	return dictionary_keys_to_list(necesitados);
+}
+
+t_deadlock* crear_deadlock
+(t_tcb_entrenador* tcb_1, t_tcb_entrenador* tcb_2, t_list* puede_dar_tcb_1, t_list* puede_dar_tcb_2){
+	t_deadlock* deadlock = malloc(sizeof(t_deadlock));
+
+	deadlock->tcb_1 = tcb_1;
+	deadlock->tcb_2 = tcb_2;
+
+	deadlock->tcb_1->entrenador_a_intercambiar = deadlock->tcb_2;
+	deadlock->tcb_1->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_1);
+	deadlock->tcb_1->estado_tcb = DEADLOCK;
+	deadlock->tcb_2->estado_tcb = DEADLOCK;
+
+	deadlock->tcb_2->entrenador_a_intercambiar = deadlock->tcb_1;
+	deadlock->tcb_2->pokemon_a_dar_en_intercambio = list_first(puede_dar_tcb_2);
+
+
+	return deadlock;
+}
+
+t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
+	t_deadlock* deadlock = NULL;
+	t_list* necesitados_tcb_1 = pokemones_necesitados(tcb_1);
+	t_list* no_necesitados_tcb_1 = pokemones_no_necesitados(tcb_1);
+
+	t_deadlock* detectar_espera_circular(t_tcb_entrenador* tcb_2) {
+		t_deadlock* deadlock = NULL;
+
+		t_list* puede_dar_tcb_1 = list_intersection(pokemones_necesitados(tcb_2), no_necesitados_tcb_1);
+		t_list* puede_dar_tcb_2 = list_intersection(pokemones_no_necesitados(tcb_2), necesitados_tcb_1);
+
+		if(list_size(puede_dar_tcb_1) > 0 && list_size(puede_dar_tcb_2) >0)  {
+			deadlock = crear_deadlock(tcb_1, tcb_2, puede_dar_tcb_1, puede_dar_tcb_2);
+		}
+
+		return deadlock;
+	}
+
+	for(int i = 0; i< list_size(ready_to_exchange); i++) {
+
+		t_tcb_entrenador* potencial_cambiador = list_get(ready_to_exchange, i);
+
+		if (tcb_1 != potencial_cambiador && potencial_cambiador->estado_tcb != DEADLOCK) {
+			deadlock = detectar_espera_circular(potencial_cambiador);
+		}
+
+		if(deadlock != NULL){ break; }
+	}
+
+	return deadlock;
+}
+
+void despachar_resolucion_de_deadlock(t_deadlock* deadlock) {
+	cargar_rafaga_intercambio(deadlock->tcb_1);
+	pasar_a_ready(deadlock->tcb_1, "Entrenador va a intercambiar");
+}
+
+void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
+	pthread_mutex_lock(&mutex_manejar_deadlock);
+	t_deadlock* deadlock = detectar_deadlock(tcb);
+
+	if (deadlock != NULL) {
+		despachar_resolucion_de_deadlock(deadlock);
+	}
+	free(deadlock);
+	pthread_mutex_unlock(&mutex_manejar_deadlock);
+}
+
+void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb) {
+	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, "Atrapó el máximo permitido");
+
+	ejecutar_manejador_de_deadlocks(tcb);
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
@@ -445,6 +524,8 @@ char* cola_planificacion_a_string(int cola_planificacion){
 		return "Deadlock";
 	case UNBLOCKED:
 		return "Unblocked";
+	case READY_TO_EXCHANGE:
+		return "Ready to Exchange";
 	default:
 		return "NULL";
 	}

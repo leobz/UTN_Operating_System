@@ -54,3 +54,31 @@ void list_remove_element(t_list* lista, void* element){
 			list_remove(lista, i);
 	}
 }
+
+bool list_include(t_list* lista, void* element) {
+	bool include = false;
+	for(int i = 0;  i < list_size(lista); i++){
+		if  (list_get(lista, i) == element)
+			include = true;
+	}
+
+	return include;
+}
+
+bool list_include_string(t_list* lista, char* element) {
+	bool include = false;
+	for(int i = 0;  i < list_size(lista); i++){
+		if  (strcmp(list_get(lista, i),element) == 0)
+			include = true;
+	}
+
+	return include;
+}
+
+t_list* list_intersection(t_list* lista_a, t_list* lista_b) {
+	bool list_b_include_element_a(char* elemento_de_a) {
+		return list_include_string(lista_b, elemento_de_a);
+	}
+
+	return list_filter(lista_a, (void*) list_b_include_element_a);
+}
