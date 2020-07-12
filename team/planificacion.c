@@ -220,7 +220,6 @@ void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
 	cargar_rafaga_movimiento(tcb, posicion_pokemon);
 	cargar_instruccion(tcb, CATCH);
-
 }
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {

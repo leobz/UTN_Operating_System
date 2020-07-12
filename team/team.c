@@ -109,6 +109,15 @@ void inicializar_tcbs_enviaron_catch() {
 	enviaron_catch = dictionary_create();
 }
 
+void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
+	if (list_get(team_config->pokemon_entrenadores, *i) != NULL) {
+		return list_get(team_config->pokemon_entrenadores, *i);
+	}
+	else {
+		return dictionary_create();
+	}
+}
+
 // CARGA DE TCBs
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
@@ -121,8 +130,8 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 				i);
 		entrenador->objetivos = list_get(team_config->objetivos_entrenadores,
 				i);
-		entrenador->pokemones_capturados = list_get(
-				team_config->pokemon_entrenadores, i);
+		entrenador->pokemones_capturados = inicializar_pokemones_capturados(
+				team_config, &i);
 		entrenador->estado_tcb = NEW;
 		entrenador->rafaga = queue_create();
 		entrenador->pokemones_max = sum_dictionary_values(entrenador->objetivos);
