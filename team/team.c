@@ -130,6 +130,8 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->rafaga_anterior = 0;
 		entrenador->estimacion_anterior = team_config->estimacion_inicial;
 
+		dictionary_put(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(entrenador->tid), 0);
+
 		list_add(new, entrenador);
 	}
 }

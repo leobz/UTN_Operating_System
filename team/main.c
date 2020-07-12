@@ -19,7 +19,9 @@ int main(int argc, char ** argv) {
 
 	inicializar_listas();
 	inicializar_diccionarios(team_config);
+	inicializar_metricas();
 	crear_tcb_entrenadores(team_config);
+
 
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)

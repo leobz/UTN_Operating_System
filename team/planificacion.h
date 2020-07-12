@@ -32,11 +32,21 @@ typedef enum {
 	SJF_CD = 4,
 } tipo_de_planificacion;
 
+typedef struct {
+	int cantidad_ciclos_CPU_totales;
+	int cantidad_cambios_contexto;
+	t_dictionary* cantidad_ciclos_CPU_entrenador;
+	int cantidad_deadlocks_producidos;
+	int cantidad_deadlocks_resueltos;
+} t_metricas;
+
+t_metricas* metricas;
 
 // Inicializacion
 void inicializar_listas();
 void inicializar_diccionarios();
 void iniciar_planificador();
+void inicializar_metricas();
 void planificar();
 
 // Carga de TCB

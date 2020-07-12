@@ -40,6 +40,17 @@ void iniciar_planificador() {
 	pthread_detach(planificador);
 }
 
+void inicializar_metricas() {
+	metricas = malloc(sizeof(t_metricas));
+
+	metricas->cantidad_ciclos_CPU_totales = 0;
+	metricas->cantidad_cambios_contexto = 0;
+	metricas->cantidad_ciclos_CPU_entrenador = dictionary_create();
+	metricas->cantidad_deadlocks_producidos = 0;
+	metricas->cantidad_deadlocks_resueltos = 0;
+
+}
+
 void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 	sem_post(tcb_exec->semaforo);
 }
@@ -169,47 +180,49 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 }
 
 void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
+	int cantidad_ciclos_instruccion = 1;
+
 	switch (instruccion) {
-	case MOVERSE:
-		actualizar_posicion(tcb);
+		case MOVERSE:
+			actualizar_posicion(tcb);
 
-		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
-				tcb->posicion->x, tcb->posicion->y);
-		sleep(team_config->retardo_ciclo_cpu);
-		break;
-	case MOVERSE_A_ENTRENADOR:
-		actualizar_posicion_entrenador_intercambio(tcb);
+			log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
+					tcb->posicion->x, tcb->posicion->y);
+			break;
+		case MOVERSE_A_ENTRENADOR:
+			actualizar_posicion_entrenador_intercambio(tcb);
 
-		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
-				tcb->posicion->x, tcb->posicion->y);
-		sleep(team_config->retardo_ciclo_cpu);
-		break;
-	case CATCH:
-		log_info(logger, "[INSTRUCCION] TID:%d, CATCH %s %d %d",
-				tcb->tid,
-				tcb->pokemon_a_capturar->pokemon,
-				tcb->pokemon_a_capturar->posicion->x,
-				tcb->pokemon_a_capturar->posicion->y);
-		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
-		// a que me devuelvan un id_correlativo y eso puede tardar
-		ejecutar_catch(tcb);
-		sleep(team_config->retardo_ciclo_cpu);
-		break;
-	case INTERCAMBIAR:
-		log_info(logger, "[INSTRUCCION] INTERCAMBIO, TID entrenador: %d, TID entrenador a intercambiar: %d",
-						tcb->tid,
-						tcb->entrenador_a_intercambiar->tid);
-		t_tcb_entrenador* entrenador = tcb;
-		t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
+			log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
+					tcb->posicion->x, tcb->posicion->y);
+			break;
+		case CATCH:
+			log_info(logger, "[INSTRUCCION] TID:%d, CATCH %s %d %d",
+					tcb->tid,
+					tcb->pokemon_a_capturar->pokemon,
+					tcb->pokemon_a_capturar->posicion->x,
+					tcb->pokemon_a_capturar->posicion->y);
+			//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
+			// a que me devuelvan un id_correlativo y eso puede tardar
+			ejecutar_catch(tcb);
+			break;
+		case INTERCAMBIAR:
+			log_info(logger, "[INSTRUCCION] INTERCAMBIO, TID entrenador: %d, TID entrenador a intercambiar: %d",
+							tcb->tid,
+							tcb->entrenador_a_intercambiar->tid);
+			t_tcb_entrenador* entrenador = tcb;
+			t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
 
-		ejecutar_intercambio(tcb);
+			ejecutar_intercambio(tcb);
 
-		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
-		ejecutar_acciones_post_intercambio(entrenador, false);
+			ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
+			ejecutar_acciones_post_intercambio(entrenador, false);
 
-		sleep(team_config->retardo_ciclo_cpu * 5);
-		break;
+			cantidad_ciclos_instruccion = 5;
+			break;
 	}
+	sleep(team_config->retardo_ciclo_cpu * cantidad_ciclos_instruccion);
+	metricas->cantidad_ciclos_CPU_totales += cantidad_ciclos_instruccion;
+	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(tcb->tid), cantidad_ciclos_instruccion);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -469,6 +482,7 @@ void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* m
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_lock(&mutex_lista_ready);
+	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
 }
@@ -476,22 +490,25 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
 	tcb_exec->estado_tcb = EXEC;
 	list_remove_element(ready, tcb_exec);
-
+	metricas->cantidad_cambios_contexto++;
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
+	metricas->cantidad_cambios_contexto++;
 	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
+	metricas->cantidad_cambios_contexto++;
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	tcb->estado_tcb = EXIT;
 	list_add(l_exit, tcb);
+	metricas->cantidad_cambios_contexto++;
 	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }
 
@@ -591,7 +608,7 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 
 void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb, char* motivo) {
 	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, motivo);
-
+	metricas->cantidad_cambios_contexto++;
 	ejecutar_manejador_de_deadlocks(tcb);
 }
 
