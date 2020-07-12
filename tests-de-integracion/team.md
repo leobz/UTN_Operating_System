@@ -50,6 +50,8 @@ $ cat team.log
 <...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
 <...>[CAPTURA] TID:2 Capturó pokemon. Total capturados:2<...>
 <...>[CAMBIO DE COLA] TID:2 (Exec->Ready to Exchange) (6, 6) Motivo:Capturó máximo permitido(2)
+<...>[DEADLOCK] Inicio de detección de deadlock
+<...>[DEADLOCK] No se detectó espera circular entre los TCBs
 ```
 
 ### APPEARED_POKEMON 2
