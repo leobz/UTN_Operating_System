@@ -25,7 +25,19 @@ void agregar_tests_deadlock() {
 			test_detectar_deadlock);
 
 	CU_add_test(suite_configuracion,
-			"Despachar deadlock carga rafaga de TCB y lo envia a ready",
+			"Ejecutar intercambio de pokemon entre dos entrenadores",
+			test_ejecutar_intercambio);
+
+	CU_add_test(suite_configuracion,
+			"Ejecutar las acciones correspondientes post intercambio para un entrenador a intercambiar que no haya cumplido su objetivo",
+			test_ejecutar_acciones_post_intercambio_para_tcb_a_intercambiar_sin_objetivo_cumplido);
+
+	CU_add_test(suite_configuracion,
+			"Ejecutar las acciones correspondientes post intercambio para un entrenador que haya cumplido su objetivo",
+			test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido);
+  
+	CU_add_test(suite_configuracion,
+      "Despachar deadlock carga rafaga de TCB y lo envia a ready",
 			test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready);
 }
 
@@ -230,6 +242,107 @@ void test_detectar_deadlock() {
 	free(primer_tcb);
 }
 
+void test_ejecutar_intercambio() {
+	t_tcb_entrenador* tcb = malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_a_intercambiar = malloc(sizeof(t_tcb_entrenador));
+	t_dictionary* tcb_capturados = dictionary_create();
+	t_dictionary* tcb_a_intercambiar_capturados = dictionary_create();
+
+	dictionary_put(tcb_capturados, "Alakazam", 1);
+	dictionary_put(tcb_a_intercambiar_capturados, "Pidgey", 2);
+
+	tcb->pokemones_capturados = tcb_capturados;
+	tcb->pokemon_a_dar_en_intercambio = "Alakazam";
+	tcb->entrenador_a_intercambiar = tcb_a_intercambiar;
+
+	tcb_a_intercambiar->pokemones_capturados = tcb_a_intercambiar_capturados;
+	tcb_a_intercambiar->pokemon_a_dar_en_intercambio = "Pidgey";
+	tcb_a_intercambiar->entrenador_a_intercambiar = tcb;
+
+	ejecutar_intercambio(tcb);
+
+	CU_ASSERT_EQUAL_FATAL(dictionary_get(tcb->pokemones_capturados, "Pidgey"), 1);
+	CU_ASSERT_FALSE_FATAL(dictionary_has_key(tcb->pokemones_capturados, "Alakazam"));
+	CU_ASSERT_TRUE_FATAL(tcb->entrenador_a_intercambiar == NULL);
+	CU_ASSERT_TRUE_FATAL(tcb->pokemon_a_dar_en_intercambio == NULL);
+
+	CU_ASSERT_EQUAL_FATAL(dictionary_get(tcb_a_intercambiar->pokemones_capturados, "Alakazam"), 1);
+	CU_ASSERT_EQUAL_FATAL(dictionary_get(tcb_a_intercambiar->pokemones_capturados, "Pidgey"), 1);
+	CU_ASSERT_TRUE_FATAL(tcb_a_intercambiar->entrenador_a_intercambiar == NULL);
+	CU_ASSERT_TRUE_FATAL(tcb_a_intercambiar->pokemon_a_dar_en_intercambio == NULL);
+
+	dictionary_clean(tcb_a_intercambiar_capturados);
+	dictionary_destroy(tcb_a_intercambiar_capturados);
+	dictionary_clean(tcb_capturados);
+	dictionary_destroy(tcb_capturados);
+	free(tcb_a_intercambiar);
+	free(tcb);
+}
+
+void test_ejecutar_acciones_post_intercambio_para_tcb_a_intercambiar_sin_objetivo_cumplido() {
+	t_tcb_entrenador* tcb = malloc(sizeof(t_tcb_entrenador));
+	t_dictionary* objetivos = dictionary_create();
+	t_dictionary* capturados = dictionary_create();
+
+	dictionary_put(objetivos, "Pikachu", 1);
+	dictionary_put(objetivos, "Pidgey", 2);
+
+	dictionary_put(capturados, "Pikachu", 1);
+	dictionary_put(capturados, "Pidgey", 1);
+	dictionary_put(capturados, "Alakazam", 1);
+
+	tcb->estado_tcb = DEADLOCK;
+	tcb->objetivos = objetivos;
+	tcb->pokemones_capturados = capturados;
+
+	list_add(ready_to_exchange, tcb);
+
+	ejecutar_acciones_post_intercambio(tcb, true);
+
+	CU_ASSERT_EQUAL_FATAL(list_get(ready_to_exchange, 0), tcb);
+	CU_ASSERT_EQUAL_FATAL(tcb->estado_tcb, READY_TO_EXCHANGE);
+
+	list_clean(ready_to_exchange);
+	dictionary_clean(capturados);
+	dictionary_destroy(capturados);
+	dictionary_clean(objetivos);
+	dictionary_destroy(objetivos);
+	free(tcb);
+}
+
+void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido() {
+	t_tcb_entrenador* tcb = malloc(sizeof(t_tcb_entrenador));
+	t_dictionary* objetivos = dictionary_create();
+	t_dictionary* capturados = dictionary_create();
+	ready = list_create();
+
+	dictionary_put(objetivos, "Pikachu", 1);
+	dictionary_put(objetivos, "Pidgey", 2);
+
+	dictionary_put(capturados, "Pikachu", 1);
+	dictionary_put(capturados, "Pidgey", 2);
+
+	tcb->estado_tcb = DEADLOCK;
+	tcb->objetivos = objetivos;
+	tcb->pokemones_capturados = capturados;
+
+	list_add(ready, tcb);
+
+	ejecutar_acciones_post_intercambio(tcb, false);
+
+	CU_ASSERT_TRUE_FATAL(list_is_empty(ready) >= 1);
+	CU_ASSERT_EQUAL_FATAL(list_size(l_exit), 1);
+	CU_ASSERT_EQUAL_FATAL(list_get(l_exit, 0), tcb);
+	CU_ASSERT_EQUAL_FATAL(tcb->estado_tcb, EXIT);
+
+	list_clean(ready);
+	dictionary_clean(capturados);
+	dictionary_destroy(capturados);
+	dictionary_clean(objetivos);
+	dictionary_destroy(objetivos);
+	free(tcb);
+}
+
 void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready() {
 	t_tcb_entrenador* tcb_1 = tcb_generico(NULL);
 	t_tcb_entrenador* tcb_2 = tcb_generico(NULL);
@@ -257,4 +370,5 @@ void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready() {
 	free(deadlock->tcb_2);
 	free(deadlock);
 }
+
 

@@ -175,6 +175,14 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 
 		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
 				tcb->posicion->x, tcb->posicion->y);
+		sleep(team_config->retardo_ciclo_cpu);
+		break;
+	case MOVERSE_A_ENTRENADOR:
+		actualizar_posicion_entrenador_intercambio(tcb);
+
+		log_info(logger, "[INSTRUCCION] TID:%d, MOVIMIENTO Posición:(%d, %d)", tcb->tid,
+				tcb->posicion->x, tcb->posicion->y);
+		sleep(team_config->retardo_ciclo_cpu);
 		break;
 	case CATCH:
 		log_info(logger, "[INSTRUCCION] TID:%d, CATCH %s %d %d",
@@ -185,13 +193,23 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		//TODO: Este envio se tiene que hacer mediante un hilo, ya que hay que esperar
 		// a que me devuelvan un id_correlativo y eso puede tardar
 		ejecutar_catch(tcb);
-
+		sleep(team_config->retardo_ciclo_cpu);
 		break;
 	case INTERCAMBIAR:
-		//TODO
+		log_info(logger, "[INSTRUCCION] INTERCAMBIO, TID entrenador: %d, TID entrenador a intercambiar: %d",
+						tcb->tid,
+						tcb->entrenador_a_intercambiar->tid);
+		t_tcb_entrenador* entrenador = tcb;
+		t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
+
+		ejecutar_intercambio(tcb);
+
+		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
+		ejecutar_acciones_post_intercambio(entrenador, false);
+
+		sleep(team_config->retardo_ciclo_cpu * 5);
 		break;
 	}
-	sleep(team_config->retardo_ciclo_cpu);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -206,7 +224,7 @@ void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) 
 }
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
-	cargar_rafaga_movimiento(tcb, tcb->entrenador_a_intercambiar->posicion);
+	cargar_rafaga_movimiento_a_entrenador(tcb, tcb->entrenador_a_intercambiar->posicion);
 	cargar_instruccion(tcb, INTERCAMBIAR);
 }
 
@@ -216,6 +234,16 @@ void cargar_rafaga_movimiento(t_tcb_entrenador* tcb,
 
 	while (movimientos < distancia_entre(tcb->posicion, posicion_pokemon)) {
 		cargar_instruccion(tcb, MOVERSE);
+		movimientos++;
+	}
+}
+
+void cargar_rafaga_movimiento_a_entrenador(t_tcb_entrenador* tcb,
+		t_posicion* posicion_tcb_a_intercambiar) {
+	int movimientos = 0;
+
+	while (movimientos < distancia_entre(tcb->posicion, posicion_tcb_a_intercambiar)) {
+		cargar_instruccion(tcb, MOVERSE_A_ENTRENADOR);
 		movimientos++;
 	}
 }
@@ -249,7 +277,26 @@ void actualizar_posicion(t_tcb_entrenador* tcb) {
 			inicio->y--;
 		}
 	}
+}
 
+void actualizar_posicion_entrenador_intercambio(t_tcb_entrenador* tcb) {
+	t_posicion* destino = tcb->entrenador_a_intercambiar->posicion;
+	t_posicion* inicio = tcb->posicion;
+
+	int delta_x = destino->x - inicio->x;
+	int delta_y = destino->y - inicio->y;
+
+	if (delta_x > 0) {
+		inicio->x++;
+	} else if (delta_x < 0) {
+		inicio->x--;
+	} else if (delta_x == 0) {
+		if (delta_y > 0) {
+			inicio->y++;
+		} else if (delta_y < 0) {
+			inicio->y--;
+		}
+	}
 }
 
 void lanzar_reintentar_conexion(int conexion){
@@ -308,6 +355,37 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		liberar_conexion(conexion);
 	}
 
+}
+
+void ejecutar_intercambio(t_tcb_entrenador* tcb) {
+	t_tcb_entrenador* entrenador = tcb;
+	t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
+
+	dictionary_increment_value(entrenador->pokemones_capturados, entrenador_a_intercambiar->pokemon_a_dar_en_intercambio);
+	dictionary_increment_value(entrenador_a_intercambiar->pokemones_capturados, entrenador->pokemon_a_dar_en_intercambio);
+
+	remover_decrementar_value_en_diccionario(entrenador->pokemones_capturados, entrenador->pokemon_a_dar_en_intercambio);
+	remover_decrementar_value_en_diccionario(entrenador_a_intercambiar->pokemones_capturados, entrenador_a_intercambiar->pokemon_a_dar_en_intercambio);
+
+	entrenador->entrenador_a_intercambiar = NULL;
+	entrenador->pokemon_a_dar_en_intercambio = NULL;
+
+	entrenador_a_intercambiar->entrenador_a_intercambiar = NULL;
+	entrenador_a_intercambiar->pokemon_a_dar_en_intercambio = NULL;
+}
+
+void ejecutar_acciones_post_intercambio(t_tcb_entrenador* tcb, bool es_entrenador_a_intercambiar) {
+	if (cumplio_objetivo(tcb)) {
+		list_remove_element(ready, tcb);
+		pasar_a_exit(tcb);
+	} else {
+		if (es_entrenador_a_intercambiar)
+			tcb->estado_tcb = READY_TO_EXCHANGE;
+		else{
+			list_remove_element(ready, tcb);
+			pasar_a_ready_to_exchange(tcb, string_maximo_permitido(tcb));
+		}
+	}
 }
 
 int total_capturados(t_tcb_entrenador* tcb) {
@@ -412,6 +490,7 @@ void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
+	tcb->estado_tcb = EXIT;
 	list_add(l_exit, tcb);
 	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
 }

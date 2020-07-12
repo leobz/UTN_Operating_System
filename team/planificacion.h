@@ -46,8 +46,11 @@ void cargar_instruccion(t_tcb_entrenador* tcb, int instruccion);
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb);
 void cargar_rafaga_captura(t_tcb_entrenador*, t_posicion*);
 void cargar_rafaga_movimiento(t_tcb_entrenador*, t_posicion*);
+void cargar_rafaga_movimiento_a_entrenador(t_tcb_entrenador*, t_posicion*);
 
 int distancia_entre(t_posicion* inicio, t_posicion* destino);
+void actualizar_posicion(t_tcb_entrenador*);
+void actualizar_posicion_entrenador_intercambio(t_tcb_entrenador*);
 
 
 // Ejecucion de TCB
@@ -57,6 +60,8 @@ bool tiene_menor_proxima_estimacion(t_tcb_entrenador*, t_tcb_entrenador*);
 double obtener_proxima_estimacion(t_tcb_entrenador*);
 void ejecutar_tcb(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
+void ejecutar_intercambio(t_tcb_entrenador*);
+void ejecutar_acciones_post_intercambio(t_tcb_entrenador*, bool);
 
 // Mensajes
 void ejecutar_catch(t_tcb_entrenador*);
@@ -72,6 +77,7 @@ void asignar_pokemon(t_tcb_entrenador*);
 // Utilidades
 int string_to_algoritmo_de_planificacion(char*);
 char* cola_planificacion_a_string(int);
+char* string_maximo_permitido(t_tcb_entrenador* tcb);
 
 //Deadlock
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb);
