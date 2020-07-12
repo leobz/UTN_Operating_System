@@ -18,6 +18,12 @@
 void* list_first(t_list* lista);
 
 /**
+ * @NAME: list_last
+ * @DESC: retorna el ultimo elemento de la lista
+ */
+void* list_last(t_list* lista);
+
+/**
  * @NAME: list_pop_first
  * @DESC: retorna el primer elemento y lo saca de la lista
  */
@@ -52,5 +58,23 @@ t_list* strings_to_list(char** strings);
 * del elemento pasado
 */
 void list_remove_element(t_list* lista, void* element);
+
+/**
+* @NAME: list_include
+* @DESC: Si la lista contiene el elemento retorna true, sino, retorna false
+*/
+bool list_include(t_list* lista, void* element);
+
+/**
+* @NAME: list_include_string
+* @DESC: Si la lista contiene el string retorna true, sino, retorna false
+*/
+bool list_include_string(t_list* lista, char* element);
+
+/**
+* @NAME: list_intersection
+* @DESC: Retorna la interseccion entre dos listas
+*/
+t_list* list_intersection(t_list* lista_a, t_list* lista_b);
 
 #endif /* LISTAS_H_ */

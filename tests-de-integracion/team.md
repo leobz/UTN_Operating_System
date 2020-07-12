@@ -32,19 +32,14 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 
 ```bash
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
-[AGREGADO]: Pikachu 6 6 [TOTAL]: 1
-Tamaño de rafaga: 3  Posicion del TCB (5, 5)
-WARNING: Error al conectar con IP:<...> Puerto:<...>
-[TCB-info] TID:2 Capturó pokemon. Total capturados:2
-[TCB-info] TID:2 Capturó máximo permitido(2)
-[TCB-info] TID:2 Pasó a lista Deadlock
+<...>[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1<...>
+<...>Tamaño de rafaga: 3  Posicion del TCB (5, 5)<...>
 ```
 
 #### Se agrega al Mapa -> Se planifica entrenador
 
 El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
-
-TODO: Arreglar logs para que sean mas expresivos (En el codigo y luego en el test)
+Luego de capturarlo, pasa a la cola de ReadyToExchange, ya que capturo su maximo permitido
 
 ```bash
 $ cat team.log
@@ -53,22 +48,23 @@ $ cat team.log
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
+<...>[CAPTURA] TID:2 Capturó pokemon. Total capturados:2<...>
+<...>[CAMBIO DE COLA] TID:2 (Exec->Ready to Exchange) (6, 6) Motivo:Capturó máximo permitido(2)
+<...>[DEADLOCK] Inicio de detección de deadlock
+<...>[DEADLOCK] No se detectó espera circular entre los TCBs
 ```
 
 ### APPEARED_POKEMON 2
 
-#### Misma especie -> Se aumenta cantidad
+#### Se agrega al Mapa -> Se planifica entrenador 
 
-Envio otro Pikachu (6,6). Como ya habia uno, la cantidad aumenta a dos.
-Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
+Como el entrandor capturo el pokemon, la cantidad en mapa volvio a 0.
+Envio otro Pikachu (6,6). Quedan 2 entrenadores (1,1) y (3,3), como el segundo es el más cercano, va a capturarlo.
 
 ```bash
 $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
-[AGREGADO]: Pikachu 6 6 [TOTAL]: 2
-Tamaño de rafaga: 7  Posicion del TCB (3, 3)
-WARNING: Error al conectar con IP:<...> Puerto:<...>
-[TCB-info] TID:1 Capturó pokemon. Total capturados:2
-[CAMBIO DE COLA] TID:1 Pasó a lista Unblocked
+<...>[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1<...>
+<...>Tamaño de rafaga: 7  Posicion del TCB (3, 3)<...>
 ```
 
 ```bash
@@ -82,6 +78,8 @@ $ cat team.log
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:1, CATCH Pikachu 6 6
+<...>[CAPTURA] TID:1 Capturó pokemon. Total capturados:2
+<...>[CAMBIO DE COLA] TID:1 (Exec->Unblocked) (6, 6) Motivo:Capturó pokemon y puede seguir capturando
 
 ```
 

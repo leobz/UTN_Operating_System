@@ -42,7 +42,7 @@ Suscripción
 
 ```bash
 $ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 120 & # byexample: +timeout=100 +fail-fast +paste
-[<job-gameboy-id>] <gameboy-pid>
+<...>[<job-gameboy-id>] <gameboy-pid>
 ```
 
 Comprobación
