@@ -359,7 +359,7 @@ void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready() {
 	despachar_resolucion_de_deadlock(deadlock);
 
 	CU_ASSERT_EQUAL(queue_size(deadlock->tcb_1->rafaga), 3);
-	test_leer_instrucciones(deadlock->tcb_1, 2, MOVERSE);
+	test_leer_instrucciones(deadlock->tcb_1, 2, MOVERSE_A_ENTRENADOR);
 	CU_ASSERT_EQUAL(queue_peek(deadlock->tcb_1->rafaga), INTERCAMBIAR);
 
 	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, list_first(ready));
