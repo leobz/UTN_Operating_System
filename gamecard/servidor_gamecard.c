@@ -15,7 +15,7 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void servidor_gamecard(int conexion){
 	while (1){
-		t_paquete_socket* paquete =  recibir_mensaje_servidor(conexion);
+		t_paquete_socket* paquete =  recibir_mensajes(conexion);
 		procesar_mensaje_recibido(paquete);
 	}
 }
