@@ -148,6 +148,13 @@ t_mensaje_appeared* deserializar_mensaje_appeared_pokemon(t_buffer* buffer);
 void eliminar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared);
 t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package);
 
+//LOCALIZED_POKEMON
+
+t_buffer* buffer_localized_pokemon(int nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);
+void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[],int id_mensaje, int id_correlativo);
+t_mensaje_localized* deserializar_mensaje_localized_pokemon(t_buffer* buffer);
+t_mensaje_localized* deserializar_paquete_localized_pokemon(void* package);
+
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado,int id_mensaje, int id_correlativo);
 t_buffer* buffer_caught_pokemon(int estado);
