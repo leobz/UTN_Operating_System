@@ -63,9 +63,9 @@ Comprobamos que llegaron los mensajes y los entrenadores pasan a ready:
 
 ```bash
 $ sleep <sleep-time> ; cat team.log  # byexample: +timeout=4 +fail-fast +paste
-<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA<...>
 <...>
-<...>[CAMBIO DE COLA] TID:0 (New->Ready) (1, 1) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:0 (New->Ready) (1, 1) Motivo:CAPTURA<...>
 <...>
 ```
 

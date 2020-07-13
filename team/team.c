@@ -363,6 +363,16 @@ t_tcb_entrenador* elegir_entrenador_cercano_a_posicion(
 		}
 }
 
+char* string_motivo_captura(t_pokemon* pokemon) {
+	int length = strlen("CAPTURA de (,)") + 30;
+	char* string_motivo_captura = malloc(length);
+	snprintf(
+			string_motivo_captura, length, "CAPTURA de %s (%d,%d)",
+			pokemon->pokemon, pokemon->posicion->x, pokemon->posicion->y
+			);
+	return string_motivo_captura;
+}
+
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	int distancia_cercana = 0;
 	t_tcb_entrenador* entrenador_cercano_ready = NULL;
@@ -419,6 +429,7 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 
 	cargar_tcb_captura(entrenador_cercano, pokemon);
 
-	pasar_a_ready(entrenador_cercano, "CAPTURA");
+
+	pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
 	list_remove_element(new, entrenador_cercano);
 }
