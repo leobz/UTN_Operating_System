@@ -331,36 +331,91 @@ void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
 	imprimir_pokemon_agregado(mensaje);
 }
 
+t_tcb_entrenador* elegir_entrenador_cercano_a_posicion(
+		t_tcb_entrenador* tcb_1, t_tcb_entrenador* tcb_2, t_posicion* posicion){
+
+		int distancia_tcb_1;
+		int distancia_tcb_2;
+
+		if (tcb_1 != NULL && tcb_2 != NULL) {
+			distancia_tcb_1 = distancia_entre(tcb_1->posicion, posicion);
+			distancia_tcb_2 = distancia_entre(tcb_2->posicion, posicion);
+
+			if (distancia_tcb_1 < distancia_tcb_2) {
+				return tcb_1;
+			}
+			else {
+				return tcb_2;
+			}
+		}
+
+		if(tcb_1 != NULL && tcb_2 == NULL) {
+			return tcb_1;
+		}
+
+		if (tcb_2 != NULL && tcb_1 == NULL) {
+			return tcb_2;
+		}
+
+		if (tcb_2 == NULL && tcb_1 == NULL) {
+			printf("ERROR, NO HAY TCBS DISPONIBLES PARA IR A LA POSICION (%d, %d)\n", posicion->x, posicion->y);
+			exit(-1);
+		}
+}
+
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	int distancia_cercana = 0;
-	t_tcb_entrenador* entrenador_cercano = NULL;
+	t_tcb_entrenador* entrenador_cercano_ready = NULL;
+	t_tcb_entrenador* entrenador_cercano_unblocked = NULL;
+
 
 	t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
 	posicion_pokemon->x = mensaje->posx;
 	posicion_pokemon->y = mensaje->posy;
 
-	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
+	void elegir_entrenador_cercano_ready(t_tcb_entrenador* entrenador){
 		int nueva_distancia = 0;
 
 		nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
 
-		if (entrenador_cercano == NULL){
+		if (entrenador_cercano_ready == NULL){
 			distancia_cercana = nueva_distancia;
-			entrenador_cercano = entrenador;
+			entrenador_cercano_ready = entrenador;
 		}
 		else{
 			if (distancia_cercana > nueva_distancia){
 				distancia_cercana = nueva_distancia;
-				entrenador_cercano = entrenador;
+				entrenador_cercano_ready = entrenador;
 			}
 		}
 	}
 
-	list_iterate(new, elegir_entrenador_cercano);
+	void elegir_entrenador_cercano_unblocked(t_tcb_entrenador* entrenador){
+			int nueva_distancia = 0;
+
+			nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
+
+			if (entrenador_cercano_unblocked == NULL){
+				distancia_cercana = nueva_distancia;
+				entrenador_cercano_unblocked = entrenador;
+			}
+			else{
+				if (distancia_cercana > nueva_distancia){
+					distancia_cercana = nueva_distancia;
+					entrenador_cercano_unblocked = entrenador;
+				}
+			}
+	}
+
+	list_iterate(unblocked, elegir_entrenador_cercano_unblocked);
+	list_iterate(new, elegir_entrenador_cercano_ready);
 
 	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
 	pokemon->pokemon = mensaje->pokemon;
 	pokemon->posicion = posicion_pokemon;
+
+	t_tcb_entrenador* entrenador_cercano =
+			elegir_entrenador_cercano_a_posicion(entrenador_cercano_ready, entrenador_cercano_unblocked, posicion_pokemon);
 
 	cargar_tcb_captura(entrenador_cercano, pokemon);
 
