@@ -80,7 +80,10 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 	switch (codigo_de_operacion) {
 
 
-	case NEW_POKEMON:
+	case NEW_POKEMON:{
+
+		t_mensaje_new *mensaje_new_recibido;
+
 		mensaje_new_recibido = deserializar_paquete_new_pokemon(sent_package);
 
 			log_info(logger,"Mensaje recibido NEW_POKEMON %s %d %d %d",mensaje_new_recibido->pokemon,
@@ -89,9 +92,12 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 			free(mensaje_new_recibido->pokemon);
 			free(mensaje_new_recibido);
 
-		break;
+		break;}
 
-	case GET_POKEMON:
+	case GET_POKEMON:{
+
+		t_mensaje_get *mensaje_get_recibido;
+
 		mensaje_get_recibido= deserializar_paquete_get_pokemon(sent_package);
 
 			log_info(logger,"Mensaje recibido GET_POKEMON %s",mensaje_get_recibido->pokemon);
@@ -100,9 +106,12 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 			free(mensaje_get_recibido);
 
 
-				break;
+		break;}
 
-	case CATCH_POKEMON:
+	case CATCH_POKEMON:{
+
+		t_mensaje_catch *mensaje_catch_recibido;
+
 		mensaje_catch_recibido = deserializar_paquete_catch_pokemon(sent_package);
 		log_info(logger, "Mensaje recibido CATCH_POKEMON %s %d %d",
 				mensaje_catch_recibido->pokemon, mensaje_catch_recibido->posx,
@@ -110,9 +119,11 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		free(mensaje_catch_recibido->pokemon);
 		free(mensaje_catch_recibido);
-		break;
+		break;}
 
-	case APPEARED_POKEMON:
+	case APPEARED_POKEMON:{
+
+		t_mensaje_appeared *mensaje_appeared_recibido;
 
 		mensaje_appeared_recibido= deserializar_paquete_appeared_pokemon(sent_package);
 
@@ -123,9 +134,26 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 		free(mensaje_appeared_recibido);
 
 
-				break;
+		break;}
 
-	case CAUGHT_POKEMON:
+
+	case LOCALIZED_POKEMON:{
+
+		t_mensaje_localized* mensaje_localized;
+
+		mensaje_localized= deserializar_paquete_localized_pokemon(sent_package);
+
+			log_info(logger,"Mensaje recibido LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
+
+			free(mensaje_localized->pokemon);
+			free(mensaje_localized);
+
+
+		break;}
+
+	case CAUGHT_POKEMON:{
+
+		t_mensaje_caught *mensaje_caught_recibido;
 		mensaje_caught_recibido= deserializar_paquete_caught_pokemon(sent_package);
 
 		log_info(logger,"Mensaje recibido CAUGHT_POKEMON %d %s",mensaje_caught_recibido->id_correlativo,
@@ -133,7 +161,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 			free(mensaje_caught_recibido);
 
-		break;
+		break;}
 	default:
 		//printf("ERROR, CODIGO DE OPERACION INCORRECTO\n");
 		//exit(-1);

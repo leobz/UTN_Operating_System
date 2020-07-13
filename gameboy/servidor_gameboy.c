@@ -21,7 +21,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 		switch (paquete_socket->codigo_operacion) {
 
-		case NEW_POKEMON:
+		case NEW_POKEMON:{
+
+			t_mensaje_new* mensaje_new;
+
 			mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
@@ -29,9 +32,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
 
-			break;
+			break;}
 
-		case GET_POKEMON:
+		case GET_POKEMON:{
+
+			t_mensaje_get* mensaje_get;
+
 			mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
@@ -40,9 +46,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_get);
 
 
-			break;
+			break;}
 
-		case CATCH_POKEMON:
+		case CATCH_POKEMON:{
+
+			t_mensaje_catch* mensaje_catch;
 
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 				log_info(logger,"%ld Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d", (long)getpid(), mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
@@ -51,9 +59,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_catch->pokemon);
 				free(mensaje_catch);
 
-			break;
+			break;}
 
-		case APPEARED_POKEMON:
+		case APPEARED_POKEMON:{
+
+			t_mensaje_appeared* mensaje_appeared;
 
 			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
@@ -63,29 +73,32 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_appeared);
 
 
-			break;
+			break;}
 
-		case LOCALIZED_POKEMON:
+		case LOCALIZED_POKEMON:{
 
-			/*mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
+			t_mensaje_localized* mensaje_localized;
+
+			mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
-				*/
 
 
-			break;
+			break;}
 
-		case CAUGHT_POKEMON:
+		case CAUGHT_POKEMON:{
+
+			t_mensaje_caught* mensaje_caught;
 			mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
 
 			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s con ID_CORRELATIVO: %d",value_to_state(mensaje_caught->resultado),paquete_socket->id_correlativo);
 
 				free(mensaje_caught);
 
-			break;
+			break;}
 
 		default:
 			break;
