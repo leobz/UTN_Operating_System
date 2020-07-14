@@ -101,6 +101,7 @@ typedef struct t_tcb{
 	int rafaga_anterior;
 	double estimacion_anterior;
 	struct t_list* les_puede_dar;
+	int nivel_de_grafo_en_deadlock;
 }t_tcb_entrenador;
 
 

@@ -532,6 +532,8 @@ void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock Recursivo");
 
 	t_tcb_entrenador* tcb_actual = tcb_que_llega;
+	//TODO: Usar esta lista para agregar los TCBs en el deadlock;
+	t_list* tcb_en_nivel_de_grafo = list_create();
 
 	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
 		t_list* pokemones_que_puede_recibir =
@@ -544,15 +546,21 @@ void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 		}
 	}
 
+	tcb_actual->nivel_de_grafo_en_deadlock = 0;
 	tcb_actual->les_puede_dar = list_filter(ready_to_exchange, le_puede_dar);
 	t_list* les_puedo_dar  = tcb_actual->les_puede_dar;
 
+
+	void aumentar_nivel_de_grafo(t_tcb_entrenador* tcb_iterado) {
+		tcb_iterado->nivel_de_grafo_en_deadlock = tcb_actual->nivel_de_grafo_en_deadlock + 1;
+	}
 
 	void hay_espera_circular(t_tcb_entrenador* tcb_iterado) {
 		tcb_actual = tcb_iterado;
 
 		if (tcb_iterado == tcb_que_llega) {
 		 	printf("HAY ESPERA CIRCULAR\n");
+		 	printf("Nivel de Grafo: %d \n", tcb_iterado->nivel_de_grafo_en_deadlock);
 		 	// TODO: Hacer algo con esta espera circular, detectar los involucrados
 		 }
 		 else {
@@ -561,11 +569,13 @@ void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 
 				 if (les_puedo_dar > 0){
+					list_iterate(les_puedo_dar, (void*) aumentar_nivel_de_grafo);
 				 	list_iterate(les_puedo_dar, (void*) hay_espera_circular);
 				 }
 		 }
 	}
 
+	list_iterate(les_puedo_dar, aumentar_nivel_de_grafo);
 	list_iterate(les_puedo_dar, hay_espera_circular);
 
 }
