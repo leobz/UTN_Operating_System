@@ -100,6 +100,7 @@ typedef struct t_tcb{
 	sem_t* semaforo;
 	int rafaga_anterior;
 	double estimacion_anterior;
+	struct t_list* les_puede_dar;
 }t_tcb_entrenador;
 
 

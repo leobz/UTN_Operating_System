@@ -138,6 +138,7 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->tid = i;
 		entrenador->rafaga_anterior = 0;
 		entrenador->estimacion_anterior = team_config->estimacion_inicial;
+		entrenador->les_puede_dar = list_create();
 
 		list_add(new, entrenador);
 	}

@@ -87,5 +87,7 @@ t_deadlock* crear_deadlock
 (t_tcb_entrenador*, t_tcb_entrenador*, t_list*, t_list*);
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador*);
 
+void hay_espera_circular(t_tcb_entrenador* tcb_iterado);
+
 
 #endif /* PLANIFICACION_H_ */

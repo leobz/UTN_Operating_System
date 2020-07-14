@@ -527,6 +527,49 @@ t_deadlock* crear_deadlock
 	return deadlock;
 }
 
+
+void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
+	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock Recursivo");
+
+	t_tcb_entrenador* tcb_actual = tcb_que_llega;
+
+	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
+		t_list* pokemones_que_puede_recibir =
+				list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
+		if (list_size(pokemones_que_puede_recibir) > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	tcb_actual->les_puede_dar = list_filter(ready_to_exchange, le_puede_dar);
+	t_list* les_puedo_dar  = tcb_actual->les_puede_dar;
+
+
+	void hay_espera_circular(t_tcb_entrenador* tcb_iterado) {
+		tcb_actual = tcb_iterado;
+
+		if (tcb_iterado == tcb_que_llega) {
+		 	printf("HAY ESPERA CIRCULAR\n");
+		 	// TODO: Hacer algo con esta espera circular, detectar los involucrados
+		 }
+		 else {
+				tcb_iterado->les_puede_dar = list_filter(ready_to_exchange, le_puede_dar);
+				t_list* les_puedo_dar = tcb_iterado->les_puede_dar;
+
+
+				 if (les_puedo_dar > 0){
+				 	list_iterate(les_puedo_dar, (void*) hay_espera_circular);
+				 }
+		 }
+	}
+
+	list_iterate(les_puedo_dar, hay_espera_circular);
+
+}
+
 t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
 	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock");
 
@@ -578,6 +621,8 @@ void loggear_deteccion_de_deadlock(t_deadlock* deadlock) {
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
 	t_deadlock* deadlock = detectar_deadlock(tcb);
+
+	detectar_deadlock_recursivo(tcb);
 
 	if (deadlock != NULL) {
 		loggear_deteccion_de_deadlock(deadlock);
