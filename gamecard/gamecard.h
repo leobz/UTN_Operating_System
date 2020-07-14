@@ -34,6 +34,11 @@ t_log* logger;
 t_gamecard_config* gamecard_config;
 pthread_t suscripcion_broker;
 
+char* path_directorio_metadata;
+char* path_directorio_files;
+char* path_directorio_blocks;
+
+
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
 void suscribirme_al_broker();

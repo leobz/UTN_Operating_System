@@ -3,6 +3,7 @@
 int main(){
 	inicializar_gamecard();
 	inicializar_directorios();
+	pokemones_gamecard=dictionary_create();
 	pthread_create(&suscripcion_broker, NULL, (void*)suscribirme_al_broker, NULL);
 
 	// Creo la conexion para escuchar

@@ -28,7 +28,7 @@ void suscribirme_al_broker(){
 	int colas_a_suscribir[] = {NEW_POKEMON, GET_POKEMON, CATCH_POKEMON};
 	int id_proceso = 0;
 	int i;
-	for (i=0; i<(&colas_a_suscribir)[1]-colas_a_suscribir; i++){
+	for (i=0; i<3; i++){
 		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
 		socket_broker = conexion;
 		while (conexion == -1) {
@@ -84,11 +84,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket){
 			break;
 
 		case CATCH_POKEMON:
-			//TODO
+			procesar_catch_pokemon(paquete_socket);
 			break;
 
 		case GET_POKEMON:
-			//TODO
+			procesar_get_pokemon(paquete_socket);
 			break;
 		}
 		free(paquete_socket);

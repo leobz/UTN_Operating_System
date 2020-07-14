@@ -94,6 +94,13 @@ void setear_abierto(FILE* archivo) {
 }
 
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
+
+	t_mensaje_new*mensaje_new;
+	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+
+	if(esta_en_diccionario(pokemones_gamecard,mensaje_new->pokemon)){} //ya que el archio persistira es lo mismo que buscarlo
+																		//por el diccionario, sin embargo puede cambiarse
+																		//incluso para testear, buscarlo en el archivo
 	/* Existe pokemon?
 	 * NO
 	 * 	Crear direcotorio del nuevo pokemon
@@ -110,13 +117,9 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	 * 	 Existe la posicion?
 	 * 	 NO
 	 */
-	t_mensaje_new* mensaje_new = deserializar_mensaje_new_pokemon(
-			paquete_socket->buffer);
 	char* path_archivo_pokemon = string_new();
-	string_append_with_format(&path_archivo_pokemon, "%s",
-			&path_directorio_files);
-	string_append_with_format(&path_archivo_pokemon, "%s",
-			mensaje_new->pokemon);
+	string_append_with_format(&path_archivo_pokemon, "%s",&path_directorio_files);
+	string_append_with_format(&path_archivo_pokemon, "%s",mensaje_new->pokemon);
 	string_append(&path_archivo_pokemon, "/Metadata.bin");
 
 	FILE* pokemon_metadata = fopen(pokemon_metadata, "rb");
@@ -133,3 +136,21 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	setear_abierto(pokemon_metadata);
 
 }
+
+
+void procesar_get_pokemon(t_paquete_socket* paquete_socket){
+	t_mensaje_new*mensaje_get;
+	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+
+	if(esta_en_diccionario(pokemones_gamecard,mensaje_get->pokemon)){}
+
+}
+
+void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
+	t_mensaje_new*mensaje_catch;
+	mensaje_catch=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+
+		if(esta_en_diccionario(pokemones_gamecard,mensaje_catch->pokemon)){}
+
+}
+
