@@ -5,6 +5,7 @@ void inicializar_diccionarios() {
 	administracion_por_id = dictionary_create();
 	administracion_por_cod = dictionary_create();
 	subscribers = dictionary_create();
+	mensajes_iguales=dictionary_create();
 }
 
 void inicalizar_lista_de_todos_las_colas() {

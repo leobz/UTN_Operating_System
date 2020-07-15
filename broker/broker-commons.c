@@ -81,7 +81,6 @@ t_broker_config *cargar_broker_config(char *path_archivo) {
 	return broker_config;
 }
 
-
 void inicializar_broker() {
 	broker_config = cargar_broker_config("broker.config");
 	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
