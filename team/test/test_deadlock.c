@@ -319,6 +319,7 @@ void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido() {
 	t_tcb_entrenador* tcb = malloc(sizeof(t_tcb_entrenador));
 	t_dictionary* objetivos = dictionary_create();
 	t_dictionary* capturados = dictionary_create();
+	t_posicion* posicion = malloc(sizeof(t_posicion));
 	ready = list_create();
 
 	dictionary_put(objetivos, "Pikachu", 1);
@@ -327,7 +328,11 @@ void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido() {
 	dictionary_put(capturados, "Pikachu", 1);
 	dictionary_put(capturados, "Pidgey", 2);
 
+	posicion->x = 1;
+	posicion->y = 1;
+
 	tcb->estado_tcb = DEADLOCK;
+	tcb->posicion = posicion;
 	tcb->objetivos = objetivos;
 	tcb->pokemones_capturados = capturados;
 
@@ -341,6 +346,7 @@ void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido() {
 	CU_ASSERT_EQUAL_FATAL(tcb->estado_tcb, EXIT);
 
 	list_clean(ready);
+	free(posicion);
 	dictionary_clean(capturados);
 	dictionary_destroy(capturados);
 	dictionary_clean(objetivos);
@@ -394,7 +400,6 @@ void test_detectar_dealock_recursivo() {
 	t_dictionary* tcb_4_objetivos = dictionary_create();
 	t_dictionary* tcb_4_capturados = dictionary_create();
 
-
 	t_deadlock* deadlock = NULL;
 
 	/*
@@ -408,7 +413,7 @@ void test_detectar_dealock_recursivo() {
 	dictionary_put(tcb_1_capturados, "Pikachu", 1);
 	dictionary_put(tcb_1_capturados, "Charmander", 1);
 
-
+	tcb_1->tid = 1;
 	tcb_1->estado_tcb = READY_TO_EXCHANGE;
 	tcb_1->objetivos = tcb_1_objetivos;
 	tcb_1->pokemones_capturados = tcb_1_capturados;
@@ -424,8 +429,7 @@ void test_detectar_dealock_recursivo() {
 	dictionary_put(tcb_2_capturados, "Charmander", 1);
 	dictionary_put(tcb_2_capturados, "Squirtle", 1);
 
-
-
+	tcb_2->tid = 2;
 	tcb_2->estado_tcb = READY_TO_EXCHANGE;
 	tcb_2->objetivos = tcb_2_objetivos;
 	tcb_2->pokemones_capturados = tcb_2_capturados;
@@ -442,13 +446,10 @@ void test_detectar_dealock_recursivo() {
 	dictionary_put(tcb_3_capturados, "Squirtle", 1);
 	dictionary_put(tcb_3_capturados, "Pikachu", 1);
 
-
-
+	tcb_3->tid = 3;
 	tcb_3->estado_tcb = READY_TO_EXCHANGE;
 	tcb_3->objetivos = tcb_3_objetivos;
 	tcb_3->pokemones_capturados = tcb_3_capturados;
-
-
 
 	/*
 	 * Cuarto tcb:
@@ -461,13 +462,10 @@ void test_detectar_dealock_recursivo() {
 	dictionary_put(tcb_4_capturados, "Mew", 1);
 	dictionary_put(tcb_4_capturados, "Pikachu", 1);
 
-
-
+	tcb_4->tid = 4;
 	tcb_4->estado_tcb = READY_TO_EXCHANGE;
 	tcb_4->objetivos = tcb_4_objetivos;
 	tcb_4->pokemones_capturados = tcb_4_capturados;
-
-
 
 
 	list_add(ready_to_exchange, tcb_1);
@@ -479,28 +477,41 @@ void test_detectar_dealock_recursivo() {
 	deadlock = detectar_deadlock_recursivo(tcb_1);
 
 
-//	CU_ASSERT_TRUE_FATAL(deadlock != NULL);
-//	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, tcb_1);
-//	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_2, tcb_3);
-//	CU_ASSERT_EQUAL_FATAL(tcb_1->estado_tcb, DEADLOCK);
-//	CU_ASSERT_EQUAL_FATAL(tcb_3->estado_tcb, DEADLOCK);
-//	CU_ASSERT_EQUAL_FATAL(tcb_1->entrenador_a_intercambiar, tcb_3);
-//	CU_ASSERT_EQUAL_FATAL(tcb_3->entrenador_a_intercambiar, tcb_1);
-//	CU_ASSERT_STRING_EQUAL_FATAL(tcb_1->pokemon_a_dar_en_intercambio, "Alakazam");
-//	CU_ASSERT_STRING_EQUAL_FATAL(tcb_3->pokemon_a_dar_en_intercambio, "Squirtle");
-//
-//	free(deadlock);
-//	dictionary_clean(tcb_2_capturados);
-//	dictionary_destroy(tcb_2_capturados);
-//	dictionary_clean(tcb_2_objetivos);
-//	dictionary_destroy(tcb_2_objetivos);
-//	dictionary_clean(tcb_1_capturados);
-//	dictionary_destroy(tcb_1_capturados);
-//	dictionary_clean(tcb_1_objetivos);
-//	dictionary_destroy(tcb_1_objetivos);
-//	free(tcb_3);
-//	free(tcb_2);
-//	free(tcb_1);
+	CU_ASSERT_TRUE_FATAL(deadlock != NULL);
+	CU_ASSERT_EQUAL_FATAL(list_size(deadlock), 3);
+	CU_ASSERT_EQUAL_FATAL(list_get(deadlock, 0), tcb_1);
+	CU_ASSERT_EQUAL_FATAL(list_get(deadlock, 1), tcb_2);
+	CU_ASSERT_EQUAL_FATAL(list_get(deadlock, 2), tcb_3);
+	CU_ASSERT_EQUAL_FATAL(tcb_1->nivel_de_grafo_en_deadlock, 0);
+	CU_ASSERT_EQUAL_FATAL(tcb_2->nivel_de_grafo_en_deadlock, 1);
+	CU_ASSERT_EQUAL_FATAL(tcb_3->nivel_de_grafo_en_deadlock, 2);
 
+	list_clean(deadlock);
+	list_destroy(deadlock);
+
+	dictionary_clean(tcb_4_capturados);
+	dictionary_destroy(tcb_4_capturados);
+	dictionary_clean(tcb_4_objetivos);
+	dictionary_destroy(tcb_4_objetivos);
+
+	dictionary_clean(tcb_3_capturados);
+	dictionary_destroy(tcb_3_capturados);
+	dictionary_clean(tcb_3_objetivos);
+	dictionary_destroy(tcb_3_objetivos);
+
+	dictionary_clean(tcb_2_capturados);
+	dictionary_destroy(tcb_2_capturados);
+	dictionary_clean(tcb_2_objetivos);
+	dictionary_destroy(tcb_2_objetivos);
+
+	dictionary_clean(tcb_1_capturados);
+	dictionary_destroy(tcb_1_capturados);
+	dictionary_clean(tcb_1_objetivos);
+	dictionary_destroy(tcb_1_objetivos);
+
+	free(tcb_4);
+	free(tcb_3);
+	free(tcb_2);
+	free(tcb_1);
 }
 

@@ -532,20 +532,23 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock Recursivo");
 
 	t_tcb_entrenador* tcb_actual = tcb_que_llega;
-	//TODO: Usar esta lista para agregar los TCBs en el deadlock;
 	t_list* tcbs_en_niveles_de_grafo = list_create();
 	t_list* en_deadlock = NULL;
 
 	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
-		//TODO: Omitir los que ya tienen el estado de DEADLOCK
-		t_list* pokemones_que_puede_recibir =
-				list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
-		if (list_size(pokemones_que_puede_recibir) > 0) {
-			return true;
+		if (tcb_que_puede_recibir->estado_tcb != DEADLOCK) {
+			t_list* pokemones_que_puede_recibir =
+					list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
+			if (list_size(pokemones_que_puede_recibir) > 0) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
+		else
 			return false;
-		}
+
 	}
 
 	tcb_actual->nivel_de_grafo_en_deadlock = 0;
@@ -565,7 +568,7 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 		 	printf("Nivel de Grafo: %d \n", tcb_iterado->nivel_de_grafo_en_deadlock);
 
 		 	en_deadlock = list_take(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock);
-
+		 	tcb_iterado->nivel_de_grafo_en_deadlock = 0;
 
 		 	t_tcb_entrenador* tcb_1 = list_get(en_deadlock, 0);
 		 	t_tcb_entrenador* tcb_2 = list_get(en_deadlock, 1);
@@ -585,6 +588,8 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 				 }
 		 }
 	}
+
+	list_add_in_index(tcbs_en_niveles_de_grafo, tcb_actual->nivel_de_grafo_en_deadlock, tcb_actual);
 
 	list_iterate(les_puedo_dar, aumentar_nivel_de_grafo);
 	list_iterate(les_puedo_dar, hay_espera_circular);
