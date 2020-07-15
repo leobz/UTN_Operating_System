@@ -5,23 +5,20 @@ void inicializar_directorios() {
 
 	//Creo Metadata
 	path_directorio_metadata = string_new();
-	string_append(&path_directorio_metadata,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_metadata,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_metadata, "/Metadata");
 	mkdir(path_directorio_metadata, 0777);
 
 	//Creo Files
 	path_directorio_files = string_new();
-	string_append(&path_directorio_files,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_files,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_files, "/Files");
 	mkdir(path_directorio_files, 0777);
 
 	//Creo Blocks
 	//TODO: escribir archivos blocks
 	path_directorio_blocks = string_new();
-	string_append(&path_directorio_blocks,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_blocks,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_blocks, "/Blocks");
 	mkdir(path_directorio_blocks, 0777);
 
