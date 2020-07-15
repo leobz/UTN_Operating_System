@@ -527,15 +527,17 @@ t_deadlock* crear_deadlock
 	return deadlock;
 }
 
-
-void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
+//TODO: Este metodo debe devolver una lista con todos los involucrados en la espera circular
+t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 	log_info(logger, "[DEADLOCK] Inicio de detección de deadlock Recursivo");
 
 	t_tcb_entrenador* tcb_actual = tcb_que_llega;
 	//TODO: Usar esta lista para agregar los TCBs en el deadlock;
-	t_list* tcb_en_nivel_de_grafo = list_create();
+	t_list* tcbs_en_niveles_de_grafo = list_create();
+	t_list* en_deadlock = NULL;
 
 	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
+		//TODO: Omitir los que ya tienen el estado de DEADLOCK
 		t_list* pokemones_que_puede_recibir =
 				list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
 		if (list_size(pokemones_que_puede_recibir) > 0) {
@@ -557,11 +559,20 @@ void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 	void hay_espera_circular(t_tcb_entrenador* tcb_iterado) {
 		tcb_actual = tcb_iterado;
-
+		list_add_in_index(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock, tcb_iterado);
 		if (tcb_iterado == tcb_que_llega) {
 		 	printf("HAY ESPERA CIRCULAR\n");
 		 	printf("Nivel de Grafo: %d \n", tcb_iterado->nivel_de_grafo_en_deadlock);
-		 	// TODO: Hacer algo con esta espera circular, detectar los involucrados
+
+		 	en_deadlock = list_take(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock);
+
+
+		 	t_tcb_entrenador* tcb_1 = list_get(en_deadlock, 0);
+		 	t_tcb_entrenador* tcb_2 = list_get(en_deadlock, 1);
+		 	t_tcb_entrenador* tcb_3 = list_get(en_deadlock, 2);
+
+		 	printf("Tamaño de lista deadlock: %d  Elemento 0 = %d, 1 = %d, 2 = %d ...\n",
+		 			list_size(en_deadlock), tcb_1->tid, tcb_2->tid, tcb_3->tid);
 		 }
 		 else {
 				tcb_iterado->les_puede_dar = list_filter(ready_to_exchange, le_puede_dar);
@@ -578,6 +589,7 @@ void detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 	list_iterate(les_puedo_dar, aumentar_nivel_de_grafo);
 	list_iterate(les_puedo_dar, hay_espera_circular);
 
+	return en_deadlock;
 }
 
 t_deadlock* detectar_deadlock(t_tcb_entrenador* tcb_1) {
@@ -632,7 +644,18 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
 	t_deadlock* deadlock = detectar_deadlock(tcb);
 
-	detectar_deadlock_recursivo(tcb);
+	t_list* lista_deadlock = detectar_deadlock_recursivo(tcb);
+
+	if(lista_deadlock != NULL) {
+		//TODO: Ponerle estado DEADLOCK a todos
+		//TODO: Resolver Deadlock de esta lista despachando a uno con otro al que le intercambiara
+		// TODO: Borrar esta impresion(era solo por comprobacion)
+		void imprimir_tcbs(t_tcb_entrenador* tcb ){
+			printf("TCB en deadlock TID:%d\n", tcb->tid);
+		}
+
+		list_iterate(lista_deadlock, imprimir_tcbs);
+	}
 
 	if (deadlock != NULL) {
 		loggear_deteccion_de_deadlock(deadlock);

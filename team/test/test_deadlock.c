@@ -39,6 +39,11 @@ void agregar_tests_deadlock() {
 	CU_add_test(suite_configuracion,
       "Despachar deadlock carga rafaga de TCB y lo envia a ready",
 			test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready);
+
+	CU_add_test(suite_configuracion,
+			"Detectar deadlock recursivamente",
+			test_detectar_dealock_recursivo);
+
 }
 
 void test_pokemones_necesitados() {
@@ -371,4 +376,131 @@ void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready() {
 	free(deadlock);
 }
 
+void test_detectar_dealock_recursivo() {
+	t_tcb_entrenador* tcb_1 = malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_2 = malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_3 = malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_4 = malloc(sizeof(t_tcb_entrenador));
+
+	t_dictionary* tcb_1_objetivos = dictionary_create();
+	t_dictionary* tcb_1_capturados = dictionary_create();
+
+	t_dictionary* tcb_2_objetivos = dictionary_create();
+	t_dictionary* tcb_2_capturados = dictionary_create();
+
+	t_dictionary* tcb_3_objetivos = dictionary_create();
+	t_dictionary* tcb_3_capturados = dictionary_create();
+
+	t_dictionary* tcb_4_objetivos = dictionary_create();
+	t_dictionary* tcb_4_capturados = dictionary_create();
+
+
+	t_deadlock* deadlock = NULL;
+
+	/*
+	 * Primer tcb:
+	 * - Pokemones necesarios: "2 Pikachu"
+	 * - Pokemones no necesarios: "Charmander"
+	*/
+
+	dictionary_put(tcb_1_objetivos, "Pikachu", 2);
+
+	dictionary_put(tcb_1_capturados, "Pikachu", 1);
+	dictionary_put(tcb_1_capturados, "Charmander", 1);
+
+
+	tcb_1->estado_tcb = READY_TO_EXCHANGE;
+	tcb_1->objetivos = tcb_1_objetivos;
+	tcb_1->pokemones_capturados = tcb_1_capturados;
+
+	/*
+	 * Segundo tcb:
+	 * - Pokemones necesarios: "2 Charmander"
+	 * - Pokemones no necesarios: "Squirtle"
+	*/
+
+	dictionary_put(tcb_2_objetivos, "Charmander", 2);
+
+	dictionary_put(tcb_2_capturados, "Charmander", 1);
+	dictionary_put(tcb_2_capturados, "Squirtle", 1);
+
+
+
+	tcb_2->estado_tcb = READY_TO_EXCHANGE;
+	tcb_2->objetivos = tcb_2_objetivos;
+	tcb_2->pokemones_capturados = tcb_2_capturados;
+
+
+	/*
+	 * Tercer tcb:
+	 * - Pokemones necesarios: "2 Squirtle"
+	 * - Pokemones no necesarios: "Pikachu"
+	*/
+
+	dictionary_put(tcb_3_objetivos, "Squirtle", 2);
+
+	dictionary_put(tcb_3_capturados, "Squirtle", 1);
+	dictionary_put(tcb_3_capturados, "Pikachu", 1);
+
+
+
+	tcb_3->estado_tcb = READY_TO_EXCHANGE;
+	tcb_3->objetivos = tcb_3_objetivos;
+	tcb_3->pokemones_capturados = tcb_3_capturados;
+
+
+
+	/*
+	 * Cuarto tcb:
+	 * - Pokemones necesarios: "2 Mew"
+	 * - Pokemones no necesarios: "Pikachu"
+	*/
+
+	dictionary_put(tcb_4_objetivos, "Mew", 2);
+
+	dictionary_put(tcb_4_capturados, "Mew", 1);
+	dictionary_put(tcb_4_capturados, "Pikachu", 1);
+
+
+
+	tcb_4->estado_tcb = READY_TO_EXCHANGE;
+	tcb_4->objetivos = tcb_4_objetivos;
+	tcb_4->pokemones_capturados = tcb_4_capturados;
+
+
+
+
+	//list_add(ready_to_exchange, tcb_1);
+	list_add(ready_to_exchange, tcb_2);
+	list_add(ready_to_exchange, tcb_3);
+	list_add(ready_to_exchange, tcb_4);
+
+
+	deadlock = detectar_deadlock_recursivo(tcb_1);
+
+
+	CU_ASSERT_TRUE_FATAL(deadlock != NULL);
+	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_1, tcb_1);
+	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_2, tcb_3);
+	CU_ASSERT_EQUAL_FATAL(tcb_1->estado_tcb, DEADLOCK);
+	CU_ASSERT_EQUAL_FATAL(tcb_3->estado_tcb, DEADLOCK);
+	CU_ASSERT_EQUAL_FATAL(tcb_1->entrenador_a_intercambiar, tcb_3);
+	CU_ASSERT_EQUAL_FATAL(tcb_3->entrenador_a_intercambiar, tcb_1);
+	CU_ASSERT_STRING_EQUAL_FATAL(tcb_1->pokemon_a_dar_en_intercambio, "Alakazam");
+	CU_ASSERT_STRING_EQUAL_FATAL(tcb_3->pokemon_a_dar_en_intercambio, "Squirtle");
+
+	free(deadlock);
+	dictionary_clean(tcb_2_capturados);
+	dictionary_destroy(tcb_2_capturados);
+	dictionary_clean(tcb_2_objetivos);
+	dictionary_destroy(tcb_2_objetivos);
+	dictionary_clean(tcb_1_capturados);
+	dictionary_destroy(tcb_1_capturados);
+	dictionary_clean(tcb_1_objetivos);
+	dictionary_destroy(tcb_1_objetivos);
+	free(tcb_3);
+	free(tcb_2);
+	free(tcb_1);
+
+}
 

@@ -19,4 +19,6 @@ void test_ejecutar_intercambio();
 void test_ejecutar_acciones_post_intercambio_para_tcb_a_intercambiar_sin_objetivo_cumplido();
 void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido();
 
+void test_detectar_dealock_recursivo();
+
 #endif /* TEST_TEST_DEADLOCK_H_ */
