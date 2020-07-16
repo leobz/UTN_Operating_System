@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include "../utils/config.h"
+#include "bloques.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
 
@@ -33,6 +33,7 @@ typedef struct {
 t_log* logger;
 t_gamecard_config* gamecard_config;
 pthread_t suscripcion_broker;
+
 
 char* path_directorio_metadata;
 char* path_directorio_files;
