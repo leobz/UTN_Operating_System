@@ -34,6 +34,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
 
+
 			break;}
 
 		case GET_POKEMON:{
@@ -42,7 +43,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
+			log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
 
 				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
 				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
@@ -51,9 +52,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_get->pokemon);
 				free(mensaje_get);
 
-
-			break;}
-
+			break;
+		}
 		case CATCH_POKEMON:{
 
 			t_mensaje_catch* mensaje_catch;
@@ -67,14 +67,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				free(mensaje_catch->pokemon);
 				free(mensaje_catch);
+			break;
+    }
 
-
-			break;}
 
 		case APPEARED_POKEMON:{
 
 			t_mensaje_appeared* mensaje_appeared;
-
 			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
@@ -86,13 +85,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_appeared->pokemon);
 				free(mensaje_appeared);
 
-			break;}
+			break;
+    }
 
 		case LOCALIZED_POKEMON:{
 
 			t_mensaje_localized* mensaje_localized;
 			mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
-
 
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
@@ -104,6 +103,27 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
 
+
+void recibir_id_correlativo(int socket_cliente) {
+	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
+
+	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO: %d\n", paquete->id_mensaje);
+	printf("Recibida Confirmacion: %d\n",paquete->id_mensaje);
+}
+
+void enviar_confirmacion(int id,op_code confirmacion,int socket){
+	int offset=0;
+
+	void*enviar=malloc(sizeof(int)*3);
+	memcpy(enviar,&confirmacion,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id_proceso_gameboy,sizeof(int)); //valor nulo pq no es un id_proceso
+
+	enviar_mensaje(socket,enviar,sizeof(int)*3);
+	//le devuelve al proceso emisor el id del mensaje
+}
 
 			break;}
 
@@ -131,7 +151,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		liberar_paquete_socket(paquete_socket);
 }
 
-
 void recibir_id_correlativo(int socket_cliente) {
 	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
 
@@ -152,3 +171,4 @@ void enviar_confirmacion(int id,op_code confirmacion,int socket){
 	enviar_mensaje(socket,enviar,sizeof(int)*3);
 	//le devuelve al proceso emisor el id del mensaje
 }
+
