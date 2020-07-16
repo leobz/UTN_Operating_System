@@ -26,5 +26,6 @@ int size_metadata_blocks(t_list* lista);
 void procesar_new_pokemon(t_paquete_socket* paquete_socket);
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket);
 void procesar_get_pokemon(t_paquete_socket* paquete_socket);
+char* crear_ruta(char* ruta);
 
 #endif  //DIRECTORIOS_H_
