@@ -62,9 +62,9 @@ char* archivo_a_string(char* ruta) {
 }
 
 
-t_archivo* leer_archivo(char* ruta) {
+t_archivo* leer_archivo_de_datos(char* ruta_al_metadata_bin_del_archivo) {
 	t_archivo* archivo = malloc(sizeof(t_archivo));
-	t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta));
+	t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta_al_metadata_bin_del_archivo));
 
 	archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
 	archivo->blocks = strings_to_list(config_get_array_value(bloque_metadata_archivo, "BLOCKS"));
@@ -80,7 +80,7 @@ char* ruta_blocks(char* numero_de_bloque) {
 	return ruta_bloque;
 }
 
-char* buffer_archivo(t_archivo* archivo) {
+char* buffer_del_archivo_completo(t_archivo* archivo) {
 	char* buffer_archivo = string_new();
 
 	void unir_bloques(char* numero_de_bloque) {

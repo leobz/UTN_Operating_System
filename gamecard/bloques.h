@@ -28,19 +28,58 @@ typedef struct{
 
 
 /**
+* @NAME: crear_ruta(char* ruta)
+* @DESC: Convierte una ruta relativa a absoluta
+* Ejemplo: crear_ruta("unDirectorio/unArchivo.bin") => "home/../punto-de-montaje/unDirectorio/unArchivo.bin"
+*
+*/
+char* crear_ruta(char* ruta);
+
+
+/**
+* @NAME: ruta_blocks(char* numero_de_bloque)
+* @DESC: Retorna relativa a absoluta de un numero de block
+* Ejemplo: ruta_blocks("1") => "home/../punto-de-montaje/Blocks/1.bin"
+*/
+char* ruta_blocks(char* numero_de_bloque);
+
+
+/**
 * @NAME: crear_bloque(char* ruta_del_archivo)
 * @DESC: Abre un archivo de texto de tipo bloque, lee todas sus keys
 * y las parsea a un formato t_bloque(t_config). Si no existe, lo crea
 */
 t_bloque* crear_bloque(char* ruta_archivo);
-char* crear_ruta(char* ruta);
 
 
+/**
+* @NAME: buffer_del_archivo_completo(t_archivo* archivo)
+* @DESC: Dado un t_archivo, busca el contenido de cada bloque y los une en un solo char*
+* Ejemplo: {1.bin="hola", 2.bin=" chau"} ==> "hola chau"
+*/
+char* buffer_del_archivo_completo(t_archivo* archivo);
+
+
+/**
+* @NAME: leer_archivo(char* ruta)
+* @DESC: Crea un struct t_archivo desde un Metadata.bin de un POKEMON (No sirve para el del FS)
+* Ejemplo: leer_archivo_de_datos("Files/Pikachu/Metadata.bin") => t_archivo.size = 12, t_archivo.blocks =....
+*/
+t_archivo* leer_archivo_de_datos(char* ruta_al_metadata_bin_del_archivo);
+
+
+/**
+* @NAME: archivo_a_string(char* ruta)
+* @DESC: Convierte a string un archivo
+*/
+char* archivo_a_string(char* ruta);
+
+/**
+* @NAME: cargar_bloque_desde_buffer(char* un_buffer);
+* @DESC: Crea un t_config/t_bloque nuevo desde un char* en vez de desde un archivo
+*/
 t_config *cargar_bloque_desde_buffer(char* un_buffer);
 
-char* archivo_a_string(char* ruta);
-char* buffer_archivo(t_archivo* archivo);
-char* ruta_blocks(char* numero_de_bloque);
-t_archivo* leer_archivo(char* ruta);
+
 
 #endif /* BLOQUES_H_ */
