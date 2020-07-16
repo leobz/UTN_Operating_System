@@ -13,5 +13,5 @@
 
 int iniciar_servidor(char* ip, char* puerto);
 void esperar_cliente(int socket_cliente, void(*procesar_mensaje_recibido)(t_paquete_socket*));
-t_paquete_socket* recibir_mensaje_servidor(int socket_cliente);
+t_paquete_socket* recibir_mensajes(int socket_cliente);
 #endif

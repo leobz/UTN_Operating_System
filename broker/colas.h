@@ -12,11 +12,11 @@
 #include<stdlib.h>
 #include "server.h"
 
-
-
 t_mensaje*mensajes[6][3];
 
-typedef enum{FRENTE,FIN,ACTUAL}men;
+typedef enum{
+	FRENTE,FIN,ACTUAL
+}men;
 
 void inicializar_listas(int cola);
 void encolar_proceso(int socket, int cola);

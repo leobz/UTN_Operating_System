@@ -19,14 +19,18 @@
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
 
+
 t_objetivo_global* objetivo_global;
-t_pokemon_requeridos* pokemon_requeridos;
+t_pokemon_requeridos* pokemones_en_mapa;
+t_dictionary* pokemones_atrapados;
+t_dictionary* pokemones_planificados;
+t_dictionary* enviaron_catch;
 
 t_list* ready;
 t_list* new;
 t_list* blocked;
 t_list* unblocked;
-t_list* deadlock;
+t_list* ready_to_exchange;
 t_list* l_exit;
 
 t_log* logger;
@@ -44,6 +48,8 @@ typedef enum {
 	EXIT = 5,
 	//estado_tcbS INTERMEDIOS
 	READY_TO_EXCHANGE = 6,
+	DEADLOCK = 7,
+	UNBLOCKED = 8,
 } estado_tcb;
 
 
@@ -51,6 +57,7 @@ typedef enum {
 	MOVERSE = 1,
 	CATCH = 2,
 	INTERCAMBIAR = 3,
+	MOVERSE_A_ENTRENADOR = 4
 } instruccion;
 
 
@@ -63,7 +70,8 @@ typedef struct{
 	int retardo_ciclo_cpu;
 	char *algoritmo_de_planificacion;
 	int quantum;
-	int estimacion_inicial;
+	double alpha;
+	double estimacion_inicial;
 	char *ip_broker;
 	char *puerto_broker;
 	char *log_file;
@@ -77,24 +85,30 @@ typedef struct{
 }t_pokemon;
 
 
-typedef struct{
+typedef struct t_tcb{
 	pthread_t* entrenador;
 	int tid;
 	t_posicion* posicion;
 	t_dictionary* objetivos;
 	t_queue* rafaga;
-	struct t_tcb_entrenador* entrenador_a_intercambiar;
+	struct t_tcb* entrenador_a_intercambiar;
+	char* pokemon_a_dar_en_intercambio;
 	int pokemones_max;
 	t_dictionary* pokemones_capturados;
 	estado_tcb estado_tcb;
 	t_pokemon* pokemon_a_capturar;
 	sem_t* semaforo;
+	int rafaga_anterior;
+	double estimacion_anterior;
 }t_tcb_entrenador;
 
 
 // INICIALIZACIONES TEAM
-void cargar_objetivo_global(t_team_config*);
-void crear_pokemon_requeridos();
+void inicializar_objetivo_global(t_team_config*);
+void inicializar_pokemones_atrapados(t_team_config*);
+void inicializar_pokemones_en_mapa();
+void inicializar_pokemones_planificados();
+void inicializar_tcbs_enviaron_catch();
 void agregar_pokemones_de_entrenador_a_objetivo_global(
 		char** objetivos_entrenadores);
 void agregar_pokemon_a_objetivo_global(char *pokemon);
@@ -105,8 +119,8 @@ int obtener_cantidad_global_por_pokemon(char* pokemon);
 bool existe_pokemon_en_objetivo_global(char* pokemon);
 void destruir_objetivo_global();
 
-void agregar_pokemon_a_pokemon_requeridos(char* pokemon, t_list* lista_posiciones);
-bool existe_pokemon_en_pokemon_requeridos(char* pokemon);
+void agregar_pokemon_a_mapa(char* pokemon, t_list* lista_posiciones);
+bool existe_pokemon_en_mapa(char* pokemon);
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char *pokemon);
 void destruir_pokemon_requeridos();
 void destruir_lista_posiciones(t_list* posiciones);
@@ -114,7 +128,7 @@ void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
-void agregar_pokemon_requerido_by_mensaje_appeared(t_mensaje_appeared* mensaje);
+void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 
 

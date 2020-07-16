@@ -21,11 +21,6 @@ void imprimir_posiciones(t_list* posiciones) {
 	imprimir_posicion(posicion);
 }
 
-
-void imprimir_objetivo_global() {
-
-}
-
 void mostrar_lista_entrenadores(t_team_config* team_config) {
 	for (int i = 0; i < team_config->cantidad_entrenadores; i++) {
 		t_tcb_entrenador* entrenador = list_get(new, i);
@@ -49,11 +44,13 @@ void correrTests() {
 	agregar_tests_entrenador_cercano_a_ready();
 	agregar_tests_movimiento_entrenador();
 	agregar_tests_lista_blocked();
+	agregar_tests_appeared();
+	agregar_tests_caught();
+	agregar_tests_algoritmos_sjf();
+	agregar_tests_deadlock();
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
 	CU_cleanup_registry();
-
-	imprimir_objetivo_global();
 
 }
 

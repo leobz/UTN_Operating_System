@@ -49,6 +49,11 @@ void dictionary_increment_value(t_dictionary* dictionary, char* key) {
 	dictionary_increment_value_in(dictionary, key, 1);
 }
 
+
+void dictionary_decrement_value(t_dictionary* dictionary, char* key) {
+	dictionary_increment_value_in(dictionary, key, -1);
+}
+
 void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amount) {
 	if (key != NULL) {
 		if (dictionary_has_key(dictionary,key)){
@@ -58,6 +63,10 @@ void dictionary_increment_value_in(t_dictionary* dictionary, char* key, int amou
 		}
 		else
 			dictionary_put(dictionary, key, amount);
+	}
+
+	if (dictionary_get(dictionary, key) < 0) {
+		dictionary_put(dictionary, key, 0);
 	}
 }
 
@@ -91,9 +100,51 @@ void*obtener_de_diccionario(t_dictionary*dictionary, int key){
 	void*value=dictionary_get(dictionary,char_key);
 	return value;
 }
+
 bool esta_en_diccionario(t_dictionary* dictionary,int key){
 	char*char_key=pasar_a_char(key);
 	bool verificacion=dictionary_has_key(dictionary,char_key);
 	free(char_key);
 	return verificacion;
+}
+
+t_dictionary* dictionary_substract(t_dictionary* dic1, t_dictionary* dic2){
+	t_dictionary* dictionary_substract = dictionary_create();
+
+	void substract_key_and_values(char* key, void* value){
+		int subtracted_value = value;
+
+		if (dictionary_has_key(dic2, key)) {
+			subtracted_value -= (int) dictionary_get(dic2, key);
+		}
+
+		if(subtracted_value > 0) {
+			dictionary_put(dictionary_substract, key, subtracted_value);
+		}
+	}
+
+	dictionary_iterator(dic1, substract_key_and_values);
+
+	return dictionary_substract;
+}
+
+t_list* dictionary_keys_to_list(t_dictionary* dictionary){
+	t_list* list = list_create();
+
+	void add_key_to_list(char* key, void* value){
+		list_add(list, key);
+	}
+
+	dictionary_iterator(dictionary, (void*) add_key_to_list);
+
+	return list;
+}
+
+void remover_decrementar_value_en_diccionario(t_dictionary* dic, char* key) {
+	if (dictionary_has_key(dic, key)) {
+		if (dictionary_get(dic, key) == 1)
+			dictionary_remove(dic, key);
+		else
+			dictionary_decrement_value(dic, key);
+	}
 }
