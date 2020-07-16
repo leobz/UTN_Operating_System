@@ -113,6 +113,7 @@ void verificar_cache(t_proceso* proceso){
 	void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
 
 		bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
+			return proceso_a_comparar->id_proceso == id_suscriptor;
 		}
 
 		if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
