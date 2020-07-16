@@ -47,7 +47,14 @@ void inicializar_gamecard() {
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
 }
 
+void liberar_paths(){
+	free(path_directorio_metadata);
+	free(path_directorio_files);
+	free(path_directorio_blocks);
+}
+
 void finalizar_gamecard() {
+	liberar_paths();
 	destruir_gamecard_config(gamecard_config);
 	destruir_logger(logger);
 }

@@ -8,7 +8,7 @@
 #ifndef SERVIDOR_GAMECARD_H_
 #define SERVIDOR_GAMECARD_H_
 
-#include "gamecard.h"
+#include "directorios.h"
 
 // Funciones
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket);

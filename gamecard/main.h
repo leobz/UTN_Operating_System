@@ -8,7 +8,6 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#include "directorios.h"
 #include "servidor_gamecard.h"
 
 
