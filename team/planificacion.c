@@ -220,7 +220,6 @@ void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 void cargar_rafaga_captura(t_tcb_entrenador* tcb, t_posicion* posicion_pokemon) {
 	cargar_rafaga_movimiento(tcb, posicion_pokemon);
 	cargar_instruccion(tcb, CATCH);
-
 }
 
 void cargar_rafaga_intercambio(t_tcb_entrenador* tcb) {
@@ -490,9 +489,13 @@ void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
-	tcb->estado_tcb = EXIT;
-	list_add(l_exit, tcb);
-	printf("[CAMBIO DE COLA] TID:%d Pasó a lista Exit\n", tcb->tid);
+	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados)){
+		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");
+		// TODO: Mostar metricas
+		// TODO: Cerrar conexiones
+		// TODO: Finalizar proceso
+	}
 }
 
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
