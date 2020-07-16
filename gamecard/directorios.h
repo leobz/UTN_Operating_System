@@ -18,6 +18,14 @@ typedef struct{
 	char* magic_number;
 }t_metadata;
 
+typedef struct{
+  t_list* blocks;
+  int size;
+  char* directory;
+  bool open;
+}t_archivo;
+
+pthread_mutex_t mutex_abiertos[3];
 t_metadata* metadata;
 t_dictionary* archivos_existentes;
 t_dictionary* archivos_abiertos;

@@ -29,12 +29,6 @@ typedef struct {
 	int id_proceso;
 } t_gamecard_config;
 
-typedef struct {
-	char* posiciones;
-} t_pokemon_config;
-
-
-
 // Variables
 t_log* logger;
 t_gamecard_config* gamecard_config;

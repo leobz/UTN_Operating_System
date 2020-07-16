@@ -102,7 +102,19 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	t_mensaje_new*mensaje_new;
 	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	if(esta_en_diccionario(archivos_existentes,mensaje_new->pokemon)){}
+	if(esta_en_diccionario(archivos_existentes,mensaje_new->pokemon)){
+
+			while(archivo_esta_abierto(mensaje_new->pokemon))
+				sleep(gamecard_config->tiempo_reintento_operacion);
+
+		pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
+			char*path_pokemonn=modificar_archivo_abierto(mensaje_new->pokemon);
+		pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
+
+		t_archivo* archivo_pokemon_config=leer_archivo(path_pokemonn);
+		agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+
+	}
 
 	else{
 
@@ -155,6 +167,23 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 
 		if(esta_en_diccionario(archivos_existentes,mensaje_catch->pokemon)){}
 
+}
+
+
+t_archivo* modificar_archivo_abierto(char*pokemonn){
+
+}
+
+t_archivo* leer_archivo(char* ruta){
+    t_archivo* archivo = malloc(sizeof(t_archivo));
+    t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta));
+
+    archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
+    archivo->blocks = strings_to_list(config_get_array_value(bloque_metadata_archivo, "BLOCKS"));
+    archivo->open = config_get_string_value(bloque_metadata_archivo, "OPEN");
+    archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
+
+    return archivo;
 }
 
 char* crear_ruta(char* ruta) {
