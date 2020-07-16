@@ -96,6 +96,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
+				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
+				liberar_conexion(conexion_corfirmacion);
+
+
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
 

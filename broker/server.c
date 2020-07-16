@@ -66,9 +66,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
 			pthread_detach(thread_subscribers);
 
-
-			sem_post(&sem_proceso[paquete->cola]);
-
 			break;}
 
 		case CONFIRMACION:{
@@ -112,7 +109,7 @@ void verificar_cache(t_proceso* proceso){
 	void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
 
 		bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
-			return proceso_a_comparar->id_proceso=id_suscriptor;
+			return proceso_a_comparar->id_proceso==id_suscriptor;
 		}
 
 		if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
