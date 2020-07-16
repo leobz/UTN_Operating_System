@@ -30,6 +30,7 @@ sem_t sem;
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
+void ingresar_en_cola_y_cache(t_paquete_socket* paquete);
 
 void verificar_cache(t_proceso* proceso);
 

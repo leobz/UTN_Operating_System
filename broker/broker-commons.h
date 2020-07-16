@@ -73,7 +73,7 @@ t_dictionary* administracion_por_id;
 t_dictionary* administracion_por_cod;
 t_dictionary* dic_suscriptores[6];
 t_dictionary* subscribers;
-
+t_dictionary* mensajes_iguales;
 
 void *empaquetar_mensaje_broker(t_mensaje *mensaje,int* bytes);
 void parsear_broker_config(t_broker_config *broker_config, t_config *config);

@@ -5,6 +5,7 @@ void inicializar_diccionarios() {
 	administracion_por_id = dictionary_create();
 	administracion_por_cod = dictionary_create();
 	subscribers = dictionary_create();
+	mensajes_iguales=dictionary_create();
 }
 
 void inicalizar_lista_de_todos_las_colas() {
@@ -182,11 +183,12 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 		loggear_mensaje_recibido(codigo_de_operacion, sent_package); //Por ahora de prueba
 
-		if(list_size(suscriptores[codigo_de_operacion])==0)
-			sem_wait(&sem_proceso[codigo_de_operacion]);
-
 		t_adm_mensaje* administrator;
 		administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
+
+		pthread_mutex_lock(&m_cache);
+		agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
+		pthread_mutex_unlock(&m_cache);
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 		void enviar_a_suscriptores(t_proceso* proceso){
@@ -200,12 +202,8 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 			}
 		}
 
-
+	if(list_size(suscriptores[codigo_de_operacion])!=0)
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);
-
-		pthread_mutex_lock(&m_cache);
-		agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
-		pthread_mutex_unlock(&m_cache);
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);
