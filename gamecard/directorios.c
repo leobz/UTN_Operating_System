@@ -57,7 +57,6 @@ void inicializar_directorios() {
 	fputs(metada_chars, metadata_file);
 
 	free(metada_chars);
-	free(metada_chars);
 	free(metadata);
 	free(metadata_aux);
 	free(path_metadata);
@@ -152,5 +151,14 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 
 		if(esta_en_diccionario(pokemones_gamecard,mensaje_catch->pokemon)){}
 
+}
+
+char* crear_ruta(char* ruta) {
+	char* path_ruta_absoluta = string_new();
+	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_ruta_absoluta, "/");
+	string_append(&path_ruta_absoluta, ruta);
+
+	return path_ruta_absoluta;
 }
 
