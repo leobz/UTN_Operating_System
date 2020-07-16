@@ -29,6 +29,12 @@ typedef struct {
 	int id_proceso;
 } t_gamecard_config;
 
+typedef struct {
+	char* poiciones;
+} t_pokemon_config;
+
+
+
 // Variables
 t_log* logger;
 t_gamecard_config* gamecard_config;
@@ -37,10 +43,11 @@ pthread_t suscripcion_broker;
 char* path_directorio_metadata;
 char* path_directorio_files;
 char* path_directorio_blocks;
-
+int id_proceso_gamecard;
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
+t_pokemon_config* cargar_pokemon_config(char* path_archivo);
 void suscribirme_al_broker();
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
