@@ -4,6 +4,7 @@
 void inicializar_directorios() {
 
 	//Creo Metadata
+
 	path_directorio_metadata = string_new();
 	string_append(&path_directorio_metadata,
 			gamecard_config->punto_montaje_tallgrass);
@@ -41,26 +42,15 @@ void inicializar_directorios() {
 	fclose(bitmap_file);
 
 	//Creo archivo Metadata.bin
-	FILE* metadata_file;
-	char* path_metadata = string_new();
-	string_append(&path_metadata, path_directorio_metadata);
-	string_append(&path_metadata, "/Metadata.bin");
-	metadata_file = fopen(path_metadata, "wb");
+	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
+	config_set_value(bloque_metadata_bin, "BLOCK_SIZE", string_itoa(metadata->block_size));
+	config_set_value(bloque_metadata_bin, "BLOCKS", string_itoa(metadata->blocks));
+	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER", metadata->magic_number);
 
-	char* metada_chars = string_new();
-	string_append(&metada_chars, "BLOCK_SIZE=");
-	string_append_with_format(&metada_chars, "%d\n", metadata->block_size);
-	string_append(&metada_chars, "BLOCKS=");
-	string_append_with_format(&metada_chars, "%d\n", metadata->blocks);
-	string_append(&metada_chars, "MAGIC_NUMBER=");
-	string_append_with_format(&metada_chars, "%s\n", metadata->magic_number);
-	fputs(metada_chars, metadata_file);
+	config_save(bloque_metadata_bin);
 
-	free(metada_chars);
 	free(metadata);
 	free(metadata_aux);
-	free(path_metadata);
-	fclose(metadata_file);
 
 	//liberar_paths();
 
