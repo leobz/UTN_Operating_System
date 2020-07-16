@@ -30,7 +30,7 @@ typedef struct {
 } t_gamecard_config;
 
 typedef struct {
-	char* poiciones;
+	char* posiciones;
 } t_pokemon_config;
 
 
@@ -45,6 +45,8 @@ char* path_directorio_metadata;
 char* path_directorio_files;
 char* path_directorio_blocks;
 int id_proceso_gamecard;
+
+int contador_bloques_totales;
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);

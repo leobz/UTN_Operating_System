@@ -18,10 +18,14 @@ typedef struct{
 	char* magic_number;
 }t_metadata;
 
-t_dictionary* pokemones_gamecard;
+t_metadata* metadata;
+t_dictionary* archivos_existentes;
+t_dictionary* archivos_abiertos;
 
 //Funciones
 void inicializar_directorios();
+void inicializar_diccionarios();
+void crear_archivo_pokemon(t_mensaje_new* mensaje_new);
 int size_metadata_blocks(t_list* lista);
 void procesar_new_pokemon(t_paquete_socket* paquete_socket);
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket);
