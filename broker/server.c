@@ -72,10 +72,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 			log_info(logger, "[MSG_RECIBIDO] CON ID_MENSAJE: %d", paquete->id_mensaje);
 
-			t_adm_mensaje*administrador_confirmado = obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
+			t_adm_mensaje* administrador_confirmado = obtener_de_diccionario(administracion_por_id, paquete->id_mensaje);
 			t_proceso* proceso_confirmado = obtener_de_diccionario(subscribers,paquete->id_proceso);
 
-			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
+			list_add(administrador_confirmado->suscriptores_confirmados, proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
 
 			//printf("Recibida confirmacion de proceso: %d\n",paquete->id_proceso);
 
@@ -109,11 +109,12 @@ void verificar_cache(t_proceso* proceso){
 	void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
 
 		bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
-			return proceso_a_comparar->id_proceso==id_suscriptor;
+			return proceso_a_comparar->id_proceso == id_suscriptor;
 		}
 
 		if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
 			//si ese proceso no se encuentra entre los procesos que habian confirmado el mensaje
+
 			int bytes=0;
 			void* mensaje_para_enviar = generar_mensaje(actual_administrator,&bytes);
 
@@ -123,6 +124,7 @@ void verificar_cache(t_proceso* proceso){
 			//verificar pq puede que ese proceso ya exista en esa lista
 			list_add(actual_administrator->suscriptores_enviados,proceso);
 		}
+
 	}
 
 //***** primero itera

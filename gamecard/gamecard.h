@@ -15,6 +15,8 @@
 #include "bloques.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
+#include <sys/stat.h>
+#include <dirent.h>
 
 // Estructuras
 typedef struct {
