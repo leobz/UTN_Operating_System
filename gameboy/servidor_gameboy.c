@@ -42,17 +42,17 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			mensaje_get= deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
-				log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
+			log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
 
-				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-				liberar_conexion(conexion_corfirmacion);
+			int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+			//enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
+			liberar_conexion(conexion_corfirmacion);
 
-				free(mensaje_get->pokemon);
-				free(mensaje_get);
-
+			free(mensaje_get->pokemon);
+			free(mensaje_get);
 
 			break;}
+
 
 		case CATCH_POKEMON:{
 
@@ -69,12 +69,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_catch);
 
 
-			break;}
+			break;
+		}
 
 		case APPEARED_POKEMON:{
 
-			t_mensaje_appeared* mensaje_appeared;
-
+			t_mensaje_appeared *mensaje_appeared;
 			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
@@ -92,8 +92,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			t_mensaje_localized* mensaje_localized;
 			mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
-
-
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
 				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
@@ -139,11 +137,11 @@ void recibir_id_correlativo(int socket_cliente) {
 	printf("Recibida Confirmacion: %d\n",paquete->id_mensaje);
 }
 
-void enviar_confirmacion(int id,op_code confirmacion,int socket){
+void enviar_confirmacion(int id, int confirmacion, int socket){
 	int offset=0;
 
-	void*enviar=malloc(sizeof(int)*3);
-	memcpy(enviar,&confirmacion,sizeof(int));
+	void*enviar = malloc(sizeof(int) * 3);
+	memcpy(enviar, &confirmacion,sizeof(int));
 	offset+=sizeof(int);
 	memcpy(enviar+offset,&id,sizeof(int));
 	offset+=sizeof(int);

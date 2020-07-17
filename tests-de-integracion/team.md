@@ -44,7 +44,7 @@ Luego de capturarlo, pasa a la cola de ReadyToExchange, ya que capturo su maximo
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA<...>
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
@@ -70,7 +70,7 @@ $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:1 (New->Ready) (3, 3) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:1 (New->Ready) (3, 3) Motivo:CAPTURA<...>
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(4, 3)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(5, 3)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 3)

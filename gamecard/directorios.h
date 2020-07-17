@@ -18,13 +18,6 @@ typedef struct{
 	char* magic_number;
 }t_metadata;
 
-typedef struct{
-  t_list* blocks;
-  int size;
-  char* directory;
-  bool open;
-}t_archivo;
-
 pthread_mutex_t mutex_abiertos[3];
 t_metadata* metadata;
 t_dictionary* archivos_existentes;
@@ -38,6 +31,10 @@ int size_metadata_blocks(t_list* lista);
 void procesar_new_pokemon(t_paquete_socket* paquete_socket);
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket);
 void procesar_get_pokemon(t_paquete_socket* paquete_socket);
-char* crear_ruta(char* ruta);
+bool archivo_esta_abierto(char* pokemonn);
+char* setear_archivo_abierto(char*pokemonn);
+void cerrar_archivo(char* pokemonn);
+char*formar_archivo_pokemon(char*pokemonn);
+
 
 #endif  //DIRECTORIOS_H_

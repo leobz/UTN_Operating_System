@@ -27,7 +27,7 @@ void inicializar_directorios() {
 	metadata->block_size = 64;
 	metadata->blocks = 5192;
 	metadata->magic_number = "TALL_GRASS";
-	t_metadata* metadata_aux = malloc(sizeof(t_metadata));
+	//t_metadata* metadata_aux = malloc(sizeof(t_metadata));
 
 	//Creo archivo Bitmap.bin
 	FILE* bitmap_file;
@@ -102,18 +102,20 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	t_mensaje_new*mensaje_new;
 	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	if(esta_en_diccionario(archivos_existentes,mensaje_new->pokemon)){
+	if(dictionary_has_key(archivos_existentes,mensaje_new->pokemon)){
 
 			while(archivo_esta_abierto(mensaje_new->pokemon))
 				sleep(gamecard_config->tiempo_reintento_operacion);
 
 		pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
-			char*path_pokemonn=modificar_archivo_abierto(mensaje_new->pokemon);
+			char*path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
 		pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
 
-		t_archivo* archivo_pokemon_config=leer_archivo(path_pokemonn);
-		agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+		t_archivo* archivo_pokemon_config=leer_archivo_de_datos(path_pokemonn);
 
+		//agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+
+		cerrar_archivo(mensaje_new->pokemon);
 	}
 
 	else{
@@ -169,16 +171,33 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 
 }
 
+bool archivo_esta_abierto(char *pokemonn){
+	return dictionary_get(archivos_existentes,pokemonn);
+}
 
-t_archivo* modificar_archivo_abierto(char*pokemonn){
+char* setear_archivo_abierto(char*pokemonn){
+
+	dictionary_put(archivos_existentes,pokemonn,1);
 
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	t_config*pokemon_config=config_create(path_absoluta);
-	config_set_value(pokemon_config, "DIRECTORY","Y");
+	config_set_value(pokemon_config, "OPEN","Y");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 	return path_absoluta;
+}
+
+void cerrar_archivo(char* pokemonn){
+
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+	t_config*pokemon_config=config_create(path_absoluta);
+	config_set_value(pokemon_config, "OPEN","N");
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+
+	dictionary_put(archivos_existentes,pokemonn,0);
 }
 
 char*formar_archivo_pokemon(char*pokemonn){
@@ -187,26 +206,5 @@ char*formar_archivo_pokemon(char*pokemonn){
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
 	string_append(&path_archivo_pokemon, "/Metadata.bin");
 	return path_archivo_pokemon;
-}
-
-t_archivo* leer_archivo(char* ruta){
-    t_archivo* archivo = malloc(sizeof(t_archivo));
-    t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta));
-
-    archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
-    archivo->blocks = strings_to_list(config_get_array_value(bloque_metadata_archivo, "BLOCKS"));
-    archivo->open = config_get_string_value(bloque_metadata_archivo, "OPEN");
-    archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
-
-    return archivo;
-}
-
-char* crear_ruta(char* ruta) {
-	char* path_ruta_absoluta = string_new();
-	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
-	string_append(&path_ruta_absoluta, "/");
-	string_append(&path_ruta_absoluta, ruta);
-
-	return path_ruta_absoluta;
 }
 
