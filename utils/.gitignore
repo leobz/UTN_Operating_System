@@ -2,6 +2,10 @@
 # Created by https://www.gitignore.io/api/c,eclipse
 # Edit at https://www.gitignore.io/?templates=c,eclipse
 
+### GameBoyProject Configuration ###
+*.config
+*.log
+
 ### C ###
 # Prerequisites
 *.d
@@ -68,7 +72,6 @@ local.properties
 .settings/
 .loadpath
 .recommenders
-Debug/
 
 # External tool builders
 .externalToolBuilders/
