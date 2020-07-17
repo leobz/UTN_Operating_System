@@ -80,21 +80,13 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 		config_set_value(pokemon_config, "BLOCKS",block);
 		config_set_value(pokemon_config, "OPEN","N");
 
-		dictionary_put(archivos_existentes,mensaje_new->pokemon,0);//indica que esta cerrado
+		dictionary_put(archivos_existentes,mensaje_new->pokemon,false);//indica que esta cerrado
 
 		destruir_config(pokemon_config);
 	}
 	else{
 		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
 	}
-}
-
-bool esta_abierto(FILE* archivo) {
-//	TODO
-}
-
-void setear_abierto(FILE* archivo) {
-//	TODO
 }
 
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
@@ -104,12 +96,29 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 
 	if(dictionary_has_key(archivos_existentes,mensaje_new->pokemon)){
 
-			while(archivo_esta_abierto(mensaje_new->pokemon))
-				sleep(gamecard_config->tiempo_reintento_operacion);
+		char*path_pokemonn;
+		bool abierto=archivo_esta_abierto(mensaje_new->pokemon);
 
-		pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
-			char*path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
-		pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
+		if(abierto==true){ //sie el archivo esta abierto
+
+			pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
+
+			while(abierto==true){
+
+				sleep(gamecard_config->tiempo_reintento_operacion);
+				abierto=archivo_esta_abierto(mensaje_new->pokemon);
+			}
+			abierto=true;
+			path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
+			pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
+
+		}
+		else{ //si el archivo esta cerrado
+
+			pthread_mutex_lock(&mutex_setear[NEW_POKEMON]);
+				path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
+			pthread_mutex_unlock(&mutex_setear[NEW_POKEMON]);
+		}
 
 		t_archivo* archivo_pokemon_config=leer_archivo_de_datos(path_pokemonn);
 
@@ -119,7 +128,6 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	}
 
 	else{
-
 		crear_archivo_pokemon(mensaje_new);
 		}
 	/* Existe pokemon?
@@ -177,7 +185,7 @@ bool archivo_esta_abierto(char *pokemonn){
 
 char* setear_archivo_abierto(char*pokemonn){
 
-	dictionary_put(archivos_existentes,pokemonn,1);
+	dictionary_put(archivos_existentes,pokemonn,true);
 
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
@@ -197,7 +205,7 @@ void cerrar_archivo(char* pokemonn){
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 
-	dictionary_put(archivos_existentes,pokemonn,0);
+	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
 char*formar_archivo_pokemon(char*pokemonn){

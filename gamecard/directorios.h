@@ -19,6 +19,7 @@ typedef struct{
 }t_metadata;
 
 pthread_mutex_t mutex_abiertos[3];
+pthread_mutex_t mutex_setear[3];
 t_metadata* metadata;
 t_dictionary* archivos_existentes;
 t_dictionary* archivos_abiertos;
