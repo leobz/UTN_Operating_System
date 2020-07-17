@@ -43,6 +43,8 @@ t_gamecard_config* cargar_gamecard_config(char* path_archivo){
 }
 
 void inicializar_gamecard() {
+	//TODO: Borrar este valor, cuando se resuelva la busqueda dinamica de bloques disponibles
+	numero_de_bloque_disponible = 100;
 	gamecard_config = cargar_gamecard_config("gamecard.config");
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
 }
