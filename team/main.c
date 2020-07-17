@@ -21,6 +21,7 @@ int main(int argc, char ** argv) {
 
 	inicializar_listas();
 	inicializar_diccionarios(team_config);
+	inicializar_metricas();
 	crear_tcb_entrenadores(team_config);
 
 	if (argc == 2) {
@@ -42,6 +43,7 @@ int main(int argc, char ** argv) {
 		while (!team_cumplio_objetivo)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 
+		destruir_metricas();
 		destruir_objetivo_global();
 		//destruir_pokemon_requeridos();
 		destruir_team_config(team_config);

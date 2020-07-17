@@ -38,6 +38,7 @@ t_list* deadlock_actual;
 void inicializar_listas();
 void inicializar_diccionarios();
 void iniciar_planificador();
+void inicializar_metricas();
 void planificar();
 
 // Carga de TCB
@@ -94,5 +95,8 @@ void loggear_deteccion_de_deadlock(t_list*);
 void hay_espera_circular(t_tcb_entrenador* tcb_iterado);
 t_list* detectar_deadlock_recursivo(t_tcb_entrenador*);
 void continuar_o_manejar_deadlock();
+
+
+void destruir_metricas();
 
 #endif /* PLANIFICACION_H_ */

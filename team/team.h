@@ -105,6 +105,16 @@ typedef struct t_tcb{
 	int nivel_de_grafo_en_deadlock;
 }t_tcb_entrenador;
 
+typedef struct {
+	int cantidad_ciclos_CPU_totales;
+	int cantidad_cambios_contexto;
+	t_dictionary* cantidad_ciclos_CPU_entrenador;
+	int cantidad_deadlocks_producidos;
+	int cantidad_deadlocks_resueltos;
+} t_metricas;
+
+t_metricas* metricas;
+
 
 // INICIALIZACIONES TEAM
 void inicializar_objetivo_global(t_team_config*);

@@ -42,6 +42,16 @@ void iniciar_planificador() {
 	pthread_detach(planificador);
 }
 
+void inicializar_metricas() {
+	metricas = malloc(sizeof(t_metricas));
+
+	metricas->cantidad_ciclos_CPU_totales = 0;
+	metricas->cantidad_cambios_contexto = 0;
+	metricas->cantidad_ciclos_CPU_entrenador = dictionary_create();
+	metricas->cantidad_deadlocks_producidos = 0;
+	metricas->cantidad_deadlocks_resueltos = 0;
+}
+
 void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 	sem_post(tcb_exec->semaforo);
 }
@@ -171,6 +181,8 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 }
 
 void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
+	int cantidad_ciclos_instruccion = 1;
+
 	switch (instruccion) {
 	case MOVERSE:
 		actualizar_posicion(tcb);
@@ -209,12 +221,16 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
 		ejecutar_acciones_post_intercambio(entrenador, false);
 
+		cantidad_ciclos_instruccion = 5;
 		sleep(team_config->retardo_ciclo_cpu * 5);
 
 		continuar_o_manejar_deadlock();
 
 		break;
 	}
+
+	metricas->cantidad_ciclos_CPU_totales += cantidad_ciclos_instruccion;
+	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(tcb->tid), cantidad_ciclos_instruccion);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -480,6 +496,7 @@ void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* m
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	pthread_mutex_lock(&mutex_lista_ready);
+	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
 }
@@ -487,21 +504,24 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
 	tcb_exec->estado_tcb = EXEC;
 	list_remove_element(ready, tcb_exec);
-
+	metricas->cantidad_cambios_contexto++;
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	list_add(blocked, tcb);
 	tcb->estado_tcb = BLOCKED;
+	metricas->cantidad_cambios_contexto++;
 	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
+	metricas->cantidad_cambios_contexto++;
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");
 		// TODO: Mostar metricas
@@ -653,6 +673,7 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 
 			free(deadlock);
 
+			metricas->cantidad_deadlocks_producidos++;
 			loggear_deteccion_de_deadlock(lista_deadlock);
 		}
 		else {
@@ -670,6 +691,7 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
+			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
@@ -683,6 +705,7 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
+			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
@@ -700,6 +723,7 @@ void continuar_o_manejar_deadlock() {
 void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb, char* motivo) {
 	pasar_a_cola(tcb, ready_to_exchange, READY_TO_EXCHANGE, motivo);
 
+	metricas->cantidad_cambios_contexto++;
 	ejecutar_manejador_de_deadlocks(tcb);
 }
 
@@ -739,4 +763,11 @@ char* cola_planificacion_a_string(int cola_planificacion){
 	default:
 		return "NULL";
 	}
+}
+
+void destruir_metricas() {
+	dictionary_clean(metricas->cantidad_ciclos_CPU_entrenador);
+	dictionary_destroy(metricas->cantidad_ciclos_CPU_entrenador);
+
+	free(metricas);
 }
