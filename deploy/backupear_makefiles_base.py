@@ -36,8 +36,10 @@ def actualizar_todos_los_makefiles():
 	reemplazar_makefile_base("gamecard")
 	reemplazar_makefile_base("broker")
 	reemplazar_makefile_base("team")
-	print("Finalizado")
+	reemplazar_makefile_base("gameboy")
+	reemplazar_makefile_base("utils")
 
+	print("Finalizado")
 
 
 actualizar_todos_los_makefiles()

@@ -27,9 +27,11 @@ def actualizar_todos_los_makefiles():
 	reemplazar_ruta_utils_en_makefile("gamecard/Debug/makefile")
 	reemplazar_ruta_utils_en_makefile("broker/Debug/makefile")
 	reemplazar_ruta_utils_en_makefile("team/Debug/makefile")
+	reemplazar_ruta_utils_en_makefile("gameboy/Debug/makefile")
+
 	print("Finalizado")
 
-
+ 
 
 actualizar_todos_los_makefiles()
 
