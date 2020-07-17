@@ -132,11 +132,48 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 		}
 }
 
-void procesar_get_pokemon(t_paquete_socket* paquete_socket){
-	t_mensaje_new*mensaje_get;
-	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+void enviar_mensaje_localized(t_dictionary* posiciones){
+	int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+	if (conexion == -1){
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker")
+	}
+	else {
+		int bytes;
+		// TODO
+		// void* a_enviar = serializar_localized_pokemon(&bytes, );
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+}
 
-	if(esta_en_diccionario(archivos_existentes,mensaje_get->pokemon)){}
+void procesar_get_pokemon(t_paquete_socket* paquete_socket){
+	t_mensaje_get* mensaje_get;
+	mensaje_get = deserializar_mensaje_get_pokemon(paquete_socket->buffer);
+	if(esta_en_diccionario(archivos_existentes, mensaje_get->pokemon)){
+		char* path_pokemon;
+		bool abierto = archivo_esta_abierto(mensaje_get->pokemon);
+		if(abierto){
+			pthread_mutex_lock(&mutex_abiertos[GET_POKEMON]);
+			while(abierto){
+				sleep(gamecard_config->tiempo_reintento_conexion);
+				abierto = archivo_esta_abierto(mensaje_get->pokemon);
+			}
+			path_pokemon = setear_archivo_abierto(mensaje_get->pokemon);
+			pthread_mutex_unlock(&mutex_abiertos[GET_POKEMON]);
+		}
+		else{
+			// TODO: codigo de leo
+			// Si obtengo una lista
+
+			t_list posiciones;
+			if(!list_is_empty(posiciones)) {
+				list_iterate(posiciones, enviar_mensaje_localized);
+			}
+		}
+	}
+	else {
+		// TODO: envio de mensaje
+	}
+}
 
 void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado){
 	int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
