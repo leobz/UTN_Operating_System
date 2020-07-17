@@ -9,8 +9,6 @@
 #define MAIN_H_
 
 #include "servidor_gamecard.h"
-#include "gamecard.h"
-#include "bloques.h"
 
 
 #endif /* MAIN_H_ */

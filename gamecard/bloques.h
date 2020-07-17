@@ -12,13 +12,41 @@
 #include <dirent.h>
 #include <math.h>
 #include "commons/string.h"
+#include "commons/bitarray.h"
 #include "../utils/config.h"
 #include "../utils/listas.h"
 #include "../utils/log.h"
 #include "../utils/servidor.h"
-#include "gamecard.h"
-#include "directorios.h"
+#include "../utils/diccionarios.h"
+//#include "gamecard.h"
 
+
+
+typedef struct {
+	int tiempo_reintento_conexion;
+	int tiempo_reintento_operacion;
+	int tiempo_retardo_operacion;
+	char* punto_montaje_tallgrass;
+	char* ip_broker;
+	char* puerto_broker;
+	char* ip_gamecard;
+	char* puerto_gamecard;
+	int id_proceso;
+} t_gamecard_config;
+
+typedef struct{
+	int block_size;
+	t_list* blocks;
+	char* magic_number;
+}t_file_metadata;
+
+typedef struct{
+	int block_size;
+	int blocks;
+	char* magic_number;
+}t_metadata;
+
+t_metadata* metadata;
 
 typedef t_config t_bloque;
 int numero_de_bloque_disponible; // Esto se usa para un mock, borrar cuando no se use mas
@@ -30,6 +58,7 @@ typedef struct{
 	bool open;
 }t_archivo;
 
+t_gamecard_config* gamecard_config;
 
 /**
 * @NAME: crear_ruta(char* ruta)
