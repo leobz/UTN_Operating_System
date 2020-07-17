@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include "commons/string.h"
+#include "commons/bitarray.h"
 #include "../utils/config.h"
 #include "../utils/listas.h"
 #include "../utils/log.h"
