@@ -147,57 +147,58 @@ void test_crear_deadlock() {
 
 	/*
 	 * Tcb actual:
-	 * - Pokemones necesarios: "Spearow"
-	 * - Pokemones no necesarios: "Abra", "Muk"
+	 * - Pokemones necesarios: "Lapras"
+	 * - Pokemones no necesarios: "Spearow"
 	*/
 
-	dictionary_put(tcb_actual_objetivos, "Pidgey", 1);
-	dictionary_put(tcb_actual_objetivos, "Spearow", 2);
+	dictionary_put(tcb_actual_objetivos, "Charmander", 1);
+	dictionary_put(tcb_actual_objetivos, "Lapras", 2);
 
-	dictionary_put(tcb_actual_pokemones_capturados, "Muk", 1);
-	dictionary_put(tcb_actual_pokemones_capturados, "Abra", 1);
-	dictionary_put(tcb_actual_pokemones_capturados, "Pidgey", 1);
+	dictionary_put(tcb_actual_pokemones_capturados, "Spearow", 1);
+	dictionary_put(tcb_actual_pokemones_capturados, "Charmander", 1);
+	dictionary_put(tcb_actual_pokemones_capturados, "Lapras", 1);
 
 	tcb_actual->estado_tcb = DEADLOCK;
 	tcb_actual->objetivos = tcb_actual_objetivos;
 	tcb_actual->pokemones_capturados = tcb_actual_pokemones_capturados;
 
 	/*
-	 * Tcb a intercambiar:
-	 * - Pokemones necesarios: "Lapras"
-	 * - Pokemones no necesarios: "Spearow"
-	*/
-
-	dictionary_put(tcb_a_intercambiar_objetivos, "Charmander", 1);
-	dictionary_put(tcb_a_intercambiar_objetivos, "Lapras", 2);
-
-	dictionary_put(tcb_a_intercambiar_pokemones_capturados, "Spearow", 1);
-	dictionary_put(tcb_a_intercambiar_pokemones_capturados, "Charmander", 1);
-	dictionary_put(tcb_a_intercambiar_pokemones_capturados, "Lapras", 1);
-
-	tcb_a_intercambiar->estado_tcb = DEADLOCK;
-	tcb_a_intercambiar->objetivos = tcb_a_intercambiar_objetivos;
-	tcb_a_intercambiar->pokemones_capturados = tcb_a_intercambiar_pokemones_capturados;
-
-	/*
 	 * Tcb anterior:
-	 * - Pokemones necesarios: "Abra"
-	 * - Pokemones no necesarios: "Lapras"
+	 * - Pokemones necesarios: "Spearow"
+	 * - Pokemones no necesarios: "Abra", "Muk"
 	*/
 
-	dictionary_put(tcb_anterior_objetivos, "Abra", 1);
-	dictionary_put(tcb_anterior_objetivos, "Caterpie", 1);
+	dictionary_put(tcb_anterior_objetivos, "Pidgey", 1);
+	dictionary_put(tcb_anterior_objetivos, "Spearow", 2);
 
-	dictionary_put(tcb_anterior_pokemones_capturados, "Lapras", 1);
-	dictionary_put(tcb_anterior_pokemones_capturados, "Caterpie", 1);
+	dictionary_put(tcb_anterior_pokemones_capturados, "Muk", 1);
+	dictionary_put(tcb_anterior_pokemones_capturados, "Abra", 1);
+	dictionary_put(tcb_anterior_pokemones_capturados, "Pidgey", 1);
 
 	tcb_anterior->estado_tcb = DEADLOCK;
 	tcb_anterior->objetivos = tcb_anterior_objetivos;
 	tcb_anterior->pokemones_capturados = tcb_anterior_pokemones_capturados;
 
+
+	/*
+	 * Tcb a intercambiar:
+	 * - Pokemones necesarios: "Abra"
+	 * - Pokemones no necesarios: "Lapras"
+	*/
+
+	dictionary_put(tcb_a_intercambiar_objetivos, "Abra", 1);
+	dictionary_put(tcb_a_intercambiar_objetivos, "Caterpie", 1);
+
+	dictionary_put(tcb_a_intercambiar_pokemones_capturados, "Lapras", 1);
+	dictionary_put(tcb_a_intercambiar_pokemones_capturados, "Caterpie", 1);
+
+	tcb_a_intercambiar->estado_tcb = DEADLOCK;
+	tcb_a_intercambiar->objetivos = tcb_a_intercambiar_objetivos;
+	tcb_a_intercambiar->pokemones_capturados = tcb_a_intercambiar_pokemones_capturados;
+
 	list_add(lista_deadlock, tcb_actual);
-	list_add(lista_deadlock, tcb_a_intercambiar);
 	list_add(lista_deadlock, tcb_anterior);
+	list_add(lista_deadlock, tcb_a_intercambiar);
 
 	deadlock = crear_deadlock(lista_deadlock);
 
@@ -206,8 +207,8 @@ void test_crear_deadlock() {
 	CU_ASSERT_EQUAL_FATAL(deadlock->tcb_2, tcb_a_intercambiar);
 	CU_ASSERT_EQUAL_FATAL(tcb_actual->entrenador_a_intercambiar, tcb_a_intercambiar);
 	CU_ASSERT_EQUAL_FATAL(tcb_a_intercambiar->entrenador_a_intercambiar, tcb_actual);
-	CU_ASSERT_STRING_EQUAL_FATAL(tcb_actual->pokemon_a_dar_en_intercambio, "Abra");
-	CU_ASSERT_STRING_EQUAL_FATAL(tcb_a_intercambiar->pokemon_a_dar_en_intercambio, "Spearow");
+	CU_ASSERT_STRING_EQUAL_FATAL(tcb_actual->pokemon_a_dar_en_intercambio, "Spearow");
+	CU_ASSERT_STRING_EQUAL_FATAL(tcb_a_intercambiar->pokemon_a_dar_en_intercambio, "Lapras");
 
 	free(deadlock);
 	dictionary_clean(tcb_a_intercambiar_pokemones_capturados);

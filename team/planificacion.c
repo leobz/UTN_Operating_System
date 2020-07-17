@@ -204,30 +204,14 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		t_tcb_entrenador* entrenador = tcb;
 		t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
 
-		printf("TCB: entrenador, pokemon a intercambiar: %s\n", entrenador->pokemon_a_dar_en_intercambio);
-		printf("TCB: entrenador, cant. pokemon capturados:%d\n", dictionary_size(entrenador->pokemones_capturados));
-		printf("TCB: entrenador, cant. objetivos:%d\n", dictionary_size(entrenador->objetivos));
-
-		printf("TCB: entrenador_a_intercambiar, pokemon a intercambiar: %s\n", entrenador_a_intercambiar->pokemon_a_dar_en_intercambio);
-		printf("TCB: entrenador_a_intercambiar, cant. pokemon capturados:%d\n", dictionary_size(entrenador_a_intercambiar->pokemones_capturados));
-		printf("TCB: entrenador_a_intercambiar, cant. objetivos:%d\n", dictionary_size(entrenador_a_intercambiar->objetivos));
-
 		ejecutar_intercambio(tcb);
-
-		printf("Termino intercambio!\n");
 
 		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
 		ejecutar_acciones_post_intercambio(entrenador, false);
 
-		printf("Termino acciones post intercambio!\n");
-
 		sleep(team_config->retardo_ciclo_cpu * 5);
 
-		printf("Termino retardo de 5 ciclos de CPU!\n");
-
 		continuar_o_manejar_deadlock();
-
-		printf("Termino eleccion de continuar o manejar deadlock!\n");
 
 		break;
 	}
@@ -533,14 +517,6 @@ bool todos_los_entrenadores_exit() {
 		return tcb->estado_tcb == EXIT;
 	}
 
-	printf("Tamaño new: %d\n", list_size(new));
-	printf("Tamaño new: %d\n", list_size(ready));
-	printf("Tamaño new: %d\n", list_size(blocked));
-	printf("Tamaño new: %d\n", list_size(unblocked));
-	printf("Tamaño new: %d\n", list_size(ready_to_exchange));
-	printf("Tamaño new: %d\n", list_size(l_exit));
-	printf("¿Todos los tcbs en estado EXIT? %d\n", list_all_satisfy(l_exit, (void*) todos_tcbs_estado_exit));
-
 	return list_size(new) == 0
 		&& list_size(ready) == 0
 		&& list_size(blocked) == 0
@@ -619,9 +595,6 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 		tcb_actual = tcb_iterado;
 		list_add_in_index(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock, tcb_iterado);
 		if (tcb_iterado == tcb_que_llega) {
-		 	printf("HAY ESPERA CIRCULAR\n");
-		 	printf("Nivel de Grafo: %d \n", tcb_iterado->nivel_de_grafo_en_deadlock);
-
 		 	en_deadlock = list_take(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock);
 		 	tcb_iterado->nivel_de_grafo_en_deadlock = 0;
 		 }
@@ -672,23 +645,6 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 			}
 
 			list_iterate(lista_deadlock, cambiar_estado_tcb);
-
-			void imprimir_tcbs(t_tcb_entrenador* tcb) {
-				printf("Id: %d\n", tcb->tid);
-				printf("Cantidad objetivos: %d\n", dictionary_size(tcb->objetivos));
-
-				void imprimir_dic (char* key, void* value) {
-					printf("- Pokemon: %s, Cantidad:%d\n", key, (int)value);
-				}
-
-				dictionary_iterator(tcb->objetivos, (void*) imprimir_dic);
-
-				printf("Cantidad pokemones capturados: %d\n", dictionary_size(tcb->pokemones_capturados));
-
-				dictionary_iterator(tcb->pokemones_capturados, (void*) imprimir_dic);
-			}
-
-			list_iterate(lista_deadlock, (void*) imprimir_tcbs);
 
 			deadlock_actual = lista_deadlock;
 
