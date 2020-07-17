@@ -84,7 +84,7 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 			pthread_mutex_unlock(&mutex_setear[NEW_POKEMON]);
 		}
 
-		t_archivo* archivo_pokemon_config=leer_archivo_de_datos(path_pokemonn);
+		t_metadata_pokemon* archivo_pokemon_config=leer_metadata_pokemon(path_pokemonn);
 
 		//agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
 
@@ -179,7 +179,7 @@ void crear_archivo_metadata(char *path_pokemonn,int contador_bloques){
 	config_destroy(pokemon_config);
 }
 
-char*formar_archivo_pokemon(char*pokemonn,bool creacion){
+char* formar_archivo_pokemon(char*pokemonn, bool creacion){
 	char* path_archivo_pokemon = string_new();
 	string_append(&path_archivo_pokemon, "Files/");
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);

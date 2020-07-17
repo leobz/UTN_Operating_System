@@ -10,7 +10,7 @@ t_bloque* crear_bloque(char* ruta_archivo) {
 }
 
 
-t_config *cargar_bloque_desde_buffer(char* un_buffer) {
+t_config *cargar_config_desde_buffer(char* un_buffer) {
 	t_config *config = malloc(sizeof(t_config));
 
 	config->properties = dictionary_create();
@@ -69,8 +69,8 @@ char* archivo_a_string(char* ruta_absoluta) {
 }
 
 
-t_archivo* leer_archivo_de_datos(char* ruta_al_metadata_bin_del_archivo) {
-	t_archivo* archivo = malloc(sizeof(t_archivo));
+t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo) {
+	t_metadata_pokemon* archivo = malloc(sizeof(t_metadata_pokemon));
 	t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta_al_metadata_bin_del_archivo));
 
 	archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
@@ -87,7 +87,7 @@ char* ruta_blocks(char* numero_de_bloque) {
 	return crear_ruta(ruta_bloque);
 }
 
-char* buffer_del_archivo_completo(t_archivo* archivo) {
+char* buffer_del_archivo_completo(t_metadata_pokemon* archivo) {
 	char* buffer_archivo = string_new();
 
 	void unir_bloques(char* numero_de_bloque) {
@@ -139,7 +139,7 @@ char* obtener_numero_de_bloque_disponible(){
 	return string_itoa(numero_de_bloque_disponible);
 }
 
-int escribir_archivo(t_archivo* archivo, char* buffer_de_guardado) {
+int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado) {
 	int size_buffer_de_guardado = string_length(buffer_de_guardado);
 	int bloques_necesarios = cantidad_de_bloques_necesarios(size_buffer_de_guardado);
 	int offset = 0;
@@ -167,3 +167,22 @@ int escribir_archivo(t_archivo* archivo, char* buffer_de_guardado) {
 	return 1;
 }
 
+t_config* leer_config_pokemon(char* pokemon){
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon, false));
+	char* buffer_pokemon = buffer_del_archivo_completo(metadata_pokemon);
+	t_config* config_pokemon = cargar_config_desde_buffer(buffer_pokemon);
+
+	free(metadata_pokemon);
+	free(buffer_pokemon);
+
+	return config_pokemon;
+}
+
+void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon) {
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon, false));
+	char* buffer_pokemon = config_save_to_buffer(config_pokemon);
+	escribir_archivo(metadata_pokemon, buffer_pokemon);
+
+	free(metadata_pokemon);
+	free(buffer_pokemon);
+}
