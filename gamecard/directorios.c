@@ -130,38 +130,7 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	else{
 		crear_archivo_pokemon(mensaje_new);
 		}
-	/* Existe pokemon?
-	 * NO
-	 * 	Crear direcotorio del nuevo pokemon
-	 * 	Crear el archivo del metadata
-	 * 	Completar el metadata.bin
-	 * SI
-	 * 	Se encuentra abierto?
-	 * 	SI
-	 * 	 Reintentar el tiempo que esta configurado
-	 * 	NO
-	 * 	 Abrir todos los blocks
-	 * 	 Concatenar
-	 * 	 Buscar la posicion
-	 * 	 Existe la posicion?
-	 * 	 NO
-	 */
-
-	/*FILE* pokemon_metadata = fopen(pokemon_metadata, "rb");
-
-	if (pokemon_metadata == NULL) {
-		printf("no se encontro el directorio %s", &path_archivo_pokemon);
-		pokemon_metadata = crear_archivo_pokemon(mensaje_new);
-	}
-
-	while (esta_abierto(pokemon_metadata)) {
-//		TODO
-	}
-
-	setear_abierto(pokemon_metadata);
-*/
 }
-
 
 void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	t_mensaje_new*mensaje_get;
@@ -172,11 +141,31 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 }
 
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
-	t_mensaje_new*mensaje_catch;
-	mensaje_catch=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
-
-		if(esta_en_diccionario(archivos_existentes,mensaje_catch->pokemon)){}
-
+	t_mensaje_catch* mensaje_catch;
+	mensaje_catch = deserializar_paquete_catch_pokemon(paquete_socket->buffer);
+	if(esta_en_diccionario(archivos_existentes, mensaje_catch->pokemon)){
+		char* path_pokemon;
+		bool abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+		if(abierto){
+			pthread_mutex_lock(&mutex_abiertos[CATCH_POKEMON]);
+			while(abierto){
+				sleep(gamecard_config->tiempo_reintento_conexion);
+				abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+			}
+			path_pokemon = setear_archivo_abierto(mensaje_catch->pokemon);
+			pthread_mutex_unlock(&mutex_abiertos[CATCH_POKEMON]);
+		}
+		else{
+			// TODO: codigo de leo
+		}
+	}
+	else {
+		int bytes;
+		int estado = FAIL;
+		void* a_enviar = serializar_caught_pokemon(&bytes, estado, paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
 }
 
 bool archivo_esta_abierto(char *pokemonn){
