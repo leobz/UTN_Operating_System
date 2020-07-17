@@ -11,7 +11,6 @@
 #include "../utils/listas.h"
 #include "../utils/diccionarios.h"
 
-
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
 pthread_mutex_t mutex_lista_ready;
@@ -64,6 +63,9 @@ void ejecutar_tcb(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
 void ejecutar_intercambio(t_tcb_entrenador*);
 void ejecutar_acciones_post_intercambio(t_tcb_entrenador*, bool);
+
+void pasar_a_exit(t_tcb_entrenador*);
+bool todos_los_entrenadores_exit();
 
 // Mensajes
 void ejecutar_catch(t_tcb_entrenador*);

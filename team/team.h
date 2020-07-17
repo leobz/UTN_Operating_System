@@ -14,6 +14,7 @@
 #include "../utils/log.h"
 #include <commons/collections/queue.h>
 
+bool team_cumplio_objetivo;
 
 //ESTRUCTURAS
 typedef t_dictionary t_objetivo_global;
@@ -124,7 +125,7 @@ void destruir_objetivo_global();
 void agregar_pokemon_a_mapa(char* pokemon, t_list* lista_posiciones);
 bool existe_pokemon_en_mapa(char* pokemon);
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char *pokemon);
-void destruir_pokemon_requeridos();
+//void destruir_pokemon_requeridos();
 void destruir_lista_posiciones(t_list* posiciones);
 void destruir_posicion(t_posicion* posicion);
 

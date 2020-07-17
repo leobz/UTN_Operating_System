@@ -433,4 +433,5 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 
 	pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
 	list_remove_element(new, entrenador_cercano);
+	list_remove_element(unblocked, entrenador_cercano);
 }
