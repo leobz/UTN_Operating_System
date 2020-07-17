@@ -6,27 +6,24 @@ void inicializar_directorios() {
 	//Creo Metadata
 
 	path_directorio_metadata = string_new();
-	string_append(&path_directorio_metadata,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_metadata,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_metadata, "/Metadata");
 	mkdir(path_directorio_metadata, 0777);
 
 	//Creo Files
 	path_directorio_files = string_new();
-	string_append(&path_directorio_files,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_files,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_files, "/Files");
 	mkdir(path_directorio_files, 0777);
 
 	//Creo Blocks
 	//TODO: escribir archivos blocks
 	path_directorio_blocks = string_new();
-	string_append(&path_directorio_blocks,
-			gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_blocks,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_blocks, "/Blocks");
 	mkdir(path_directorio_blocks, 0777);
 
-	t_metadata* metadata = malloc(sizeof(t_metadata));
+	metadata = malloc(sizeof(t_metadata));
 	metadata->block_size = 64;
 	metadata->blocks = 5192;
 	metadata->magic_number = "TALL_GRASS";
@@ -49,29 +46,47 @@ void inicializar_directorios() {
 
 	config_save(bloque_metadata_bin);
 
-	free(metadata);
-	free(metadata_aux);
+	//free(metadata);
+	//free(metadata_aux);
 
 	//liberar_paths();
 
 }
+void inicializar_diccionarios(){
+archivos_existentes = dictionary_create();
+//archivos_abiertos=dictionary_create();
+}
 
-FILE* crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
-	char* path_archivo_pokemon = string_new();
-	string_append_with_format(&path_archivo_pokemon, "%s",
-			mensaje_new->pokemon);
-	mkdir(path_archivo_pokemon, 0777);
-	string_append(&path_archivo_pokemon, "/Metadata.bin");
-	FILE* metadata_file = fopen(path_archivo_pokemon, "wb");
+void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 
-	char* metada_chars = string_new();
-	string_append(&metada_chars, "DIRECTORY=N\n");
-	string_append(&metada_chars, "SIZE=0\n");
-	string_append(&metada_chars, "BLOCKS=[]");
-	string_append(&metada_chars, "OPEN=N");
-	fputs(metada_chars, metadata_file);
+	contador_bloques_totales++;
 
-	return metadata_file;
+	if(contador_bloques_totales< metadata->blocks){
+		char* path_archivo_pokemon = string_new();
+		string_append(&path_archivo_pokemon, "Files/");
+		string_append_with_format(&path_archivo_pokemon, "%s",mensaje_new->pokemon);
+		mkdir(path_archivo_pokemon, 0777);
+		string_append(&path_archivo_pokemon, "/Metadata.bin");
+
+
+		t_bloque* pokemon_config=crear_bloque(crear_ruta(path_archivo_pokemon));
+
+		config_set_value(pokemon_config, "DIRECTORY","N");
+		config_set_value(pokemon_config, "SIZE","0");
+		char* block = string_new();
+		string_append(&block, "[");
+		string_append_with_format(&block, "%s",string_itoa(contador_bloques_totales));
+		string_append(&block, "]");
+		config_set_value(pokemon_config, "BLOCKS",block);
+		config_set_value(pokemon_config, "OPEN","N");
+
+		dictionary_put(archivos_existentes,mensaje_new->pokemon,0);//indica que esta cerrado
+
+		destruir_config(pokemon_config);
+	}
+	else{
+		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
+	}
 }
 
 bool esta_abierto(FILE* archivo) {
@@ -87,9 +102,12 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	t_mensaje_new*mensaje_new;
 	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	if(esta_en_diccionario(pokemones_gamecard,mensaje_new->pokemon)){} //ya que el archio persistira es lo mismo que buscarlo
-																		//por el diccionario, sin embargo puede cambiarse
-																		//incluso para testear, buscarlo en el archivo
+	if(esta_en_diccionario(archivos_existentes,mensaje_new->pokemon)){}
+
+	else{
+
+		crear_archivo_pokemon(mensaje_new);
+		}
 	/* Existe pokemon?
 	 * NO
 	 * 	Crear direcotorio del nuevo pokemon
@@ -106,12 +124,8 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	 * 	 Existe la posicion?
 	 * 	 NO
 	 */
-	char* path_archivo_pokemon = string_new();
-	string_append_with_format(&path_archivo_pokemon, "%s",&path_directorio_files);
-	string_append_with_format(&path_archivo_pokemon, "%s",mensaje_new->pokemon);
-	string_append(&path_archivo_pokemon, "/Metadata.bin");
 
-	FILE* pokemon_metadata = fopen(pokemon_metadata, "rb");
+	/*FILE* pokemon_metadata = fopen(pokemon_metadata, "rb");
 
 	if (pokemon_metadata == NULL) {
 		printf("no se encontro el directorio %s", &path_archivo_pokemon);
@@ -123,7 +137,7 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	}
 
 	setear_abierto(pokemon_metadata);
-
+*/
 }
 
 
@@ -131,7 +145,7 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	t_mensaje_new*mensaje_get;
 	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	if(esta_en_diccionario(pokemones_gamecard,mensaje_get->pokemon)){}
+	if(esta_en_diccionario(archivos_existentes,mensaje_get->pokemon)){}
 
 }
 
@@ -139,16 +153,9 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 	t_mensaje_new*mensaje_catch;
 	mensaje_catch=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-		if(esta_en_diccionario(pokemones_gamecard,mensaje_catch->pokemon)){}
+		if(esta_en_diccionario(archivos_existentes,mensaje_catch->pokemon)){}
 
 }
 
-char* crear_ruta(char* ruta) {
-	char* path_ruta_absoluta = string_new();
-	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
-	string_append(&path_ruta_absoluta, "/");
-	string_append(&path_ruta_absoluta, ruta);
 
-	return path_ruta_absoluta;
-}
 

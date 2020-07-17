@@ -16,7 +16,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)){
 
-
 		if(paquete->id_correlativo==0){
 			ingresar_en_cola_y_cache(paquete);
 		}
@@ -57,21 +56,15 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				proceso->id_proceso=paquete->id_proceso;
 				proceso->socket=paquete->socket_cliente;
 				list_add(suscriptores[paquete->cola], proceso);
-
 				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
 				meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 			}
-
-
 
 			cola_paquete=paquete->cola;
 
 			pthread_t thread_subscribers;
 			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
 			pthread_detach(thread_subscribers);
-
-
-			sem_post(&sem_proceso[paquete->cola]);
 
 			break;}
 

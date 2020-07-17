@@ -18,12 +18,9 @@ void servidor_gameboy(int conexion) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
-	if ((paquete_socket->codigo_operacion >= 0)&& (paquete_socket->codigo_operacion <= 5)) {
-
 		switch (paquete_socket->codigo_operacion) {
 
 		case NEW_POKEMON:{
-
 			t_mensaje_new* mensaje_new;
 
 			mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
@@ -36,7 +33,6 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
-
 
 			break;}
 
@@ -55,9 +51,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			free(mensaje_get->pokemon);
 			free(mensaje_get);
 
+			break;}
 
-			break;
-		}
+
 		case CATCH_POKEMON:{
 
 			t_mensaje_catch* mensaje_catch;
@@ -72,12 +68,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_catch->pokemon);
 				free(mensaje_catch);
 
+
 			break;
 		}
 
 		case APPEARED_POKEMON:{
 
-			t_mensaje_appeared* mensaje_appeared;
+			t_mensaje_appeared *mensaje_appeared;
 			mensaje_appeared= deserializar_mensaje_appeared_pokemon(paquete_socket->buffer);
 
 				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
@@ -89,15 +86,18 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 				free(mensaje_appeared->pokemon);
 				free(mensaje_appeared);
 
-
-
 			break;}
 
 		case LOCALIZED_POKEMON:{
-				t_mensaje_localized* mensaje_localized;
-			  	  mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
 
+			t_mensaje_localized* mensaje_localized;
+			mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
+
+				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
+				liberar_conexion(conexion_corfirmacion);
+
 
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
@@ -108,6 +108,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 		case CAUGHT_POKEMON:{
 
 			t_mensaje_caught* mensaje_caught;
+
 			mensaje_caught= deserializar_mensaje_caught_pokemon(paquete_socket->buffer);
 
 			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s con ID_CORRELATIVO: %d",value_to_state(mensaje_caught->resultado),paquete_socket->id_correlativo);
@@ -126,26 +127,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 
 		liberar_paquete_socket(paquete_socket);
-
-	}
-	else{
-		switch (paquete_socket->codigo_operacion) {
-			case SUSCRIPCION:
-				break;
-
-			case CONFIRMACION:
-				log_info(logger,"Confirmacion %d",paquete_socket->id_mensaje);
-				break;
-
-			case OP_ERROR:
-				break;
-
-			default:
-				break;
-			}
-	free(paquete_socket);
-	}
 }
+
 
 void recibir_id_correlativo(int socket_cliente) {
 	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);

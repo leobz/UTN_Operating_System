@@ -57,15 +57,14 @@ void suscribirme_al_broker(){
 void confirmar_recepcion(t_paquete_socket* paquete_socket){
 	printf("Enviando mensaje al socket %d... \n", socket_broker);
 	int offset = 0;
-	int id_falso=0;
 	int* confirmacion = CONFIRMACION;
 	void* a_enviar = malloc(sizeof(int)*3);
 
 	memcpy(a_enviar, &confirmacion, sizeof(int));
 	offset += sizeof(int);
-	memcpy(a_enviar, &paquete_socket->id_correlativo, sizeof(int));
+	memcpy(a_enviar, &paquete_socket->id_mensaje, sizeof(int));
 	offset += sizeof(int);
-	memcpy(a_enviar, &id_falso, sizeof(int));
+	memcpy(a_enviar, &gamecard_config->id_proceso, sizeof(int));
 
 	enviar_mensaje(paquete_socket->socket_cliente, a_enviar, sizeof(int)*2);
 }
