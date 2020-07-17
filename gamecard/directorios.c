@@ -62,12 +62,12 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 	contador_bloques_totales++;
 
 	if(contador_bloques_totales< metadata->blocks){
+
 		char* path_archivo_pokemon = string_new();
 		string_append(&path_archivo_pokemon, "Files/");
 		string_append_with_format(&path_archivo_pokemon, "%s",mensaje_new->pokemon);
 		mkdir(path_archivo_pokemon, 0777);
 		string_append(&path_archivo_pokemon, "/Metadata.bin");
-
 
 		t_bloque* pokemon_config=crear_bloque(crear_ruta(path_archivo_pokemon));
 
@@ -172,6 +172,21 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 
 t_archivo* modificar_archivo_abierto(char*pokemonn){
 
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+	t_config*pokemon_config=config_create(path_absoluta);
+	config_set_value(pokemon_config, "DIRECTORY","Y");
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+	return path_absoluta;
+}
+
+char*formar_archivo_pokemon(char*pokemonn){
+	char* path_archivo_pokemon = string_new();
+	string_append(&path_archivo_pokemon, "Files/");
+	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
+	string_append(&path_archivo_pokemon, "/Metadata.bin");
+	return path_archivo_pokemon;
 }
 
 t_archivo* leer_archivo(char* ruta){
