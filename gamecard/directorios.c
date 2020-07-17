@@ -139,10 +139,15 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	if(esta_en_diccionario(archivos_existentes,mensaje_get->pokemon)){}
 
 void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado){
-	int bytes;
-	void* a_enviar = serializar_caught_pokemon(&bytes, estado, paquete_socket->id_correlativo, paquete_socket->id_mensaje);
 	int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-	enviar_mensaje(conexion, a_enviar, bytes);
+	if (conexion == -1){
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker")
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_caught_pokemon(&bytes, estado, paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
 }
 
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
