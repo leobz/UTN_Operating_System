@@ -60,41 +60,43 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 
 	if(dictionary_has_key(archivos_existentes,mensaje_new->pokemon)){//si el archivo ya se encontraba
 
-		char*path_pokemonn;
-		bool abierto=archivo_esta_abierto(mensaje_new->pokemon);
 
-		if(abierto==true){ //sie el archivo esta abierto
+			bool abierto=archivo_esta_abierto(mensaje_new->pokemon);
 
-			pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
+			if(abierto==true){ //sie el archivo esta abierto
 
-			while(abierto==true){
+				pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
 
-				sleep(gamecard_config->tiempo_reintento_operacion);
-				abierto=archivo_esta_abierto(mensaje_new->pokemon);
+				while(abierto==true){
+
+					sleep(gamecard_config->tiempo_reintento_operacion);
+					abierto=archivo_esta_abierto(mensaje_new->pokemon);
+				}
+				abierto=true;
+				setear_archivo_abierto(mensaje_new->pokemon);
+				pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
+
 			}
-			abierto=true;
-			path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
-			pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
+			else{ //si el archivo esta cerrado
 
-		}
-		else{ //si el archivo esta cerrado
-
-			pthread_mutex_lock(&mutex_setear[NEW_POKEMON]);
-				path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
-			pthread_mutex_unlock(&mutex_setear[NEW_POKEMON]);
-		}
-
-		t_metadata_pokemon* archivo_pokemon_config=leer_metadata_pokemon(path_pokemonn);
-
-		//agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
-
-		cerrar_archivo(mensaje_new->pokemon);
+				pthread_mutex_lock(&mutex_setear[NEW_POKEMON]);
+					setear_archivo_abierto(mensaje_new->pokemon);
+				pthread_mutex_unlock(&mutex_setear[NEW_POKEMON]);
+			}
 	}
 
-	else{ //si el archivo no existia
+	else //si el archivo no existia
 		crear_archivo_pokemon(mensaje_new);
 
-		}
+	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+
+	//t_mensaje_appeared*appeared=obtener_mensaje_appeared(mensaje_new);
+
+	//enviar_mensaje_appeared(appeared);
+
+	sleep(gamecard_config->tiempo_retardo_operacion);
+
+	cerrar_archivo(mensaje_new->pokemon);
 }
 
 
@@ -289,5 +291,28 @@ char*ruta_bitmap(){
 		string_append(&path_bitmap,	"Metadata");
 		string_append(&path_bitmap, "/Bitmap.bin");
 		return crear_ruta(path_bitmap);
+}
+
+void agregar_posicion(t_mensaje_new*mensaje_new){
+	t_config* archivo_pokemon_config=leer_config_pokemon(mensaje_new->pokemon);
+
+	char*posx=string_itoa(mensaje_new->posx);
+	char*posy=string_itoa(mensaje_new->posy);
+
+	char* posicion_pokemonn = string_new();
+	string_append_with_format(&posicion_pokemonn, "%s",posx);
+	string_append(&posicion_pokemonn,"-");
+	string_append_with_format(&posicion_pokemonn, "%s",posy);
+
+	if(config_has_property(archivo_pokemon_config, posicion_pokemonn)){//si esa posicion ya estaba en el archivo
+		int cantidad_pokemon=config_get_int_value(archivo_pokemon_config,posicion_pokemonn);
+		cantidad_pokemon+=mensaje_new->cantidad;
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(cantidad_pokemon));
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
+	}
+	else{ //si es una nueva posicion
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(mensaje_new->cantidad));
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
+	}
 }
 

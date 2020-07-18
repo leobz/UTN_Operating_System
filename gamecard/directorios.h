@@ -34,6 +34,9 @@ char*ruta_bitmap();
 t_bitarray *leer_bitmap();
 void modificar_bit(int bit,bool valor,t_bitarray*bitmap);
 void crear_archivo_metadata(char *path_pokemonn,int contador_bloques);
+void agregar_posicion(mensaje_new);
+t_mensaje_appeared*obtener_mensaje_appeared(t_mensaje_new*);
+void enviar_mensaje_appeared(t_mensaje_appeared*appeared);
 
 
 

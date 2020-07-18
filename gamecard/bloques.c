@@ -134,9 +134,10 @@ int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque) {
 
 char* obtener_numero_de_bloque_disponible(){
 	//TODO : Hacer esta funcion (Ahora esta hardcodeada)
-	numero_de_bloque_disponible += 1;
-
-	return string_itoa(numero_de_bloque_disponible);
+	int contador_bloques=contador_bloques_totales++;
+	if(contador_bloques< metadata->blocks)
+		return string_itoa(numero_de_bloque_disponible);
+	return NULL;
 }
 
 int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado) {

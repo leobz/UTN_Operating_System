@@ -59,6 +59,7 @@ typedef struct{
 }t_metadata_pokemon;
 
 t_gamecard_config* gamecard_config;
+int contador_bloques_totales;
 
 t_config* leer_config_pokemon(char* pokemon);
 void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon);
