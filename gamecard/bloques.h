@@ -88,7 +88,6 @@ char* ruta_blocks(char* numero_de_bloque);
 */
 t_bloque* crear_bloque(char* ruta_archivo);
 
-
 /**
 * @NAME: buffer_
 * del_archivo_completo(t_archivo* archivo)
@@ -123,5 +122,5 @@ int cantidad_de_bloques_necesarios(int size_buffer_de_guardado) ;
 int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque);
 char* obtener_numero_de_bloque_disponible();
 int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado);
-
+char*formar_archivo_pokemon(char*pokemonn);
 #endif /* BLOQUES_H_ */

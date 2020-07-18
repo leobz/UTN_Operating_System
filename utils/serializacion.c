@@ -449,7 +449,7 @@ t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package) {
 
 
 
-t_buffer* buffer_localized_pokemon(int nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]){
+t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]){
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 	int cant_coordenadas=cantidad_posiciones*2;
 
