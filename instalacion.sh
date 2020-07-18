@@ -25,3 +25,10 @@ echo
 echo Compilando Gamecard
 make clean -C gamecard/Debug 2>> error.log  1>> instalacion.log
 make -C gamecard/Debug 2>> error.log  1>> instalacion.log
+
+echo
+echo Actualizando LIBRARY_PATH
+root_tp=$(pwd)
+utils_path="${root_tp}/utils/Debug"
+export_command="export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${utils_path}"
+echo $export_command >> $HOME/.bashrc
