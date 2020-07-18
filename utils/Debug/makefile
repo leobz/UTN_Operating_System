@@ -22,26 +22,21 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: gamecard
-
-dependents:
-	-cd /home/leo/Música/tp-2020-1c-UNIX/utils/Debug && $(MAKE) all
+all: libutils.so
 
 # Tool invocations
-gamecard: $(OBJS) $(USER_OBJS) /home/leo/Música/tp-2020-1c-UNIX/utils/Debug/libutils.so
+libutils.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/leo/Música/tp-2020-1c-UNIX/utils/Debug" -o "gamecard" $(OBJS) $(USER_OBJS) $(LIBS) -lm
-
+	gcc -shared -o "libutils.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) gamecard
+	-$(RM) $(LIBRARIES)$(OBJS)$(C_DEPS) libutils.so
 	-@echo ' '
 
 .PHONY: all clean dependents
-/home/leo/Música/tp-2020-1c-UNIX/utils/Debug/libutils.so:
 
 -include ../makefile.targets
