@@ -91,6 +91,7 @@ t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb);
 t_deadlock* crear_deadlock(t_list*);
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador*);
 void loggear_deteccion_de_deadlock(t_list*);
+void loggear_tcbs_para_intercambiar_deadlock(t_deadlock*);
 
 void hay_espera_circular(t_tcb_entrenador* tcb_iterado);
 t_list* detectar_deadlock_recursivo(t_tcb_entrenador*);
