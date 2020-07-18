@@ -163,6 +163,7 @@ void crear_tcb_entrenadores();
 
 void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared);
 void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje);
+char* string_motivo_captura(t_pokemon* pokemon) ;
 
 #endif
 
