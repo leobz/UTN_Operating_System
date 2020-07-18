@@ -361,8 +361,8 @@ t_tcb_entrenador* elegir_entrenador_cercano_a_posicion(
 		}
 
 		if (tcb_2 == NULL && tcb_1 == NULL) {
-			printf("ERROR, NO HAY TCBS DISPONIBLES PARA IR A LA POSICION (%d, %d)\n", posicion->x, posicion->y);
-			exit(-1);
+			printf("ERROR, NO HAY TCBS DISPONIBLES ACTUALMENTE PARA IR A LA POSICION (%d, %d)\n", posicion->x, posicion->y);
+			return NULL;
 		}
 }
 
@@ -430,10 +430,13 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	t_tcb_entrenador* entrenador_cercano =
 			elegir_entrenador_cercano_a_posicion(entrenador_cercano_ready, entrenador_cercano_unblocked, posicion_pokemon);
 
-	cargar_tcb_captura(entrenador_cercano, pokemon);
+	if (entrenador_cercano != NULL) {
+		cargar_tcb_captura(entrenador_cercano, pokemon);
+		pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
+		list_remove_element(new, entrenador_cercano);
+		list_remove_element(unblocked, entrenador_cercano);
+	}
+	else{
+	}
 
-
-	pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
-	list_remove_element(new, entrenador_cercano);
-	list_remove_element(unblocked, entrenador_cercano);
 }
