@@ -11,7 +11,6 @@
 #include "../utils/listas.h"
 #include "../utils/diccionarios.h"
 
-
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
 pthread_mutex_t mutex_lista_ready;
@@ -32,11 +31,14 @@ typedef enum {
 	SJF_CD = 4,
 } tipo_de_planificacion;
 
+t_list* deadlock_actual;
+
 
 // Inicializacion
 void inicializar_listas();
 void inicializar_diccionarios();
 void iniciar_planificador();
+void inicializar_metricas();
 void planificar();
 
 // Carga de TCB
@@ -63,6 +65,9 @@ void ejecutar_instruccion(int, t_tcb_entrenador*);
 void ejecutar_intercambio(t_tcb_entrenador*);
 void ejecutar_acciones_post_intercambio(t_tcb_entrenador*, bool);
 
+void pasar_a_exit(t_tcb_entrenador*);
+bool todos_los_entrenadores_exit();
+
 // Mensajes
 void ejecutar_catch(t_tcb_entrenador*);
 char* recibir_id_correlativo(int);
@@ -78,14 +83,20 @@ void asignar_pokemon(t_tcb_entrenador*);
 int string_to_algoritmo_de_planificacion(char*);
 char* cola_planificacion_a_string(int);
 char* string_maximo_permitido(t_tcb_entrenador* tcb);
+char* string_motivo_intercambio();
 
 //Deadlock
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb);
 t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb);
-t_deadlock* detectar_deadlock(t_tcb_entrenador*);
-t_deadlock* crear_deadlock
-(t_tcb_entrenador*, t_tcb_entrenador*, t_list*, t_list*);
+t_deadlock* crear_deadlock(t_list*);
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador*);
+void loggear_deteccion_de_deadlock(t_list*);
 
+void hay_espera_circular(t_tcb_entrenador* tcb_iterado);
+t_list* detectar_deadlock_recursivo(t_tcb_entrenador*);
+void continuar_o_manejar_deadlock();
+
+
+void destruir_metricas();
 
 #endif /* PLANIFICACION_H_ */

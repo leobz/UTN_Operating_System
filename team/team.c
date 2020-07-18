@@ -138,6 +138,9 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->tid = i;
 		entrenador->rafaga_anterior = 0;
 		entrenador->estimacion_anterior = team_config->estimacion_inicial;
+		entrenador->les_puede_dar = list_create();
+
+		dictionary_put(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(entrenador->tid), 0);
 
 		list_add(new, entrenador);
 	}
@@ -432,4 +435,5 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 
 	pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
 	list_remove_element(new, entrenador_cercano);
+	list_remove_element(unblocked, entrenador_cercano);
 }

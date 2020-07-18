@@ -14,6 +14,7 @@
 #include "../utils/log.h"
 #include <commons/collections/queue.h>
 
+bool team_cumplio_objetivo;
 
 //ESTRUCTURAS
 typedef t_dictionary t_objetivo_global;
@@ -100,7 +101,19 @@ typedef struct t_tcb{
 	sem_t* semaforo;
 	int rafaga_anterior;
 	double estimacion_anterior;
+	struct t_list* les_puede_dar;
+	int nivel_de_grafo_en_deadlock;
 }t_tcb_entrenador;
+
+typedef struct {
+	int cantidad_ciclos_CPU_totales;
+	int cantidad_cambios_contexto;
+	t_dictionary* cantidad_ciclos_CPU_entrenador;
+	int cantidad_deadlocks_producidos;
+	int cantidad_deadlocks_resueltos;
+} t_metricas;
+
+t_metricas* metricas;
 
 
 // INICIALIZACIONES TEAM
@@ -122,7 +135,7 @@ void destruir_objetivo_global();
 void agregar_pokemon_a_mapa(char* pokemon, t_list* lista_posiciones);
 bool existe_pokemon_en_mapa(char* pokemon);
 t_list* obtener_lista_posiciones_by_pokemon_requerido(char *pokemon);
-void destruir_pokemon_requeridos();
+//void destruir_pokemon_requeridos();
 void destruir_lista_posiciones(t_list* posiciones);
 void destruir_posicion(t_posicion* posicion);
 
