@@ -26,13 +26,13 @@ endif
 all: broker
 
 dependents:
-	-cd /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug && $(MAKE) clean all
+	-cd /home/leo/Música/tp-2020-1c-UNIX/utils/Debug && $(MAKE) clean all
 
 # Tool invocations
-broker: $(OBJS) $(USER_OBJS) /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so
+broker: $(OBJS) $(USER_OBJS) /home/leo/Música/tp-2020-1c-UNIX/utils/Debug/libutils.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug" -o "broker" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/leo/Música/tp-2020-1c-UNIX/utils/Debug" -o "broker" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -42,6 +42,6 @@ clean:
 	-@echo ' '
 
 .PHONY: all clean dependents
-/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so:
+/home/leo/Música/tp-2020-1c-UNIX/utils/Debug/libutils.so:
 
 -include ../makefile.targets
