@@ -389,7 +389,6 @@ void quitar_pokemon_de_mapa(t_tcb_entrenador* entrenador) {
 
 void aplicar_acciones_caught(t_tcb_entrenador* entrenador) {
 	quitar_pokemon_de_planificados(entrenador);
-	quitar_pokemon_de_mapa(entrenador);
 	definir_cola_post_caught(entrenador);
 	entrenador->pokemon_a_capturar = NULL;
 }
@@ -552,6 +551,7 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 
 	if (entrenador_cercano != NULL) {
 		cargar_tcb_captura(entrenador_cercano, pokemon);
+		quitar_pokemon_de_mapa(entrenador_cercano);
 		pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
 		list_remove_element(new, entrenador_cercano);
 		list_remove_element(unblocked, entrenador_cercano);

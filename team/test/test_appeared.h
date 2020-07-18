@@ -9,8 +9,6 @@ t_list* temp;
 t_mensaje_appeared* mensaje;
 
 void agregar_tests_appeared();
-
-void test_se_agrega_pokemon_al_mapa();
 void test_se_agrega_pokemon_a_planificados();
 t_mensaje_appeared* inicializar_test_appeared();
 t_mensaje_appeared* mock_appeared();
