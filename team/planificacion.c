@@ -16,6 +16,7 @@ void inicializar_listas() {
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
+	pthread_mutex_init(&mutex_lista_new, NULL);
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -499,6 +500,7 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
+
 }
 
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {

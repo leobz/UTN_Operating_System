@@ -233,7 +233,11 @@ void procesar_mensaje_appeared(t_paquete_socket* paquete) {
 
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
+
+		pthread_mutex_lock(&mutex_lista_new);
 		pasar_a_ready_si_corresponde(mensaje_appeared);
+		pthread_mutex_unlock(&mutex_lista_new);
+
 	}
 }
 
