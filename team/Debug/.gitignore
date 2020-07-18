@@ -5,7 +5,10 @@
 ### GameBoyProject Configuration ###
 
 *.log
-
+team
+broker
+gameboy
+gamecard
 ### C ###
 # Prerequisites
 *.d
