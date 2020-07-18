@@ -5,7 +5,7 @@
 ### GameBoyProject Configuration ###
 *.config
 *.log
-
+so-commons-library/
 ### C ###
 # Prerequisites
 *.d

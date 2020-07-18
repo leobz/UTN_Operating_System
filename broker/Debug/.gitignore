@@ -4,6 +4,7 @@
 
 ### GameBoyProject Configuration ###
 
+makefile
 *.log
 team
 broker

@@ -1,22 +1,22 @@
-echo Restaurando makefiles desde backups contenidos en deploy/ ...
+echo Restaurando makefiles desde backups
 
-echo   Restaurando team..
+echo "   Restaurando team.."
 mkdir team/Debug 2>/dev/null
 cp deploy/team_makefile team/Debug/makefile
 
-echo   Restaurando gamecard..
+echo "   Restaurando gamecard.."
 mkdir gamecard/Debug 2>/dev/null
 cp deploy/gamecard_makefile gamecard/Debug/makefile
 
-echo   Restaurando broker..
+echo "   Restaurando broker.."
 mkdir broker/Debug 2>/dev/null
 cp deploy/broker_makefile broker/Debug/makefile
 
-echo   Restaurando gameboy..
+echo "   Restaurando gameboy.."
 mkdir gameboy/Debug 2>/dev/null
 
 cp deploy/gameboy_makefile gameboy/Debug/makefile
 
-echo   Restaurando utils..
+echo "   Restaurando utils.."
 mkdir utils/Debug 2>/dev/null
 cp deploy/utils_makefile utils/Debug/makefile
