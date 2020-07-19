@@ -311,7 +311,6 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
 	pokemon = obtener_pokemon_mas_cercano(tcb);
 
-	sleep(3);
 	printf("Pasaron 3 segundos\n");
 	if (pokemon!= NULL) {
 		printf("El pokemon mas cercano es: \n");
@@ -319,19 +318,13 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 		printf("Posicion: %d, %d\n" , pokemon->posicion->x, pokemon->posicion->y);
 
 		//quitar_pokemon_de_mapa(pokemon);
-		t_pokemon* pokemon_hardcodeado = malloc(sizeof(t_pokemon));
 
-		pokemon_hardcodeado->pokemon = strdup("MEwtow");
-		pokemon_hardcodeado->posicion = malloc(sizeof(t_posicion));
-		pokemon_hardcodeado->posicion->x = 0;
-		pokemon_hardcodeado->posicion->y = 0;
-
-		cargar_tcb_captura(tcb, pokemon_hardcodeado);
+		cargar_tcb_captura(tcb, pokemon);
 		printf("TCB %d tiene asignado un %s en posicion %d, %d\n",
 				tcb->tid, tcb->pokemon_a_capturar->pokemon,
 				tcb->pokemon_a_capturar->posicion->x, tcb->pokemon_a_capturar->posicion->y);
 
-		pasar_a_ready(tcb, string_motivo_captura(pokemon_hardcodeado));
+		pasar_a_ready(tcb, string_motivo_captura(pokemon));
 		list_remove_element(new, tcb);
 		list_remove_element(unblocked, tcb);
 	}
