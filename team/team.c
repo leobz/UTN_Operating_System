@@ -308,18 +308,17 @@ void despachar_entrenador_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 }
 
 void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
-	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
-	pokemon = obtener_pokemon_mas_cercano(tcb);
+	t_pokemon* pokemon = obtener_pokemon_mas_cercano(tcb);
 
-	printf("Pasaron 3 segundos\n");
 	if (pokemon!= NULL) {
 		printf("El pokemon mas cercano es: \n");
 		printf("Pokemon: %s \n", pokemon->pokemon);
 		printf("Posicion: %d, %d\n" , pokemon->posicion->x, pokemon->posicion->y);
 
-		//quitar_pokemon_de_mapa(pokemon);
 
 		cargar_tcb_captura(tcb, pokemon);
+		quitar_pokemon_de_mapa(tcb);
+
 		printf("TCB %d tiene asignado un %s en posicion %d, %d\n",
 				tcb->tid, tcb->pokemon_a_capturar->pokemon,
 				tcb->pokemon_a_capturar->posicion->x, tcb->pokemon_a_capturar->posicion->y);
