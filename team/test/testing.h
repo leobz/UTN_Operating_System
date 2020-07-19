@@ -12,6 +12,7 @@
 #include "test_caught.h"
 #include "test_appeared.h"
 #include "test_deadlock.h"
+#include "test_unblocked_a_ready.h"
 
 void correrTests();
 
