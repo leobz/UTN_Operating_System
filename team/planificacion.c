@@ -147,6 +147,12 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 	}
 }
 
+void pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(t_tcb_entrenador* tcb) {
+	if (list_include(unblocked, tcb)) {
+		pasar_tcb_a_ready_si_hay_pokemones_en_mapa(tcb);
+	}
+}
+
 void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	sem_t semaforo_tcb;
 	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
@@ -176,6 +182,9 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			ejecutar_rafaga(tcb);
 			break;
 		}
+
+		pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(tcb);
+
 		pthread_mutex_unlock(&mutex_tcb_exec);
 
 	}
