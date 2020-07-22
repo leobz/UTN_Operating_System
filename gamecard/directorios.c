@@ -24,8 +24,8 @@ void inicializar_directorios() {
 	mkdir(path_directorio_blocks, 0777);
 
 	metadata = malloc(sizeof(t_metadata));
-	metadata->block_size = 64;
-	metadata->blocks = 5192;
+	metadata->block_size = 20;
+	metadata->blocks = 50;
 	metadata->magic_number = "TALL_GRASS";
 	//t_metadata* metadata_aux = malloc(sizeof(t_metadata));
 
@@ -49,7 +49,7 @@ void inicializar_directorios() {
 }
 void inicializar_diccionarios(){
 archivos_existentes = dictionary_create();
-//archivos_abiertos=dictionary_create();
+cantidad_posiciones_pokemon=dictionary_create();
 }
 
 
@@ -59,42 +59,21 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
 	if(dictionary_has_key(archivos_existentes,mensaje_new->pokemon)){//si el archivo ya se encontraba
-
-		char*path_pokemonn;
-		bool abierto=archivo_esta_abierto(mensaje_new->pokemon);
-
-		if(abierto==true){ //sie el archivo esta abierto
-
-			pthread_mutex_lock(&mutex_abiertos[NEW_POKEMON]);
-
-			while(abierto==true){
-
-				sleep(gamecard_config->tiempo_reintento_operacion);
-				abierto=archivo_esta_abierto(mensaje_new->pokemon);
-			}
-			abierto=true;
-			path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
-			pthread_mutex_unlock(&mutex_abiertos[NEW_POKEMON]);
-
-		}
-		else{ //si el archivo esta cerrado
-
-			pthread_mutex_lock(&mutex_setear[NEW_POKEMON]);
-				path_pokemonn=setear_archivo_abierto(mensaje_new->pokemon);
-			pthread_mutex_unlock(&mutex_setear[NEW_POKEMON]);
-		}
-
-		t_metadata_pokemon* archivo_pokemon_config=leer_metadata_pokemon(path_pokemonn);
-
-		//agregar_posicion(mensaje_new,archivo_pokemon_config); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
-
-		cerrar_archivo(mensaje_new->pokemon);
+		checkear_archivo_abierto(mensaje_new->pokemon,NEW_POKEMON);
 	}
 
-	else{ //si el archivo no existia
+	else //si el archivo no existia
 		crear_archivo_pokemon(mensaje_new);
 
-		}
+	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+
+	//t_mensaje_appeared*appeared=obtener_mensaje_appeared(mensaje_new);
+
+	//enviar_mensaje_appeared(appeared);
+
+	sleep(gamecard_config->tiempo_retardo_operacion);
+
+	cerrar_archivo(mensaje_new->pokemon);
 }
 
 
@@ -102,7 +81,17 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	t_mensaje_new*mensaje_get;
 	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){}
+	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){
+		checkear_archivo_abierto(mensaje_get->pokemon,GET_POKEMON);
+		t_posiciones*posiciones_pokemon=obtener_posiciones_pokemon(mensaje_get->pokemon);
+
+		int cantidad_de_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_get->pokemon);
+		//trata a posiciones_pokemon como un vector que tendra maximo indice la cantidad_de_posiciones
+		//enviar_mensaje_localized(posiciones_pokemon,cantidad_de_posiciones,paquete_socket->id_mensaje);
+	}
+	else
+		printf("No se encontro el pokemon requerido");
+
 
 }
 
@@ -120,9 +109,11 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 	int contador_bloques=++contador_bloques_totales;
 
 	if(contador_bloques_totales< metadata->blocks){
-		char*path_archivo_pokemon=formar_archivo_pokemon(mensaje_new->pokemon,true);
+		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
+		//crear_bloque_vacio(contador_bloques);
 		crear_archivo_metadata(path_archivo_pokemon,contador_bloques);
-		setear_bloque_ocupado(contador_bloques);
+		//setear_bloque_ocupado(contador_bloques);
+		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,false);//indica que esta cerrado
 	}
 	else{
@@ -130,39 +121,12 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 	}
 }
 
-bool archivo_esta_abierto(char *pokemonn){
-	return dictionary_get(archivos_existentes,pokemonn);
-}
-
-char* setear_archivo_abierto(char*pokemonn){
-
-	dictionary_put(archivos_existentes,pokemonn,true);
-
-	char*path_pokemon=formar_archivo_pokemon(pokemonn,false);
-	char*path_absoluta=crear_ruta(path_pokemon);
-	t_config*pokemon_config=config_create(path_absoluta);
-	config_set_value(pokemon_config, "OPEN","Y");
-	config_save(pokemon_config);
-	config_destroy(pokemon_config);
-	return path_pokemon;
-}
-
-void cerrar_archivo(char* pokemonn){
-
-	char*path_pokemon=formar_archivo_pokemon(pokemonn,false);
-	char*path_absoluta=crear_ruta(path_pokemon);
-	t_config*pokemon_config=config_create(path_absoluta);
-	config_set_value(pokemon_config, "OPEN","N");
-	config_save(pokemon_config);
-	config_destroy(pokemon_config);
-
-	dictionary_put(archivos_existentes,pokemonn,false);
-}
 
 void crear_archivo_metadata(char *path_pokemonn,int contador_bloques){
 
-	t_bloque* pokemon_config=crear_bloque(crear_ruta(path_pokemonn));
+	t_bloque* pokemon_config=crear_bloque(path_pokemonn);
 
+	//crear_bloque_vacio(contador_bloques);
 	config_set_value(pokemon_config, "DIRECTORY","N");
 	config_set_value(pokemon_config, "SIZE","0");
 
@@ -179,14 +143,71 @@ void crear_archivo_metadata(char *path_pokemonn,int contador_bloques){
 	config_destroy(pokemon_config);
 }
 
-char* formar_archivo_pokemon(char*pokemonn, bool creacion){
+
+char* crear_pokemon_metadata(char*pokemonn){
 	char* path_archivo_pokemon = string_new();
 	string_append(&path_archivo_pokemon, "Files/");
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
-	if(creacion) //si quiero crear el pokemon
-		mkdir(path_archivo_pokemon, 0777);
-	string_append(&path_archivo_pokemon, "/Metadata.bin");
-	return path_archivo_pokemon;
+	char*path_completo=crear_ruta(path_archivo_pokemon);
+	mkdir(path_completo, 0777);
+	string_append(&path_completo, "/Metadata.txt");
+
+	return path_completo;
+}
+
+
+void checkear_archivo_abierto(char*pokemonn,op_code cola){
+	bool abierto=archivo_esta_abierto(pokemonn);
+
+		if(abierto==true){ //sie el archivo esta abierto
+
+			pthread_mutex_lock(&mutex_abiertos[cola]);
+
+			while(abierto==true){
+
+				sleep(gamecard_config->tiempo_reintento_operacion);
+				abierto=archivo_esta_abierto(pokemonn);
+			}
+			abierto=true;
+			setear_archivo_abierto(pokemonn);
+			pthread_mutex_unlock(&mutex_abiertos[cola]);
+
+		}
+		else{ //si el archivo esta cerrado
+
+			pthread_mutex_lock(&mutex_setear[cola]);
+				setear_archivo_abierto(pokemonn);
+			pthread_mutex_unlock(&mutex_setear[cola]);
+		}
+}
+
+bool archivo_esta_abierto(char *pokemonn){
+	return dictionary_get(archivos_existentes,pokemonn);
+}
+
+char* setear_archivo_abierto(char*pokemonn){
+
+	dictionary_put(archivos_existentes,pokemonn,true);
+
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+	t_config*pokemon_config=config_create(path_absoluta);
+	config_set_value(pokemon_config, "OPEN","Y");
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+	return path_pokemon;
+}
+
+void cerrar_archivo(char* pokemonn){
+
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+	t_config*pokemon_config=config_create(path_absoluta);
+	config_set_value(pokemon_config, "OPEN","N");
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+
+	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
 void setear_bloque_ocupado(int numero_bloque){
@@ -291,3 +312,57 @@ char*ruta_bitmap(){
 		return crear_ruta(path_bitmap);
 }
 
+void agregar_posicion(t_mensaje_new*mensaje_new){
+
+	t_config* archivo_pokemon_config=leer_config_pokemon(mensaje_new->pokemon);
+
+	char*posx=string_itoa(mensaje_new->posx);
+	char*posy=string_itoa(mensaje_new->posy);
+
+	char* posicion_pokemonn = string_new();
+	string_append_with_format(&posicion_pokemonn, "%s",posx);
+	string_append(&posicion_pokemonn,"-");
+	string_append_with_format(&posicion_pokemonn, "%s",posy);
+
+	if(config_has_property(archivo_pokemon_config, posicion_pokemonn)){//si esa posicion ya estaba en el archivo
+
+		int cantidad_pokemon=config_get_int_value(archivo_pokemon_config,posicion_pokemonn);
+		cantidad_pokemon+=mensaje_new->cantidad;
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(cantidad_pokemon));
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
+	}
+	else{ //si es una nueva posicion
+
+		int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
+		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,cant_posiciones+1);
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(mensaje_new->cantidad));
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
+	}
+}
+t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
+	int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,pokemonn);
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon("Pikachu"));
+	char* buffer_pokemon = buffer_del_archivo_completo(metadata_pokemon);
+	char**string_vector=string_n_split(buffer_pokemon, cant_posiciones, "\n");
+
+	t_posiciones *posiciones_pokemon;
+	int iterador=0;
+
+	void separar_y_obtener_posiciones(char*linea){
+		char**vector_separado=string_split(linea,"=");
+		char*posicion=vector_separado[0];
+		char**posiciones_separadas=string_split(posicion,"-");
+		t_posiciones estructura_posiciones;
+		estructura_posiciones.posx=atoi(posiciones_separadas[0]);
+		estructura_posiciones.posy=atoi(posiciones_separadas[1]);
+
+		posiciones_pokemon[iterador]=estructura_posiciones;
+		iterador++;
+	}
+	string_iterate_lines(string_vector, separar_y_obtener_posiciones);
+
+	free(metadata_pokemon);
+	free(buffer_pokemon);
+
+	return posiciones_pokemon;
+}

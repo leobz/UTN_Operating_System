@@ -29,6 +29,29 @@ t_list* strings_to_list(char** strings) {
 	return list;
 }
 
+char* list_to_char_array(t_list*lista){
+
+	int i=0;
+	char* vector_de_bloques = string_new();
+
+	string_append(&vector_de_bloques, "[");
+
+
+	void meter_en_vector(char* elemento_en_lista){
+
+		if(i!=0)
+			string_append(&vector_de_bloques, ",");
+
+		string_append_with_format(&vector_de_bloques, "%s",elemento_en_lista);
+		i++;
+	}
+	list_iterate(lista,meter_en_vector);
+
+	string_append(&vector_de_bloques, "]");
+
+	return vector_de_bloques;
+}
+
 void* list_first(t_list* lista){
 	return list_get(lista, 0);
 }

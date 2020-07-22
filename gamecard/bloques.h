@@ -59,6 +59,8 @@ typedef struct{
 }t_metadata_pokemon;
 
 t_gamecard_config* gamecard_config;
+int contador_bloques_totales;
+t_dictionary* cantidad_posiciones_pokemon;
 
 t_config* leer_config_pokemon(char* pokemon);
 void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon);
@@ -86,7 +88,6 @@ char* ruta_blocks(char* numero_de_bloque);
 * y las parsea a un formato t_bloque(t_config). Si no existe, lo crea
 */
 t_bloque* crear_bloque(char* ruta_archivo);
-
 
 /**
 * @NAME: buffer_
@@ -121,6 +122,9 @@ char* config_save_to_buffer(t_config *self) ;
 int cantidad_de_bloques_necesarios(int size_buffer_de_guardado) ;
 int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque);
 char* obtener_numero_de_bloque_disponible();
-int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado);
-
+int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*pokemon);
+char*formar_archivo_pokemon(char*pokemonn);
+void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon*archivo,char*pokemonn);
+void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn);
+void cerrar_bloque(char*bloque_restante);
 #endif /* BLOQUES_H_ */

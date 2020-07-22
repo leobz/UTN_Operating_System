@@ -31,7 +31,7 @@ char* path_directorio_files;
 char* path_directorio_blocks;
 int id_proceso_gamecard;
 
-int contador_bloques_totales;
+
 
 // Funciones
 t_gamecard_config* cargar_gamecard_config(char* path_archivo);
