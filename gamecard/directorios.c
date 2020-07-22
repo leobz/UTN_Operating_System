@@ -24,7 +24,7 @@ void inicializar_directorios() {
 	mkdir(path_directorio_blocks, 0777);
 
 	metadata = malloc(sizeof(t_metadata));
-	metadata->block_size = 64;
+	metadata->block_size = 20;
 	metadata->blocks = 50;
 	metadata->magic_number = "TALL_GRASS";
 	//t_metadata* metadata_aux = malloc(sizeof(t_metadata));
@@ -150,7 +150,7 @@ char* crear_pokemon_metadata(char*pokemonn){
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
 	char*path_completo=crear_ruta(path_archivo_pokemon);
 	mkdir(path_completo, 0777);
-	string_append(&path_completo, "/Metadata.bin");
+	string_append(&path_completo, "/Metadata.txt");
 
 	return path_completo;
 }

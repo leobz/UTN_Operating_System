@@ -52,7 +52,6 @@ char* archivo_a_string(char* ruta_absoluta) {
 	FILE* file = fopen(ruta, "rb");
 
 	if (file == NULL) {
-		printf("Error: Archivo %s no existe, creandolo...\n", ruta);
 		file = fopen(ruta, "wb");
 	}
 
@@ -118,6 +117,7 @@ int cantidad_de_bloques_necesarios(int size_buffer_de_guardado) {
 }
 
 int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque) {
+
 	char* ruta_bloque = ruta_blocks(numero_de_bloque);
 	FILE* file = fopen(ruta_bloque, "wb+");
 
@@ -133,18 +133,19 @@ int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque) {
 
 char* obtener_numero_de_bloque_disponible(){
 	//TODO : Hacer esta funcion (Ahora esta hardcodeada)
-	int contador_bloques=contador_bloques_totales++;
+	int contador_bloques=++contador_bloques_totales;
 	if(contador_bloques< metadata->blocks)
-		return string_itoa(numero_de_bloque_disponible);
+		return string_itoa(contador_bloques);
 	return NULL;
 }
 
-int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado) {
+int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*pokemon) {
 	int size_buffer_de_guardado = string_length(buffer_de_guardado);
 	int bloques_necesarios = cantidad_de_bloques_necesarios(size_buffer_de_guardado);
 	int offset = 0;
 
-	for (int i= 0; i <bloques_necesarios; i++) {
+	int i=0;
+	for (i= 0; i <bloques_necesarios; i++) {
 		char* sub_string_bloque = string_substring(buffer_de_guardado, offset, metadata->block_size);
 		offset += metadata->block_size;
 		char* numero_de_bloque = list_get(archivo->blocks, i);
@@ -155,7 +156,9 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado) {
 		}
 		else{
 			char* numero_de_bloque_disponible = obtener_numero_de_bloque_disponible();
-			if (numero_de_bloque_disponible != NULL) {
+			if (numero_de_bloque_disponible != NULL) { ///Aca entrara cuando se tenga que agregar un nuevo bloque
+				list_add(archivo->blocks,numero_de_bloque_disponible);
+				actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 				escribir_buffer_en_bloque(sub_string_bloque, numero_de_bloque_disponible);
 			}
 			else {
@@ -164,13 +167,45 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado) {
 			}
 		}
 	}
+	while (list_size(archivo->blocks) > bloques_necesarios){ //Aca entrara cuando se tenga que eliminar un bloque
+		list_remove(archivo->blocks, i);
+		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
+		i++;
+	}
 	return 1;
 }
+
+
+void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon*archivo,char*pokemonn){
+
+	char*vector_de_bloques=list_to_char_array(archivo->blocks);
+
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+
+	t_config*pokemon_config=config_create(path_absoluta);
+
+	config_set_value(pokemon_config,"BLOCKS",vector_de_bloques);
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+
+}
+
+void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn){
+	char*path_pokemon=formar_archivo_pokemon(pokemonn);
+	char*path_absoluta=crear_ruta(path_pokemon);
+	int space=strlen(buffer_pokemon);
+	t_config*pokemon_config=config_create(path_absoluta);
+	config_set_value(pokemon_config,"SIZE",string_itoa(space));
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+}
+
 char* formar_archivo_pokemon(char*pokemonn){
 	char* path_archivo_pokemon = string_new();
 	string_append(&path_archivo_pokemon, "Files/");
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
-	string_append(&path_archivo_pokemon, "/Metadata.bin");
+	string_append(&path_archivo_pokemon, "/Metadata.txt");
 	return path_archivo_pokemon;
 }
 
@@ -188,7 +223,8 @@ t_config* leer_config_pokemon(char* pokemon){
 void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon) {
 	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon));
 	char* buffer_pokemon = config_save_to_buffer(config_pokemon);
-	escribir_archivo(metadata_pokemon, buffer_pokemon);
+	actualizar_tamanio_archivo(buffer_pokemon,pokemon);
+	escribir_archivo(metadata_pokemon, buffer_pokemon,pokemon);
 
 	free(metadata_pokemon);
 	free(buffer_pokemon);

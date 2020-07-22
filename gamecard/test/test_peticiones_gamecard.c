@@ -11,22 +11,46 @@
 
 
 //TEST PETICION NEW
-/*crear_archivo_metadata(crear_pokemon_metadata("Pikachu"),1);
-	t_mensaje_new*menssaje_new=malloc(sizeof(t_mensaje_new));
+/*		t_mensaje_new*menssaje_new=malloc(sizeof(t_mensaje_new));
 
-	menssaje_new->pokemon="Pikachu";
-	menssaje_new->cantidad=2;
-	menssaje_new->length_pokemon=strlen(menssaje_new->pokemon);
-	menssaje_new->posx=3;
-	menssaje_new->posy=4;
-	agregar_posicion(menssaje_new);
+		menssaje_new->pokemon="Pikachu";
+		menssaje_new->cantidad=10;
+		menssaje_new->length_pokemon=strlen(menssaje_new->pokemon);
+		menssaje_new->posx=36;
+		menssaje_new->posy=4;
 
-	menssaje_new->cantidad=3;
-	agregar_posicion(menssaje_new);
+		crear_archivo_pokemon(menssaje_new);
 
-	menssaje_new->posy=7;
-	menssaje_new->cantidad=9;
-	agregar_posicion(menssaje_new);*/
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posy=7;
+		menssaje_new->cantidad=9;
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posx=5;
+		menssaje_new->posy=18;
+		menssaje_new->cantidad=10;
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posx=5;
+		menssaje_new->posy=18;
+		menssaje_new->cantidad=12;
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posx=15;
+		menssaje_new->posy=12;
+		menssaje_new->cantidad=10;
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posy=25;
+		menssaje_new->posx=12;
+		menssaje_new->cantidad=10;
+		agregar_posicion(menssaje_new);
+
+		menssaje_new->posx=3;
+		menssaje_new->posy=45;
+		menssaje_new->cantidad=4;
+		agregar_posicion(menssaje_new);
 
 
 //TEST PETICION GET

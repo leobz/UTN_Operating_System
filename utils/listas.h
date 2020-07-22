@@ -9,6 +9,7 @@
 #define LISTAS_H_
 
 #include <commons/collections/list.h>
+#include "commons/string.h"
 #include <stdlib.h>
 
 /**
@@ -51,6 +52,14 @@ t_list* list_map_free(t_list* self, void*(*transformer)(void*));
 * Ejemplo: {"1","2"} -> ["1", "2"]
 */
 t_list* strings_to_list(char** strings);
+
+/**
+* @NAME: list_to_char_array
+* @DESC: Dada una lista de strings retorna una array en forma de char*
+*
+* Ejemplo: {"1","2"} -> "[1, 2]"
+*/
+char* list_to_char_array(t_list*lista);
 
 /**
 * @NAME: list_remove_element

@@ -6,6 +6,7 @@ int main(){
 	inicializar_diccionarios();
 	pthread_create(&suscripcion_broker, NULL, (void*)suscribirme_al_broker, NULL);
 
+
 	// Creo la conexion para escuchar
 	char* ip = gamecard_config->ip_gamecard;
 	char* puerto = gamecard_config->puerto_gamecard;
