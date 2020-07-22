@@ -2,11 +2,15 @@
 
 t_bloque* crear_bloque(char* ruta_archivo) {
 	FILE* archivo;
-	archivo = fopen(ruta_archivo, "wb");
+	archivo = fopen(ruta_archivo, "w");
 	fclose(archivo);
 
 	t_bloque* bloque = config_create(ruta_archivo);
 	return bloque;
+}
+void cerrar_bloque(char*bloque_restante){
+	char*ruta=ruta_blocks(bloque_restante);
+	fclose(fopen(ruta, "w")); //permite limpiar el contenido de dicho bloque
 }
 
 t_config *cargar_config_desde_buffer(char* un_buffer) {
@@ -168,7 +172,8 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 		}
 	}
 	while (list_size(archivo->blocks) > bloques_necesarios){ //Aca entrara cuando se tenga que eliminar un bloque
-		list_remove(archivo->blocks, i);
+		char*bloque_restante=list_remove(archivo->blocks, i);
+		cerrar_bloque(bloque_restante);
 		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 		i++;
 	}

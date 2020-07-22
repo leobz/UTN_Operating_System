@@ -126,4 +126,5 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 char*formar_archivo_pokemon(char*pokemonn);
 void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon*archivo,char*pokemonn);
 void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn);
+void cerrar_bloque(char*bloque_restante);
 #endif /* BLOQUES_H_ */
