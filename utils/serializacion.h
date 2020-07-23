@@ -5,7 +5,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include <stdbool.h>
-
+#include <commons/string.h>
 // ESTRUCTURAS
 
 typedef enum {
@@ -152,7 +152,7 @@ void eliminar_mensaje_catch(t_mensaje_catch* mensaje_catch);
 void* payload_catch_sin_barra(char* nombre_pokemon, int pos_x, int pos_y);
 void* payload_catch_con_barra(char* nombre_pokemon, int pos_x, int pos_y);
 t_mensaje_catch* deserializar_payload_catch_pokemon(void*payload);
-
+t_mensaje_catch* deserializar_payload_catch_pokemon_con_barra(void*payload);
 // APPEARED_POKEMON
 void* serializar_appeared_pokemon(int* bytes, char* nombre_pokemon, int pos_x,
 		int pos_y,int id_mensaje, int id_correlativo);

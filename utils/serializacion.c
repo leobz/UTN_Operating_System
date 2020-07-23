@@ -147,16 +147,17 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 		case GET_POKEMON:{
 
 			t_mensaje_get* men=deserializar_payload_get_pokemon(payload);
-			char*pokemonn=strcat(men->pokemon,"\0");
-			return payload_get_con_barra(pokemonn);
+			string_append(*(men->pokemon),"\0");
+			return payload_get_con_barra(men->pokemon);
 
 
 			break;
 		}
 		case CATCH_POKEMON:{
 
-			t_mensaje_catch* men=deserializar_payload_catch_pokemon(payload);
-			char*pokemonn=strcat(men->pokemon,"\0");
+			t_mensaje_catch* men=deserializar_payload_catch_pokemon_con_barra(payload);
+			char*pokemonn=men->pokemon;
+			pokemonn[men->length_pokemon]="\0";
 			return payload_catch_con_barra(pokemonn,men->posx,men->posy);
 
 			break;
@@ -213,7 +214,7 @@ void* payload_new_sin_barra(char* nombre_pokemon, int pos_x, int pos_y,int canti
 
 	int pokemon_length=strlen(nombre_pokemon);
 	char *pokemon = strndup(nombre_pokemon,pokemon_length);
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*4+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
@@ -235,7 +236,7 @@ void* payload_new_con_barra(char* nombre_pokemon, int pos_x, int pos_y,int canti
 
 	char *pokemon = strdup(nombre_pokemon);
 	int pokemon_length=strlen(pokemon)+1;
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*4+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
@@ -516,7 +517,7 @@ t_buffer* buffer_catch_pokemon(char* nombre_pokemon, int pos_x, int pos_y) {
 void* payload_catch_sin_barra(char* nombre_pokemon, int pos_x, int pos_y) {
 	int pokemon_length=strlen(nombre_pokemon);
 	char *pokemon = strndup(nombre_pokemon,pokemon_length);
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*3+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
@@ -537,7 +538,7 @@ void* payload_catch_sin_barra(char* nombre_pokemon, int pos_x, int pos_y) {
 void* payload_catch_con_barra(char* nombre_pokemon, int pos_x, int pos_y) {
 	char *pokemon = strdup(nombre_pokemon);
 	int pokemon_length=strlen(pokemon)+1;
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*3+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
@@ -594,6 +595,22 @@ t_mensaje_catch* deserializar_payload_catch_pokemon(void* payload) {
 	int offset = 0;
 	memcpy(&(mensaje_catch->length_pokemon), payload + offset,sizeof(int));
 	mensaje_catch->pokemon = malloc(mensaje_catch->length_pokemon);
+		offset += sizeof(int);
+	memcpy(mensaje_catch->pokemon, payload + offset,mensaje_catch->length_pokemon);
+		offset += mensaje_catch->length_pokemon;
+	memcpy(&(mensaje_catch->posx), payload + offset, sizeof(int));
+		offset += sizeof(int);
+	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
+
+	return mensaje_catch;
+}
+
+t_mensaje_catch* deserializar_payload_catch_pokemon_con_barra(void* payload) {
+	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*) malloc(sizeof(t_mensaje_catch));
+
+	int offset = 0;
+	memcpy(&(mensaje_catch->length_pokemon), payload + offset,sizeof(int));
+	mensaje_catch->pokemon = malloc((mensaje_catch->length_pokemon)+1);
 		offset += sizeof(int);
 	memcpy(mensaje_catch->pokemon, payload + offset,mensaje_catch->length_pokemon);
 		offset += mensaje_catch->length_pokemon;
@@ -667,7 +684,7 @@ void* payload_appeared_sin_barra(char* nombre_pokemon, int pos_x, int pos_y) {
 
 	int pokemon_length=strlen(nombre_pokemon);
 	char *pokemon = strndup(nombre_pokemon,pokemon_length);
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*3+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
@@ -688,7 +705,7 @@ void* payload_appeared_con_barra(char* nombre_pokemon, int pos_x, int pos_y) {
 	char *pokemon = strdup(nombre_pokemon);
 	int pokemon_length=strlen(pokemon)+1;
 
-	void* payload =malloc(sizeof(int)+pokemon_length);
+	void* payload =malloc(sizeof(int)*3+pokemon_length);
 
 	int offset = 0;
 	memcpy(payload + offset, &pokemon_length, sizeof(int));
