@@ -544,19 +544,16 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 			}
 		}
 
-		printf("Metricas:\n");
-		printf("* Cantidad de ciclos de CPU totales: %d\n", metricas->cantidad_ciclos_CPU_totales);
-		printf("* Cantidad de cambios de contexto: %d\n", metricas->cantidad_cambios_contexto);
-		printf("* Cantidad de ciclos de CPU por entrenador:\n");
-
+		log_info(logger, "[METRICAS] Cantidad de ciclos de CPU totales: %d", metricas->cantidad_ciclos_CPU_totales);
+		log_info(logger, "[METRICAS] Cantidad de cambios de contexto: %d", metricas->cantidad_cambios_contexto);
 		void imprimir_ciclos_tcbs(char* key, void* value){
-			printf("** TID: %s, cantidad ciclos de CPU: %d\n", key, (int)value);
+			log_info(logger, "[METRICAS] TID: %s, cantidad ciclos de CPU: %d", key, (int)value);
 		}
 
 		dictionary_iterator(metricas->cantidad_ciclos_CPU_entrenador, (void*) imprimir_ciclos_tcbs);
 
-		printf("* Cantidad de deadlocks producidos: %d\n", metricas->cantidad_deadlocks_producidos);
-		printf("* Cantidad de deadlocks resueltos: %d\n", metricas->cantidad_deadlocks_resueltos);
+		log_info(logger, "[METRICAS] Cantidad de deadlocks producidos: %d", metricas->cantidad_deadlocks_producidos);
+		log_info(logger, "[METRICAS] Cantidad de deadlocks resueltos: %d", metricas->cantidad_deadlocks_resueltos);
 
 		team_cumplio_objetivo = true;
 	}
@@ -735,6 +732,7 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
+			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
@@ -748,6 +746,7 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
+			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
