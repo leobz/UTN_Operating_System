@@ -220,7 +220,7 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		sleep(team_config->retardo_ciclo_cpu);
 		break;
 	case INTERCAMBIAR:
-		log_info(logger, "[INSTRUCCION] INTERCAMBIO, TID entrenador: %d, TID entrenador a intercambiar: %d",
+		log_info(logger, "[INSTRUCCION] INTERCAMBIO, TID: %d TID entrenador a intercambiar: %d",
 						tcb->tid,
 						tcb->entrenador_a_intercambiar->tid);
 		t_tcb_entrenador* entrenador = tcb;
@@ -228,11 +228,11 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 
 		ejecutar_intercambio(tcb);
 
-		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
-		ejecutar_acciones_post_intercambio(entrenador, false);
-
 		cantidad_ciclos_instruccion = 5;
 		sleep(team_config->retardo_ciclo_cpu * 5);
+
+		ejecutar_acciones_post_intercambio(entrenador_a_intercambiar, true);
+		ejecutar_acciones_post_intercambio(entrenador, false);
 
 		continuar_o_manejar_deadlock();
 
@@ -535,9 +535,29 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");
-		// TODO: Mostar metricas
 		// TODO: Cerrar conexiones
 		// TODO: Finalizar proceso
+
+		if (deadlock_actual != NULL) {
+			if (list_size(deadlock_actual) == 0 || list_size(deadlock_actual) == 1){
+				metricas->cantidad_deadlocks_resueltos++;
+			}
+		}
+
+		printf("Metricas:\n");
+		printf("* Cantidad de ciclos de CPU totales: %d\n", metricas->cantidad_ciclos_CPU_totales);
+		printf("* Cantidad de cambios de contexto: %d\n", metricas->cantidad_cambios_contexto);
+		printf("* Cantidad de ciclos de CPU por entrenador:\n");
+
+		void imprimir_ciclos_tcbs(char* key, void* value){
+			printf("** TID: %s, cantidad ciclos de CPU: %d\n", key, (int)value);
+		}
+
+		dictionary_iterator(metricas->cantidad_ciclos_CPU_entrenador, (void*) imprimir_ciclos_tcbs);
+
+		printf("* Cantidad de deadlocks producidos: %d\n", metricas->cantidad_deadlocks_producidos);
+		printf("* Cantidad de deadlocks resueltos: %d\n", metricas->cantidad_deadlocks_resueltos);
+
 		team_cumplio_objetivo = true;
 	}
 }
@@ -662,6 +682,17 @@ void loggear_deteccion_de_deadlock(t_list* lista_deadlock) {
 			list_size(lista_deadlock));
 }
 
+void loggear_tcbs_para_intercambiar_deadlock(t_deadlock* deadlock) {
+	log_info(logger,
+			"[DEADLOCK] El entrenador TID: %d se moverá a la posición (%d,%d) del entrenador TID: %d para intercambiar los pokemones: %s-%s.",
+			deadlock->tcb_1->tid,
+			deadlock->tcb_2->posicion->x,
+			deadlock->tcb_2->posicion->y,
+			deadlock->tcb_2->tid,
+			deadlock->tcb_1->pokemon_a_dar_en_intercambio,
+			deadlock->tcb_2->pokemon_a_dar_en_intercambio);
+}
+
 void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 	pthread_mutex_lock(&mutex_manejar_deadlock);
 
@@ -682,10 +713,12 @@ void ejecutar_manejador_de_deadlocks(t_tcb_entrenador* tcb) {
 			t_deadlock* deadlock = crear_deadlock(deadlock_actual);
 			despachar_resolucion_de_deadlock(deadlock);
 
-			free(deadlock);
 
 			metricas->cantidad_deadlocks_producidos++;
 			loggear_deteccion_de_deadlock(lista_deadlock);
+			loggear_tcbs_para_intercambiar_deadlock(deadlock);
+
+			free(deadlock);
 		}
 		else {
 			log_info(logger,"[DEADLOCK] No se detectó espera circular entre los TCBs");
@@ -702,7 +735,6 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
-			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
@@ -716,7 +748,6 @@ void continuar_o_manejar_deadlock() {
 			list_destroy(deadlock_actual);
 			deadlock_actual = NULL;
 
-			metricas->cantidad_deadlocks_resueltos++;
 			if (list_size(ready_to_exchange) > 0) {
 				t_tcb_entrenador* siguiente_tcb = list_first(ready_to_exchange);
 
@@ -726,6 +757,7 @@ void continuar_o_manejar_deadlock() {
 			t_deadlock* deadlock = crear_deadlock(deadlock_actual);
 			despachar_resolucion_de_deadlock(deadlock);
 
+			loggear_tcbs_para_intercambiar_deadlock(deadlock);
 			free(deadlock);
 		}
 	}
