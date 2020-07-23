@@ -70,6 +70,7 @@ void agregar_tests_buddy_system() {
 
 void inicializar_test_bs() {
 	broker_config = cargar_broker_config("broker.config.sample");
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 	broker_config->tamanio_memoria = 1200;
 	free(broker_config->algoritmo_memoria);
 	broker_config->algoritmo_memoria = strdup("BS");
@@ -105,6 +106,7 @@ void finalizar_test_bs() {
 	dictionary_destroy_and_destroy_elements(administracion_por_cod, (void*)eliminar_administracion_por_cod);
 
 	finalizar_memoria_cache();
+	destruir_logger(logger);
 	destruir_broker_config(broker_config);
 }
 

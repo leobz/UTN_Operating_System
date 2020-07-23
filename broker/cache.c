@@ -220,7 +220,6 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 
 
 		id_particion++;
-		orden_creacion++;
 
 		primer_hijo->id = id_particion;
 		primer_hijo->esta_libre = true;
@@ -228,7 +227,7 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		primer_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		primer_hijo->size_mensaje = 0;
 		primer_hijo->contador_uso = 0;
-		primer_hijo->orden_creacion = orden_creacion;
+		primer_hijo->orden_creacion = 0;
 		primer_hijo->adm_mensaje = NULL;
 		primer_hijo->padre = hoja_libre;
 		primer_hijo->primer_hijo = NULL;
@@ -236,7 +235,6 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 
 
 		id_particion++;
-		orden_creacion++;
 
 		segundo_hijo->id = id_particion;
 		segundo_hijo->esta_libre = true;
@@ -244,7 +242,7 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 		segundo_hijo->tamanio_particion = hoja_libre->tamanio_particion / 2;
 		segundo_hijo->size_mensaje = 0;
 		segundo_hijo->contador_uso = 0;
-		segundo_hijo->orden_creacion = orden_creacion;
+		segundo_hijo->orden_creacion = 0;
 		segundo_hijo->adm_mensaje = NULL;
 		segundo_hijo->padre = hoja_libre;
 		segundo_hijo->primer_hijo = NULL;
@@ -262,10 +260,12 @@ t_particion_bs* dividir_particion_elegida (t_particion_bs* hoja_libre, int taman
 
 void cargar_particion_elegida (t_particion_bs* particion_elegida, int payload_size, t_adm_mensaje* adm_mensaje) {
 	contador_uso++;
+	orden_creacion++;
 
 	particion_elegida->esta_libre = false;
 	particion_elegida->size_mensaje = payload_size;
 	particion_elegida->contador_uso = contador_uso;
+	particion_elegida->orden_creacion = orden_creacion;
 	particion_elegida->adm_mensaje = adm_mensaje;
 }
 
@@ -333,6 +333,8 @@ void liberar_particion_victima(t_particion_bs* particion_victima){
 	particion_victima->esta_libre = true;
 	particion_victima->size_mensaje = 0;
 	particion_victima->adm_mensaje = NULL;
+
+	log_info(logger,"[BUDDY SYSTEM] Eliminación de partición con posición de inicio: %d", particion_victima->offset);
 }
 
 void consolidar_particiones_companieros(t_particion_bs* particion_victima){
@@ -351,6 +353,10 @@ void consolidar_particiones_companieros(t_particion_bs* particion_victima){
 		particion_padre->primer_hijo = NULL;
 		particion_padre->segundo_hijo = NULL;
 
+		log_info(logger,"[BUDDY SYSTEM] Asociación de particiones con inicio en %d y %d",
+					particion_victima->offset,
+					particion_companiera->offset);
+
 		free(particion_victima);
 		elimimar_particiones_bs(particion_companiera);
 
@@ -364,6 +370,8 @@ void generar_archivo_dump_bs(){
 	FILE* archivo_dump;
 	char* fecha_actual = obtener_fecha_actual();
 	char* hora_actual = obtener_hora_actual();
+
+	log_info(logger,"[BUDDY SYSTEM] Solicitud de Dump de cache");
 
 	archivo_dump = fopen("dump_cache.txt", "a+");
 
