@@ -41,14 +41,6 @@ t_config *cargar_config_desde_buffer(char* un_buffer) {
 	return config;
 }
 
-char* crear_ruta(char* ruta) {
-	char* path_ruta_absoluta = string_new();
-	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
-	string_append(&path_ruta_absoluta, "/");
-	string_append(&path_ruta_absoluta, ruta);
-
-	return path_ruta_absoluta;
-}
 
 char* archivo_a_string(char* ruta_absoluta) {
 	char* ruta = ruta_absoluta;
@@ -136,10 +128,9 @@ int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque) {
 }
 
 char* obtener_numero_de_bloque_disponible(){
-	//TODO : Hacer esta funcion (Ahora esta hardcodeada)
-	int contador_bloques=++contador_bloques_totales;
-	if(contador_bloques< metadata->blocks)
-		return string_itoa(contador_bloques);
+
+	int bloque_disponible=bloque_disponible_en_bitmap();
+		return string_itoa(bloque_disponible);
 	return NULL;
 }
 
@@ -162,6 +153,7 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 			char* numero_de_bloque_disponible = obtener_numero_de_bloque_disponible();
 			if (numero_de_bloque_disponible != NULL) { ///Aca entrara cuando se tenga que agregar un nuevo bloque
 				list_add(archivo->blocks,numero_de_bloque_disponible);
+				setear_bloque_ocupado(atoi(numero_de_bloque_disponible));
 				actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 				escribir_buffer_en_bloque(sub_string_bloque, numero_de_bloque_disponible);
 			}
@@ -173,6 +165,7 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 	}
 	while (list_size(archivo->blocks) > bloques_necesarios){ //Aca entrara cuando se tenga que eliminar un bloque
 		char*bloque_restante=list_remove(archivo->blocks, i);
+		setear_bloque_libre(atoi(bloque_restante));
 		cerrar_bloque(bloque_restante);
 		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 		i++;

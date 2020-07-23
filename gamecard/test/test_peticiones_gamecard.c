@@ -52,6 +52,20 @@
 		menssaje_new->cantidad=4;
 		agregar_posicion(menssaje_new);
 
+	//PERMITE VER EL FUNCIONAMIENTO DEL BITMAP HASTA ENCONTRAR EL PRIMER BLOQUE LIBRE
+	int indice=-1;
+	bool bit=true;
+
+	t_bitarray*bitmap=leer_bitmap();
+	int max_bit=bitarray_get_max_bit(bitmap);
+	while ((bit==true)&&(indice<max_bit)){
+		indice++;
+		bit=bitarray_test_bit(bitmap, indice);
+		printf("Bit numero: %d, valor: %d\n",indice,bit);
+	}
+	actualizar_archivo_bitmap(bitmap);
+
+	setear_bloque_libre(1);
 
 //TEST PETICION GET
 
