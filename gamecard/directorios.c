@@ -9,12 +9,14 @@ void inicializar_directorios() {
 	string_append(&path_directorio_metadata,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_metadata, "/Metadata");
 	mkdir(path_directorio_metadata, 0777);
+	crear_metadata_para_directorios(path_directorio_metadata);
 
 	//Creo Files
 	path_directorio_files = string_new();
 	string_append(&path_directorio_files,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_files, "/Files");
 	mkdir(path_directorio_files, 0777);
+	crear_metadata_para_directorios(path_directorio_files);
 
 	//Creo Blocks
 	//TODO: escribir archivos blocks
@@ -22,10 +24,11 @@ void inicializar_directorios() {
 	string_append(&path_directorio_blocks,gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_blocks, "/Blocks");
 	mkdir(path_directorio_blocks, 0777);
+	crear_metadata_para_directorios(path_directorio_blocks);
 
 	metadata = malloc(sizeof(t_metadata));
 	metadata->block_size = 20;
-	metadata->blocks = 50;
+	metadata->blocks = 80;
 	metadata->magic_number = "TALL_GRASS";
 	//t_metadata* metadata_aux = malloc(sizeof(t_metadata));
 
@@ -103,21 +106,29 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
 
 }
 
+void crear_metadata_para_directorios(char*ruta_directorio){
+	string_append(&ruta_directorio, "/Metadata.bin");
+	t_bloque* pokemon_config=crear_bloque(ruta_directorio);
+	config_set_value(pokemon_config, "DIRECTORY","Y");
+	config_save(pokemon_config);
+	config_destroy(pokemon_config);
+}
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 
-	int contador_bloques=++contador_bloques_totales;
+	int bloque_disponible=bloque_disponible_en_bitmap();
 
-	if(contador_bloques_totales< metadata->blocks){
+	if(bloque_disponible!=-1){
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
-		//crear_bloque_vacio(contador_bloques);
-		crear_archivo_metadata(path_archivo_pokemon,contador_bloques);
-		//setear_bloque_ocupado(contador_bloques);
+
+		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
+		setear_bloque_ocupado(bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,false);//indica que esta cerrado
 	}
 	else{
 		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
+		exit(1);
 	}
 }
 
@@ -159,26 +170,26 @@ char* crear_pokemon_metadata(char*pokemonn){
 void checkear_archivo_abierto(char*pokemonn,op_code cola){
 	bool abierto=archivo_esta_abierto(pokemonn);
 
-		if(abierto==true){ //sie el archivo esta abierto
+	if(abierto==true){ //sie el archivo esta abierto
 
-			pthread_mutex_lock(&mutex_abiertos[cola]);
+		pthread_mutex_lock(&mutex_abiertos[cola]);
 
-			while(abierto==true){
+		while(abierto==true){
 
-				sleep(gamecard_config->tiempo_reintento_operacion);
-				abierto=archivo_esta_abierto(pokemonn);
-			}
-			abierto=true;
+			sleep(gamecard_config->tiempo_reintento_operacion);
+			abierto=archivo_esta_abierto(pokemonn);
+		}
+		abierto=true;
+		setear_archivo_abierto(pokemonn);
+		pthread_mutex_unlock(&mutex_abiertos[cola]);
+
+	}
+	else{ //si el archivo esta cerrado
+
+		pthread_mutex_lock(&mutex_setear[cola]);
 			setear_archivo_abierto(pokemonn);
-			pthread_mutex_unlock(&mutex_abiertos[cola]);
-
-		}
-		else{ //si el archivo esta cerrado
-
-			pthread_mutex_lock(&mutex_setear[cola]);
-				setear_archivo_abierto(pokemonn);
-			pthread_mutex_unlock(&mutex_setear[cola]);
-		}
+		pthread_mutex_unlock(&mutex_setear[cola]);
+	}
 }
 
 bool archivo_esta_abierto(char *pokemonn){
@@ -210,107 +221,6 @@ void cerrar_archivo(char* pokemonn){
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
-void setear_bloque_ocupado(int numero_bloque){
-	t_bitarray*bitmap=leer_bitmap();
-	modificar_bit(numero_bloque,true,bitmap);
-	actualizar_archivo_bitmap(bitmap);
-}
-void modificar_bit(int bit,bool valor,t_bitarray*bitmap){
-
-	if(valor) //si esta libre ese bloque
-		bitarray_set_bit(bitmap, bit);
-
-	else   //si esta ocupado ese bloque
-		bitarray_clean_bit(bitmap, bit);
-}
-
-
-void actualizar_archivo_bitmap(t_bitarray*bitmap) {
-	char *ruta = ruta_bitmap();
-
-	FILE *bitmap_file = fopen(ruta, "wb");
-	free(ruta);
-
-	if (bitmap_file == NULL) {
-		printf("No se pudo actualizar el archivo Bitmap.bin");
-	}
-
-	fwrite(bitmap->bitarray, sizeof(char), bitmap->size, bitmap_file);
-
-	fclose(bitmap_file);
-	bitarray_destroy(bitmap);
-}
-
-
-/*
-t_bitarray * crear_bitmap(int cant_bloques){
-
-	int tamanio_bitarray=cant_bloques/8;
-	if(cant_bloques % 8 != 0){
-	  tamanio_bitarray++;
-	 }
-
-	char* bits=malloc(tamanio_bitarray);
-
-	t_bitarray * bitarray = bitarray_create_with_mode(bits,tamanio_bitarray,LSB_FIRST);
-
-
-	for(int cont=0; cont < tamanio_bitarray*8; cont++){ //Limpia los bits del bitarray (Los pone en 0)
-		bitarray_clean_bit(bitarray, cont);
-	}
-
-	return bitarray;
-}*/
-t_bitarray *crear_bitmap(int cant_bloques) {
-
-
-	size_t bytes = BIT_SIZE(cant_bloques, CHAR_BIT);
-
-	//Duda sizeof(char)
-	char *bitarray = calloc(bytes, sizeof(char));
-
-	t_bitarray * bitmap=bitarray_create_with_mode(bitarray, bytes, LSB_FIRST);
-
-	for(int cont=0; cont < cant_bloques; cont++){ //Limpia los bits del bitarray (Los pone en 0)
-			bitarray_clean_bit(bitmap, cont);
-		}
-
-
-	return bitmap;
-}
-
-
-t_bitarray *leer_bitmap() {
-	char *ruta = ruta_bitmap();
-
-	FILE *bitmap_file = fopen(ruta, "rb");
-	free(ruta);
-
-	size_t bitarray_size = BIT_SIZE(metadata->blocks, CHAR_BIT); // CHAR_BIT = cantidad bits x char
-
-	char *bitarray = malloc(bitarray_size);
-
-	//creo que seria sizeof(char) en vez de 1
-	size_t read_bytes = fread(bitarray, 1, bitarray_size, bitmap_file);
-
-	if (read_bytes != bitarray_size) {
-		fclose(bitmap_file);
-		free(bitarray);
-		printf("El Bitmap esta incompleto\n");
-		return NULL;
-	}
-
-	fclose(bitmap_file);
-
-	return bitarray_create_with_mode(bitarray, bitarray_size, LSB_FIRST);
-}
-
-char*ruta_bitmap(){
-		char* path_bitmap = string_new();
-		string_append(&path_bitmap,	"Metadata");
-		string_append(&path_bitmap, "/Bitmap.bin");
-		return crear_ruta(path_bitmap);
-}
 
 void agregar_posicion(t_mensaje_new*mensaje_new){
 

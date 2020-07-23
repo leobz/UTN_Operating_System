@@ -1,38 +1,7 @@
 #ifndef BLOQUES_H_
 #define BLOQUES_H_
 
-#include <stdio.h>
-#include <string.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <math.h>
-#include "commons/string.h"
-#include "commons/bitarray.h"
-#include "../utils/config.h"
-#include "../utils/listas.h"
-#include "../utils/log.h"
-#include "../utils/servidor.h"
-#include "../utils/diccionarios.h"
-//#include "gamecard.h"
-
-
-
-typedef struct {
-	int tiempo_reintento_conexion;
-	int tiempo_reintento_operacion;
-	int tiempo_retardo_operacion;
-	char* punto_montaje_tallgrass;
-	char* ip_broker;
-	char* puerto_broker;
-	char* ip_gamecard;
-	char* puerto_gamecard;
-	int id_proceso;
-} t_gamecard_config;
+#include "bitmap.h"
 
 typedef struct{
 	int block_size;
@@ -40,16 +9,6 @@ typedef struct{
 	char* magic_number;
 }t_file_metadata;
 
-typedef struct{
-	int block_size;
-	int blocks;
-	char* magic_number;
-}t_metadata;
-
-t_metadata* metadata;
-
-typedef t_config t_bloque;
-int numero_de_bloque_disponible; // Esto se usa para un mock, borrar cuando no se use mas
 
 typedef struct{
 	t_list* blocks;
@@ -58,20 +17,13 @@ typedef struct{
 	bool open;
 }t_metadata_pokemon;
 
-t_gamecard_config* gamecard_config;
-int contador_bloques_totales;
+
+typedef t_config t_bloque;
+
 t_dictionary* cantidad_posiciones_pokemon;
 
 t_config* leer_config_pokemon(char* pokemon);
 void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon);
-
-/**
-* @NAME: crear_ruta(char* ruta)
-* @DESC: Convierte una ruta relativa a absoluta
-* Ejemplo: crear_ruta("unDirectorio/unArchivo.bin") => "home/../punto-de-montaje/unDirectorio/unArchivo.bin"
-*
-*/
-char* crear_ruta(char* ruta);
 
 
 /**

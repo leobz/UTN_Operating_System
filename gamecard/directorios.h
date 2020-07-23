@@ -28,10 +28,6 @@ char* setear_archivo_abierto(char*pokemonn);
 void cerrar_archivo(char* pokemonn);
 t_bitarray * crear_bitmap(int cant_bloques);
 void actualizar_archivo_bitmap(t_bitarray * bitmap);
-void setear_bloque_ocupado(int numero_bloque);
-char*ruta_bitmap();
-t_bitarray *leer_bitmap();
-void modificar_bit(int bit,bool valor,t_bitarray*bitmap);
 void crear_archivo_metadata(char *path_pokemonn,int contador_bloques);
 void agregar_posicion(t_mensaje_new*);
 t_mensaje_appeared*obtener_mensaje_appeared(t_mensaje_new*);
@@ -40,6 +36,7 @@ t_posiciones*obtener_posiciones_pokemon(char*);
 void checkear_archivo_abierto(char*pokemonn,op_code cola);
 char* crear_pokemon_metadata(char*pokemonn);
 void enviar_mensaje_localized(t_posiciones**,int cantidad_de_posiciones,int id_correlativo);
+void crear_metadata_para_directorios(char*ruta_directorio);
 
 
 #endif  //DIRECTORIOS_H_
