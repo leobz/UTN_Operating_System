@@ -14,13 +14,12 @@ Esta prueba tiene como objetivo verificar el funcionamiento de la planificación
 ## Prueba RR
 
 2) El funcionamiento del algoritmo RR debería detectar un deadlock triple entre los procesos
+3) Como C finaliza antes que la primer captura de A, el mismo se dirige a atrapar a Gengar generando así un deadlock triple
 
 ```bash
 $ cat team.log | grep "DEADLOCK"
 <...>Se detectó espera circular entre  3 TCBs.<...>
 ```
-
-3) Como C finaliza antes que la primer captura de A, el mismo se dirige a atrapar a Gengar generando así un deadlock triple
 
 ```bash
 $ cat team.log | grep "Gengar"
