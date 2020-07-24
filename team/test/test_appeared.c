@@ -4,10 +4,6 @@ void agregar_tests_appeared(){
 	CU_pSuite suite_configuracion = CU_add_suite("Acciones de APPEARED", NULL, NULL);
 
 	CU_add_test(suite_configuracion,
-				"Appeared agrega pokemon al mapa",
-				test_se_agrega_pokemon_al_mapa);
-
-	CU_add_test(suite_configuracion,
 				"Appeared agrega pokemon a planificados",
 				test_se_agrega_pokemon_a_planificados);
 	CU_add_test(suite_configuracion,
@@ -21,13 +17,6 @@ t_mensaje_appeared* inicializar_test_appeared() {
 	temp = list_create();
 	t_mensaje_appeared* mensaje = mock_appeared();
 	return mensaje;
-}
-
-void test_se_agrega_pokemon_al_mapa() {
-	mensaje = inicializar_test_appeared();
-
-	t_list* lista_posiciones_pokemon = dictionary_get(pokemones_en_mapa, mensaje->pokemon);
-	CU_ASSERT_EQUAL(list_size(lista_posiciones_pokemon), 1);
 }
 
 void test_se_agrega_pokemon_a_planificados() {
