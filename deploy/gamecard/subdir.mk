@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../bitmap.c \
 ../bloques.c \
 ../directorios.c \
 ../gamecard.c \
@@ -11,6 +12,7 @@ C_SRCS += \
 ../servidor_gamecard.c 
 
 OBJS += \
+./bitmap.o \
 ./bloques.o \
 ./directorios.o \
 ./gamecard.o \
@@ -18,6 +20,7 @@ OBJS += \
 ./servidor_gamecard.o 
 
 C_DEPS += \
+./bitmap.d \
 ./bloques.d \
 ./directorios.d \
 ./gamecard.d \

@@ -23,25 +23,25 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: gameboy
+all: team
 
 dependents:
-	-cd /home/leo/tp-2020-1c-UNIX/utils/Debug && $(MAKE) clean all
+	-cd /home/leo/Programacion/C/EclipseWorkSpace/pruebaTP/tp-2020-1c-UNIX/utils/Debug && $(MAKE) clean all
 
 # Tool invocations
-gameboy: $(OBJS) $(USER_OBJS) /home/leo/tp-2020-1c-UNIX/utils/Debug/libutils.so
+team: $(OBJS) $(USER_OBJS) /home/leo/Programacion/C/EclipseWorkSpace/pruebaTP/tp-2020-1c-UNIX/utils/Debug/libutils.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/leo/tp-2020-1c-UNIX/utils/Debug" -o "gameboy" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/leo/Programacion/C/EclipseWorkSpace/pruebaTP/tp-2020-1c-UNIX/utils/Debug" -o "team" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) gameboy
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) team
 	-@echo ' '
 
 .PHONY: all clean dependents
-/home/leo/tp-2020-1c-UNIX/utils/Debug/libutils.so:
+/home/leo/Programacion/C/EclipseWorkSpace/pruebaTP/tp-2020-1c-UNIX/utils/Debug/libutils.so:
 
 -include ../makefile.targets
