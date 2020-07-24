@@ -157,7 +157,7 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 
 			t_mensaje_catch* men=deserializar_payload_catch_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
-			pokemonn[men->length_pokemon]="\0";
+			pokemonn[men->length_pokemon]='\0';
 			return payload_catch_con_barra(pokemonn,men->posx,men->posy);
 
 			break;
