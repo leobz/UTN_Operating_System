@@ -3,25 +3,23 @@
 # Edit at https://www.gitignore.io/?templates=c,eclipse
 
 ### GameBoyProject Configuration ###
-*.config
 *.log
+*.txt
 so-commons-library/
 
-.*/*.config
 .*/*.log
 
-.*/Debug/makefile
-.*/Debug/*.log
-.*/Debug/team
-.*/Debug/broker
-.*/Debug/gameboy
-.*/Debug/gamecard
-
-.*/Debug/test/*.o
-.*/Debug/test/*.ob
-.*/Debug/test/*.ko
-.*/Debug/test/*.elf
-.*/Debug/test/*.log
+*/Debug/makefile
+*/Debug/*.log
+*/Debug/team
+*/Debug/broker
+*/Debug/gameboy
+*/Debug/gamecard
+*/Debug/test/*.o
+*/Debug/test/*.ob
+*/Debug/test/*.ko
+*/Debug/test/*.elf
+*/Debug/test/*.log
 
 ### C ###
 # Prerequisites
