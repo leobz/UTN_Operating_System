@@ -4,32 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../bitmap.c \
-../bloques.c \
-../directorios.c \
-../gamecard.c \
-../main.c \
-../servidor_gamecard.c 
+../test/test_peticiones_gamecard.c 
 
 OBJS += \
-./bitmap.o \
-./bloques.o \
-./directorios.o \
-./gamecard.o \
-./main.o \
-./servidor_gamecard.o 
+./test/test_peticiones_gamecard.o 
 
 C_DEPS += \
-./bitmap.d \
-./bloques.d \
-./directorios.d \
-./gamecard.d \
-./main.d \
-./servidor_gamecard.d 
+./test/test_peticiones_gamecard.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-%.o: ../%.c
+test/%.o: ../test/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -I"/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils" -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<" -lm
