@@ -12,11 +12,12 @@ void test_pokemones_necesitados();
 void test_pokemones_no_necesitados();
 void test_list_intersection();
 void test_crear_deadlock();
-void test_detectar_deadlock();
 void test_despachar_deadlock_carga_la_rafaga_del_tcb_y_lo_envia_a_ready();
 
 void test_ejecutar_intercambio();
-void test_ejecutar_acciones_post_intercambio_para_tcb_a_intercambiar_sin_objetivo_cumplido();
+void test_ejecutar_acciones_post_intercambio_para_tcb_sin_objetivo_cumplido();
 void test_ejecutar_acciones_post_intercambio_para_tcb_con_objetivo_cumplido();
+
+void test_detectar_dealock_recursivo();
 
 #endif /* TEST_TEST_DEADLOCK_H_ */

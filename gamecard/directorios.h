@@ -12,7 +12,7 @@
 pthread_mutex_t mutex_abiertos[3];
 pthread_mutex_t mutex_setear[3];
 t_dictionary* archivos_existentes;
-t_dictionary* archivos_abiertos;
+t_dictionary* cantidad_posiciones_pokemon;
 //t_bitarray* bitmap;
 
 //Funciones
@@ -26,18 +26,17 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket);
 bool archivo_esta_abierto(char* pokemonn);
 char* setear_archivo_abierto(char*pokemonn);
 void cerrar_archivo(char* pokemonn);
-char*formar_archivo_pokemon(char*pokemonn,bool creacion);
 t_bitarray * crear_bitmap(int cant_bloques);
 void actualizar_archivo_bitmap(t_bitarray * bitmap);
-void setear_bloque_ocupado(int numero_bloque);
-char*ruta_bitmap();
-t_bitarray *leer_bitmap();
-void modificar_bit(int bit,bool valor,t_bitarray*bitmap);
 void crear_archivo_metadata(char *path_pokemonn,int contador_bloques);
-void agregar_posicion(mensaje_new);
+void agregar_posicion(t_mensaje_new*);
 t_mensaje_appeared*obtener_mensaje_appeared(t_mensaje_new*);
 void enviar_mensaje_appeared(t_mensaje_appeared*appeared);
-
+t_posiciones*obtener_posiciones_pokemon(char*);
+void checkear_archivo_abierto(char*pokemonn,op_code cola);
+char* crear_pokemon_metadata(char*pokemonn);
+void enviar_mensaje_localized(t_posiciones**,int cantidad_de_posiciones,int id_correlativo);
+void crear_metadata_para_directorios(char*ruta_directorio);
 
 
 #endif  //DIRECTORIOS_H_
