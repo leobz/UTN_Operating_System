@@ -35,20 +35,22 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 	mensaje->codigo_operacion = actual_administrator->codigo_operacion;
 	mensaje->id_mensaje = actual_administrator->id_mensaje;
 	mensaje->id_correlativo = actual_administrator->id_correlativo;
+	mensaje->payload= serializar_segun_codigo_con_barra(payload,mensaje->codigo_operacion,&payload_size);
 	mensaje->payload_size = payload_size;
-	mensaje->payload = payload;
 
 	return empaquetar_mensaje_broker(mensaje, bytes);
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
 	if (es_particion_dinamica()){
-		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica(mensaje,actual_administrator);
+		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(mensaje,actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
+		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
 	}
 	else if(es_buddy_system()){
-		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs(mensaje, actual_administrator);
+		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs_barra_cero(mensaje, actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
+		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
 	}
 }
 
