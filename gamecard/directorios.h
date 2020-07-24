@@ -18,7 +18,6 @@ t_dictionary* pokemon_semaphores;
 
 //Funciones
 void inicializar_directorios();
-void inicializar_diccionarios();
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new);
 int size_metadata_blocks(t_list* lista);
 void procesar_new_pokemon(t_paquete_socket* paquete_socket);
@@ -38,6 +37,7 @@ void checkear_archivo_abierto(char*pokemonn,op_code cola);
 char* crear_pokemon_metadata(char*pokemonn);
 void enviar_mensaje_localized(t_posiciones**,int cantidad_de_posiciones,int id_correlativo);
 void crear_metadata_para_directorios(char*ruta_directorio);
+void crear_diccionario_semaforo(char*pokemonn);
 
 
 #endif  //DIRECTORIOS_H_

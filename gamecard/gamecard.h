@@ -38,6 +38,7 @@ t_gamecard_config* cargar_gamecard_config(char* path_archivo);
 void suscribirme_al_broker();
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
+void inicializar_diccionarios();
 void finalizar_gamecard();
 
 #endif /* GAMECARD_H_ */

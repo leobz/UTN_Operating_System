@@ -50,11 +50,6 @@ void inicializar_directorios() {
 	//liberar_paths();
 
 }
-void inicializar_diccionarios(){
-archivos_existentes = dictionary_create();
-cantidad_posiciones_pokemon=dictionary_create();
-pokemon_semaphores=dictionary_create();
-}
 
 
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
@@ -71,13 +66,15 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 
 	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
 
+	cerrar_archivo(mensaje_new->pokemon);
+
 	//t_mensaje_appeared*appeared=obtener_mensaje_appeared(mensaje_new);
 
 	//enviar_mensaje_appeared(appeared);
 
 	sleep(gamecard_config->tiempo_retardo_operacion);
 
-	cerrar_archivo(mensaje_new->pokemon);
+
 }
 
 
@@ -114,7 +111,10 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 }
-void crear_diccionario_semaforo(char*pokemonn){}
+void crear_diccionario_semaforo(char*pokemonn){
+	pthread_mutex_t pokemon_sem;
+	dictionary_add(pokemon_semaphores,pokemonn,pokemon_sem);
+}
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 
@@ -173,9 +173,11 @@ char* crear_pokemon_metadata(char*pokemonn){
 void checkear_archivo_abierto(char*pokemonn,op_code cola){
 	bool abierto=archivo_esta_abierto(pokemonn);
 
+	pthread_mutex_t pokemon_sem=dictionary_get(pokemon_semaphores,pokemonn);
+
 	if(abierto==true){ //sie el archivo esta abierto
 
-		pthread_mutex_lock(&mutex_abiertos[cola]);
+		pthread_mutex_lock(&pokemon_sem);
 
 		while(abierto==true){
 
@@ -184,14 +186,14 @@ void checkear_archivo_abierto(char*pokemonn,op_code cola){
 		}
 		abierto=true;
 		setear_archivo_abierto(pokemonn);
-		pthread_mutex_unlock(&mutex_abiertos[cola]);
+		pthread_mutex_unlock(&pokemon_sem);
 
 	}
 	else{ //si el archivo esta cerrado
 
-		pthread_mutex_lock(&mutex_setear[cola]);
+		pthread_mutex_lock(&pokemon_sem);
 			setear_archivo_abierto(pokemonn);
-		pthread_mutex_unlock(&mutex_setear[cola]);
+		pthread_mutex_unlock(&pokemon_sem);
 	}
 }
 

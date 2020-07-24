@@ -46,6 +46,12 @@ void inicializar_gamecard() {
 	gamecard_config = cargar_gamecard_config("gamecard.config");
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
 }
+void inicializar_diccionarios(){
+archivos_existentes = dictionary_create();
+cantidad_posiciones_pokemon=dictionary_create();
+pokemon_semaphores=dictionary_create();
+}
+
 
 void liberar_paths(){
 	free(path_directorio_metadata);
