@@ -24,13 +24,22 @@ def reemplazar_ruta_utils_en_makefile(path_makefile):
 
 def actualizar_todos_los_makefiles():
 	print("Reemplazando la ruta Utils/Debug dentro de todos los makefile...")
-	reemplazar_ruta_utils_en_makefile("gamecard/Debug/makefile")
-	reemplazar_ruta_utils_en_makefile("broker/Debug/makefile")
-	reemplazar_ruta_utils_en_makefile("team/Debug/makefile")
-	reemplazar_ruta_utils_en_makefile("gameboy/Debug/makefile")
 
+	reemplazar_ruta_utils_en_makefile("broker/Debug/makefile")
 	reemplazar_ruta_utils_en_makefile("broker/Debug/subdir.mk")
 	reemplazar_ruta_utils_en_makefile("broker/Debug/test/subdir.mk")
+
+	reemplazar_ruta_utils_en_makefile("gamecard/Debug/makefile")
+	reemplazar_ruta_utils_en_makefile("gamecard/Debug/subdir.mk")
+	reemplazar_ruta_utils_en_makefile("gamecard/Debug/test/subdir.mk")
+
+	reemplazar_ruta_utils_en_makefile("team/Debug/makefile")
+	reemplazar_ruta_utils_en_makefile("team/Debug/subdir.mk")
+	reemplazar_ruta_utils_en_makefile("team/Debug/test/subdir.mk")
+
+	reemplazar_ruta_utils_en_makefile("gameboy/Debug/makefile")
+	reemplazar_ruta_utils_en_makefile("gameboy/Debug/subdir.mk")
+	reemplazar_ruta_utils_en_makefile("gameboy/Debug/test/subdir.mk")
 
 	print("Finalizado")
 
