@@ -5,10 +5,12 @@
 ### GameBoyProject Configuration ###
 *.log
 *.txt
+*.auxiliar
 so-commons-library/
 
 .*/*.log
-
+*/*.gitignore
+*/Debug/*.gitignore
 */Debug/makefile
 */Debug/*.mk
 */Debug/*.log
@@ -22,6 +24,8 @@ so-commons-library/
 */Debug/test/*.ko
 */Debug/test/*.elf
 */Debug/test/*.log
+
+tests-de-integracion/byexample.config
 
 ### C ###
 # Prerequisites
