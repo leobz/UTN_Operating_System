@@ -16,6 +16,7 @@ void inicializar_listas() {
 
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
+	pthread_mutex_init(&mutex_lista_new, NULL);
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -146,6 +147,12 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 	}
 }
 
+void pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(t_tcb_entrenador* tcb) {
+	if (list_include(unblocked, tcb)) {
+		pasar_tcb_a_ready_si_hay_pokemones_en_mapa(tcb);
+	}
+}
+
 void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	sem_t semaforo_tcb;
 	inicializar_semaforo_tcb(tcb, &semaforo_tcb);
@@ -175,6 +182,9 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			ejecutar_rafaga(tcb);
 			break;
 		}
+
+		pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(tcb);
+
 		pthread_mutex_unlock(&mutex_tcb_exec);
 
 	}
@@ -499,6 +509,7 @@ void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
 	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
 	pthread_mutex_unlock(&mutex_lista_ready);
+
 }
 
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {

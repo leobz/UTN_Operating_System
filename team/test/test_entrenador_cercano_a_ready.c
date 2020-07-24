@@ -15,6 +15,7 @@ void entrenador_cercano_cambia_estado_a_ready() {
 	t_tcb_entrenador* entrenador = NULL;
 	list_clean(ready);
 
+	agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje);
 	pasar_entrenador_a_ready_segun_cercania(mensaje);
 
 	CU_ASSERT_EQUAL(list_size(ready), 1);
