@@ -31,11 +31,11 @@ void actualizar_archivo_bitmap(t_bitarray * bitmap);
 void crear_archivo_metadata(char *path_pokemonn,int contador_bloques);
 void agregar_posicion(t_mensaje_new*);
 t_mensaje_appeared*obtener_mensaje_appeared(t_mensaje_new*);
-void enviar_mensaje_appeared(t_mensaje_appeared*appeared);
+void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new);
 t_posiciones*obtener_posiciones_pokemon(char*);
 void checkear_archivo_abierto(char*pokemonn,op_code cola);
 char* crear_pokemon_metadata(char*pokemonn);
-void enviar_mensaje_localized(t_posiciones**,int cantidad_de_posiciones,int id_correlativo);
+void enviar_mensaje_localized(t_paquete_socket* paquete_socket, t_mensaje_localized* mensaje_localized);
 void crear_metadata_para_directorios(char*ruta_directorio);
 
 

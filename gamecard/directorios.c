@@ -57,8 +57,24 @@ void inicializar_directorios() {
 
 }
 void inicializar_diccionarios(){
-archivos_existentes = dictionary_create();
-cantidad_posiciones_pokemon=dictionary_create();
+	archivos_existentes = dictionary_create();
+	cantidad_posiciones_pokemon=dictionary_create();
+}
+
+void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new){
+	int conexion = crear_conexion(gamecard_config->ip_broker,
+			gamecard_config->puerto_broker);
+	if (conexion == -1) {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,
+				mensaje_new->posx, mensaje_new->posy,
+				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+	free(mensaje_new);
 }
 
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
@@ -75,69 +91,84 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 		crear_archivo_pokemon(mensaje_new);
 
 	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
-	//t_mensaje_appeared*appeared=obtener_mensaje_appeared(mensaje_new);
-	//enviar_mensaje_appeared(appeared);
+	enviar_mensaje_appeared(paquete_socket, mensaje_new);
 	sleep(gamecard_config->tiempo_retardo_operacion);
 	cerrar_archivo(mensaje_new->pokemon);
 }
 
+void enviar_mensaje_localized(t_paquete_socket* paquete_socket, t_mensaje_localized* mensaje_localized){
+	int conexion = crear_conexion(gamecard_config->ip_broker,
+			gamecard_config->puerto_broker);
+	if (conexion == -1) {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_localized_pokemon(&bytes, mensaje_localized->pokemon,
+				mensaje_localized->cantidad_posiciones, mensaje_localized->pos,
+				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+	free(mensaje_localized->pokemon);
+	free(mensaje_localized);
+}
 
 void procesar_get_pokemon(t_paquete_socket* paquete_socket){
-	t_mensaje_new*mensaje_get;
-	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+	t_mensaje_get* mensaje_get;
+	mensaje_get=deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
 	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){
 		checkear_archivo_abierto(mensaje_get->pokemon,GET_POKEMON);
-		t_posiciones*posiciones_pokemon=obtener_posiciones_pokemon(mensaje_get->pokemon);
+		t_posiciones* posiciones_pokemon=obtener_posiciones_pokemon(mensaje_get->pokemon);
 
 		int cantidad_de_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_get->pokemon);
-		//trata a posiciones_pokemon como un vector que tendra maximo indice la cantidad_de_posiciones
-		//enviar_mensaje_localized(posiciones_pokemon,cantidad_de_posiciones,paquete_socket->id_mensaje);
+		t_mensaje_localized* mensaje_localized = malloc(sizeof(t_mensaje_localized));
+		mensaje_localized->cantidad_posiciones = cantidad_de_posiciones;
+		mensaje_localized->length_pokemon = mensaje_get->length_pokemon;
+		mensaje_localized->pokemon = mensaje_get->pokemon;
+		mensaje_localized->pos->posx = posiciones_pokemon->posx;
+		mensaje_localized->pos->posy = posiciones_pokemon->posy;
+		enviar_mensaje_localized(paquete_socket, mensaje_localized);
 	}
 	else
 		printf("No se encontro el pokemon requerido");
-
-
-}
-
-void procesar_get_pokemon(t_paquete_socket* paquete_socket) {
-	t_mensaje_get* mensaje_get;
-	mensaje_get = deserializar_mensaje_get_pokemon(paquete_socket->buffer);
-	//if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){}
-	if (esta_en_diccionario(archivos_existentes, mensaje_get->pokemon)) {
-		char* path_pokemon;
-		bool abierto = archivo_esta_abierto(mensaje_get->pokemon);
-		if (abierto) {
-			pthread_mutex_lock(&mutex_abiertos[GET_POKEMON]);
-			while (abierto) {
-				sleep(gamecard_config->tiempo_reintento_conexion);
-				abierto = archivo_esta_abierto(mensaje_get->pokemon);
-			}
-			path_pokemon = setear_archivo_abierto(mensaje_get->pokemon);
-			pthread_mutex_unlock(&mutex_abiertos[GET_POKEMON]);
-		} else {
-			// TODO: codigo de leo
-			// Si obtengo una lista
-			t_list posiciones;
-			if (!list_is_empty(posiciones)) {
-				list_iterate(posiciones, enviar_mensaje_localized);
-			}
-		}
-	} else {
-		// TODO: envio de mensaje
-	}
 }
 
 void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 	int conexion = crear_conexion(gamecard_config->ip_broker,
 			gamecard_config->puerto_broker);
 	if (conexion == -1) {
-		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker")
-	} else {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
 		int bytes;
 		void* a_enviar = serializar_caught_pokemon(&bytes, estado,
 				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
 		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+}
+
+
+void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
+	t_mensaje_catch* mensaje_catch;
+	mensaje_catch = deserializar_paquete_catch_pokemon(paquete_socket->buffer);
+	if (dictionary_has_key(archivos_existentes, mensaje_catch->pokemon)) {
+		bool abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+		if (abierto) {
+			pthread_mutex_lock(&mutex_abiertos[CATCH_POKEMON]);
+			while (abierto) {
+				sleep(gamecard_config->tiempo_reintento_conexion);
+				abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+			}
+			pthread_mutex_unlock(&mutex_abiertos[CATCH_POKEMON]);
+		}
+		pthread_mutex_lock(&mutex_setear[CATCH_POKEMON]);
+		setear_archivo_abierto(mensaje_catch->pokemon);
+		pthread_mutex_unlock(&mutex_setear[CATCH_POKEMON]);
+		int resultado = decrementar_cantidad(mensaje_catch);
+		enviar_mensaje_caught(paquete_socket, resultado);
+	} else {
+		enviar_mensaje_caught(paquete_socket, FAIL);
 	}
 }
 
@@ -150,12 +181,9 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 }
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
-
 	int bloque_disponible=bloque_disponible_en_bitmap();
-
 	if(bloque_disponible!=-1){
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
-
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		setear_bloque_ocupado(bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
@@ -204,23 +232,17 @@ char* crear_pokemon_metadata(char*pokemonn){
 
 void checkear_archivo_abierto(char*pokemonn,op_code cola){
 	bool abierto=archivo_esta_abierto(pokemonn);
-
 	if(abierto==true){ //sie el archivo esta abierto
-
 		pthread_mutex_lock(&mutex_abiertos[cola]);
-
 		while(abierto==true){
-
 			sleep(gamecard_config->tiempo_reintento_operacion);
 			abierto=archivo_esta_abierto(pokemonn);
 		}
 		abierto=true;
 		setear_archivo_abierto(pokemonn);
 		pthread_mutex_unlock(&mutex_abiertos[cola]);
-
 	}
 	else{ //si el archivo esta cerrado
-
 		pthread_mutex_lock(&mutex_setear[cola]);
 			setear_archivo_abierto(pokemonn);
 		pthread_mutex_unlock(&mutex_setear[cola]);
@@ -232,9 +254,7 @@ bool archivo_esta_abierto(char *pokemonn){
 }
 
 char* setear_archivo_abierto(char*pokemonn){
-
 	dictionary_put(archivos_existentes,pokemonn,true);
-
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	t_config*pokemon_config=config_create(path_absoluta);
@@ -245,20 +265,16 @@ char* setear_archivo_abierto(char*pokemonn){
 }
 
 void cerrar_archivo(char* pokemonn){
-
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	t_config*pokemon_config=config_create(path_absoluta);
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
-
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
-
 void agregar_posicion(t_mensaje_new*mensaje_new){
-
 	t_config* archivo_pokemon_config=leer_config_pokemon(mensaje_new->pokemon);
 
 	char*posx = string_itoa(mensaje_new->posx);
@@ -277,7 +293,6 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 	else{ //si es una nueva posicion
-
 		int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,cant_posiciones+1);
 		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(mensaje_new->cantidad));
@@ -312,3 +327,30 @@ t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
 
 	return posiciones_pokemon;
 }
+
+int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
+	int resultado = FAIL;
+	t_config* archivo_pokemon_config = leer_config_pokemon(mensaje_catch->pokemon);
+
+	char* posx = string_itoa(mensaje_catch->posx);
+	char* posy = string_itoa(mensaje_catch->posy);
+	char* posicion_pokemon = string_new();
+	string_append_with_format(&posicion_pokemon, "%s", posx);
+	string_append_with_format(&posicion_pokemon, "-%s", posy);
+
+	if (config_has_property(archivo_pokemon_config, posicion_pokemon)) {
+		int cantidad_pokemon = config_get_int_value(archivo_pokemon_config, posicion_pokemon);
+		if (cantidad_pokemon <= 1) {
+			dictionary_remove_and_destroy(cantidad_posiciones_pokemon, posicion_pokemon, free);
+			config_remove_key(archivo_pokemon_config, posicion_pokemon);
+		}
+		else {
+			dictionary_put(cantidad_posiciones_pokemon,mensaje_catch->pokemon,cantidad_pokemon--);
+			config_set_value(archivo_pokemon_config, posicion_pokemon, string_itoa(cantidad_pokemon));
+		}
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_catch->pokemon);
+		resultado = OK;
+	}
+	return resultado;
+}
+

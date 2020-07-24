@@ -146,7 +146,6 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 
 		if(numero_de_bloque != NULL) {
 			escribir_buffer_en_bloque(sub_string_bloque , numero_de_bloque);
-
 		}
 		else{
 			char* numero_de_bloque_disponible = obtener_numero_de_bloque_disponible();
@@ -159,7 +158,8 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 			}
 			else {
 				printf("Error: No mas bloques disponibles\n");
-				return -1;
+				// TODO que dato envio.
+				// return -1;
 			}
 		}
 	}
@@ -170,7 +170,7 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 		i++;
 	}
-	return 1;
+	return archivo->blocks;
 }
 
 
