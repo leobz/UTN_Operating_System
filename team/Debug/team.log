@@ -3293,3 +3293,23 @@
 [INFO] 13:00:58:801 team/(417936:417936): [DEADLOCK] Inicio de detección de deadlock
 [INFO] 13:00:58:801 team/(417936:417936): [CAMBIO DE COLA] TID:0 (Deadlock->Exit) (0, 0) Motivo:Cumplió Objetivo
 [INFO] 13:00:58:801 team/(417936:417936): [CAMBIO DE COLA] TID:0 (Deadlock->Ready) (0, 0) Motivo:Entrenador va a intercambiar
+[INFO] 11:40:33:31 team/(333515:333515): [CAMBIO DE COLA] TID:1 (New->Ready) (0, 0) Motivo:
+[INFO] 11:40:33:31 team/(333515:333515): [CAMBIO DE COLA] TID:0 (New->Ready) (0, 0) Motivo:
+[INFO] 11:40:33:31 team/(333515:333515): [CAMBIO DE COLA] TID:1 (New->Ready) (0, 0) Motivo:
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA de Pikachu (5,6)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 Pasó a lista Blocked
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 Pasó a lista Blocked
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 Pasó a lista Blocked
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (New->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Unblocked) (3, 7) Motivo:Capturó pokemon y puede seguir capturando
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Unblocked->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Unblocked) (3, 7) Motivo:Capturó pokemon y puede seguir capturando
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Unblocked->Ready) (3, 7) Motivo:CAPTURA de pikachu (9,9)
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Ready->Unblocked) (3, 7) Motivo:Capturó pokemon y puede seguir capturando
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:1 (Deadlock->Ready to Exchange) (1, 1) Motivo:Finalizó intercambio con tcb
+[INFO] 11:40:33:32 team/(333515:333515): [CAMBIO DE COLA] TID:0 (Deadlock->Exit) (1, 1) Motivo:Cumplió Objetivo
+[INFO] 11:40:33:33 team/(333515:333515): [CAMBIO DE COLA] TID:0 (Deadlock->Ready) (0, 0) Motivo:Entrenador va a intercambiar
+[INFO] 11:40:33:33 team/(333515:333515): [DEADLOCK] Inicio de detección de deadlock
