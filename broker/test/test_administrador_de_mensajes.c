@@ -13,7 +13,7 @@ void test_guardar_mensaje_en_cache_dinamica() {
 	inicializar_test_con_particion_dinamica();
 	inicializar_test_con_administracion_de_mensajes();
 	char *payload_string = "someString";
-	int payload_string_size=strlen(payload_string) + 1;;
+	int payload_string_size=strlen(payload_string) + 1;
 
 
 	t_mensaje* mensaje = mensaje_generico(payload_string,payload_string_size);

@@ -53,6 +53,7 @@ void inicializar_directorios() {
 void inicializar_diccionarios(){
 archivos_existentes = dictionary_create();
 cantidad_posiciones_pokemon=dictionary_create();
+pokemon_semaphores=dictionary_create();
 }
 
 
@@ -113,6 +114,7 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 }
+void crear_diccionario_semaforo(char*pokemonn){}
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 
@@ -122,6 +124,7 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
 
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
+		crear_diccionario_semaforo(mensaje_new->pokemon);
 		setear_bloque_ocupado(bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,false);//indica que esta cerrado

@@ -13,6 +13,7 @@ pthread_mutex_t mutex_abiertos[3];
 pthread_mutex_t mutex_setear[3];
 t_dictionary* archivos_existentes;
 t_dictionary* cantidad_posiciones_pokemon;
+t_dictionary* pokemon_semaphores;
 //t_bitarray* bitmap;
 
 //Funciones
