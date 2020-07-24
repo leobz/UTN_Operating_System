@@ -85,7 +85,7 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 		siguiente_tcb = list_pop_first(ready);
 		break;
 	case SJF_CD:
-		// TODO
+		siguiente_tcb = obtener_tcb_menor_proxima_estimacion();
 		break;
 	case SJF_SD:
 		siguiente_tcb = obtener_tcb_menor_proxima_estimacion();
@@ -147,6 +147,18 @@ void ejecutar_rafaga_con_desalojo(t_tcb_entrenador* tcb) {
 	}
 }
 
+void ejecutar_rafaga_con_desalojo_sjf(t_tcb_entrenador* tcb) {
+	while (!queue_is_empty(tcb->rafaga)) {
+		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
+		queue_pop(tcb->rafaga);
+
+		t_tcb_entrenador* tcb_en_ready_de_menor_rafaga = obtener_tcb_menor_proxima_estimacion();
+		if (tiene_menor_proxima_estimacion(tcb_en_ready_de_menor_rafaga, tcb)){
+			break;
+		}
+	}
+}
+
 void pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(t_tcb_entrenador* tcb) {
 	if (list_include(unblocked, tcb)) {
 		pasar_tcb_a_ready_si_hay_pokemones_en_mapa(tcb);
@@ -176,7 +188,7 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			break;
 
 		case SJF_CD:
-			// TODO
+			ejecutar_rafaga_con_desalojo_sjf(tcb);
 			break;
 		case SJF_SD:
 			ejecutar_rafaga(tcb);
