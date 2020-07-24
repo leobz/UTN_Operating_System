@@ -135,3 +135,8 @@ local.properties
 
 # End of https://www.gitignore.io/api/c,eclipse
 
+.test/*.o
+.test/*.ob
+.test/*.ko
+.test/*.elf
+
