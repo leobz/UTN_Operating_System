@@ -138,16 +138,18 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 
 		case NEW_POKEMON:{
 
-			t_mensaje_new* men=deserializar_payload_new_pokemon(payload);
-			char*pokemonn=strcat(men->pokemon,"\0");
+			t_mensaje_new* men=deserializar_payload_new_pokemon_con_barra(payload);
+			char*pokemonn=men->pokemon;
+			pokemonn[men->length_pokemon]='\0';
 			return payload_new_con_barra(pokemonn,men->posx,men->posy,men->cantidad);
 
 			break;
 		}
 		case GET_POKEMON:{
 
-			t_mensaje_get* men=deserializar_payload_get_pokemon(payload);
-			string_append(*(men->pokemon),"\0");
+			t_mensaje_get* men=deserializar_payload_get_pokemon_con_barra(payload);
+			char*pokemonn=men->pokemon;
+			pokemonn[men->length_pokemon]='\0';
 			return payload_get_con_barra(men->pokemon);
 
 
@@ -164,8 +166,9 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 		}
 		case APPEARED_POKEMON:{
 
-			t_mensaje_appeared* men=deserializar_payload_appeared_pokemon(payload);
-			char*pokemonn=strcat(men->pokemon,"\0");
+			t_mensaje_appeared* men=deserializar_payload_appeared_pokemon_con_barra(payload);
+			char*pokemonn=men->pokemon;
+			pokemonn[men->length_pokemon]='\0';
 			return payload_appeared_con_barra(pokemonn,men->posx,men->posy);
 
 			break;
@@ -294,6 +297,24 @@ t_mensaje_new* deserializar_payload_new_pokemon(void*payload) {
 	int offset = 0;
 	memcpy(&(mensaje_new->length_pokemon), payload + offset,sizeof(int));
 	mensaje_new->pokemon = malloc(mensaje_new->length_pokemon);
+		offset += sizeof(int);
+	memcpy(mensaje_new->pokemon, payload + offset,mensaje_new->length_pokemon);
+		offset += mensaje_new->length_pokemon;
+	memcpy(&(mensaje_new->posx), payload + offset, sizeof(int));
+		offset += sizeof(int);
+	memcpy(&(mensaje_new->posy), payload + offset, sizeof(int));
+		offset += sizeof(int);
+	memcpy(&(mensaje_new->cantidad), payload + offset, sizeof(int));
+
+	return mensaje_new;
+}
+
+t_mensaje_new* deserializar_payload_new_pokemon_con_barra(void*payload) {
+	t_mensaje_new* mensaje_new = (t_mensaje_new*) malloc(sizeof(t_mensaje_new));
+
+	int offset = 0;
+	memcpy(&(mensaje_new->length_pokemon), payload + offset,sizeof(int));
+	mensaje_new->pokemon = malloc((mensaje_new->length_pokemon)+1);
 		offset += sizeof(int);
 	memcpy(mensaje_new->pokemon, payload + offset,mensaje_new->length_pokemon);
 		offset += mensaje_new->length_pokemon;
@@ -484,6 +505,19 @@ t_mensaje_get* deserializar_payload_get_pokemon(void*payload){
 	int offset = 0;
 	memcpy(&(mensaje_get->length_pokemon), payload + offset,sizeof(int));
 	mensaje_get->pokemon = malloc(mensaje_get->length_pokemon);
+	offset += sizeof(int);
+	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
+
+	return mensaje_get;
+}
+
+t_mensaje_get* deserializar_payload_get_pokemon_con_barra(void*payload){
+
+	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(sizeof(t_mensaje_get));
+
+	int offset = 0;
+	memcpy(&(mensaje_get->length_pokemon), payload + offset,sizeof(int));
+	mensaje_get->pokemon = malloc((mensaje_get->length_pokemon)+1);
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
 
@@ -765,6 +799,27 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon(void* payload) {
 	stream += sizeof(int);
 
 	mensaje_appeared->pokemon = malloc(mensaje_appeared->length_pokemon);
+	memcpy(mensaje_appeared->pokemon, stream, mensaje_appeared->length_pokemon);
+	stream += mensaje_appeared->length_pokemon;
+
+	memcpy(&(mensaje_appeared->posx), stream, sizeof(int));
+	stream += sizeof(int);
+
+	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
+	stream += sizeof(int);
+
+	return mensaje_appeared;
+}
+
+t_mensaje_appeared* deserializar_payload_appeared_pokemon_con_barra(void* payload) {
+	t_mensaje_appeared* mensaje_appeared = (t_mensaje_appeared*) malloc(sizeof(t_mensaje_appeared));
+
+	void* stream = payload;
+
+	memcpy(&(mensaje_appeared->length_pokemon), stream, sizeof(int));
+	stream += sizeof(int);
+
+	mensaje_appeared->pokemon = malloc((mensaje_appeared->length_pokemon)+1);
 	memcpy(mensaje_appeared->pokemon, stream, mensaje_appeared->length_pokemon);
 	stream += mensaje_appeared->length_pokemon;
 
