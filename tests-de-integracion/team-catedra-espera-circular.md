@@ -51,8 +51,8 @@ $ cat team.log | grep "Motivo:CAPTURA"
 7) Se resuelve el deadlock y finalizan los distintos entrenadores.
 
 ```bash
-
-
+$ cat team.log | grep "DEADLOCK"
+<...>Se detectó espera circular entre  5 TCBs<...>
 ```
 
 ## Finalizacion por cumplir objetivo
@@ -60,6 +60,6 @@ $ cat team.log | grep "Motivo:CAPTURA"
 8) Finaliza el proceso Team.
 
 ```bash
-
-
+$ cat team.log | grep "FIN"
+<...>[FIN DEL PROCESO] ¡Team cumplió objetivo!
 ```
