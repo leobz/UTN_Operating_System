@@ -105,6 +105,8 @@ typedef struct t_tcb{
 	sem_t* semaforo;
 	int rafaga_anterior;
 	double estimacion_anterior;
+	double estimacion_remanente;
+	bool necesita_nueva_estimacion;
 	struct t_list* les_puede_dar;
 	int nivel_de_grafo_en_deadlock;
 }t_tcb_entrenador;

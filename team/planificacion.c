@@ -85,13 +85,48 @@ t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
 		siguiente_tcb = list_pop_first(ready);
 		break;
 	case SJF_CD:
-		siguiente_tcb = obtener_tcb_menor_proxima_estimacion();
+		siguiente_tcb = obtener_tcb_menor_proxima_estimacion_sjf_cd();
 		break;
 	case SJF_SD:
 		siguiente_tcb = obtener_tcb_menor_proxima_estimacion();
 		break;
 	}
 	return siguiente_tcb;
+}
+
+t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion_sjf_cd() {
+	t_tcb_entrenador* tcb_menor_estimacion = NULL;
+	double estimacion_anterior = 0;
+
+	void elegir_tcb_menor_proxima_estimacion(t_tcb_entrenador* tcb) {
+		if (tcb_menor_estimacion == NULL)
+			tcb_menor_estimacion = tcb;
+		else if (tiene_menor_proxima_estimacion_sjf_cd(tcb, tcb_menor_estimacion))
+			tcb_menor_estimacion = tcb;
+	}
+
+	list_iterate(ready, (void*)elegir_tcb_menor_proxima_estimacion);
+
+	if (tcb_menor_estimacion != NULL && tcb_menor_estimacion->necesita_nueva_estimacion) {
+		estimacion_anterior = obtener_proxima_estimacion(tcb_menor_estimacion);
+		tcb_menor_estimacion->estimacion_anterior = estimacion_anterior;
+		tcb_menor_estimacion->estimacion_remanente = estimacion_anterior;
+		tcb_menor_estimacion->necesita_nueva_estimacion = false;
+		tcb_menor_estimacion->rafaga_anterior = queue_size(tcb_menor_estimacion->rafaga);
+	}
+
+	return tcb_menor_estimacion;
+}
+
+bool tiene_menor_proxima_estimacion_sjf_cd(t_tcb_entrenador* tcb, t_tcb_entrenador* tcb_menor_estimacion) {
+	if (tcb->necesita_nueva_estimacion && tcb_menor_estimacion->necesita_nueva_estimacion)
+		return tiene_menor_proxima_estimacion(tcb, tcb_menor_estimacion);
+	else if (!tcb->necesita_nueva_estimacion && tcb_menor_estimacion->necesita_nueva_estimacion)
+		return tcb->estimacion_remanente < obtener_proxima_estimacion(tcb_menor_estimacion);
+	else if (tcb->necesita_nueva_estimacion && !tcb_menor_estimacion->necesita_nueva_estimacion)
+		return obtener_proxima_estimacion(tcb) < tcb_menor_estimacion->estimacion_remanente;
+	else
+		return tcb->estimacion_remanente < tcb_menor_estimacion->estimacion_remanente;
 }
 
 t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion() {
@@ -109,6 +144,8 @@ t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion() {
 
 	estimacion_anterior = obtener_proxima_estimacion(tcb_menor_estimacion);
 	tcb_menor_estimacion->estimacion_anterior = estimacion_anterior;
+	tcb_menor_estimacion->estimacion_remanente = estimacion_anterior;
+	tcb_menor_estimacion->necesita_nueva_estimacion = false;
 	tcb_menor_estimacion->rafaga_anterior = queue_size(tcb_menor_estimacion->rafaga);
 
 	return tcb_menor_estimacion;
@@ -152,9 +189,16 @@ void ejecutar_rafaga_con_desalojo_sjf(t_tcb_entrenador* tcb) {
 		ejecutar_instruccion(queue_peek(tcb->rafaga), tcb);
 		queue_pop(tcb->rafaga);
 
-		t_tcb_entrenador* tcb_en_ready_de_menor_rafaga = obtener_tcb_menor_proxima_estimacion();
-		if (tiene_menor_proxima_estimacion(tcb_en_ready_de_menor_rafaga, tcb)){
-			break;
+		if (queue_is_empty(tcb->rafaga)){
+			tcb->necesita_nueva_estimacion = true;
+		}
+		else {
+			tcb->estimacion_remanente--;
+
+			t_tcb_entrenador* tcb_en_ready_de_menor_rafaga = obtener_tcb_menor_proxima_estimacion_sjf_cd();
+			if (tcb_en_ready_de_menor_rafaga != NULL && tiene_menor_proxima_estimacion_sjf_cd(tcb_en_ready_de_menor_rafaga, tcb)){
+				break;
+			}
 		}
 	}
 }
