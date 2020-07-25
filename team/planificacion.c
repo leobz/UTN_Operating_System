@@ -678,6 +678,7 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 		list_add_in_index(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock, tcb_iterado);
 		if (tcb_iterado == tcb_que_llega) {
 		 	en_deadlock = list_take(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock);
+		 	list_destroy(tcbs_en_niveles_de_grafo);
 		 	tcb_iterado->nivel_de_grafo_en_deadlock = 0;
 		 }
 		 else {

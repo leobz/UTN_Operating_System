@@ -561,7 +561,9 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	if (entrenador_cercano != NULL) {
 		cargar_tcb_captura(entrenador_cercano, pokemon);
 		quitar_pokemon_de_mapa(entrenador_cercano);
-		pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
+		char* motivo_captura = string_motivo_captura(pokemon);
+		pasar_a_ready(entrenador_cercano, motivo_captura);
+		free(motivo_captura);
 		list_remove_element(new, entrenador_cercano);
 		list_remove_element(unblocked, entrenador_cercano);
 	}

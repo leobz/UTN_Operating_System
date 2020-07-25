@@ -16,7 +16,7 @@ t_list* list_map_free(t_list* self, void*(*transformer)(void*)){
 	}
 
 	list_iterate(self, _add_after_transform);
-	free(self);
+	list_destroy_and_destroy_elements(self, (void*)free);
 	return mapped;
 }
 
