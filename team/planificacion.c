@@ -560,7 +560,9 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 		log_info(logger, "[METRICAS] Cantidad de deadlocks resueltos: %d", metricas->cantidad_deadlocks_resueltos);
 
 		team_cumplio_objetivo = true;
+		finalizar_team(team_config);
 	}
+
 	pthread_mutex_unlock(&mutex_planificador);
 }
 
@@ -585,8 +587,13 @@ t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
 }
 
 t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
-	t_dictionary* necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
-	return dictionary_keys_to_list(necesitados);
+	t_dictionary* no_necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
+	t_list* no_necesitados_lista = dictionary_keys_to_list(no_necesitados);
+
+	free(no_necesitados->elements);
+	free(no_necesitados);
+
+	return no_necesitados_lista;
 }
 
 t_deadlock* crear_deadlock(t_list* lista_deadlock){
@@ -624,9 +631,11 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 			t_list* pokemones_que_puede_recibir =
 					list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
 			if (list_size(pokemones_que_puede_recibir) > 0) {
+				free(pokemones_que_puede_recibir);
 				return true;
 			}
 			else {
+				free(pokemones_que_puede_recibir);
 				return false;
 			}
 		}
@@ -660,6 +669,7 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 					list_iterate(les_puedo_dar, (void*) aumentar_nivel_de_grafo);
 				 	list_iterate(les_puedo_dar, (void*) hay_espera_circular);
 				 }
+				 free(les_puedo_dar);
 		 }
 	}
 
@@ -667,6 +677,8 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 	list_iterate(les_puedo_dar, aumentar_nivel_de_grafo);
 	list_iterate(les_puedo_dar, hay_espera_circular);
+
+	free(les_puedo_dar);
 
 	return en_deadlock;
 }

@@ -148,3 +148,33 @@ void remover_decrementar_value_en_diccionario(t_dictionary* dic, char* key) {
 			dictionary_decrement_value(dic, key);
 	}
 }
+
+static void internal_dictionary_clean(t_dictionary *self) {
+	int table_index;
+
+	for (table_index = 0; table_index < self->table_max_size; table_index++) {
+		t_hash_element *element = self->elements[table_index];
+		t_hash_element *next_element = NULL;
+
+		while (element != NULL) {
+
+			next_element = element->next;
+
+			free(element->key);;
+
+			element = next_element;
+		}
+
+		self->elements[table_index] = NULL;
+	}
+
+	self->table_current_size = 0;
+	self->elements_amount = 0;
+}
+
+void dictionary_destroy_keys(t_dictionary* self){
+	dictionary_clean(self);
+	free(self->elements);
+	free(self);
+
+}

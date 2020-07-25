@@ -120,6 +120,21 @@ void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
 
 // CARGA DE TCBs
 
+void destroy_tcb_entrenador_full(t_tcb_entrenador* tcb) {
+	queue_destroy(tcb->rafaga);
+	//free(tcb->pokemon_a_capturar->posicion);
+	free(tcb->pokemon_a_capturar);
+	free(tcb->posicion);
+	free(tcb->objetivos);
+	free(tcb->pokemones_capturados);
+
+	free(tcb);
+}
+
+void destroy_all_tcbs() {
+	//list_iterate(l_exit, destroy_tcb_entrenador_full);
+}
+
 void crear_tcb_entrenadores(t_team_config* team_config) {
 	int cant_entrenadores = team_config->cantidad_entrenadores;
 
