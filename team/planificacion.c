@@ -14,7 +14,7 @@ void inicializar_listas() {
 
 	deadlock_actual = NULL;
 
-	pthread_mutex_init(&mutex_lista_ready, NULL);
+	pthread_mutex_init(&mutex_planificador, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
 }
@@ -58,18 +58,22 @@ void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 }
 
 void planificar() {
-	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_exec;
 	tcb_exec = NULL;
 	pthread_mutex_init(&mutex_tcb_exec, NULL);
 
-	while (1)
+	while (1) {
+		pthread_mutex_lock(&mutex_planificador);
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
+
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			pasar_a_exec(tcb_exec);
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
 		}
+	}
+
 }
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
@@ -160,8 +164,8 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	while(true){
 		sem_wait(tcb->semaforo);
 
-		printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
-		printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+		printf("TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
+		printf("Posicion del TCB: %d ->(%d, %d)\n", tcb->tid, tcb->posicion->x, tcb->posicion->y);
 
 		int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
 
@@ -505,11 +509,9 @@ void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* m
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
-	pthread_mutex_lock(&mutex_lista_ready);
 	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
-	pthread_mutex_unlock(&mutex_lista_ready);
-
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
@@ -523,11 +525,13 @@ void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	tcb->estado_tcb = BLOCKED;
 	metricas->cantidad_cambios_contexto++;
 	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
 	metricas->cantidad_cambios_contexto++;
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
@@ -556,7 +560,10 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 		log_info(logger, "[METRICAS] Cantidad de deadlocks resueltos: %d", metricas->cantidad_deadlocks_resueltos);
 
 		team_cumplio_objetivo = true;
+		finalizar_team(team_config);
 	}
+
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 bool todos_los_entrenadores_exit() {
@@ -576,12 +583,22 @@ bool todos_los_entrenadores_exit() {
 
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
 	t_dictionary* necesitados =  dictionary_substract(tcb->objetivos, tcb->pokemones_capturados);
-	return dictionary_keys_to_list(necesitados);
+	t_list* necesitados_lista = dictionary_keys_to_list(necesitados);
+
+	dictionary_destroy_keys(necesitados);
+
+	return necesitados_lista;
 }
 
 t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
-	t_dictionary* necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
-	return dictionary_keys_to_list(necesitados);
+	t_dictionary* no_necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
+	t_list* no_necesitados_lista = dictionary_keys_to_list(no_necesitados);
+
+	dictionary_destroy(no_necesitados);
+	//free(no_necesitados->elements);
+	//free(no_necesitados);
+
+	return no_necesitados_lista;
 }
 
 t_deadlock* crear_deadlock(t_list* lista_deadlock){
@@ -591,17 +608,25 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	t_tcb_entrenador* tcb_actual = list_get(lista_deadlock,0);
 	t_tcb_entrenador* tcb_a_intercambiar = list_get(lista_deadlock,list_size(lista_deadlock)-1);
 
-	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_anterior));
-	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
+	t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
+	t_list* necesita_anterior =pokemones_necesitados(tcb_anterior);
+
+	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection_strings(no_necesita_actual, necesita_anterior);
+	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
 
 	tcb_actual->entrenador_a_intercambiar = tcb_a_intercambiar;
-	tcb_actual->pokemon_a_dar_en_intercambio = list_first(tcb_actual_pokemones_a_intercambiar);
+	tcb_actual->pokemon_a_dar_en_intercambio = list_pop_first(tcb_actual_pokemones_a_intercambiar);
 
 	tcb_a_intercambiar->entrenador_a_intercambiar = tcb_actual;
-	tcb_a_intercambiar->pokemon_a_dar_en_intercambio = list_first(tcb_a_intercambiar_pokemones_a_intercambiar);
+	tcb_a_intercambiar->pokemon_a_dar_en_intercambio = list_pop_first(tcb_a_intercambiar_pokemones_a_intercambiar);
 
 	deadlock->tcb_1 = tcb_actual;
 	deadlock->tcb_2 = tcb_a_intercambiar;
+
+	list_destroy_and_destroy_elements(tcb_actual_pokemones_a_intercambiar, (void *)free);
+	list_destroy_and_destroy_elements(tcb_a_intercambiar_pokemones_a_intercambiar, (void *)free);
+	list_destroy_and_destroy_elements(no_necesita_actual, (void *)free);
+	list_destroy_and_destroy_elements(necesita_anterior, (void *)free);
 
 	return deadlock;
 }
@@ -616,12 +641,21 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
 		if (tcb_que_puede_recibir->estado_tcb != DEADLOCK) {
+
+			t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
+			t_list* necesita_anterior = pokemones_necesitados(tcb_que_puede_recibir);
 			t_list* pokemones_que_puede_recibir =
-					list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
+					list_intersection_strings(no_necesita_actual, necesita_anterior);
+
+			list_destroy_and_destroy_elements(no_necesita_actual, (void*) free);
+			list_destroy_and_destroy_elements(necesita_anterior, (void*) free);
+
 			if (list_size(pokemones_que_puede_recibir) > 0) {
+				list_destroy_and_destroy_elements(pokemones_que_puede_recibir, (void*) free);
 				return true;
 			}
 			else {
+				list_destroy_and_destroy_elements(pokemones_que_puede_recibir, (void*) free);
 				return false;
 			}
 		}
@@ -644,6 +678,7 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 		list_add_in_index(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock, tcb_iterado);
 		if (tcb_iterado == tcb_que_llega) {
 		 	en_deadlock = list_take(tcbs_en_niveles_de_grafo, tcb_iterado->nivel_de_grafo_en_deadlock);
+		 	list_destroy(tcbs_en_niveles_de_grafo);
 		 	tcb_iterado->nivel_de_grafo_en_deadlock = 0;
 		 }
 		 else {
@@ -655,6 +690,7 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 					list_iterate(les_puedo_dar, (void*) aumentar_nivel_de_grafo);
 				 	list_iterate(les_puedo_dar, (void*) hay_espera_circular);
 				 }
+				 free(les_puedo_dar);
 		 }
 	}
 
@@ -662,6 +698,8 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 	list_iterate(les_puedo_dar, aumentar_nivel_de_grafo);
 	list_iterate(les_puedo_dar, hay_espera_circular);
+
+	free(les_puedo_dar);
 
 	return en_deadlock;
 }
@@ -767,6 +805,7 @@ void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb, char* motivo) {
 
 	metricas->cantidad_cambios_contexto++;
 	ejecutar_manejador_de_deadlocks(tcb);
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {

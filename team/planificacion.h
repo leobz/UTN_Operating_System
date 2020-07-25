@@ -8,6 +8,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
 #include "../utils/listas.h"
 #include "../utils/diccionarios.h"
 

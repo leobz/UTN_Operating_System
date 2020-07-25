@@ -108,6 +108,12 @@ t_dictionary* dictionary_substract(t_dictionary* dic1, t_dictionary* dic2);
 */
 t_list* dictionary_keys_to_list(t_dictionary* dictionary);
 
+/**
+* @NAME: dictionary_destroy_keys
+* @DESC: Destruye un diccionario y sus keys, pero no los elementos(ideal para values int)
+*/
+void dictionary_destroy_keys(t_dictionary* self);
+
 int dictionaries_are_equals(t_dictionary*, t_dictionary*);
 
 void meter_en_diccionario(t_dictionary* dictionary,int key,void*value);
