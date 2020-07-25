@@ -352,6 +352,8 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 
 void procesar_mensaje_appeared(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+	liberar_paquete_socket(paquete);
+
 	loggear_appeared_recibido(mensaje_appeared);
 
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {

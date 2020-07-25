@@ -119,6 +119,7 @@ t_dictionary* dictionary_substract(t_dictionary* dic1, t_dictionary* dic2){
 		}
 
 		if(subtracted_value > 0) {
+			dictionary_remove(dictionary_substract, key);
 			dictionary_put(dictionary_substract, key, subtracted_value);
 		}
 	}
@@ -132,7 +133,7 @@ t_list* dictionary_keys_to_list(t_dictionary* dictionary){
 	t_list* list = list_create();
 
 	void add_key_to_list(char* key, void* value){
-		list_add(list, key);
+		list_add(list, strdup(key));
 	}
 
 	dictionary_iterator(dictionary, (void*) add_key_to_list);
@@ -149,7 +150,7 @@ void remover_decrementar_value_en_diccionario(t_dictionary* dic, char* key) {
 	}
 }
 
-static void internal_dictionary_clean(t_dictionary *self) {
+void internal_dictionary_clean(t_dictionary *self) {
 	int table_index;
 
 	for (table_index = 0; table_index < self->table_max_size; table_index++) {

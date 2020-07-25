@@ -583,15 +583,20 @@ bool todos_los_entrenadores_exit() {
 
 t_list* pokemones_necesitados(t_tcb_entrenador* tcb) {
 	t_dictionary* necesitados =  dictionary_substract(tcb->objetivos, tcb->pokemones_capturados);
-	return dictionary_keys_to_list(necesitados);
+	t_list* necesitados_lista = dictionary_keys_to_list(necesitados);
+
+	dictionary_destroy_keys(necesitados);
+
+	return necesitados_lista;
 }
 
 t_list* pokemones_no_necesitados(t_tcb_entrenador* tcb) {
 	t_dictionary* no_necesitados =  dictionary_substract(tcb->pokemones_capturados, tcb->objetivos);
 	t_list* no_necesitados_lista = dictionary_keys_to_list(no_necesitados);
 
-	free(no_necesitados->elements);
-	free(no_necesitados);
+	dictionary_destroy(no_necesitados);
+	//free(no_necesitados->elements);
+	//free(no_necesitados);
 
 	return no_necesitados_lista;
 }
