@@ -6,6 +6,3 @@ echo Ejecutando solicitudes APPEARED para RR:
 ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Gengar 6 6
 ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Squirtle 5 5
 
-echo
-echo Restaurando configuracion inicial 
-rm team.config; cp team.config.auxiliar team.config; rm team.config.auxiliar

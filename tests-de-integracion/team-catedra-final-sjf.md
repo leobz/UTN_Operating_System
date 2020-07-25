@@ -11,19 +11,14 @@ Esta prueba tiene como objetivo verificar el funcionamiento de la planificación
 3) Iniciar el proceso con el algoritmo SJF, ejecutar el script prueba_final_team.sh y verificar que el proceso finalice
 4) Iniciar el proceso con el algoritmo SJF con Desalojo, ejecutar el script prueba_final_team.sh y verificar que el proceso finalice
 
-## Prueba RR
+## Prueba SJF Sin Desalojo
 
-2) El funcionamiento del algoritmo RR debería detectar un deadlock triple entre los procesos
-3) Como C finaliza antes que la primer captura de A, el mismo se dirige a atrapar a Gengar generando así un deadlock triple
+1) El funcionamiento del algoritmo SJF debería ser similar al algoritmo FIFO pero deberían dar distintas métricas.
 
 ```bash
 $ cat team.log | grep "DEADLOCK"
-<...>Se detectó espera circular entre  3 TCBs.<...>
-```
-
-```bash
-$ cat team.log | grep "Gengar"
-<...>TID:2 (Unblocked->Ready)<...>Motivo:CAPTURA de Gengar<...>
+<...>Se detectó espera circular entre  2 TCBs.<...>
+<...>El entrenador TID: 2<...>TID: 0 para intercambiar<...>
 ```
 
 ```bash
