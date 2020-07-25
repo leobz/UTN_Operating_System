@@ -98,10 +98,23 @@ bool list_include_string(t_list* lista, char* element) {
 	return include;
 }
 
-t_list* list_intersection(t_list* lista_a, t_list* lista_b) {
+t_list* list_filter_strings(t_list* self, bool(*condition)(void*)){
+	t_list* filtered = list_create();
+
+	void _add_if_apply(void* element) {
+		if (condition(element)) {
+			list_add(filtered, strdup(element));
+		}
+	}
+
+	list_iterate(self, _add_if_apply);
+	return filtered;
+}
+
+t_list* list_intersection_strings(t_list* lista_a, t_list* lista_b) {
 	bool list_b_include_element_a(char* elemento_de_a) {
 		return list_include_string(lista_b, elemento_de_a);
 	}
 
-	return list_filter(lista_a, (void*) list_b_include_element_a);
+	return list_filter_strings(lista_a, (void*) list_b_include_element_a);
 }

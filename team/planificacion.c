@@ -58,7 +58,7 @@ void desbloquear_ejecucion_tcb(t_tcb_entrenador* tcb_exec) {
 }
 
 void planificar() {
-	t_tcb_entrenador* tcb_exec = (t_tcb_entrenador*) malloc(sizeof(t_tcb_entrenador));
+	t_tcb_entrenador* tcb_exec;
 	tcb_exec = NULL;
 	pthread_mutex_init(&mutex_tcb_exec, NULL);
 
@@ -608,17 +608,25 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	t_tcb_entrenador* tcb_actual = list_get(lista_deadlock,0);
 	t_tcb_entrenador* tcb_a_intercambiar = list_get(lista_deadlock,list_size(lista_deadlock)-1);
 
-	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_anterior));
-	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
+	t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
+	t_list* necesita_anterior =pokemones_necesitados(tcb_anterior);
+
+	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection_strings(no_necesita_actual, necesita_anterior);
+	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
 
 	tcb_actual->entrenador_a_intercambiar = tcb_a_intercambiar;
-	tcb_actual->pokemon_a_dar_en_intercambio = list_first(tcb_actual_pokemones_a_intercambiar);
+	tcb_actual->pokemon_a_dar_en_intercambio = list_pop_first(tcb_actual_pokemones_a_intercambiar);
 
 	tcb_a_intercambiar->entrenador_a_intercambiar = tcb_actual;
-	tcb_a_intercambiar->pokemon_a_dar_en_intercambio = list_first(tcb_a_intercambiar_pokemones_a_intercambiar);
+	tcb_a_intercambiar->pokemon_a_dar_en_intercambio = list_pop_first(tcb_a_intercambiar_pokemones_a_intercambiar);
 
 	deadlock->tcb_1 = tcb_actual;
 	deadlock->tcb_2 = tcb_a_intercambiar;
+
+	list_destroy_and_destroy_elements(tcb_actual_pokemones_a_intercambiar, (void *)free);
+	list_destroy_and_destroy_elements(tcb_a_intercambiar_pokemones_a_intercambiar, (void *)free);
+	list_destroy_and_destroy_elements(no_necesita_actual, (void *)free);
+	list_destroy_and_destroy_elements(necesita_anterior, (void *)free);
 
 	return deadlock;
 }
@@ -633,14 +641,21 @@ t_list* detectar_deadlock_recursivo(t_tcb_entrenador* tcb_que_llega) {
 
 	bool le_puede_dar(t_tcb_entrenador* tcb_que_puede_recibir) {
 		if (tcb_que_puede_recibir->estado_tcb != DEADLOCK) {
+
+			t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
+			t_list* necesita_anterior = pokemones_necesitados(tcb_que_puede_recibir);
 			t_list* pokemones_que_puede_recibir =
-					list_intersection(pokemones_no_necesitados(tcb_actual), pokemones_necesitados(tcb_que_puede_recibir));
+					list_intersection_strings(no_necesita_actual, necesita_anterior);
+
+			list_destroy_and_destroy_elements(no_necesita_actual, (void*) free);
+			list_destroy_and_destroy_elements(necesita_anterior, (void*) free);
+
 			if (list_size(pokemones_que_puede_recibir) > 0) {
-				free(pokemones_que_puede_recibir);
+				list_destroy_and_destroy_elements(pokemones_que_puede_recibir, (void*) free);
 				return true;
 			}
 			else {
-				free(pokemones_que_puede_recibir);
+				list_destroy_and_destroy_elements(pokemones_que_puede_recibir, (void*) free);
 				return false;
 			}
 		}
