@@ -18,7 +18,7 @@ bool team_cumplio_objetivo;
 
 //ESTRUCTURAS
 
-pthread_mutex_t mutex_lista_ready;
+pthread_mutex_t mutex_planificador;
 pthread_mutex_t mutex_lista_new;
 
 typedef t_dictionary t_objetivo_global;

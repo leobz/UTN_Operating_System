@@ -14,7 +14,7 @@ void inicializar_listas() {
 
 	deadlock_actual = NULL;
 
-	pthread_mutex_init(&mutex_lista_ready, NULL);
+	pthread_mutex_init(&mutex_planificador, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
 }
@@ -62,14 +62,18 @@ void planificar() {
 	tcb_exec = NULL;
 	pthread_mutex_init(&mutex_tcb_exec, NULL);
 
-	while (1)
+	while (1) {
+		pthread_mutex_lock(&mutex_planificador);
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
+
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			pasar_a_exec(tcb_exec);
 			desbloquear_ejecucion_tcb(tcb_exec);
 			tcb_exec = NULL;
 		}
+	}
+
 }
 
 t_tcb_entrenador* siguiente_tcb_a_ejecutar() {
@@ -160,8 +164,8 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	while(true){
 		sem_wait(tcb->semaforo);
 
-		printf("Tamaño de rafaga: %d  ", queue_size(tcb->rafaga));
-		printf("Posicion del TCB (%d, %d)\n", tcb->posicion->x, tcb->posicion->y);
+		printf("TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
+		printf("Posicion del TCB: %d ->(%d, %d)\n", tcb->tid, tcb->posicion->x, tcb->posicion->y);
 
 		int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
 
@@ -505,11 +509,9 @@ void pasar_a_cola(t_tcb_entrenador* tcb, t_list* lista,int cola_destino, char* m
 }
 
 void pasar_a_ready(t_tcb_entrenador* tcb, char* motivo) {
-	pthread_mutex_lock(&mutex_lista_ready);
 	metricas->cantidad_cambios_contexto++;
 	pasar_a_cola(tcb, ready, READY, motivo);
-	pthread_mutex_unlock(&mutex_lista_ready);
-
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
@@ -523,11 +525,13 @@ void pasar_a_blocked(t_tcb_entrenador* tcb) {
 	tcb->estado_tcb = BLOCKED;
 	metricas->cantidad_cambios_contexto++;
 	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, unblocked, UNBLOCKED, "Capturó pokemon y puede seguir capturando");
 	metricas->cantidad_cambios_contexto++;
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
@@ -557,6 +561,7 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 
 		team_cumplio_objetivo = true;
 	}
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 bool todos_los_entrenadores_exit() {
@@ -767,6 +772,7 @@ void pasar_a_ready_to_exchange(t_tcb_entrenador* tcb, char* motivo) {
 
 	metricas->cantidad_cambios_contexto++;
 	ejecutar_manejador_de_deadlocks(tcb);
+	pthread_mutex_unlock(&mutex_planificador);
 }
 
 int string_to_algoritmo_de_planificacion(char* algoritmo) {
