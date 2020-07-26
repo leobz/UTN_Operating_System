@@ -6,14 +6,16 @@ void inicializar_directorios() {
 	//Creo Metadata
 
 	path_directorio_metadata = string_new();
-	string_append(&path_directorio_metadata,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_metadata,
+			gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_metadata, "/Metadata");
 	mkdir(path_directorio_metadata, 0777);
 	crear_metadata_para_directorios(path_directorio_metadata);
 
 	//Creo Files
 	path_directorio_files = string_new();
-	string_append(&path_directorio_files,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_files,
+			gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_files, "/Files");
 	mkdir(path_directorio_files, 0777);
 	crear_metadata_para_directorios(path_directorio_files);
@@ -21,7 +23,8 @@ void inicializar_directorios() {
 	//Creo Blocks
 	//TODO: escribir archivos blocks
 	path_directorio_blocks = string_new();
-	string_append(&path_directorio_blocks,gamecard_config->punto_montaje_tallgrass);
+	string_append(&path_directorio_blocks,
+			gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_directorio_blocks, "/Blocks");
 	mkdir(path_directorio_blocks, 0777);
 	crear_metadata_para_directorios(path_directorio_blocks);
@@ -30,17 +33,20 @@ void inicializar_directorios() {
 	metadata->block_size = 20;
 	metadata->blocks = 80;
 	metadata->magic_number = "TALL_GRASS";
-	//t_metadata* metadata_aux = malloc(sizeof(t_metadata));
 
 	//Creo archivo Bitmap.bin
-	t_bitarray*bitmap=crear_bitmap(metadata->blocks);
+	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
 	actualizar_archivo_bitmap(bitmap);
 
 	//Creo archivo Metadata.bin
-	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
-	config_set_value(bloque_metadata_bin, "BLOCK_SIZE", string_itoa(metadata->block_size));
-	config_set_value(bloque_metadata_bin, "BLOCKS", string_itoa(metadata->blocks));
-	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER", metadata->magic_number);
+	t_bloque* bloque_metadata_bin = crear_bloque(
+			crear_ruta("Metadata/Metadata.bin"));
+	config_set_value(bloque_metadata_bin, "BLOCK_SIZE",
+			string_itoa(metadata->block_size));
+	config_set_value(bloque_metadata_bin, "BLOCKS",
+			string_itoa(metadata->blocks));
+	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",
+			metadata->magic_number);
 
 	config_save(bloque_metadata_bin);
 
@@ -51,6 +57,21 @@ void inicializar_directorios() {
 
 }
 
+void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new){
+	int conexion = crear_conexion(gamecard_config->ip_broker,
+			gamecard_config->puerto_broker);
+	if (conexion == -1) {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,
+				mensaje_new->posx, mensaje_new->posy,
+				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+	free(mensaje_new);
+}
 
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 
@@ -61,47 +82,90 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 		checkear_archivo_abierto(mensaje_new->pokemon,NEW_POKEMON);
 	}
 
-	else //si el archivo no existia
+	else
+		//si el archivo no existia
 		crear_archivo_pokemon(mensaje_new);
 
 	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
-
-	cerrar_archivo(mensaje_new->pokemon);
-
-	//t_mensaje_appeared*appeared=obtener_mensaje_appeared(mensaje_new);
-
-	//enviar_mensaje_appeared(appeared);
-
+	enviar_mensaje_appeared(paquete_socket, mensaje_new);
 	sleep(gamecard_config->tiempo_retardo_operacion);
-
-
+	cerrar_archivo(mensaje_new->pokemon);
 }
 
+void enviar_mensaje_localized(t_paquete_socket* paquete_socket, t_mensaje_localized* mensaje_localized){
+	int conexion = crear_conexion(gamecard_config->ip_broker,
+			gamecard_config->puerto_broker);
+	if (conexion == -1) {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_localized_pokemon(&bytes, mensaje_localized->pokemon,
+				mensaje_localized->cantidad_posiciones, mensaje_localized->pos,
+				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+	free(mensaje_localized->pokemon);
+	free(mensaje_localized);
+}
 
 void procesar_get_pokemon(t_paquete_socket* paquete_socket){
-	t_mensaje_new*mensaje_get;
-	mensaje_get=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+	t_mensaje_get* mensaje_get;
+	mensaje_get=deserializar_mensaje_get_pokemon(paquete_socket->buffer);
 
 	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){
 		checkear_archivo_abierto(mensaje_get->pokemon,GET_POKEMON);
-		t_posiciones*posiciones_pokemon=obtener_posiciones_pokemon(mensaje_get->pokemon);
+		t_posiciones* posiciones_pokemon=obtener_posiciones_pokemon(mensaje_get->pokemon);
 
 		int cantidad_de_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_get->pokemon);
-		//trata a posiciones_pokemon como un vector que tendra maximo indice la cantidad_de_posiciones
-		//enviar_mensaje_localized(posiciones_pokemon,cantidad_de_posiciones,paquete_socket->id_mensaje);
+		t_mensaje_localized* mensaje_localized = malloc(sizeof(t_mensaje_localized));
+		mensaje_localized->cantidad_posiciones = cantidad_de_posiciones;
+		mensaje_localized->length_pokemon = mensaje_get->length_pokemon;
+		mensaje_localized->pokemon = mensaje_get->pokemon;
+		mensaje_localized->pos->posx = posiciones_pokemon->posx;
+		mensaje_localized->pos->posy = posiciones_pokemon->posy;
+		enviar_mensaje_localized(paquete_socket, mensaje_localized);
 	}
 	else
 		printf("No se encontro el pokemon requerido");
-
-
 }
 
-void procesar_catch_pokemon(t_paquete_socket* paquete_socket){
-	t_mensaje_new*mensaje_catch;
-	mensaje_catch=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
+	int conexion = crear_conexion(gamecard_config->ip_broker,
+			gamecard_config->puerto_broker);
+	if (conexion == -1) {
+		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+	}
+	else {
+		int bytes;
+		void* a_enviar = serializar_caught_pokemon(&bytes, estado,
+				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		enviar_mensaje(conexion, a_enviar, bytes);
+	}
+}
 
-		if(dictionary_has_key(archivos_existentes,mensaje_catch->pokemon)){}
 
+void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
+	t_mensaje_catch* mensaje_catch;
+	mensaje_catch = deserializar_paquete_catch_pokemon(paquete_socket->buffer);
+	if (dictionary_has_key(archivos_existentes, mensaje_catch->pokemon)) {
+		bool abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+		if (abierto) {
+			pthread_mutex_lock(&mutex_abiertos[CATCH_POKEMON]);
+			while (abierto) {
+				sleep(gamecard_config->tiempo_reintento_conexion);
+				abierto = archivo_esta_abierto(mensaje_catch->pokemon);
+			}
+			pthread_mutex_unlock(&mutex_abiertos[CATCH_POKEMON]);
+		}
+		pthread_mutex_lock(&mutex_setear[CATCH_POKEMON]);
+		setear_archivo_abierto(mensaje_catch->pokemon);
+		pthread_mutex_unlock(&mutex_setear[CATCH_POKEMON]);
+		int resultado = decrementar_cantidad(mensaje_catch);
+		enviar_mensaje_caught(paquete_socket, resultado);
+	} else {
+		enviar_mensaje_caught(paquete_socket, FAIL);
+	}
 }
 
 void crear_metadata_para_directorios(char*ruta_directorio){
@@ -117,12 +181,9 @@ void crear_diccionario_semaforo(char*pokemonn){
 }
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
-
 	int bloque_disponible=bloque_disponible_en_bitmap();
-
 	if(bloque_disponible!=-1){
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
-
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		crear_diccionario_semaforo(mensaje_new->pokemon);
 		setear_bloque_ocupado(bloque_disponible);
@@ -136,7 +197,7 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 }
 
 
-void crear_archivo_metadata(char *path_pokemonn,int contador_bloques){
+void crear_archivo_metadata(char *path_pokemonn, int contador_bloques) {
 
 	t_bloque* pokemon_config=crear_bloque(path_pokemonn);
 
@@ -146,11 +207,11 @@ void crear_archivo_metadata(char *path_pokemonn,int contador_bloques){
 
 	char* block = string_new();
 	string_append(&block, "[");
-	string_append_with_format(&block, "%s",string_itoa(contador_bloques));
+	string_append_with_format(&block, "%s", string_itoa(contador_bloques));
 	string_append(&block, "]");
 
-	config_set_value(pokemon_config, "BLOCKS",block);
-	config_set_value(pokemon_config, "OPEN","N");
+	config_set_value(pokemon_config, "BLOCKS", block);
+	config_set_value(pokemon_config, "OPEN", "N");
 
 	config_save(pokemon_config);
 
@@ -180,7 +241,6 @@ void checkear_archivo_abierto(char*pokemonn,op_code cola){
 		pthread_mutex_lock(&pokemon_sem);
 
 		while(abierto==true){
-
 			sleep(gamecard_config->tiempo_reintento_operacion);
 			abierto=archivo_esta_abierto(pokemonn);
 		}
@@ -202,9 +262,7 @@ bool archivo_esta_abierto(char *pokemonn){
 }
 
 char* setear_archivo_abierto(char*pokemonn){
-
 	dictionary_put(archivos_existentes,pokemonn,true);
-
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	t_config*pokemon_config=config_create(path_absoluta);
@@ -215,24 +273,20 @@ char* setear_archivo_abierto(char*pokemonn){
 }
 
 void cerrar_archivo(char* pokemonn){
-
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	t_config*pokemon_config=config_create(path_absoluta);
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
-
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
-
 void agregar_posicion(t_mensaje_new*mensaje_new){
-
 	t_config* archivo_pokemon_config=leer_config_pokemon(mensaje_new->pokemon);
 
-	char*posx=string_itoa(mensaje_new->posx);
-	char*posy=string_itoa(mensaje_new->posy);
+	char*posx = string_itoa(mensaje_new->posx);
+	char*posy = string_itoa(mensaje_new->posy);
 
 	char* posicion_pokemonn = string_new();
 	string_append_with_format(&posicion_pokemonn, "%s",posx);
@@ -247,13 +301,13 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 	else{ //si es una nueva posicion
-
 		int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,cant_posiciones+1);
 		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(mensaje_new->cantidad));
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 }
+
 t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
 	int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,pokemonn);
 	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon("Pikachu"));
@@ -281,3 +335,30 @@ t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
 
 	return posiciones_pokemon;
 }
+
+int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
+	int resultado = FAIL;
+	t_config* archivo_pokemon_config = leer_config_pokemon(mensaje_catch->pokemon);
+
+	char* posx = string_itoa(mensaje_catch->posx);
+	char* posy = string_itoa(mensaje_catch->posy);
+	char* posicion_pokemon = string_new();
+	string_append_with_format(&posicion_pokemon, "%s", posx);
+	string_append_with_format(&posicion_pokemon, "-%s", posy);
+
+	if (config_has_property(archivo_pokemon_config, posicion_pokemon)) {
+		int cantidad_pokemon = config_get_int_value(archivo_pokemon_config, posicion_pokemon);
+		if (cantidad_pokemon <= 1) {
+			dictionary_remove_and_destroy(cantidad_posiciones_pokemon, posicion_pokemon, free);
+			config_remove_key(archivo_pokemon_config, posicion_pokemon);
+		}
+		else {
+			dictionary_put(cantidad_posiciones_pokemon,mensaje_catch->pokemon,cantidad_pokemon--);
+			config_set_value(archivo_pokemon_config, posicion_pokemon, string_itoa(cantidad_pokemon));
+		}
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_catch->pokemon);
+		resultado = OK;
+	}
+	return resultado;
+}
+
