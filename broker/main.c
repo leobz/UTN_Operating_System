@@ -181,13 +181,14 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		int bytes=0;
 		void *sent_package = empaquetar_mensaje_broker(mensaje[codigo_de_operacion],&bytes);
 
-		loggear_mensaje_recibido(codigo_de_operacion, sent_package); //Por ahora de prueba
+		loggear_mensaje_recibido(codigo_de_operacion, sent_package);
 
 		t_adm_mensaje* administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
 
 		pthread_mutex_lock(&m_cache);
 			agregar_mensaje_memoria_cache(administrator, mensaje[codigo_de_operacion]);
 		pthread_mutex_unlock(&m_cache);
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 		void enviar_a_suscriptores(t_proceso* proceso){
@@ -204,6 +205,8 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 	if(list_size(suscriptores[codigo_de_operacion])!=0){
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);}
+
+
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);

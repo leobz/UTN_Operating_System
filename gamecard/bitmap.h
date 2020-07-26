@@ -25,6 +25,7 @@
 #include "../utils/log.h"
 #include "../utils/servidor.h"
 #include "../utils/diccionarios.h"
+#include "../utils/cliente.h"
 #define BIT_SIZE(x,y) ((x - 1) / y + 1);
 
 typedef struct{
@@ -45,6 +46,7 @@ typedef struct {
 	int id_proceso;
 } t_gamecard_config;
 
+t_log* logger;
 t_gamecard_config* gamecard_config;
 
 t_metadata* metadata;

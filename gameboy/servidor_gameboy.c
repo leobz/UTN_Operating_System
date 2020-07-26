@@ -27,9 +27,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				log_info(logger,"Mensaje recibido de [Broker]: NEW_POKEMON %s %d %d %d",mensaje_new->pokemon, mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
 
-				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-				liberar_conexion(conexion_corfirmacion);
+				preparar_confirmacion(paquete_socket->id_mensaje);
 
 				free(mensaje_new->pokemon);
 				free(mensaje_new);
@@ -44,9 +42,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			log_info(logger,"Mensaje recibido de [Broker]: GET_POKEMON %s",mensaje_get->pokemon);
 
-			int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-			//enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-			liberar_conexion(conexion_corfirmacion);
+			preparar_confirmacion(paquete_socket->id_mensaje);
 
 			free(mensaje_get->pokemon);
 			free(mensaje_get);
@@ -61,9 +57,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 				log_info(logger,"%ld Mensaje recibido de [Broker]: CATCH_POKEMON %s %d %d", (long)getpid(), mensaje_catch->pokemon, mensaje_catch->posx,mensaje_catch->posy);
 
-				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-				liberar_conexion(conexion_corfirmacion);
+				preparar_confirmacion(paquete_socket->id_mensaje);
 
 				free(mensaje_catch->pokemon);
 				free(mensaje_catch);
@@ -79,9 +73,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 				log_info(logger,"Mensaje recibido de [Broker]: APPEARED_POKEMON %s %d %d",mensaje_appeared->pokemon, mensaje_appeared->posx,mensaje_appeared->posy);
 
-				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-				liberar_conexion(conexion_corfirmacion);
+				preparar_confirmacion(paquete_socket->id_mensaje);
 
 				free(mensaje_appeared->pokemon);
 				free(mensaje_appeared);
@@ -94,10 +86,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 			mensaje_localized= deserializar_mensaje_localized_pokemon(paquete_socket->buffer);
 				log_info(logger,"Mensaje recibido de [Broker]: LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
-				int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-				enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-				liberar_conexion(conexion_corfirmacion);
-
+				preparar_confirmacion(paquete_socket->id_mensaje);
 
 				free(mensaje_localized->pokemon);
 				free(mensaje_localized);
@@ -113,11 +102,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 
 			log_info(logger,"Mensaje recibido de [Broker]: CAUGHT_POKEMON %s con ID_CORRELATIVO: %d",value_to_state(mensaje_caught->resultado),paquete_socket->id_correlativo);
 
-			int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
-			enviar_confirmacion(paquete_socket->id_mensaje,CONFIRMACION,conexion_corfirmacion);
-			liberar_conexion(conexion_corfirmacion);
+			preparar_confirmacion(paquete_socket->id_mensaje);
 
-				free(mensaje_caught);
+			free(mensaje_caught);
 
 			break;}
 
@@ -136,6 +123,14 @@ void recibir_id_correlativo(int socket_cliente) {
 	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO: %d\n", paquete->id_mensaje);
 	printf("Recibida Confirmacion: %d\n",paquete->id_mensaje);
 }
+
+void preparar_confirmacion(int id_men){
+
+	int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+	enviar_confirmacion(id_men,CONFIRMACION,conexion_corfirmacion);
+	liberar_conexion(conexion_corfirmacion);
+}
+
 
 void enviar_confirmacion(int id, int confirmacion, int socket){
 	int offset=0;
