@@ -17,6 +17,10 @@
 bool team_cumplio_objetivo;
 
 //ESTRUCTURAS
+
+pthread_mutex_t mutex_planificador;
+pthread_mutex_t mutex_lista_new;
+
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
 
@@ -101,6 +105,8 @@ typedef struct t_tcb{
 	sem_t* semaforo;
 	int rafaga_anterior;
 	double estimacion_anterior;
+	double estimacion_remanente;
+	bool necesita_nueva_estimacion;
 	struct t_list* les_puede_dar;
 	int nivel_de_grafo_en_deadlock;
 }t_tcb_entrenador;
@@ -159,6 +165,11 @@ void crear_tcb_entrenadores();
 
 void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared);
 void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje);
+char* string_motivo_captura(t_pokemon* pokemon) ;
+
+// Finalizacion
+void destroy_all_tcbs();
+void destroy_tcb_entrenador_full(t_tcb_entrenador* tcb);
 
 #endif
 

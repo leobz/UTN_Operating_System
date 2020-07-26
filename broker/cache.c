@@ -96,8 +96,10 @@ int es_best_fit(){
 }
 
 
+
 void guardar_en_cache(void* payload, int offset, int size){
 	memmove(memoria_cache + offset, payload, size);
+
 }
 
 void dump_cache(int senial){
@@ -135,6 +137,7 @@ char* obtener_hora_actual(){
 	strftime(hora, 20, "%H:%M:%S", local_time);
 
 	return hora;
+
 }
 
 // ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
@@ -143,7 +146,39 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje, t_adm_mensa
 	t_list* hojas_libres = list_create();
 	t_particion_bs* particion_elegida = NULL;
 	void* payload = mensaje->payload;
+
 	int payload_size = mensaje->payload_size;
+	int tamanio_particion_necesaria = obtener_tamanio_particion_necesaria(payload_size);
+	bool sin_hojas_libres = true;
+
+	while (sin_hojas_libres) {
+		obtener_hojas_libres_con_espacio_suficiente(hojas_libres, particion_bs, tamanio_particion_necesaria);
+
+		if (list_size(hojas_libres) == 0) {
+			liberar_hoja_segun_algoritmo_reemplazo();
+		}
+		else{
+			sin_hojas_libres = false;
+		}
+	}
+	ordenar_hojas_libres_segun_algoritmo_particion_libre(hojas_libres);
+	particion_elegida = dividir_particion_elegida (list_first(hojas_libres), tamanio_particion_necesaria);
+	cargar_particion_elegida(particion_elegida, payload_size, adm_mensaje);
+
+	guardar_en_cache(payload, particion_elegida->offset, particion_elegida->size_mensaje);
+
+	list_clean(hojas_libres);
+	free(hojas_libres);
+
+	return particion_elegida;
+}
+
+t_particion_bs* agregar_mensaje_memoria_cache_bs_barra_cero(t_mensaje* mensaje, t_adm_mensaje* adm_mensaje) {
+	t_list* hojas_libres = list_create();
+	t_particion_bs* particion_elegida = NULL;
+	int size=mensaje->payload_size;
+	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
+	int payload_size = size;
 	int tamanio_particion_necesaria = obtener_tamanio_particion_necesaria(payload_size);
 	bool sin_hojas_libres = true;
 
@@ -167,6 +202,7 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje, t_adm_mensa
 
 	return particion_elegida;
 }
+
 
 int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
 	int tamanio_particion_necesaria = 2;
@@ -438,6 +474,7 @@ void agregar_contenido_bs_archivo_dump(FILE* archivo_dump, t_list* hojas_partici
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 
+
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje,t_adm_mensaje* adm) {
 	void* payload = mensaje->payload;
 	int size = mensaje->payload_size;
@@ -445,6 +482,13 @@ t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje
 	return guardar_payload_en_particion_dinamica_con_adm(payload, size,adm);
 }
 
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(t_mensaje* mensaje, t_adm_mensaje* admin) {
+
+	int size=mensaje->payload_size;
+	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
+
+	return guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+}
 
 void* leer_particion_dinamica(t_particion_dinamica* particion){
 
@@ -460,6 +504,7 @@ void* leer_particion_dinamica(t_particion_dinamica* particion){
 
 t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void *payload, int tamanio, t_adm_mensaje *admin){
 	//printf("entro a buscar libre\n");
+
 	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
 	//printf("pude entrar a buscar libre\n");
 	particion_destino->esta_libre = false;
@@ -477,12 +522,12 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void *payloa
 
 	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
 
+
 	return particion_destino;
 }
 //ESTA FUNCION ES SOLO PARA EL TEST POR DIFERENCIA DE PARAMETROS
 t_particion_dinamica* guardar_payload_en_particion_dinamica(void *payload, int tamanio){
 	t_particion_dinamica* particion_destino = buscar_particion_dinamica_libre(tamanio);
-
 
 	particion_destino->esta_libre = false;
 	particion_destino->tamanio_particion = tamanio;
@@ -592,6 +637,7 @@ bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinam
 }
 
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
+
 
 	int particion_esta_libre(t_particion_dinamica* particion){
 			return !particion->esta_libre;

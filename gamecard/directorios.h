@@ -13,11 +13,11 @@ pthread_mutex_t mutex_abiertos[3];
 pthread_mutex_t mutex_setear[3];
 t_dictionary* archivos_existentes;
 t_dictionary* cantidad_posiciones_pokemon;
+t_dictionary* pokemon_semaphores;
 //t_bitarray* bitmap;
 
 //Funciones
 void inicializar_directorios();
-void inicializar_diccionarios();
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new);
 int size_metadata_blocks(t_list* lista);
 void procesar_new_pokemon(t_paquete_socket* paquete_socket);
@@ -37,6 +37,7 @@ void checkear_archivo_abierto(char*pokemonn,op_code cola);
 char* crear_pokemon_metadata(char*pokemonn);
 void enviar_mensaje_localized(t_paquete_socket* paquete_socket, t_mensaje_localized* mensaje_localized);
 void crear_metadata_para_directorios(char*ruta_directorio);
+void crear_diccionario_semaforo(char*pokemonn);
 
 
 #endif  //DIRECTORIOS_H_

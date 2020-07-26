@@ -8,12 +8,12 @@
 #include <math.h>
 #include <pthread.h>
 #include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
 #include "../utils/listas.h"
 #include "../utils/diccionarios.h"
 
 pthread_t planificador;
 pthread_t reintentador_de_conexion;
-pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_tcb_exec;
 pthread_mutex_t mutex_manejar_deadlock;
 
@@ -64,6 +64,8 @@ void ejecutar_tcb(t_tcb_entrenador*);
 void ejecutar_instruccion(int, t_tcb_entrenador*);
 void ejecutar_intercambio(t_tcb_entrenador*);
 void ejecutar_acciones_post_intercambio(t_tcb_entrenador*, bool);
+t_tcb_entrenador* obtener_tcb_menor_proxima_estimacion_sjf_cd();
+bool tiene_menor_proxima_estimacion_sjf_cd(t_tcb_entrenador*, t_tcb_entrenador*);
 
 void pasar_a_exit(t_tcb_entrenador*);
 bool todos_los_entrenadores_exit();

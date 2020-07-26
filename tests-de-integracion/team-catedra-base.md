@@ -57,8 +57,8 @@ $ cat team.log | grep "Motivo:CAPTURA"
 
 ```bash
 $ cat team.log | grep "DEADLOCK"
-<...>entre TCB: 1 <...>y TCB: 0 <...>
-<...>entre TCB: 2 <...>y TCB: 1 <...>
+<...>TID: 1 se moverá a la posición <...> del entrenador TID: 0<...>
+<...>TID: 2 se moverá a la posición <...> del entrenador TID: 1<...>
 ```
 
 
@@ -90,6 +90,6 @@ $ cat team.log | grep "Exit"
 11) Finaliza el proceso Team.
 
 ```bash
-$ tail -1 team.log
+$ cat team.log | grep "FIN"
 <...>[FIN DEL PROCESO] ¡Team cumplió objetivo!
 ```
