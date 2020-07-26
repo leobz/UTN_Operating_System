@@ -82,8 +82,14 @@ bool list_include_string(t_list* lista, char* element);
 
 /**
 * @NAME: list_intersection
-* @DESC: Retorna la interseccion entre dos listas
+* @DESC: Retorna la interseccion entre dos listas (listas que contentan char*)
 */
-t_list* list_intersection(t_list* lista_a, t_list* lista_b);
+t_list* list_intersection_strings(t_list* lista_a, t_list* lista_b);
+
+/**
+* @NAME: list_filter_strings
+* @DESC: Filtra los char* que cumplan una condicion, haciendo un strdup en los que la cumplan
+*/
+t_list* list_filter_strings(t_list* lista, bool(*condition)(void*));
 
 #endif /* LISTAS_H_ */

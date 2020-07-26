@@ -120,6 +120,21 @@ void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
 
 // CARGA DE TCBs
 
+void destroy_tcb_entrenador_full(t_tcb_entrenador* tcb) {
+	queue_destroy(tcb->rafaga);
+	//free(tcb->pokemon_a_capturar->posicion);
+	free(tcb->pokemon_a_capturar);
+	free(tcb->posicion);
+	free(tcb->objetivos);
+	free(tcb->pokemones_capturados);
+
+	free(tcb);
+}
+
+void destroy_all_tcbs() {
+	//list_iterate(l_exit, destroy_tcb_entrenador_full);
+}
+
 void crear_tcb_entrenadores(t_team_config* team_config) {
 	int cant_entrenadores = team_config->cantidad_entrenadores;
 
@@ -138,6 +153,8 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->tid = i;
 		entrenador->rafaga_anterior = 0;
 		entrenador->estimacion_anterior = team_config->estimacion_inicial;
+		entrenador->estimacion_remanente = team_config->estimacion_inicial;
+		entrenador->necesita_nueva_estimacion = true;
 		entrenador->les_puede_dar = list_create();
 
 		dictionary_put(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(entrenador->tid), 0);
@@ -337,6 +354,8 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 
 void procesar_mensaje_appeared(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+	liberar_paquete_socket(paquete);
+
 	loggear_appeared_recibido(mensaje_appeared);
 
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
@@ -544,7 +563,9 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	if (entrenador_cercano != NULL) {
 		cargar_tcb_captura(entrenador_cercano, pokemon);
 		quitar_pokemon_de_mapa(entrenador_cercano);
-		pasar_a_ready(entrenador_cercano, string_motivo_captura(pokemon));
+		char* motivo_captura = string_motivo_captura(pokemon);
+		pasar_a_ready(entrenador_cercano, motivo_captura);
+		free(motivo_captura);
 		list_remove_element(new, entrenador_cercano);
 		list_remove_element(unblocked, entrenador_cercano);
 	}

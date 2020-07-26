@@ -4,6 +4,17 @@
 t_log* logger;
 t_team_config* team_config;
 
+void finalizar_team(t_team_config* team_config) {
+	printf("Cerrando programa...\n");
+	destruir_metricas();
+	destruir_objetivo_global();
+	//destruir_pokemon_requeridos();
+	destruir_team_config(team_config);
+	destroy_all_tcbs();
+
+	exit(1);
+}
+
 int main(int argc, char ** argv) {
 
 	//TODO: Tomar id proceso por archivo de configuracion
@@ -43,10 +54,7 @@ int main(int argc, char ** argv) {
 		while (!team_cumplio_objetivo)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
 
-		destruir_metricas();
-		destruir_objetivo_global();
-		//destruir_pokemon_requeridos();
-		destruir_team_config(team_config);
+		finalizar_team(team_config);
 		return 0;
 	}
 

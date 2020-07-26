@@ -114,7 +114,7 @@ void test_list_intersection(){
 	list_add(segundos_pokemones, "Abra");
 	list_add(segundos_pokemones, "Pikachu");
 
-	inserseccion_pokemones = list_intersection(primeros_pokemones, segundos_pokemones);
+	inserseccion_pokemones = list_intersection_strings(primeros_pokemones, segundos_pokemones);
 
 	CU_ASSERT_EQUAL_FATAL(list_size(inserseccion_pokemones), 2);
 	CU_ASSERT_STRING_EQUAL_FATAL(list_get(inserseccion_pokemones, 0), "Pikachu");

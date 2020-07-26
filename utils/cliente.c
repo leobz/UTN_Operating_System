@@ -15,6 +15,7 @@ int crear_conexion(char *ip, char* puerto) {
 			server_info->ai_socktype, server_info->ai_protocol);
 
 	if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)== -1) {
+
 		printf("WARNING: Error al conectar con IP:%s Puerto:%s\n", ip, puerto);
 		return -1;
 	}
