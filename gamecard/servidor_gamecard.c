@@ -55,7 +55,7 @@ void suscribirme_al_broker(){
 }
 
 void confirmar_recepcion(t_paquete_socket* paquete_socket){
-	printf("Enviando mensaje al socket %d... \n", socket_broker);
+	printf("Enviando confirmacion al socket %d... \n", socket_broker);
 	int offset = 0;
 	int* confirmacion = CONFIRMACION;
 	void* a_enviar = malloc(sizeof(int)*3);
@@ -90,6 +90,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket){
 			procesar_get_pokemon(paquete_socket);
 			break;
 		}
-		free(paquete_socket);
+		liberar_paquete_socket(paquete_socket);
 	}
 }
+

@@ -237,8 +237,7 @@ int main(int argc, char **argv) {
 			int id_mensaje = atoi(argv[7]);
 			int id_correlativo=0;
 
-			int conexion = crear_conexion(gameboy_config->ip_gamecard,
-					gameboy_config->puerto_gamecard);
+			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
 				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
@@ -247,7 +246,7 @@ int main(int argc, char **argv) {
 
 			log_info(logger, "Conexion establecida con [GAMECARD]");
 
-			int bytes;
+			int bytes=0;
 			void *a_enviar = serializar_new_pokemon(&bytes, pokemon, pos_x,
 					pos_y, cantidad, id_mensaje,id_correlativo);
 
@@ -264,8 +263,7 @@ int main(int argc, char **argv) {
 			int id_mensaje = atoi(argv[6]);
 			int id_correlativo=0;
 
-			int conexion = crear_conexion(gameboy_config->ip_team,
-					gameboy_config->puerto_team);
+			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
 				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
@@ -290,8 +288,7 @@ int main(int argc, char **argv) {
 			int id_mensaje = atoi(argv[4]);
 			int id_correlativo=0;
 
-			int conexion = crear_conexion(gameboy_config->ip_team,
-					gameboy_config->puerto_team);
+			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
 				printf("ERROR: Conexion con [GAMECARD] no estable1cida");

@@ -173,6 +173,10 @@ t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones
 void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[],int id_mensaje, int id_correlativo);
 t_mensaje_localized* deserializar_mensaje_localized_pokemon(t_buffer* buffer);
 t_mensaje_localized* deserializar_paquete_localized_pokemon(void* package);
+void* payload_localized_sin_barra(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);
+t_mensaje_localized* deserializar_payload_localized_pokemon(void* package);
+void* payload_localized_con_barra(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);
+t_mensaje_localized* deserializar_payload_localized_pokemon_con_barra(void* package);
 
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado,int id_mensaje, int id_correlativo);

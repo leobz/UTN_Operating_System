@@ -485,7 +485,9 @@ t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(t_mensaje* mensaje, t_adm_mensaje* admin) {
 
 	int size=mensaje->payload_size;
+
 	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
+
 
 	return guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
 }

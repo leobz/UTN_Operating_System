@@ -33,6 +33,7 @@ int id_proceso_gameboy;
 void servidor_gameboy(int conexion);
 void procesar_mensaje_recibido(t_paquete_socket* paquete_socket);
 void recibir_id_correlativo(int socket_cliente);
+void preparar_confirmacion(int id_men);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
 
 #endif /* SERVIDOR_GAMEBOY_H_ */

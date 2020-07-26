@@ -138,16 +138,14 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 	int size_buffer_de_guardado = string_length(buffer_de_guardado);
 	int bloques_necesarios = cantidad_de_bloques_necesarios(size_buffer_de_guardado);
 	int offset = 0;
-
-	int i=0;
-	for (i= 0; i <bloques_necesarios; i++) {
+	int i;
+	for (i = 0; i < bloques_necesarios; i++) {
 		char* sub_string_bloque = string_substring(buffer_de_guardado, offset, metadata->block_size);
 		offset += metadata->block_size;
 		char* numero_de_bloque = list_get(archivo->blocks, i);
 
 		if(numero_de_bloque != NULL) {
 			escribir_buffer_en_bloque(sub_string_bloque , numero_de_bloque);
-
 		}
 		else{
 			char* numero_de_bloque_disponible = obtener_numero_de_bloque_disponible();
@@ -156,10 +154,12 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 				setear_bloque_ocupado(atoi(numero_de_bloque_disponible));
 				actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 				escribir_buffer_en_bloque(sub_string_bloque, numero_de_bloque_disponible);
+				list_add(archivo->blocks, numero_de_bloque_disponible);
 			}
 			else {
 				printf("Error: No mas bloques disponibles\n");
-				return -1;
+				// TODO que dato envio.
+				// return -1;
 			}
 		}
 	}
@@ -170,7 +170,7 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 		i++;
 	}
-	return 1;
+	return archivo->blocks;
 }
 
 
