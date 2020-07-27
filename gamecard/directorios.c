@@ -1,5 +1,25 @@
 #include "directorios.h"
 
+
+void crear_archivo_metadata_y_bitmap_fs() {
+	metadata = malloc(sizeof(t_metadata));
+	metadata->block_size = gamecard_config->block_size;
+	metadata->blocks = gamecard_config->blocks;
+	metadata->magic_number = gamecard_config->magic_number;
+
+	//Creo archivo Metadata.bin
+
+	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
+	config_set_value(bloque_metadata_bin, "BLOCK_SIZE",string_itoa(metadata->block_size));
+	config_set_value(bloque_metadata_bin, "BLOCKS",string_itoa(metadata->blocks));
+	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",metadata->magic_number);
+	config_save(bloque_metadata_bin);
+
+	//Creo archivo Bitmap.bin
+	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
+	actualizar_archivo_bitmap(bitmap);
+}
+
 //Inicializar directorios-> t config
 void inicializar_directorios() {
 
@@ -29,46 +49,13 @@ void inicializar_directorios() {
 	mkdir(path_directorio_blocks, 0777);
 	crear_metadata_para_directorios(path_directorio_blocks);
 
-	metadata = malloc(sizeof(t_metadata));
-	metadata->block_size = 20;
-	metadata->blocks = 80;
-	metadata->magic_number = "TALL_GRASS";
-
-	//Creo archivo Bitmap.bin
-	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
-	actualizar_archivo_bitmap(bitmap);
-
-	//Creo archivo Metadata.bin
-
-	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
-	config_set_value(bloque_metadata_bin, "BLOCK_SIZE",string_itoa(metadata->block_size));
-	config_set_value(bloque_metadata_bin, "BLOCKS",string_itoa(metadata->blocks));
-	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",metadata->magic_number);
-
-
-	config_save(bloque_metadata_bin);
+	crear_archivo_metadata_y_bitmap_fs();
 
 	//free(metadata);
 	//free(metadata_aux);
 
 	//liberar_paths();
 
-}
-
-void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new){
-	int conexion = crear_conexion(gamecard_config->ip_broker,
-			gamecard_config->puerto_broker);
-	if (conexion == -1) {
-		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
-	}
-	else {
-		int bytes;
-		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,
-				mensaje_new->posx, mensaje_new->posy,
-				paquete_socket->id_correlativo, paquete_socket->id_mensaje);
-		enviar_mensaje(conexion, a_enviar, bytes);
-	}
-	free(mensaje_new);
 }
 
 void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new){

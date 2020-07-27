@@ -17,6 +17,10 @@ void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *confi
 	gamecard_config->ip_gamecard = strdup(config_get_string_value(config, "IP_GAMECARD"));
 	gamecard_config->puerto_gamecard = strdup(config_get_string_value(config, "PUERTO_GAMECARD"));
 	gamecard_config->id_proceso = config_get_int_value(config, "ID_PROCESO");
+
+	gamecard_config->block_size = config_get_int_value(config, "BLOCK_SIZE");
+	gamecard_config->magic_number =  strdup(config_get_string_value(config, "MAGIC_NUMBER"));
+	gamecard_config->blocks = config_get_int_value(config, "BLOCKS");
 }
 
 
