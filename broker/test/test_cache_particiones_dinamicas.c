@@ -131,3 +131,7 @@ void assert_particion_tiene_el_tamanio(t_particion_dinamica* particion, int tama
 void assert_particion_tiene_offset(t_particion_dinamica* particion, int offset) {
 	CU_ASSERT_EQUAL(particion->offset, offset);
 }
+
+void assert_particiones_libres(t_list* lista_libres,int cantidad){
+	CU_ASSERT_EQUAL(list_size(lista_libres), cantidad);
+}

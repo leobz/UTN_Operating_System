@@ -17,6 +17,10 @@ void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *confi
 	gamecard_config->ip_gamecard = strdup(config_get_string_value(config, "IP_GAMECARD"));
 	gamecard_config->puerto_gamecard = strdup(config_get_string_value(config, "PUERTO_GAMECARD"));
 	gamecard_config->id_proceso = config_get_int_value(config, "ID_PROCESO");
+
+	gamecard_config->block_size = config_get_int_value(config, "BLOCK_SIZE");
+	gamecard_config->magic_number =  strdup(config_get_string_value(config, "MAGIC_NUMBER"));
+	gamecard_config->blocks = config_get_int_value(config, "BLOCKS");
 }
 
 
@@ -46,9 +50,27 @@ void inicializar_gamecard() {
 	gamecard_config = cargar_gamecard_config("gamecard.config");
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
 }
+void inicializar_diccionarios(){
+archivos_existentes = dictionary_create();
+cantidad_posiciones_pokemon=dictionary_create();
+pokemon_semaphores=dictionary_create();
+}
+
+
+void liberar_paths(){
+	free(path_directorio_metadata);
+	free(path_directorio_files);
+	free(path_directorio_blocks);
+}
 
 void finalizar_gamecard() {
+	liberar_paths();
 	destruir_gamecard_config(gamecard_config);
 	destruir_logger(logger);
 }
+
+
+
+/////////////////////////BLOQUES/////////////////////////////////////////////////////
+
 

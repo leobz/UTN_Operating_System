@@ -32,25 +32,25 @@ Envío Pikachu en posicion (6,6). Como pertenece al Objetivo global lo agrego al
 
 ```bash
 $ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=7 +paste +fail-fast
-<...>[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1<...>
-<...>Tamaño de rafaga: 3  Posicion del TCB (5, 5)<...>
-<...>[TCB-info] TID:2 Capturó pokemon. Total capturados:2<...>
-<...>[TCB-info] TID:2 Capturó máximo permitido(2)<...>
+<...>
 ```
 
 #### Se agrega al Mapa -> Se planifica entrenador
 
 El entrenador mas cercano a (6,6) está en la posicion (5,5) asi que va a capturarlo.
-Luego de capturarlo, pasa a la cola de deadlock, ya que capturo su maximo permitido
+Luego de capturarlo, pasa a la cola de ReadyToExchange, ya que capturo su maximo permitido
 
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:2 (New->Ready) (5, 5) Motivo:CAPTURA<...>
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:2, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:2, CATCH Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:2 (Exec->Deadlock) (6, 6) Motivo:Deadlock
+<...>[CAPTURA] TID:2 Capturó pokemon. Total capturados:2<...>
+<...>[CAMBIO DE COLA] TID:2 (Exec->Ready to Exchange) (6, 6) Motivo:Capturó máximo permitido(2)
+<...>[DEADLOCK] Inicio de detección de deadlock
+<...>[DEADLOCK] No se detectó espera circular entre los TCBs
 ```
 
 ### APPEARED_POKEMON 2
@@ -62,16 +62,13 @@ Envio otro Pikachu (6,6). Quedan 2 entrenadores (1,1) y (3,3), como el segundo e
 
 ```bash
 $  ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
-[AGREGADO]: Pikachu 6 6 [TOTAL EN MAPA]: 1
-<...>Tamaño de rafaga: 7  Posicion del TCB (3, 3)
-<...>[TCB-info] TID:1 Capturó pokemon. Total capturados:2
-<...>[CAMBIO DE COLA] TID:1 Pasó a lista Unblocked
+<...>
 ```
 
 ```bash
 $ cat team.log
 <...>[MSG_RECIBIDO] APPEARED_POKEMON: Pikachu 6 6
-<...>[CAMBIO DE COLA] TID:1 (New->Ready) (3, 3) Motivo:CAPTURA
+<...>[CAMBIO DE COLA] TID:1 (New->Ready) (3, 3) Motivo:CAPTURA<...>
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(4, 3)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(5, 3)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 3)
@@ -79,6 +76,8 @@ $ cat team.log
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 5)
 <...>[INSTRUCCION] TID:1, MOVIMIENTO Posición:(6, 6)
 <...>[INSTRUCCION] TID:1, CATCH Pikachu 6 6
+<...>[CAPTURA] TID:1 Capturó pokemon. Total capturados:2
+<...>[CAMBIO DE COLA] TID:1 (Exec->Unblocked) (6, 6) Motivo:Capturó pokemon y puede seguir capturando
 
 ```
 

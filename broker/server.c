@@ -14,21 +14,21 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
-	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)) {
+	if ((paquete->codigo_operacion >= 0) && (paquete->codigo_operacion <= 5)){
 
-		t_mensaje* mensaje_a_encolar;
-		mensaje_a_encolar = preparar_mensaje(paquete);
-
-		pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
-			insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
-		pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
-
-		loggear_nueva_conexion(logger, paquete);
-
-		sem_post(&cola_vacia[paquete->codigo_operacion]);
-		liberar_paquete_socket(paquete);
+		if(paquete->id_correlativo==0){
+			ingresar_en_cola_y_cache(paquete);
+		}
+		else{
+			if(esta_en_diccionario(mensajes_iguales,paquete->id_correlativo)){
+				enviar_confirmacion(++id_mensaje,CONFIRMACION,paquete->socket_cliente);
+			}
+			else{
+				ingresar_en_cola_y_cache(paquete);
+				meter_en_diccionario(mensajes_iguales,pasar_a_char(paquete->id_correlativo),paquete->id_proceso);
+			}
+		}
 	}
-
 	else {
 
 		switch (paquete->codigo_operacion) {
@@ -56,12 +56,9 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				proceso->id_proceso=paquete->id_proceso;
 				proceso->socket=paquete->socket_cliente;
 				list_add(suscriptores[paquete->cola], proceso);
+				meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
+				meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 			}
-
-			t_proceso* proceso_viejo=sacar_de_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso);
-			free(proceso_viejo);//elimino anterior proceso para actualizarlo
-			meter_en_diccionario(dic_suscriptores[paquete->cola],paquete->id_proceso,proceso);
-			meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 
 			cola_paquete=paquete->cola;
 
@@ -69,19 +66,18 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
 			pthread_detach(thread_subscribers);
 
-
-			sem_post(&sem_proceso[paquete->cola]);
-
 			break;}
 
 		case CONFIRMACION:{
 
 			log_info(logger, "[MSG_RECIBIDO] CON ID_MENSAJE: %d", paquete->id_mensaje);
 
-			t_adm_mensaje*administrador_confirmado = obtener_de_diccionario(administracion_por_id,paquete->id_mensaje);
+			t_adm_mensaje* administrador_confirmado = obtener_de_diccionario(administracion_por_id, paquete->id_mensaje);
 			t_proceso* proceso_confirmado = obtener_de_diccionario(subscribers,paquete->id_proceso);
 
-			list_add(administrador_confirmado->suscriptores_confirmados,proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
+			list_add(administrador_confirmado->suscriptores_confirmados, proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
+
+			//printf("Recibida confirmacion de proceso: %d\n",paquete->id_proceso);
 
 			break;}
 
@@ -103,7 +99,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 
 void verificar_cache(t_proceso* proceso){
-	printf("Entro a hilo verificar cache\n");
+	//printf("Entro a hilo verificar cache\n");
 	int id_suscriptor=proceso->id_proceso;
 	int socket=proceso->socket;
 	int num_cola=cola_paquete;
@@ -113,18 +109,22 @@ void verificar_cache(t_proceso* proceso){
 	void enviar_mensajes_cacheados(t_adm_mensaje* actual_administrator){
 
 		bool confirmo_el_mensaje(t_proceso* proceso_a_comparar){
-			return proceso_a_comparar->id_proceso=id_suscriptor;
+			return proceso_a_comparar->id_proceso == id_suscriptor;
 		}
 
 		if(!list_any_satisfy(actual_administrator->suscriptores_confirmados, &confirmo_el_mensaje)){
 			//si ese proceso no se encuentra entre los procesos que habian confirmado el mensaje
+
 			int bytes=0;
 			void* mensaje_para_enviar = generar_mensaje(actual_administrator,&bytes);
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
 			if(validez!=1) //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
-				list_add(actual_administrator->suscriptores_enviados,proceso);
+
+			//verificar pq puede que ese proceso ya exista en esa lista
+			list_add(actual_administrator->suscriptores_enviados,proceso);
 		}
+
 	}
 
 //***** primero itera
@@ -152,6 +152,22 @@ t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {
 	mensaje_a_preparar->siguiente = NULL;
 
 	return mensaje_a_preparar;
+}
+
+void ingresar_en_cola_y_cache(t_paquete_socket* paquete){
+
+	t_mensaje* mensaje_a_encolar;
+	mensaje_a_encolar = preparar_mensaje(paquete);
+
+	pthread_mutex_lock(&mutex[paquete->codigo_operacion]);
+		insertar_mensaje(mensaje_a_encolar, paquete->codigo_operacion);
+	pthread_mutex_unlock(&mutex[paquete->codigo_operacion]);
+
+	loggear_nueva_conexion(logger, paquete);
+
+	sem_post(&cola_vacia[paquete->codigo_operacion]);
+
+	liberar_paquete_socket(paquete);
 }
 
 

@@ -18,7 +18,7 @@ void recibir_mensajes_team(int conexion) {
 void iniciar_suscripcion(int id_proceso, int conexion, int cola) {
 	id_proceso = id_proceso * 10 + cola;
 	if (conexion == -1) {
-		printf("ERROR: Conexion %s con [Broker] no establecida", op_code_to_string(cola));
+		printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(cola));
 	}
 	else {
 		pthread_t hilo_suscripcion;

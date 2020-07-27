@@ -30,9 +30,10 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->algoritmo_de_planificacion = strdup(
 			config_get_string_value(config, "ALGORITMO_PLANIFICACION"));
 	team_config->quantum = config_get_int_value(config, "QUANTUM");
+	team_config->alpha = config_get_double_value(config, "ALPHA");
 	team_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
-	team_config->estimacion_inicial = config_get_int_value(config,
+	team_config->estimacion_inicial = config_get_double_value(config,
 			"ESTIMACION_INICIAL");
 	team_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
@@ -96,29 +97,67 @@ void inicializar_pokemones_atrapados(t_team_config* team_config) {
 			team_config->pokemon_entrenadores);
 }
 
+void inicializar_pokemones_en_mapa() {
+	pokemones_en_mapa = dictionary_create();
+}
 
+void inicializar_pokemones_planificados() {
+	pokemones_planificados = dictionary_create();
+}
+
+void inicializar_tcbs_enviaron_catch() {
+	enviaron_catch = dictionary_create();
+}
+
+void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
+	if (list_get(team_config->pokemon_entrenadores, *i) != NULL) {
+		return list_get(team_config->pokemon_entrenadores, *i);
+	}
+	else {
+		return dictionary_create();
+	}
+}
 
 // CARGA DE TCBs
+
+void destroy_tcb_entrenador_full(t_tcb_entrenador* tcb) {
+	queue_destroy(tcb->rafaga);
+	//free(tcb->pokemon_a_capturar->posicion);
+	free(tcb->pokemon_a_capturar);
+	free(tcb->posicion);
+	free(tcb->objetivos);
+	free(tcb->pokemones_capturados);
+
+	free(tcb);
+}
+
+void destroy_all_tcbs() {
+	//list_iterate(l_exit, destroy_tcb_entrenador_full);
+}
 
 void crear_tcb_entrenadores(t_team_config* team_config) {
 	int cant_entrenadores = team_config->cantidad_entrenadores;
 
 	for (int i = 0; i < cant_entrenadores; i++) {
 		t_tcb_entrenador* entrenador = malloc(sizeof(t_tcb_entrenador));
-		t_posicion* posicion = malloc(sizeof(t_posicion));
-		t_dictionary* objetivo = dictionary_create();
-		t_dictionary* pokemones_capturados = dictionary_create();
 
 		entrenador->posicion = list_get(team_config->posiciones_entrenadores,
 				i);
 		entrenador->objetivos = list_get(team_config->objetivos_entrenadores,
 				i);
-		entrenador->pokemones_capturados = list_get(
-				team_config->pokemon_entrenadores, i);
+		entrenador->pokemones_capturados = inicializar_pokemones_capturados(
+				team_config, &i);
 		entrenador->estado_tcb = NEW;
 		entrenador->rafaga = queue_create();
 		entrenador->pokemones_max = sum_dictionary_values(entrenador->objetivos);
 		entrenador->tid = i;
+		entrenador->rafaga_anterior = 0;
+		entrenador->estimacion_anterior = team_config->estimacion_inicial;
+		entrenador->estimacion_remanente = team_config->estimacion_inicial;
+		entrenador->necesita_nueva_estimacion = true;
+		entrenador->les_puede_dar = list_create();
+
+		dictionary_put(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(entrenador->tid), 0);
 
 		list_add(new, entrenador);
 	}
@@ -135,10 +174,6 @@ bool existe_pokemon_en_objetivo_global(char* pokemon) {
 
 void destruir_objetivo_global() {
 	dictionary_destroy(objetivo_global);
-}
-
-void inicializar_pokemones_en_mapa() {
-	pokemones_en_mapa = dictionary_create();
 }
 
 void agregar_pokemon_a_mapa(char* pokemon,
@@ -202,19 +237,134 @@ bool planificacion_del_pokemon_no_esta_cubierta(char* pokemon) {
 }
 
 void pasar_a_ready_si_corresponde(t_mensaje_appeared* mensaje_appeared) {
-	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon))
+	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon)){
 		dictionary_increment_value(pokemones_planificados, mensaje_appeared->pokemon);
 		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+	}
 
 }
 
+
+t_pokemon* obtener_pokemon_mas_cercano(t_tcb_entrenador* tcb) {
+	t_posicion* posicion_tcb = tcb->posicion;
+	t_pokemon* pokemon_mas_cercano = NULL;
+
+	t_list* lista_pokemones_cercanos = list_create();
+
+	void elegir_al_mas_cercano(char* pokemon, t_list* lista_posiciones){
+		int distancia_cercana = 0;
+		t_posicion* posicion_mas_cercana = NULL;
+
+		void elegir_posicion_mas_cercana_de_la_especie(t_posicion* posicion){
+			int nueva_distancia = 0;
+			nueva_distancia = distancia_entre(posicion, posicion_tcb);
+
+			if (posicion_mas_cercana == NULL){
+				distancia_cercana = nueva_distancia;
+				posicion_mas_cercana = posicion;
+			}
+			else{
+				if (distancia_cercana > nueva_distancia){
+					distancia_cercana = nueva_distancia;
+					posicion_mas_cercana = posicion;
+				}
+			}
+		}
+		printf("Lista posiciones de especie : %s -> %d \n", pokemon, list_size(lista_posiciones));
+
+		if(list_size(lista_posiciones) >0 ){
+			list_iterate(lista_posiciones, elegir_posicion_mas_cercana_de_la_especie);
+
+			t_pokemon* pokemon_cercano = malloc(sizeof(t_pokemon));
+			pokemon_cercano->pokemon = strdup(pokemon);
+			pokemon_cercano->posicion = posicion_mas_cercana;
+
+			list_add(lista_pokemones_cercanos, pokemon_cercano);
+		}
+
+	}
+
+	dictionary_iterator(pokemones_en_mapa, elegir_al_mas_cercano);
+
+	int posicion_mas_cercana = 0;
+	int distancia_cercana = 0;
+
+	void el_pokemon_mas_cercano(t_pokemon* pokemon){
+		int nueva_distancia = 0;
+
+		nueva_distancia = distancia_entre(pokemon->posicion, posicion_tcb);
+
+		if (posicion_mas_cercana == NULL){
+			distancia_cercana = nueva_distancia;
+			pokemon_mas_cercano = pokemon;
+		}
+		else{
+			if (distancia_cercana > nueva_distancia){
+				distancia_cercana = nueva_distancia;
+				pokemon_mas_cercano = pokemon;
+			}
+		}
+	}
+
+
+	printf("Tamaño de lista de pokemones cercanos : %d \n", list_size(lista_pokemones_cercanos));
+	list_iterate(lista_pokemones_cercanos, el_pokemon_mas_cercano);
+
+	return pokemon_mas_cercano;
+
+}
+
+void despachar_entrenador_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
+	// TODO:Invocar esta funcion al cargar siempre una rafaga captura, y no,
+	// esperar hasta que se le asigne el pokemon mediante un caught
+	t_posicion* copia_de_posicion = malloc(sizeof(t_posicion));
+	copia_de_posicion->x = pokemon->posicion->x;
+	copia_de_posicion->y = pokemon->posicion->y;
+
+
+}
+
+void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
+	t_pokemon* pokemon = obtener_pokemon_mas_cercano(tcb);
+
+	if (pokemon!= NULL) {
+		printf("El pokemon mas cercano es: \n");
+		printf("Pokemon: %s \n", pokemon->pokemon);
+		printf("Posicion: %d, %d\n" , pokemon->posicion->x, pokemon->posicion->y);
+
+
+		cargar_tcb_captura(tcb, pokemon);
+		quitar_pokemon_de_mapa(tcb);
+
+		printf("TCB %d tiene asignado un %s en posicion %d, %d\n",
+				tcb->tid, tcb->pokemon_a_capturar->pokemon,
+				tcb->pokemon_a_capturar->posicion->x, tcb->pokemon_a_capturar->posicion->y);
+
+		pasar_a_ready(tcb, string_motivo_captura(pokemon));
+		list_remove_element(new, tcb);
+		list_remove_element(unblocked, tcb);
+	}
+//	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon)){
+//		dictionary_increment_value(pokemones_planificados, mensaje_appeared->pokemon);
+//		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
+//	}
+
+}
+
+
 void procesar_mensaje_appeared(t_paquete_socket* paquete) {
 	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+	liberar_paquete_socket(paquete);
+
 	loggear_appeared_recibido(mensaje_appeared);
 
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
+
+		pthread_mutex_lock(&mutex_lista_new);
 		pasar_a_ready_si_corresponde(mensaje_appeared);
+		pthread_mutex_unlock(&mutex_lista_new);
+
 	}
 }
 
@@ -250,7 +400,6 @@ void quitar_pokemon_de_mapa(t_tcb_entrenador* entrenador) {
 
 void aplicar_acciones_caught(t_tcb_entrenador* entrenador) {
 	quitar_pokemon_de_planificados(entrenador);
-	quitar_pokemon_de_mapa(entrenador);
 	definir_cola_post_caught(entrenador);
 	entrenador->pokemon_a_capturar = NULL;
 }
@@ -359,39 +508,112 @@ void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
 	imprimir_pokemon_agregado(mensaje);
 }
 
+t_tcb_entrenador* elegir_entrenador_cercano_a_posicion(
+		t_tcb_entrenador* tcb_1, t_tcb_entrenador* tcb_2, t_posicion* posicion){
+
+		int distancia_tcb_1;
+		int distancia_tcb_2;
+
+		if (tcb_1 != NULL && tcb_2 != NULL) {
+			distancia_tcb_1 = distancia_entre(tcb_1->posicion, posicion);
+			distancia_tcb_2 = distancia_entre(tcb_2->posicion, posicion);
+
+			if (distancia_tcb_1 < distancia_tcb_2) {
+				return tcb_1;
+			}
+			else {
+				return tcb_2;
+			}
+		}
+
+		if(tcb_1 != NULL && tcb_2 == NULL) {
+			return tcb_1;
+		}
+
+		if (tcb_2 != NULL && tcb_1 == NULL) {
+			return tcb_2;
+		}
+
+		if (tcb_2 == NULL && tcb_1 == NULL) {
+			printf("ERROR, NO HAY TCBS DISPONIBLES ACTUALMENTE PARA IR A LA POSICION (%d, %d)\n", posicion->x, posicion->y);
+			return NULL;
+		}
+}
+
+char* string_motivo_captura(t_pokemon* pokemon) {
+	int length = strlen("CAPTURA de (,)") + 30;
+	char* string_motivo_captura = malloc(length);
+	snprintf(
+			string_motivo_captura, length, "CAPTURA de %s (%d,%d)",
+			pokemon->pokemon, pokemon->posicion->x, pokemon->posicion->y
+			);
+	return string_motivo_captura;
+}
+
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	int distancia_cercana = 0;
-	t_tcb_entrenador* entrenador_cercano = NULL;
+	t_tcb_entrenador* entrenador_cercano_ready = NULL;
+	t_tcb_entrenador* entrenador_cercano_unblocked = NULL;
+
 
 	t_posicion* posicion_pokemon = (t_posicion*) malloc(sizeof(t_posicion));
 	posicion_pokemon->x = mensaje->posx;
 	posicion_pokemon->y = mensaje->posy;
 
-	void elegir_entrenador_cercano(t_tcb_entrenador* entrenador){
+	void elegir_entrenador_cercano_ready(t_tcb_entrenador* entrenador){
 		int nueva_distancia = 0;
 
 		nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
 
-		if (entrenador_cercano == NULL){
+		if (entrenador_cercano_ready == NULL){
 			distancia_cercana = nueva_distancia;
-			entrenador_cercano = entrenador;
+			entrenador_cercano_ready = entrenador;
 		}
 		else{
 			if (distancia_cercana > nueva_distancia){
 				distancia_cercana = nueva_distancia;
-				entrenador_cercano = entrenador;
+				entrenador_cercano_ready = entrenador;
 			}
 		}
 	}
 
-	list_iterate(new, elegir_entrenador_cercano);
+	void elegir_entrenador_cercano_unblocked(t_tcb_entrenador* entrenador){
+			int nueva_distancia = 0;
+
+			nueva_distancia = distancia_entre(entrenador->posicion, posicion_pokemon);
+
+			if (entrenador_cercano_unblocked == NULL){
+				distancia_cercana = nueva_distancia;
+				entrenador_cercano_unblocked = entrenador;
+			}
+			else{
+				if (distancia_cercana > nueva_distancia){
+					distancia_cercana = nueva_distancia;
+					entrenador_cercano_unblocked = entrenador;
+				}
+			}
+	}
+
+	list_iterate(unblocked, elegir_entrenador_cercano_unblocked);
+	list_iterate(new, elegir_entrenador_cercano_ready);
 
 	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
 	pokemon->pokemon = mensaje->pokemon;
 	pokemon->posicion = posicion_pokemon;
 
-	cargar_tcb_captura(entrenador_cercano, pokemon);
+	t_tcb_entrenador* entrenador_cercano =
+			elegir_entrenador_cercano_a_posicion(entrenador_cercano_ready, entrenador_cercano_unblocked, posicion_pokemon);
 
-	pasar_a_ready(entrenador_cercano, "CAPTURA");
-	list_remove_element(new, entrenador_cercano);
+	if (entrenador_cercano != NULL) {
+		cargar_tcb_captura(entrenador_cercano, pokemon);
+		quitar_pokemon_de_mapa(entrenador_cercano);
+		char* motivo_captura = string_motivo_captura(pokemon);
+		pasar_a_ready(entrenador_cercano, motivo_captura);
+		free(motivo_captura);
+		list_remove_element(new, entrenador_cercano);
+		list_remove_element(unblocked, entrenador_cercano);
+	}
+	else{
+	}
+
 }

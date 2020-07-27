@@ -33,7 +33,10 @@ typedef struct particion_bs {
 typedef struct particion_dinamica {
 	int offset;
 	int tamanio_particion;
+	int contador_uso;
+	int orden_creacion;
 	bool esta_libre;
+	t_adm_mensaje* adm_mensaje;
 	struct particion_dinamica* siguiente_particion;
 } t_particion_dinamica;
 
@@ -48,6 +51,7 @@ void* memoria_cache;
 t_list* particiones_dinamicas;
 int ordenamiento;
 int id_particion;
+
 int contador_uso;
 int orden_creacion;
 
@@ -63,6 +67,8 @@ int obtener_tamanio_memoria_cache_bs();
 // ********************************** FUNCIONES MEMORIA CACHE ********************************** //
 int es_particion_dinamica();
 int es_buddy_system();
+int es_fifo();
+int es_lru();
 void guardar_en_cache(void* payload, int offset, int size);
 void dump_cache(int senial);
 char* obtener_fecha_actual();
@@ -70,6 +76,7 @@ char* obtener_hora_actual();
 
 // ********************************** FUNCIONES BUDDY SYSTEM *********************************** //
 t_particion_bs* agregar_mensaje_memoria_cache_bs(t_mensaje* mensaje, t_adm_mensaje* adm_mensaje);
+t_particion_bs* agregar_mensaje_memoria_cache_bs_barra_cero(t_mensaje* mensaje, t_adm_mensaje* adm_mensaje);
 int obtener_tamanio_particion_necesaria (int tamanio_mensaje);
 void obtener_hojas_libres_con_espacio_suficiente(t_list* hojas_libres, t_particion_bs* particion, int tamanio_particion_necesaria);
 bool es_menor_offset(t_particion_bs* hoja_libre, t_particion_bs* siguiente_hoja_libre);
@@ -90,7 +97,8 @@ void obtener_hojas_bs(t_list* hojas_particion_bs, t_particion_bs* particion);
 void agregar_contenido_bs_archivo_dump(FILE* archivo_dump, t_list* hojas_particion_bs);
 
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
-t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje);
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje,t_adm_mensaje*);
+t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(t_mensaje* mensaje, t_adm_mensaje* admin);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
 t_list* obtener_particiones_dinamicas_libres();
 t_particion_dinamica* crear_particion_dinamica(int, int);
@@ -103,10 +111,23 @@ void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 void compactar_particiones_dinamicas();
 t_list* filtar_particiones_libres_y_suficientes(int);
 t_list* obtener_particiones_posibles(int);
+t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin);
 t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
+t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void*, int,t_adm_mensaje*);
 void* leer_particion_dinamica(t_particion_dinamica*);
+int supero_limite_de_eliminaciones(int particiones_eliminadas);
+
+bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
+t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin);
+void unir_particiones_dinamicas_libres();
+t_list* obtener_particiones_dinamicas_ocupadas();
 void generar_archivo_dump_particion_dinamica();
 void agregar_contenido_particion_dinamica_archivo_dump(FILE* archivo_dump);
+bool menor_orden_creacion(t_particion_dinamica* particiones, t_particion_dinamica* siguiente_particion) ;
+void liberar_particion_dinamica(t_particion_dinamica* particion_victima);
+bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
+
+
 
 // ********************************** FINALIZACION MEMORIA CACHE ********************************** //
 void finalizar_mutex_cache();

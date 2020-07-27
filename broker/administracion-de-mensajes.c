@@ -35,47 +35,75 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 	mensaje->codigo_operacion = actual_administrator->codigo_operacion;
 	mensaje->id_mensaje = actual_administrator->id_mensaje;
 	mensaje->id_correlativo = actual_administrator->id_correlativo;
+	mensaje->payload= serializar_segun_codigo_con_barra(payload,mensaje->codigo_operacion,&payload_size);
 	mensaje->payload_size = payload_size;
-	mensaje->payload = payload;
 
 	return empaquetar_mensaje_broker(mensaje, bytes);
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
 	if (es_particion_dinamica()){
-		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica(mensaje);
+		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(mensaje,actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
+		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
 	}
 	else if(es_buddy_system()){
-		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs(mensaje, actual_administrator);
+		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs_barra_cero(mensaje, actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
+		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
 	}
 }
 
 
-void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* adm_mensaje){
-	int id_mensaje = adm_mensaje->id_mensaje;
-	int cod_op = adm_mensaje->codigo_operacion;
 
-	//Elimino adm_mensaje del diccionario 'administracion_por_id'
-	void eliminar_adm_mensaje_para_particion(t_adm_mensaje* adm_mensaje){
 
-		list_clean(adm_mensaje->suscriptores_enviados);
-		list_clean(adm_mensaje->suscriptores_confirmados);
 
-		free(adm_mensaje->suscriptores_enviados);
-		free(adm_mensaje->suscriptores_confirmados);
-		free(adm_mensaje);
-	}
+void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaje){
 
-	dictionary_remove_and_destroy(administracion_por_id, pasar_a_char(id_mensaje), (void*)eliminar_adm_mensaje_para_particion);
+	int id_mensajee = admins_mensaje->id_mensaje;
+
+	op_code cod_ope = admins_mensaje->codigo_operacion;
+
+	dictionary_remove(administracion_por_id, pasar_a_char(id_mensajee));
+
 
 	//Elimino adm_mensaje de la lista asociada al diccionario 'administracion_por_cod'
-	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(cod_op));
+	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(cod_ope));
+
 
 	bool tiene_mismo_id_mensaje(t_adm_mensaje* elem_adm_mensaje){
-		return elem_adm_mensaje->id_mensaje == adm_mensaje->id_mensaje;
+		return elem_adm_mensaje->id_mensaje == id_mensajee;
 	}
 
-	list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
+	t_adm_mensaje* men=list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
+
+	//printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
+
+
+	if(list_size(admins_mensaje->suscriptores_enviados)!=0)
+		list_clean(admins_mensaje->suscriptores_enviados);
+	if(list_size(admins_mensaje->suscriptores_confirmados)!=0)
+		list_clean(admins_mensaje->suscriptores_confirmados);
+
+
+	free(admins_mensaje->suscriptores_enviados);
+	free(admins_mensaje->suscriptores_confirmados);
+	free(admins_mensaje);
+}
+
+
+void leer_particion_dinamica_sin_payload(t_particion_dinamica* particion){
+
+	if(es_lru()){
+			particion->contador_uso=++contador_uso;
+	}
+}
+
+void leer_particiones_de_cola(int num_cola){
+
+	void leer_su_particion(t_adm_mensaje*adm){
+		leer_particion_dinamica_sin_payload(adm->particion_dinamica);
+	}
+
+	list_iterate(administradores[num_cola],&leer_su_particion);
 }

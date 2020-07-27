@@ -48,8 +48,20 @@ void agregar_tests_buddy_system() {
 			test_consolidar_particion_victima_companieros);
 
 	CU_add_test(suite_configuracion,
-			"Agregar mensaje a memoria cache mediante bs",
-			test_agregar_mensaje_a_memoria_cache_bs);
+			"Liberar hojas usando el algoritmo de reeemplazo sin tener en cuenta la consolidacion",
+			test_liberar_hoja_sin_compactacion_segun_algoritmo_reemplazo);
+
+	CU_add_test(suite_configuracion,
+			"Liberar hojas usando el algoritmo de reeemplazo teniendo en cuenta la consolidacion",
+			test_liberar_hoja_con_compactacion_segun_algoritmo_reemplazo);
+
+	CU_add_test(suite_configuracion,
+				"Agregar mensaje a memoria cache mediante bs",
+				test_agregar_mensaje_a_memoria_cache_bs);
+
+	CU_add_test(suite_configuracion,
+			"Agregar mensaje a memoria cache con un reemplazo y consolidacion mediante bs",
+			test_agregar_mensaje_con_reemplazo_consolidacion_a_memoria_cache_bs);
 
 	CU_add_test(suite_configuracion,
 			"Leer mensaje guardado en memoria cache mediante bs",
@@ -58,6 +70,7 @@ void agregar_tests_buddy_system() {
 
 void inicializar_test_bs() {
 	broker_config = cargar_broker_config("broker.config.sample");
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 	broker_config->tamanio_memoria = 1200;
 	free(broker_config->algoritmo_memoria);
 	broker_config->algoritmo_memoria = strdup("BS");
@@ -81,18 +94,19 @@ void finalizar_test_bs() {
 
 	dictionary_destroy_and_destroy_elements(administracion_por_id, (void*)eliminar_administracion_por_id);
 
-	void eliminar_administracion_por_cod(t_list* lista_adm_mensajes){
+	void eliminar_administracion_por_cod(t_list* l_adm_mensajes){
 
 		void eliminar_lista_adm_mensajes(t_adm_mensaje* adm_mensaje){
 			free(adm_mensaje);
 		}
 
-		list_destroy_and_destroy_elements(lista_adm_mensajes, (void*)eliminar_lista_adm_mensajes);
+		list_destroy_and_destroy_elements(l_adm_mensajes, (void*)eliminar_lista_adm_mensajes);
 	}
 
 	dictionary_destroy_and_destroy_elements(administracion_por_cod, (void*)eliminar_administracion_por_cod);
 
 	finalizar_memoria_cache();
+	destruir_logger(logger);
 	destruir_broker_config(broker_config);
 }
 
@@ -457,6 +471,141 @@ void test_consolidar_particion_victima_companieros() {
 	finalizar_test_bs();
 }
 
+void test_liberar_hoja_sin_compactacion_segun_algoritmo_reemplazo(){
+	inicializar_test_bs();
+
+	t_adm_mensaje* adm_mensaje = malloc(sizeof(t_adm_mensaje));
+	t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_segundo_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+
+	adm_mensaje->id_mensaje = 1;
+	adm_mensaje->codigo_operacion = NEW_POKEMON;
+	adm_mensaje->suscriptores_enviados = list_create();
+	adm_mensaje->suscriptores_confirmados = list_create();
+
+	dictionary_put(administracion_por_id, "1", adm_mensaje);
+
+	list_add(administradores[adm_mensaje->codigo_operacion], adm_mensaje);
+
+	orden_creacion++;
+	primer_hijo_segundo_hijo->esta_libre = false;
+	primer_hijo_segundo_hijo->orden_creacion = orden_creacion;
+	primer_hijo_segundo_hijo->adm_mensaje = adm_mensaje;
+	primer_hijo_segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_segundo_hijo->size_mensaje = (particion_bs->tamanio_particion / 4) - 1;
+	primer_hijo_segundo_hijo->padre = primer_hijo;
+	primer_hijo_segundo_hijo->primer_hijo = NULL;
+	primer_hijo_segundo_hijo->segundo_hijo = NULL;
+
+	orden_creacion++;
+	primer_hijo_primer_hijo->esta_libre = false;
+	primer_hijo_primer_hijo->orden_creacion = orden_creacion;
+	primer_hijo_primer_hijo->adm_mensaje = adm_mensaje;
+	primer_hijo_primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_primer_hijo->size_mensaje = (particion_bs->tamanio_particion / 4) - 1;
+	primer_hijo_primer_hijo->padre = primer_hijo;
+	primer_hijo_primer_hijo->primer_hijo = NULL;
+	primer_hijo_primer_hijo->segundo_hijo = NULL;
+
+	primer_hijo->esta_libre = true;
+	primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	primer_hijo->primer_hijo = primer_hijo_primer_hijo;
+	primer_hijo->segundo_hijo = primer_hijo_segundo_hijo;
+
+	segundo_hijo->esta_libre = true;
+	segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	segundo_hijo->primer_hijo = NULL;
+	segundo_hijo->segundo_hijo = NULL;
+
+	particion_bs->primer_hijo = primer_hijo;
+	particion_bs->segundo_hijo = segundo_hijo;
+
+	liberar_hoja_segun_algoritmo_reemplazo();
+
+	CU_ASSERT_TRUE_FATAL(particion_bs->primer_hijo != NULL);
+	CU_ASSERT_TRUE_FATAL(particion_bs->segundo_hijo != NULL);
+	CU_ASSERT_TRUE_FATAL(particion_bs->primer_hijo->primer_hijo != NULL);
+	CU_ASSERT_TRUE_FATAL(particion_bs->primer_hijo->segundo_hijo != NULL);
+
+	CU_ASSERT_EQUAL_FATAL(primer_hijo_segundo_hijo->orden_creacion, 3);
+	CU_ASSERT_TRUE_FATAL(primer_hijo_segundo_hijo->esta_libre);
+	CU_ASSERT_EQUAL_FATAL(primer_hijo_segundo_hijo->size_mensaje, 0);
+	CU_ASSERT_TRUE_FATAL(primer_hijo_segundo_hijo->adm_mensaje == NULL);
+
+	finalizar_test_bs();
+}
+
+void test_liberar_hoja_con_compactacion_segun_algoritmo_reemplazo(){
+	inicializar_test_bs();
+
+	t_adm_mensaje* adm_mensaje = malloc(sizeof(t_adm_mensaje));
+	t_adm_mensaje* adm_mensaje1 = malloc(sizeof(t_adm_mensaje));
+	t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* primer_hijo_segundo_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+
+	adm_mensaje->id_mensaje = 1;
+	adm_mensaje->codigo_operacion = NEW_POKEMON;
+	adm_mensaje->suscriptores_enviados = list_create();
+	adm_mensaje->suscriptores_confirmados = list_create();
+
+	adm_mensaje1->id_mensaje = 2;
+	adm_mensaje1->codigo_operacion = NEW_POKEMON;
+	adm_mensaje1->suscriptores_enviados = list_create();
+	adm_mensaje1->suscriptores_confirmados = list_create();
+
+	dictionary_put(administracion_por_id, "1", adm_mensaje);
+	dictionary_put(administracion_por_id, "2", adm_mensaje1);
+
+	list_add(administradores[adm_mensaje->codigo_operacion], adm_mensaje);
+	list_add(administradores[adm_mensaje1->codigo_operacion], adm_mensaje1);
+
+	orden_creacion++;
+	primer_hijo_segundo_hijo->esta_libre = true;
+	primer_hijo_segundo_hijo->orden_creacion = orden_creacion;
+	primer_hijo_segundo_hijo->adm_mensaje = adm_mensaje;
+	primer_hijo_segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_segundo_hijo->padre = primer_hijo;
+	primer_hijo_segundo_hijo->primer_hijo = NULL;
+	primer_hijo_segundo_hijo->segundo_hijo = NULL;
+
+	orden_creacion++;
+	primer_hijo_primer_hijo->esta_libre = false;
+	primer_hijo_primer_hijo->orden_creacion = orden_creacion;
+	primer_hijo_primer_hijo->adm_mensaje = adm_mensaje1;
+	primer_hijo_primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 4;
+	primer_hijo_primer_hijo->size_mensaje = (particion_bs->tamanio_particion / 4) - 1;
+	primer_hijo_primer_hijo->padre = primer_hijo;
+	primer_hijo_primer_hijo->primer_hijo = NULL;
+	primer_hijo_primer_hijo->segundo_hijo = NULL;
+
+	primer_hijo->esta_libre = true;
+	primer_hijo->padre = particion_bs;
+	primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	primer_hijo->primer_hijo = primer_hijo_primer_hijo;
+	primer_hijo->segundo_hijo = primer_hijo_segundo_hijo;
+
+	segundo_hijo->esta_libre = true;
+	segundo_hijo->padre = particion_bs;
+	segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	segundo_hijo->primer_hijo = NULL;
+	segundo_hijo->segundo_hijo = NULL;
+
+	particion_bs->primer_hijo = primer_hijo;
+	particion_bs->segundo_hijo = segundo_hijo;
+
+	liberar_hoja_segun_algoritmo_reemplazo();
+
+	CU_ASSERT_TRUE_FATAL(particion_bs->primer_hijo == NULL);
+	CU_ASSERT_TRUE_FATAL(particion_bs->segundo_hijo == NULL);
+
+	finalizar_memoria_cache();
+	destruir_broker_config(broker_config);
+}
+
 void test_agregar_mensaje_a_memoria_cache_bs() {
 	inicializar_test_bs();
 
@@ -469,6 +618,63 @@ void test_agregar_mensaje_a_memoria_cache_bs() {
 	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje, adm_mensaje);
 
 	CU_ASSERT_NOT_EQUAL_FATAL(particion_elegida, NULL);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida->esta_libre, false);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida->offset, 0);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida->adm_mensaje, adm_mensaje);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida->size_mensaje, mensaje->payload_size);
+	CU_ASSERT_TRUE_FATAL(particion_elegida->tamanio_particion >= mensaje->payload_size);
+
+	free(mensaje);
+	free(adm_mensaje);
+	finalizar_test_bs();
+}
+
+void test_agregar_mensaje_con_reemplazo_consolidacion_a_memoria_cache_bs() {
+	inicializar_test_bs();
+
+	particion_bs->tamanio_particion = 64;
+
+	t_adm_mensaje* adm_mensaje = malloc(sizeof(t_adm_mensaje));
+	t_particion_bs* particion_elegida = NULL;
+	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
+	mensaje->payload = "Mensaje para guardar en la memoria cache segun algoritmo BS";
+	mensaje->payload_size = strlen(mensaje->payload) + 1;
+
+	t_adm_mensaje* adm_mensaje1 = malloc(sizeof(t_adm_mensaje));
+	t_particion_bs* primer_hijo = malloc(sizeof(t_particion_bs));
+	t_particion_bs* segundo_hijo = malloc(sizeof(t_particion_bs));
+
+	adm_mensaje1->id_mensaje = 1;
+	adm_mensaje1->codigo_operacion = NEW_POKEMON;
+	adm_mensaje1->suscriptores_enviados = list_create();
+	adm_mensaje1->suscriptores_confirmados = list_create();
+
+	dictionary_put(administracion_por_id, "1", adm_mensaje1);
+
+	list_add(administradores[adm_mensaje1->codigo_operacion], adm_mensaje1);
+
+	primer_hijo->esta_libre = false;
+	primer_hijo->padre = particion_bs;
+	primer_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	primer_hijo->adm_mensaje = adm_mensaje1;
+	primer_hijo->primer_hijo = NULL;
+	primer_hijo->segundo_hijo = NULL;
+
+	segundo_hijo->esta_libre = true;
+	segundo_hijo->padre = particion_bs;
+	segundo_hijo->tamanio_particion = particion_bs->tamanio_particion / 2;
+	segundo_hijo->primer_hijo = NULL;
+	segundo_hijo->segundo_hijo = NULL;
+
+	particion_bs->primer_hijo = primer_hijo;
+	particion_bs->segundo_hijo = segundo_hijo;
+
+	particion_elegida = agregar_mensaje_memoria_cache_bs(mensaje, adm_mensaje);
+
+	CU_ASSERT_NOT_EQUAL_FATAL(particion_elegida, NULL);
+	CU_ASSERT_EQUAL_FATAL(particion_elegida, particion_bs);
+	CU_ASSERT_TRUE_FATAL(particion_elegida->primer_hijo == NULL);
+	CU_ASSERT_TRUE_FATAL(particion_elegida->segundo_hijo == NULL);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->esta_libre, false);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->offset, 0);
 	CU_ASSERT_EQUAL_FATAL(particion_elegida->adm_mensaje, adm_mensaje);
