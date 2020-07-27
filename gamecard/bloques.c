@@ -154,7 +154,6 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 				setear_bloque_ocupado(atoi(numero_de_bloque_disponible));
 				actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
 				escribir_buffer_en_bloque(sub_string_bloque, numero_de_bloque_disponible);
-				list_add(archivo->blocks, numero_de_bloque_disponible);
 			}
 			else {
 				printf("Error: No mas bloques disponibles\n");
