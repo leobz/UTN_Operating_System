@@ -20,7 +20,7 @@ char* crear_ruta(char* ruta) {
 char*ruta_bitmap(){
 	char* path_bitmap = string_new();
 	string_append(&path_bitmap,	"Metadata");
-	string_append(&path_bitmap, "/Bitmap.txt");
+	string_append(&path_bitmap, "/Bitmap.bin");
 	return crear_ruta(path_bitmap);
 }
 

@@ -44,6 +44,9 @@ typedef struct {
 	char* ip_gamecard;
 	char* puerto_gamecard;
 	int id_proceso;
+	int block_size;
+	int blocks;
+	char* magic_number;
 } t_gamecard_config;
 
 t_log* logger;
