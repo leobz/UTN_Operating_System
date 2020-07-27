@@ -22,7 +22,7 @@ sleep 0.5
 
 echo "Comprobacion: Se creo la carpeta Pikachu y su metadata indica que el tamaño es 7 bytes.\n"
 sleep 0.5
-cat ../tall_grass/Files/Pikachu/Metadata.txt
+cat ../tall_grass/Files/Pikachu/Metadata.bin
 
 
 
@@ -39,13 +39,45 @@ echo "\nEjecutando el script new_pokemons_varios.sh"
 
 echo "Comprobacion: El tamaño del archivo Pikachu se haya actualizado a 13 bytes.\n"
 sleep 0.5
-cat ../tall_grass/Files/Pikachu/Metadata.txt
+cat ../tall_grass/Files/Pikachu/Metadata.bin
+
+echo "\nComprobacion: Se creo la carpeta Charmander y su metadata indique
+ que posee dos bloques y su tamaño es 70 bytes\n"
+sleep 0.5
+cat ../tall_grass/Files/Charmander/Metadata.bin
+
+
+# PETICIONES catch_charmander.sh
+echo "\nEjecutar el script catch_charmander.sh"
+../gameboy/Debug/gameboy GAMECARD CATCH_POKEMON Charmander 413 17 1
+
+echo "Comprobacion: Verificar que el archivo Charmander ahora indique que posee
+solo un bloque y su tamaño es 61 bytes.\n"
+sleep 0.5
+cat ../tall_grass/Files/Charmander/Metadata.bin
+
+
+
+
+#COMPROBACION A NIVEL DE LINUX
+
+echo "\n\n  Comprobaciones a nivel FileSystem de Linux\n\n"
+echo "Verificar que ejecutando el script pikachu (una única sentencia), el file system cree  el archivo y asigne correctamente los bloques y bytes.
+Verificar que al realizar múltiples NEW sobre un mismo pokémon, el archivo crezca en tamaño de bloques.
+La asignación de bloques se realice correctamente.
+Verificar que al realizar catch se libere espacio en el archivo.
+Verificar que al liberar espacio suficiente, se liberen los bloques innecesarios\n"
+
+ls -l ../tall_grass/Blocks/
+
+
+
+# TEST BYEXAMPLE
+byexample -l shell gamecard-catedra-base.md
+
 
 # FINALIZACION
 
 echo "\n  Finalizando Gamecard"
-rm -r ../tall_grass/Files/*
-rm ../tall_grass/Blocks/*
 1>/dev/null 2>/dev/null sh mataProcesos.sh
-
 
