@@ -77,7 +77,7 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 
 char* ruta_blocks(char* numero_de_bloque) {
 	char* ruta_bloque = string_new();
-	string_append_with_format(&ruta_bloque, "Blocks/%s.txt",numero_de_bloque);
+	string_append_with_format(&ruta_bloque, "Blocks/%s.bin",numero_de_bloque);
 	return crear_ruta(ruta_bloque);
 }
 
@@ -112,8 +112,7 @@ int cantidad_de_bloques_necesarios(int size_buffer_de_guardado) {
 	return ceil(cantidad);
 }
 
-int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque) {
-
+int escribir_buffer_en_bloque(char* buffer, char* numero_de_bloque) {
 	char* ruta_bloque = ruta_blocks(numero_de_bloque);
 	FILE* file = fopen(ruta_bloque, "wb+");
 
@@ -139,6 +138,7 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 	int bloques_necesarios = cantidad_de_bloques_necesarios(size_buffer_de_guardado);
 	int offset = 0;
 	int i;
+
 	for (i = 0; i < bloques_necesarios; i++) {
 		char* sub_string_bloque = string_substring(buffer_de_guardado, offset, metadata->block_size);
 		offset += metadata->block_size;
@@ -163,8 +163,9 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 			}
 		}
 	}
+
 	while (list_size(archivo->blocks) > bloques_necesarios){ //Aca entrara cuando se tenga que eliminar un bloque
-		char*bloque_restante=list_remove(archivo->blocks, i);
+		char*bloque_restante = list_remove(archivo->blocks, i);
 		setear_bloque_libre(atoi(bloque_restante));
 		cerrar_bloque(bloque_restante);
 		actualizar_vector_de_bloques_en_metadata(archivo,pokemon);
@@ -174,14 +175,14 @@ int escribir_archivo(t_metadata_pokemon* archivo, char* buffer_de_guardado,char*
 }
 
 
-void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon*archivo,char*pokemonn){
+void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon* archivo, char* pokemonn){
 
-	char*vector_de_bloques=list_to_char_array(archivo->blocks);
+	char*vector_de_bloques = list_to_char_array(archivo->blocks);
 
-	char*path_pokemon=formar_archivo_pokemon(pokemonn);
-	char*path_absoluta=crear_ruta(path_pokemon);
+	char*path_pokemon = formar_archivo_pokemon(pokemonn);
+	char*path_absoluta = crear_ruta(path_pokemon);
 
-	t_config*pokemon_config=config_create(path_absoluta);
+	t_config*pokemon_config = config_create(path_absoluta);
 
 	config_set_value(pokemon_config,"BLOCKS",vector_de_bloques);
 	config_save(pokemon_config);
@@ -203,7 +204,7 @@ char* formar_archivo_pokemon(char*pokemonn){
 	char* path_archivo_pokemon = string_new();
 	string_append(&path_archivo_pokemon, "Files/");
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
-	string_append(&path_archivo_pokemon, "/Metadata.txt");
+	string_append(&path_archivo_pokemon, "/Metadata.bin");
 	return path_archivo_pokemon;
 }
 
@@ -222,7 +223,7 @@ void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon) 
 	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon));
 	char* buffer_pokemon = config_save_to_buffer(config_pokemon);
 	actualizar_tamanio_archivo(buffer_pokemon,pokemon);
-	escribir_archivo(metadata_pokemon, buffer_pokemon,pokemon);
+	escribir_archivo(metadata_pokemon, buffer_pokemon, pokemon);
 
 	free(metadata_pokemon);
 	free(buffer_pokemon);

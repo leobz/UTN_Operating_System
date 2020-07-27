@@ -231,7 +231,7 @@ char* crear_pokemon_metadata(char*pokemonn){
 	string_append_with_format(&path_archivo_pokemon, "%s",pokemonn);
 	char*path_completo=crear_ruta(path_archivo_pokemon);
 	mkdir(path_completo, 0777);
-	string_append(&path_completo, "/Metadata.txt");
+	string_append(&path_completo, "/Metadata.bin");
 
 	return path_completo;
 }
@@ -284,9 +284,9 @@ char* setear_archivo_abierto(char*pokemonn){
 }
 
 void cerrar_archivo(char* pokemonn){
-	char*path_pokemon=formar_archivo_pokemon(pokemonn);
-	char*path_absoluta=crear_ruta(path_pokemon);
-	t_config*pokemon_config=config_create(path_absoluta);
+	char*path_pokemon = formar_archivo_pokemon(pokemonn);
+	char*path_absoluta = crear_ruta(path_pokemon);
+	t_config* pokemon_config = config_create(path_absoluta);
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
@@ -294,10 +294,10 @@ void cerrar_archivo(char* pokemonn){
 }
 
 void agregar_posicion(t_mensaje_new*mensaje_new){
-	t_config* archivo_pokemon_config=leer_config_pokemon(mensaje_new->pokemon);
+	t_config* archivo_pokemon_config = leer_config_pokemon(mensaje_new->pokemon);
 
-	char*posx = string_itoa(mensaje_new->posx);
-	char*posy = string_itoa(mensaje_new->posy);
+	char* posx = string_itoa(mensaje_new->posx);
+	char* posy = string_itoa(mensaje_new->posy);
 
 	char* posicion_pokemonn = string_new();
 	string_append_with_format(&posicion_pokemonn, "%s",posx);
@@ -312,12 +312,12 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 	else{ //si es una nueva posicion
-		int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
-		cant_posiciones+=1;
-		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,cant_posiciones);
-		printf("Cant Posiciones: %d\n",dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon));
-		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(mensaje_new->cantidad));
-		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
+		int cant_posiciones = dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
+		cant_posiciones += 1;
+		dictionary_put(cantidad_posiciones_pokemon, mensaje_new->pokemon, cant_posiciones);
+		printf("Cant Posiciones: %d\n", dictionary_get(cantidad_posiciones_pokemon, mensaje_new->pokemon));
+		config_set_value(archivo_pokemon_config, posicion_pokemonn, string_itoa(mensaje_new->cantidad));
+		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
 	}
 }
 
