@@ -427,6 +427,24 @@ void procesar_mensaje_localized(t_paquete_socket* paquete) {
 	procesar_mensaje_appeared(paquete);
 }
 
+void destruir_datos_generados(char* id_correlativo, t_mensaje_appeared* mensaje_appeared) {
+	eliminar_mensaje_appeared(mensaje_appeared);
+	free(id_correlativo);
+}
+
+int existe_id_mensaje(t_paquete_socket* paquete) {
+	t_mensaje_appeared* mensaje_appeared =  deserializar_mensaje_appeared_pokemon(paquete->buffer);
+	char* id_correlativo = string_itoa(paquete->id_correlativo);
+
+	bool existe_id_mensaje = dictionary_get(enviaron_get, id_correlativo) == mensaje_appeared->pokemon;
+
+	if(existe_id_mensaje)
+		dictionary_remove_and_destroy(enviaron_get, id_correlativo, (void*) free);
+
+	destruir_datos_generados(id_correlativo, mensaje_appeared);
+	return existe_id_mensaje;
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
@@ -443,7 +461,8 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			break;
 
 		case LOCALIZED_POKEMON:
-			procesar_mensaje_localized(paquete);
+			if (existe_id_mensaje(paquete))
+				procesar_mensaje_localized(paquete);
 			break;
 
 		default:
