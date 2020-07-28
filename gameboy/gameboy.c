@@ -194,6 +194,40 @@ int main(int argc, char **argv) {
 
 		}
 
+		// ./gameboy BROKER LOCALIZED_POKEMON [POKEMON] [CANT_PARES_POSICIONES] [POSX] [POSY].. [ID_MENSAJE_CORRELATIVO]
+		if (strcmp(argv[2], "LOCALIZED_POKEMON") == 0) {
+			char *pokemon = argv[3];
+			int cantidad_de_posiciones = atoi(argv[4]);
+			t_posiciones posi[cantidad_de_posiciones];
+
+			int posicion_argumentos = 5;
+			for (int indice_par = 0; indice_par < cantidad_de_posiciones; indice_par++) {
+				posi[indice_par].posx = atoi(argv[posicion_argumentos]);
+				posicion_argumentos++;
+				posi[indice_par].posy = atoi(argv[posicion_argumentos]);
+				posicion_argumentos++;
+			}
+
+			int id_correlativo = atoi(argv[posicion_argumentos]);
+
+			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
+
+			if (conexion == -1) {
+				printf("ERROR: Conexion con [Broker] no estable1cida");
+				exit(-1);
+			}
+
+			log_info(logger, "Conexion establecida con [Broker]");
+
+			int bytes;
+			void* a_enviar = serializar_localized_pokemon(&bytes,pokemon,cantidad_de_posiciones,posi,0, id_correlativo);
+
+			enviar_mensaje(conexion, a_enviar, bytes);
+			recibir_id_correlativo(conexion);
+
+			liberar_conexion(conexion);
+		}
+
 	}
 
 	if (strcmp(argv[1], "TEAM") == 0) {

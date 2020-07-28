@@ -46,10 +46,13 @@ int main(int argc, char ** argv) {
 
 		int conexion_appeared = crear_conexion(ip, puerto);
 		int conexion_caught = crear_conexion(ip, puerto);
+		int conexion_localized = crear_conexion(ip, puerto);
 
 		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
 		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
+		iniciar_suscripcion(id_proceso, conexion_localized, LOCALIZED_POKEMON);
 
+		enviar_get_pokemon();
 
 		while (!team_cumplio_objetivo)
 			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);

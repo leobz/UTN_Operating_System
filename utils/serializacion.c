@@ -45,6 +45,11 @@ void eliminar_mensaje_get(t_mensaje_get* mensaje_get){
 	free(mensaje_get);
 }
 
+void eliminar_mensaje_localized(t_mensaje_localized* mensaje_localized) {
+	free(mensaje_localized->pokemon);
+	free(mensaje_localized);
+}
+
 
 // UTILIDADES
 void* serializar_paquete(t_paquete* paquete, int bytes) {
@@ -467,7 +472,7 @@ void* serializar_get_pokemon(int* bytes, char* nombre_pokemon,int id_mensaje,
 		int id_correlativo) {
 
 	t_buffer* buffer = buffer_get_pokemon(nombre_pokemon);
-	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer,id_mensaje, id_correlativo);
+	t_paquete *paquete = crear_paquete(GET_POKEMON, buffer, id_mensaje, id_correlativo);
 
 	*bytes = paquete->buffer->size + sizeof(int) * 4;
 	void* a_enviar = serializar_paquete(paquete, *bytes);
@@ -915,7 +920,8 @@ t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones
 	return buffer;
 }
 
-void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[],int id_mensaje, int id_correlativo) {
+void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,
+		t_posiciones pos[], int id_mensaje, int id_correlativo) {
 
 	t_buffer* buffer = buffer_localized_pokemon(nombre_pokemon, cantidad_posiciones,pos);
 	t_paquete *paquete = crear_paquete(LOCALIZED_POKEMON, buffer, id_mensaje,id_correlativo);

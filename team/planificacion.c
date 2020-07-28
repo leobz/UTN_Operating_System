@@ -23,6 +23,10 @@ void inicializar_diccionarios(t_team_config* team_config) {
 	inicializar_objetivo_global(team_config);
 	inicializar_pokemones_atrapados(team_config);
 	inicializar_pokemones_en_mapa();
+
+	enviaron_catch = dictionary_create();
+	enviaron_get = dictionary_create();
+
 	inicializar_pokemones_planificados();
 	inicializar_tcbs_enviaron_catch();
 }

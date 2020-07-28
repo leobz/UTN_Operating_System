@@ -205,6 +205,14 @@ void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
 			mensaje_appeared->posy);
 }
 
+void loggear_localized_recibido(t_mensaje_localized* mensaje_localized, int id_correlativo) {
+	log_info(logger, "[MSG_RECIBIDO] LOCALIZED_POKEMON: Pokemon:%s Cantidad:%d ID_Correlativo:%d",
+			mensaje_localized->pokemon,
+			mensaje_localized->cantidad_posiciones,
+			id_correlativo);
+}
+
+
 void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 	t_list* de_la_especie_en_mapa = dictionary_get(pokemones_en_mapa,
 			mensaje->pokemon);
@@ -352,12 +360,7 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 }
 
 
-void procesar_mensaje_appeared(t_paquete_socket* paquete) {
-	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
-	liberar_paquete_socket(paquete);
-
-	loggear_appeared_recibido(mensaje_appeared);
-
+void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
 
@@ -423,11 +426,59 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 
 }
 
+void procesar_mensaje_localized(t_paquete_socket* paquete) {
+	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
+	loggear_localized_recibido(mensaje_localized, paquete->id_correlativo);
+
+	liberar_paquete_socket(paquete);
+
+
+	for(int i = 0; i < mensaje_localized->cantidad_posiciones ; i++) {
+		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(mensaje_appeared));
+		mensaje_appeared->length_pokemon = mensaje_localized->length_pokemon;
+		mensaje_appeared->pokemon = strdup(mensaje_localized->pokemon);
+		mensaje_appeared->posx = mensaje_localized->pos[i].posx;
+		mensaje_appeared->posy = mensaje_localized->pos[i].posy;
+
+		procesar_mensaje_appeared(mensaje_appeared);
+	}
+
+	eliminar_mensaje_localized(mensaje_localized);
+}
+
+void destruir_datos_generados(char* id_correlativo, t_mensaje_localized* mensaje_localized) {
+	eliminar_mensaje_localized(mensaje_localized);
+	free(id_correlativo);
+}
+
+bool localized_tiene_id_valido(char* id_correlativo) {
+	return dictionary_has_key(enviaron_get, id_correlativo);
+}
+
+int localized_es_valido(t_paquete_socket* paquete) {
+	bool localized_valido = false;
+	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
+	char* id_correlativo = string_itoa(paquete->id_correlativo);
+
+	if (localized_tiene_id_valido(id_correlativo)) {
+		localized_valido = strcmp(dictionary_get(enviaron_get, id_correlativo), mensaje_localized->pokemon) == 0;
+
+		if(localized_valido)
+				dictionary_remove_and_destroy(enviaron_get, id_correlativo, (void*) free);
+	}
+
+	destruir_datos_generados(id_correlativo, mensaje_localized);
+	return localized_valido;
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
-		case APPEARED_POKEMON:
-			procesar_mensaje_appeared(paquete);
+		case APPEARED_POKEMON:;
+			t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+			liberar_paquete_socket(paquete);
+			loggear_appeared_recibido(mensaje_appeared);
+			procesar_mensaje_appeared(mensaje_appeared);
 			break;
 
 		case CONFIRMACION:
@@ -438,10 +489,58 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			procesar_mensaje_caught(paquete);
 			break;
 
+		case LOCALIZED_POKEMON:
+
+			if (localized_es_valido(paquete))
+				procesar_mensaje_localized(paquete);
+			break;
+
 		default:
 			pthread_exit(NULL);
 			break;
 	}
+}
+
+char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion) {
+	t_paquete_socket* paquete =  recibir_mensajes(conexion);
+
+	if (paquete->codigo_operacion == CONFIRMACION) {
+		int length = snprintf( NULL, 0, "%d", paquete->id_mensaje);
+		char* id_mensaje_char = malloc( length + 1 );
+		snprintf(id_mensaje_char, length + 1, "%d", paquete->id_mensaje);
+		log_info(logger, "[MSG_RECIBIDO] CONFIRMACION: %s Pokemon:%s ID_Correlativo:%s",
+				op_code_to_string(codigo_de_operacion), pokemon, id_mensaje_char);
+		return id_mensaje_char;
+	}
+	else
+		return NULL;
+}
+
+void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
+	if (id_mensaje != NULL){
+		dictionary_put(enviaron_get, id_mensaje, pokemon);
+	}
+}
+
+void enviar_get_pokemon() {
+	//TODO: inicializar id_mensaje = id_proceso * 10
+	void enviar_get(char* key_pokemon, void* value) {
+		int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
+
+		if (conexion != -1){
+			int bytes;
+			void *a_enviar = serializar_get_pokemon(&bytes, key_pokemon, 0, 0);
+			enviar_mensaje(conexion, a_enviar, bytes);
+			char* id_mensaje = recibir_id_mensaje(conexion, key_pokemon, GET_POKEMON);
+			agregar_a_enviaron_get(id_mensaje, key_pokemon);
+
+			liberar_conexion(conexion);
+			free(a_enviar);
+			free(id_mensaje);
+		}
+	}
+
+	dictionary_iterator(objetivo_global, (void*) enviar_get);
 }
 
 void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje) {

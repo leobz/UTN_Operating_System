@@ -13,6 +13,8 @@
 #include "test_appeared.h"
 #include "test_deadlock.h"
 #include "test_unblocked_a_ready.h"
+#include "test_localized.h"
+
 
 void correrTests();
 
