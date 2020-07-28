@@ -6,7 +6,7 @@ En este test demostramos:
 
 ### Suscripcion de TEAM a colas APPEARED y CAUGHT del broker
 
-1) Suscripcion automatica de Team a las colas APPEARED y CAUGHT del Broker
+1) Suscripcion automatica de Team a las 3 colas
 
 ### Normal ejecucion de TEAM para APPEARED
 
@@ -37,7 +37,7 @@ $ ../broker/Debug/broker &   # byexample: +fail-fast
 
 - - - - - - - - - - - - -
 
-## TEST 1: Suscripcion de TEAM a colas APPEARED y CAUGHT del broker
+## TEST 1: Suscripcion de TEAM a colas APPEARED, LOCALIZED y CAUGHT del broker
 
 Levanto Team en segundo plano
 
@@ -60,7 +60,13 @@ $ cat broker.log
 <...>[SUSCRIPCION] Cola:CAUGHT_POKEMON ID_Proceso:<...>
 ```
 
-## TEST 2: Normal ejecucion de TEAM para APPEARE
+Comprobación : Suscripcion automatica de Team a la cola LOCALIZED_POKEMON
+
+```bash
+$ cat broker.log
+<...>[SUSCRIPCION] Cola:LOCALIZED_POKEMON ID_Proceso:<...>
+```
+## TEST 2: Normal ejecucion de TEAM para APPEARED
 
 Envio de mensaje APPEARED de: Gameboy => Broker => Team
 

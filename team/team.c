@@ -455,33 +455,38 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 char* recibir_id_mensaje(int conexion) {
 	t_paquete_socket* paquete =  recibir_mensajes(conexion);
 
-	int length = snprintf( NULL, 0, "%d", paquete->id_mensaje);
-	char* id_mensaje_char = malloc( length + 1 );
-	snprintf(id_mensaje_char, length + 1, "%d", paquete->id_correlativo);
-
-	log_info(logger, "[MSG_RECIBIDO] ID_MENSAJE para GET:%s", id_mensaje_char);
-
-	return id_mensaje_char;
+	if (paquete->codigo_operacion == CONFIRMACION) {
+		int length = snprintf( NULL, 0, "%d", paquete->id_mensaje);
+		char* id_mensaje_char = malloc( length + 1 );
+		snprintf(id_mensaje_char, length + 1, "%d", paquete->id_mensaje);
+		log_info(logger, "[MSG_RECIBIDO] CONFIRMACION: ID Mensaje para GET: %s", id_mensaje_char);
+		return id_mensaje_char;
+	}
+	else
+		return NULL;
 }
 
 void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
-	dictionary_put(enviaron_get, id_mensaje, pokemon);
+	if (id_mensaje != NULL){
+		dictionary_put(enviaron_get, id_mensaje, pokemon);
+	}
 }
 
 void enviar_get_pokemon() {
 	//TODO: inicializar id_mensaje = id_proceso * 10
 	void enviar_get(char* key_pokemon, void* value) {
 		int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
+
 		if (conexion != -1){
 			int bytes;
 			void *a_enviar = serializar_get_pokemon(&bytes, key_pokemon, 0, 0);
-
 			enviar_mensaje(conexion, a_enviar, bytes);
-
 			char* id_mensaje = recibir_id_mensaje(conexion);
 			agregar_a_enviaron_get(id_mensaje, key_pokemon);
 
 			liberar_conexion(conexion);
+			free(a_enviar);
+			free(id_mensaje);
 		}
 	}
 
