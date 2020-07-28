@@ -150,8 +150,10 @@ void destruir_posicion(t_posicion* posicion);
 void procesar_mensaje_recibido(t_paquete_socket* paquete);
 void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
+char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion);
 
 int localized_es_valido(t_paquete_socket*);
+t_list* transformar_localized_en_appeareds(t_mensaje_localized* mensaje_localized);
 
 
 // CONFIG

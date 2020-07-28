@@ -66,8 +66,8 @@ Envio de Confirmacion de GET: Broker => Team
 
 ```bash
 $ sleep 1; cat team.log    # byexample: +timeout=10 +fail-fast
-<...>CONFIRMACION: ID Mensaje para GET Squirtle: <ID-MSJ-SQUIRTLE>
-<...>CONFIRMACION: ID Mensaje para GET Pikachu: <...>
+<...>CONFIRMACION: GET_POKEMON Pokemon:Squirtle ID_Correlativo:<ID-MSJ-SQUIRTLE>
+<...>CONFIRMACION: GET_POKEMON Pokemon:Pikachu ID_Correlativo:<...>
 ```
 
 -------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ La ultima linea de team.log **no indica** que hubo procesamiento posterior al te
 
 ```bash
 $ sleep 1; tail -1 team.log    # byexample: +timeout=10 +fail-fast
-<...>CONFIRMACION: ID Mensaje para GET Pikachu: <...>
+<...>CONFIRMACION: GET_POKEMON Pokemon:Pikachu ID_Correlativo:<...>
 ```
 
 -------------------------------------------------------------------------------------
@@ -160,6 +160,7 @@ $ sleep 1; cat team.log    # byexample: +timeout=10 +paste
 Cierro broker, gameboy suscriptor y team (De otro modo los puertos quedan sin poder usarse)
 
 ```bash
-$ 1>/dev/null 2>/dev/null sh mataProcesos      # byexample: +timeout=20 +norm-ws  -skip
-<...>
+$ rm *.log; kill <broker-pid> ; kill <team-pid>; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
+<...>Term<...>
+<...>Term<...>
 ```

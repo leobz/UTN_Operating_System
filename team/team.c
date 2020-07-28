@@ -501,14 +501,15 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 	}
 }
 
-char* recibir_id_mensaje(int conexion, char* pokemon) {
+char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion) {
 	t_paquete_socket* paquete =  recibir_mensajes(conexion);
 
 	if (paquete->codigo_operacion == CONFIRMACION) {
 		int length = snprintf( NULL, 0, "%d", paquete->id_mensaje);
 		char* id_mensaje_char = malloc( length + 1 );
 		snprintf(id_mensaje_char, length + 1, "%d", paquete->id_mensaje);
-		log_info(logger, "[MSG_RECIBIDO] CONFIRMACION: ID Mensaje para GET %s: %s", pokemon, id_mensaje_char);
+		log_info(logger, "[MSG_RECIBIDO] CONFIRMACION: %s Pokemon:%s ID_Correlativo:%s",
+				op_code_to_string(codigo_de_operacion), pokemon, id_mensaje_char);
 		return id_mensaje_char;
 	}
 	else
@@ -530,7 +531,7 @@ void enviar_get_pokemon() {
 			int bytes;
 			void *a_enviar = serializar_get_pokemon(&bytes, key_pokemon, 0, 0);
 			enviar_mensaje(conexion, a_enviar, bytes);
-			char* id_mensaje = recibir_id_mensaje(conexion, key_pokemon);
+			char* id_mensaje = recibir_id_mensaje(conexion, key_pokemon, GET_POKEMON);
 			agregar_a_enviaron_get(id_mensaje, key_pokemon);
 
 			liberar_conexion(conexion);
