@@ -205,6 +205,13 @@ void loggear_appeared_recibido(t_mensaje_appeared* mensaje_appeared) {
 			mensaje_appeared->posy);
 }
 
+void loggear_localized_recibido(t_mensaje_localized* mensaje_localized) {
+	log_info(logger, "[MSG_RECIBIDO] LOCALIZED_POKEMON: %s Cantidad: %d",
+			mensaje_localized->pokemon,
+			mensaje_localized->cantidad_posiciones);
+}
+
+
 void imprimir_pokemon_agregado(t_mensaje_appeared* mensaje) {
 	t_list* de_la_especie_en_mapa = dictionary_get(pokemones_en_mapa,
 			mensaje->pokemon);
@@ -352,12 +359,7 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 }
 
 
-void procesar_mensaje_appeared(t_paquete_socket* paquete) {
-	t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
-	liberar_paquete_socket(paquete);
-
-	loggear_appeared_recibido(mensaje_appeared);
-
+void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
 
@@ -424,7 +426,22 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 }
 
 void procesar_mensaje_localized(t_paquete_socket* paquete) {
-	procesar_mensaje_appeared(paquete);
+	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
+	liberar_paquete_socket(paquete);
+
+	loggear_localized_recibido(mensaje_localized);
+
+	for(int i = 0; i < mensaje_localized->cantidad_posiciones ; i++) {
+		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(mensaje_appeared));
+		mensaje_appeared->length_pokemon = mensaje_localized->length_pokemon;
+		mensaje_appeared->pokemon = strdup(mensaje_localized->pokemon);
+		mensaje_appeared->posx = mensaje_localized->pos[i].posx;
+		mensaje_appeared->posx = mensaje_localized->pos[i].posy;
+
+		procesar_mensaje_appeared(mensaje_appeared);
+	}
+
+	eliminar_mensaje_localized(mensaje_localized);
 }
 
 void destruir_datos_generados(char* id_correlativo, t_mensaje_appeared* mensaje_appeared) {
@@ -448,8 +465,11 @@ int existe_id_mensaje(t_paquete_socket* paquete) {
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 	switch(paquete->codigo_operacion) {
-		case APPEARED_POKEMON:
-			procesar_mensaje_appeared(paquete);
+		case APPEARED_POKEMON:;
+			t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+			liberar_paquete_socket(paquete);
+			loggear_appeared_recibido(mensaje_appeared);
+			procesar_mensaje_appeared(mensaje_appeared);
 			break;
 
 		case CONFIRMACION:
