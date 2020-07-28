@@ -207,7 +207,7 @@ t_particion_bs* agregar_mensaje_memoria_cache_bs_barra_cero(t_mensaje* mensaje, 
 int obtener_tamanio_particion_necesaria (int tamanio_mensaje) {
 	int tamanio_particion_necesaria = 2;
 
-	while (tamanio_particion_necesaria < tamanio_mensaje) {
+	while (tamanio_particion_necesaria < broker_config->tamanio_minimo_particion || tamanio_particion_necesaria < tamanio_mensaje) {
 		tamanio_particion_necesaria *= 2;
 	}
 
@@ -477,19 +477,30 @@ void agregar_contenido_bs_archivo_dump(FILE* archivo_dump, t_list* hojas_partici
 
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje,t_adm_mensaje* adm) {
 	void* payload = mensaje->payload;
-	int size = mensaje->payload_size;
+	int size = obtener_particion_minima_suficiente(mensaje->payload_size, mensaje->codigo_operacion);
 
 	return guardar_payload_en_particion_dinamica_con_adm(payload, size,adm);
 }
 
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(t_mensaje* mensaje, t_adm_mensaje* admin) {
 
-	int size=mensaje->payload_size;
+	int size=obtener_particion_minima_suficiente(mensaje->payload_size, mensaje->codigo_operacion);
 
 	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
 
 
 	return guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+}
+
+int obtener_particion_minima_suficiente(int tamanio_mensaje, op_code cod_op) {
+	if (tamanio_mensaje > broker_config->tamanio_minimo_particion)
+		return tamanio_mensaje;
+	else {
+		if (cod_op == CAUGHT_POKEMON)
+			return broker_config->tamanio_minimo_particion;
+		else
+			return broker_config->tamanio_minimo_particion + 1;
+	}
 }
 
 void* leer_particion_dinamica(t_particion_dinamica* particion){
@@ -599,22 +610,20 @@ void crear_particion_intermedia(t_particion_dinamica* particion_ocupada){
 	int tamanio_intermedio;
 	int offset_intermedio;
 
-
 	siguiente_particion = particion_ocupada->siguiente_particion;
 	particion_intermedia=NULL;
 
 	if (siguiente_particion != NULL){
 		tamanio_intermedio = calcular_tamanio_particion_intermedia(particion_ocupada, siguiente_particion);
 	}
-
 	else{
 		tamanio_intermedio = broker_config->tamanio_memoria - (particion_ocupada->offset + particion_ocupada->tamanio_particion);
 	}
 
 	offset_intermedio = particion_ocupada->offset + particion_ocupada->tamanio_particion;
 
-	//printf("Offset restante %d\n",offset_intermedio);
-	//printf("Tamanio restante %d\n",tamanio_intermedio);
+//	printf("Offset restante %d\n",offset_intermedio);
+//	printf("Tamanio restante %d\n",tamanio_intermedio);
 
 	//verificar que el tamaño de a particion sea mayor que el minimo dado en el archivo de config
 	if(tamanio_intermedio>=broker_config->tamanio_minimo_particion){
@@ -655,18 +664,18 @@ void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 }
 
 void liberar_particion_dinamica(t_particion_dinamica* particion_victima){
-		t_adm_mensaje* adm_mensaje = particion_victima->adm_mensaje;
+	t_adm_mensaje* adm_mensaje = particion_victima->adm_mensaje;
 
-		eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
+	eliminar_adm_mensaje_particion_en_diccionarios(adm_mensaje);
 
-		particion_victima->esta_libre = true;
-		particion_victima->adm_mensaje = NULL;
+	particion_victima->esta_libre = true;
+	particion_victima->adm_mensaje = NULL;
 
+	log_info(logger,"[PARTICIONES DINAMICAS] Eliminación de partición con posición de inicio: %d", particion_victima->offset);
 }
 
 
 void unir_particiones_dinamicas_libres(){
-
 
 	t_list* particiones_libres=obtener_particiones_dinamicas_libres();
 
@@ -675,21 +684,20 @@ void unir_particiones_dinamicas_libres(){
 	void unir_libres(t_particion_dinamica* dinamica){
 
 		if(dinamica->siguiente_particion!=NULL){
+			if(dinamica->siguiente_particion->esta_libre){
 
+				int counter=dinamica->orden_creacion;
+				dinamica->siguiente_particion->tamanio_particion+=dinamica->tamanio_particion;
+				dinamica->siguiente_particion->offset=dinamica->offset;
 
-		if(dinamica->siguiente_particion->esta_libre){
+				bool tiene_mismo_orden_creacion(t_particion_dinamica* particion_din){
+						return particion_din->orden_creacion== counter;
+					}
 
+				list_remove_by_condition(particiones_dinamicas, (void*)tiene_mismo_orden_creacion);
 
-			int counter=dinamica->orden_creacion;
-			dinamica->siguiente_particion->tamanio_particion+=dinamica->tamanio_particion;
-			dinamica->siguiente_particion->offset=dinamica->offset;
+				free(dinamica);
 
-			bool tiene_mismo_orden_creacion(t_particion_dinamica* particion_din){
-					return particion_din->orden_creacion== counter;
-				}
-
-			list_remove_by_condition(particiones_dinamicas, (void*)tiene_mismo_orden_creacion);
-			free(dinamica);
 			}
 		}
 	}
@@ -699,6 +707,8 @@ void unir_particiones_dinamicas_libres(){
 }
 
 void compactar_particiones_dinamicas(){
+
+	log_info(logger,"[PARTICIONES DINAMICAS] Compactación de particiones");
 
 	//printf("Entro a compactar\n");
 	int offset_hueco=0;
@@ -823,7 +833,6 @@ void generar_archivo_dump_particion_dinamica() {
 	archivo_dump = fopen("dump_cache.txt", "a+");
 
 	if (archivo_dump != NULL){
-		t_list* hojas_particion_bs = list_create();
 
 		fputs("---------------------------------------------------------------------------------------------------------------------------------------\n", archivo_dump);
 		fprintf(archivo_dump, "Dump:\t\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t\t%s\n", fecha_actual, hora_actual);
@@ -849,6 +858,8 @@ void agregar_contenido_particion_dinamica_archivo_dump(FILE* archivo_dump){
 			return 'X';
 	}
 
+	list_sort(particiones_dinamicas, (void*)pd_es_menor_offset);
+
 	void escribir_archivo_dump(t_particion_dinamica* particion){
 
 		if (particion->esta_libre)
@@ -856,21 +867,16 @@ void agregar_contenido_particion_dinamica_archivo_dump(FILE* archivo_dump){
 						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
 						particion->tamanio_particion);
 		else
-			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\n",
-									i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
-									particion->tamanio_particion);
-//			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\t\tLRU:%d\t\tCola:%d\t\tID:%d\n",
-//						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
-//						particion->tamanio_particion, particion->contador_uso, particion->adm_mensaje->codigo_operacion,
-//						particion->id);
+			fprintf(archivo_dump, "Partición %d: 0x%03x - 0x%03x.\t\t[%c]\t\tSize: %d b\t\tLRU:%d\t\tCola:%d\t\tID:%d\n",
+						i, particion->offset, particion->offset + particion->tamanio_particion - 1, obtener_caracter_libre(particion),
+						particion->tamanio_particion, particion->contador_uso, particion->adm_mensaje->codigo_operacion,
+						particion->orden_creacion);
 
 		/*
 		 * TODO: Agregar los siguientes campos en el struct 't_particion_dinamica'
-		 * - contador_uso (o similar): usado en algoritmo LRU
-		 * - adm_mensaje
 		 * - id: correspondiente a la particion
 		 *
-		 * Una vez agregados, eliminar el codigo del 'else' y usar el codigo comentado
+		 * Una vez agregado, cambiarlo en el codigo del else
 		*/
 
 		i++;

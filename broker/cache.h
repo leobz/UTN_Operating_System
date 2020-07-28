@@ -99,6 +99,7 @@ void agregar_contenido_bs_archivo_dump(FILE* archivo_dump, t_list* hojas_partici
 // ********************************** FUNCIONES PARTICIONES DINAMICAS ********************************** //
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica(t_mensaje* mensaje,t_adm_mensaje*);
 t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(t_mensaje* mensaje, t_adm_mensaje* admin);
+int obtener_particion_minima_suficiente(int, op_code);
 t_particion_dinamica* buscar_particion_dinamica_libre(int);
 t_list* obtener_particiones_dinamicas_libres();
 t_particion_dinamica* crear_particion_dinamica(int, int);

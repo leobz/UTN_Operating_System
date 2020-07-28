@@ -11,7 +11,3 @@ echo
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Muk 4 5
 ../gameboy/Debug/gameboy SUSCRIPCION NEW_POKEMON 10 1
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Charmander 4 5
-
-echo
-echo Restaurando configuracion inicial
-cp broker.config broker.config.buddy.system; rm broker.config; cp broker.config.auxiliar broker.config; rm broker.config.auxiliar
