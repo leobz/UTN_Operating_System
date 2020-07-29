@@ -369,6 +369,7 @@ void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 		pthread_mutex_unlock(&mutex_lista_new);
 
 	}
+	eliminar_mensaje_appeared(mensaje_appeared);
 }
 
 void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_correlativo) {
@@ -653,7 +654,7 @@ void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje){
 	list_iterate(new, elegir_entrenador_cercano_ready);
 
 	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
-	pokemon->pokemon = mensaje->pokemon;
+	pokemon->pokemon = strdup(mensaje->pokemon);
 	pokemon->posicion = posicion_pokemon;
 
 	t_tcb_entrenador* entrenador_cercano =

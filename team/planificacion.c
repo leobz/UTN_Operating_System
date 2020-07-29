@@ -24,7 +24,6 @@ void inicializar_diccionarios(t_team_config* team_config) {
 	inicializar_pokemones_atrapados(team_config);
 	inicializar_pokemones_en_mapa();
 
-	enviaron_catch = dictionary_create();
 	enviaron_get = dictionary_create();
 
 	inicializar_pokemones_planificados();
@@ -521,7 +520,9 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
-			pasar_a_ready_to_exchange(tcb, string_maximo_permitido(tcb));
+			char* motivo_maximo_permitido = string_maximo_permitido(tcb);
+			pasar_a_ready_to_exchange(tcb, motivo_maximo_permitido);
+			free(motivo_maximo_permitido);
 		}
 	} else {
 		pasar_a_unblocked(tcb);
