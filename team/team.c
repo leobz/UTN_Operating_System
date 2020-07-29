@@ -187,7 +187,11 @@ t_list* obtener_lista_posiciones_by_pokemon_requerido(char* pokemon) {
 
 void destruir_posicion(t_posicion* posicion) {
 	free(posicion);
+}
 
+void destruir_pokemon(t_pokemon* pokemon) {
+	free(pokemon->posicion);
+	free(pokemon);
 }
 
 void destruir_lista_posiciones(t_list* posiciones) {
@@ -316,6 +320,9 @@ t_pokemon* obtener_pokemon_mas_cercano(t_tcb_entrenador* tcb) {
 
 	printf("Tamaño de lista de pokemones cercanos : %d \n", list_size(lista_pokemones_cercanos));
 	list_iterate(lista_pokemones_cercanos, el_pokemon_mas_cercano);
+
+	list_remove_element(lista_pokemones_cercanos, pokemon_mas_cercano);
+	list_destroy_and_destroy_elements(lista_pokemones_cercanos, destruir_pokemon);
 
 	return pokemon_mas_cercano;
 
