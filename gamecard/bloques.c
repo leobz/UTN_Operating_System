@@ -17,6 +17,7 @@ t_config *cargar_config_desde_buffer(char* un_buffer) {
 	t_config *config = malloc(sizeof(t_config));
 
 	config->properties = dictionary_create();
+	config->path = malloc(1);
 
 	char* buffer = strdup(un_buffer);
 
@@ -66,11 +67,15 @@ char* archivo_a_string(char* ruta_absoluta) {
 t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo) {
 	t_metadata_pokemon* archivo = malloc(sizeof(t_metadata_pokemon));
 
-	t_bloque* bloque_metadata_archivo = config_create(crear_ruta(ruta_al_metadata_bin_del_archivo));
+	char* ruta = crear_ruta(ruta_al_metadata_bin_del_archivo);
+	t_bloque* bloque_metadata_archivo = config_create(ruta);
 	archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
 	archivo->blocks = strings_to_list(config_get_array_value(bloque_metadata_archivo, "BLOCKS"));
 	archivo->open = config_get_string_value(bloque_metadata_archivo, "OPEN");
 	archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
+
+	free(ruta);
+	config_destroy(bloque_metadata_archivo);
 
 	return archivo;
 }

@@ -31,6 +31,8 @@ void modificar_bit(t_bitarray*bitmap,bool valor,int bit){
 
 	else   //si esta ocupado ese bloque
 		bitarray_clean_bit(bitmap, bit);
+	free(bitmap->bitarray);
+	free(bitmap);
 }
 
 
@@ -47,7 +49,8 @@ void actualizar_archivo_bitmap(t_bitarray*bitmap) {
 	fwrite(bitmap->bitarray, sizeof(char), bitmap->size, bitmap_file);
 
 	fclose(bitmap_file);
-	bitarray_destroy(bitmap);
+	free(bitmap);
+	free(bitmap->bitarray);
 }
 
 

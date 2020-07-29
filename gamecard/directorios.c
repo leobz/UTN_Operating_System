@@ -319,6 +319,7 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		config_set_value(archivo_pokemon_config, posicion_pokemonn, string_itoa(mensaje_new->cantidad));
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
 	}
+	config_destroy(archivo_pokemon_config);
 }
 
 t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
