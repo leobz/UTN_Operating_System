@@ -42,6 +42,7 @@ void inicializar_hilos_tcbs() {
 }
 
 void iniciar_planificador() {
+	finalizo_planificador = false;
 	inicializar_hilos_tcbs();
 	pthread_create(&planificador, NULL, (void*) planificar, NULL);
 	pthread_detach(planificador);
@@ -68,8 +69,18 @@ void planificar() {
 
 	while (1) {
 		pthread_mutex_lock(&mutex_planificador);
+
+		if(finalizo_planificador){
+			break;
+		}
+
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
+
+			if(finalizo_planificador){
+				break;
+			}
+
 
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			pasar_a_exec(tcb_exec);
@@ -604,6 +615,13 @@ void finalizar_hilo_tcb(t_tcb_entrenador* tcb) {
 	sem_post(tcb->semaforo);
 }
 
+void finalizar_hilo_planificador() {
+	finalizo_planificador = true;
+	pthread_mutex_unlock(&mutex_planificador);
+	pthread_mutex_unlock(&mutex_tcb_exec);
+
+}
+
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
 	finalizar_hilo_tcb(tcb);
@@ -631,6 +649,7 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 		log_info(logger, "[METRICAS] Cantidad de deadlocks resueltos: %d", metricas->cantidad_deadlocks_resueltos);
 
 		team_cumplio_objetivo = true;
+		finalizar_hilo_planificador();
 		finalizar_team(team_config);
 	}
 
