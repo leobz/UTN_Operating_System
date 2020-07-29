@@ -156,6 +156,7 @@ void crear_tcb_entrenadores(t_team_config* team_config) {
 		entrenador->estimacion_remanente = team_config->estimacion_inicial;
 		entrenador->necesita_nueva_estimacion = true;
 		entrenador->les_puede_dar = list_create();
+		entrenador->finalizo = false;
 
 		dictionary_put(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(entrenador->tid), 0);
 

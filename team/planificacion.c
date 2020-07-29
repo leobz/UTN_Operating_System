@@ -34,6 +34,7 @@ void inicializar_hilos_tcbs() {
 	void cargar_semaforo_y_thread_al_tcb(t_tcb_entrenador* entrenador) {
 		pthread_t thread_tcb;
 		pthread_create(&thread_tcb, NULL, (void*)ejecutar_tcb, entrenador);
+		pthread_detach(thread_tcb);
 		entrenador->entrenador = &thread_tcb;
 	}
 
@@ -223,6 +224,10 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	while(true){
 		sem_wait(tcb->semaforo);
 
+		if (tcb->finalizo) {
+			break;
+		}
+
 		printf("TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
 		printf("Posicion del TCB: %d ->(%d, %d)\n", tcb->tid, tcb->posicion->x, tcb->posicion->y);
 
@@ -249,7 +254,6 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 		pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(tcb);
 
 		pthread_mutex_unlock(&mutex_tcb_exec);
-
 	}
 }
 
@@ -595,8 +599,14 @@ void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pthread_mutex_unlock(&mutex_planificador);
 }
 
+void finalizar_hilo_tcb(t_tcb_entrenador* tcb) {
+	tcb->finalizo = true;
+	sem_post(tcb->semaforo);
+}
+
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	finalizar_hilo_tcb(tcb);
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");

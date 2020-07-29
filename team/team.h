@@ -110,6 +110,7 @@ typedef struct t_tcb{
 	bool necesita_nueva_estimacion;
 	struct t_list* les_puede_dar;
 	int nivel_de_grafo_en_deadlock;
+	bool finalizo;
 }t_tcb_entrenador;
 
 typedef struct {
