@@ -202,6 +202,7 @@ void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn){
 	config_set_value(pokemon_config,"SIZE",string_itoa(space));
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_absoluta);
 }
 
 char* formar_archivo_pokemon(char*pokemonn){

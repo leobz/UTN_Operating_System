@@ -13,6 +13,7 @@ char* crear_ruta(char* ruta) {
 	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_ruta_absoluta, "/");
 	string_append(&path_ruta_absoluta, ruta);
+	free(ruta);
 
 	return path_ruta_absoluta;
 }

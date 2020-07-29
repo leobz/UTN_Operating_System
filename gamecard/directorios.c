@@ -280,6 +280,7 @@ char* setear_archivo_abierto(char*pokemonn){
 	config_set_value(pokemon_config, "OPEN","Y");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_absoluta);
 	return path_pokemon;
 }
 
@@ -290,6 +291,7 @@ void cerrar_archivo(char* pokemonn){
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_absoluta);
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
