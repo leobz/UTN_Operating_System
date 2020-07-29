@@ -281,10 +281,10 @@ t_pokemon* obtener_pokemon_mas_cercano(t_tcb_entrenador* tcb) {
 
 			t_pokemon* pokemon_cercano = malloc(sizeof(t_pokemon));
 			pokemon_cercano->pokemon = strdup(pokemon);
-//			pokemon_cercano->posicion = malloc(sizeof(t_posicion));
-//			pokemon_cercano->posicion->x = posicion_mas_cercana->x;
-//			pokemon_cercano->posicion->y = posicion_mas_cercana->y;
-			pokemon_cercano->posicion = posicion_mas_cercana;
+			pokemon_cercano->posicion = malloc(sizeof(t_posicion));
+			pokemon_cercano->posicion->x = posicion_mas_cercana->x;
+			pokemon_cercano->posicion->y = posicion_mas_cercana->y;
+//			pokemon_cercano->posicion = posicion_mas_cercana;
 
 			list_add(lista_pokemones_cercanos, pokemon_cercano);
 		}
