@@ -25,7 +25,7 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 			team_config->objetivos_entrenadores);
 	team_config->tiempoDeReconexion = config_get_int_value(config,
 			"TIEMPO_RECONEXION");
-	team_config->retardo_ciclo_cpu = config_get_int_value(config,
+	team_config->retardo_ciclo_cpu = config_get_double_value(config,
 			"RETARDO_CICLO_CPU");
 	team_config->algoritmo_de_planificacion = strdup(
 			config_get_string_value(config, "ALGORITMO_PLANIFICACION"));

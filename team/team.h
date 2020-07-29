@@ -73,7 +73,7 @@ typedef struct{
 	t_list* objetivos_entrenadores;
 	int cantidad_entrenadores;
 	int tiempoDeReconexion;
-	int retardo_ciclo_cpu;
+	double retardo_ciclo_cpu;
 	char *algoritmo_de_planificacion;
 	int quantum;
 	double alpha;
