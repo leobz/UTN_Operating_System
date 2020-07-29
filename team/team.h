@@ -20,6 +20,7 @@ bool team_cumplio_objetivo;
 
 pthread_mutex_t mutex_planificador;
 pthread_mutex_t mutex_lista_new;
+pthread_mutex_t mutex_mapa;
 
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;

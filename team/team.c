@@ -173,8 +173,7 @@ void destruir_objetivo_global() {
 	dictionary_destroy(objetivo_global);
 }
 
-void agregar_pokemon_a_mapa(char* pokemon,
-		t_list* lista_posiciones) {
+void agregar_pokemon_a_mapa(char* pokemon, t_list* lista_posiciones) {
 	dictionary_put(pokemones_en_mapa, pokemon, lista_posiciones);
 }
 
@@ -282,6 +281,9 @@ t_pokemon* obtener_pokemon_mas_cercano(t_tcb_entrenador* tcb) {
 
 			t_pokemon* pokemon_cercano = malloc(sizeof(t_pokemon));
 			pokemon_cercano->pokemon = strdup(pokemon);
+//			pokemon_cercano->posicion = malloc(sizeof(t_posicion));
+//			pokemon_cercano->posicion->x = posicion_mas_cercana->x;
+//			pokemon_cercano->posicion->y = posicion_mas_cercana->y;
 			pokemon_cercano->posicion = posicion_mas_cercana;
 
 			list_add(lista_pokemones_cercanos, pokemon_cercano);
@@ -330,6 +332,7 @@ void despachar_entrenador_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
 }
 
 void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
+	pthread_mutex_lock(&mutex_mapa);
 	t_pokemon* pokemon = obtener_pokemon_mas_cercano(tcb);
 
 	if (pokemon!= NULL) {
@@ -345,10 +348,15 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 				tcb->tid, tcb->pokemon_a_capturar->pokemon,
 				tcb->pokemon_a_capturar->posicion->x, tcb->pokemon_a_capturar->posicion->y);
 
-		pasar_a_ready(tcb, string_motivo_captura(pokemon));
+
+		char* motivo = string_motivo_captura(pokemon);
+		pasar_a_ready(tcb, motivo);
+		free(motivo);
 		list_remove_element(new, tcb);
 		list_remove_element(unblocked, tcb);
 	}
+	pthread_mutex_unlock(&mutex_mapa);
+
 //	if (planificacion_del_pokemon_no_esta_cubierta(mensaje_appeared->pokemon)){
 //		dictionary_increment_value(pokemones_planificados, mensaje_appeared->pokemon);
 //		pasar_entrenador_a_ready_segun_cercania(mensaje_appeared);
@@ -358,13 +366,19 @@ void pasar_tcb_a_ready_si_hay_pokemones_en_mapa(t_tcb_entrenador* tcb) {
 
 
 void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
+	pthread_mutex_lock(&mutex_mapa);
 	if (existe_pokemon_en_objetivo_global(mensaje_appeared->pokemon)) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
+		pthread_mutex_unlock(&mutex_mapa);
+
 
 		pthread_mutex_lock(&mutex_lista_new);
 		pasar_a_ready_si_corresponde(mensaje_appeared);
 		pthread_mutex_unlock(&mutex_lista_new);
 
+	}
+	else {
+		pthread_mutex_unlock(&mutex_mapa);
 	}
 	eliminar_mensaje_appeared(mensaje_appeared);
 }
@@ -548,8 +562,7 @@ void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje) {
 	t_list* lista_posiciones;
 
 	if (existe_pokemon_en_mapa(mensaje->pokemon))
-		lista_posiciones = obtener_lista_posiciones_by_pokemon_requerido(
-				mensaje->pokemon);
+		lista_posiciones = obtener_lista_posiciones_by_pokemon_requerido(mensaje->pokemon);
 	else
 		lista_posiciones = list_create();
 

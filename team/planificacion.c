@@ -17,6 +17,8 @@ void inicializar_listas() {
 	pthread_mutex_init(&mutex_planificador, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
+	pthread_mutex_init(&mutex_mapa, NULL);
+
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -319,7 +321,9 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 	}
 
 	metricas->cantidad_ciclos_CPU_totales += cantidad_ciclos_instruccion;
-	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(tcb->tid), cantidad_ciclos_instruccion);
+	char* tid = pasar_a_char(tcb->tid);
+	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, tid, cantidad_ciclos_instruccion);
+	free(tid);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -702,10 +706,12 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	t_tcb_entrenador* tcb_a_intercambiar = list_get(lista_deadlock,list_size(lista_deadlock)-1);
 
 	t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
-	t_list* necesita_anterior =pokemones_necesitados(tcb_anterior);
+	t_list* necesita_actual =  pokemones_necesitados(tcb_actual);
+	t_list* necesita_anterior = pokemones_necesitados(tcb_anterior);
+	t_list* no_necesita_a_intercambiar = pokemones_no_necesitados(tcb_a_intercambiar);
 
 	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection_strings(no_necesita_actual, necesita_anterior);
-	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
+	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(no_necesita_a_intercambiar, necesita_actual);
 
 	tcb_actual->entrenador_a_intercambiar = tcb_a_intercambiar;
 	tcb_actual->pokemon_a_dar_en_intercambio = list_pop_first(tcb_actual_pokemones_a_intercambiar);
@@ -719,7 +725,13 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	list_destroy_and_destroy_elements(tcb_actual_pokemones_a_intercambiar, (void *)free);
 	list_destroy_and_destroy_elements(tcb_a_intercambiar_pokemones_a_intercambiar, (void *)free);
 	list_destroy_and_destroy_elements(no_necesita_actual, (void *)free);
+	list_destroy_and_destroy_elements(necesita_actual, (void *)free);
 	list_destroy_and_destroy_elements(necesita_anterior, (void *)free);
+	list_destroy_and_destroy_elements(no_necesita_a_intercambiar, (void *)free);
+
+
+
+
 
 	return deadlock;
 }
