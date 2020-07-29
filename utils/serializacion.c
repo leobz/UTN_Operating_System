@@ -348,6 +348,8 @@ t_mensaje_new* deserializar_payload_new_pokemon_con_barra(void*payload) {
 		offset += sizeof(int);
 	memcpy(&(mensaje_new->cantidad), payload + offset, sizeof(int));
 
+	free(payload);
+
 	return mensaje_new;
 }
 
@@ -385,6 +387,8 @@ t_mensaje_new* deserializar_paquete_new_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_new->cantidad), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_new;
 }
@@ -509,14 +513,15 @@ t_mensaje_get* deserializar_paquete_get_pokemon(void* package) {
 	memcpy(&(size), package + offset, sizeof(int));
 	offset += sizeof(int);
 
-	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(
-			sizeof(t_mensaje_get));
+	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(sizeof(t_mensaje_get));
 
 	memcpy(&(mensaje_get->length_pokemon), package + offset, sizeof(int));
 
 	mensaje_get->pokemon = malloc(mensaje_get->length_pokemon);
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, package + offset,mensaje_get->length_pokemon);
+
+	free(package);
 
 	return mensaje_get;
 }
@@ -531,6 +536,8 @@ t_mensaje_get* deserializar_payload_get_pokemon(void*payload){
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
 
+	free(payload);
+
 	return mensaje_get;
 }
 
@@ -543,6 +550,8 @@ t_mensaje_get* deserializar_payload_get_pokemon_con_barra(void*payload){
 	mensaje_get->pokemon = malloc((mensaje_get->length_pokemon)+1);
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
+
+	free(payload);
 
 	return mensaje_get;
 }
@@ -657,6 +666,8 @@ t_mensaje_catch* deserializar_payload_catch_pokemon(void* payload) {
 		offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
 
+	free(payload);
+
 	return mensaje_catch;
 }
 
@@ -672,6 +683,8 @@ t_mensaje_catch* deserializar_payload_catch_pokemon_con_barra(void* payload) {
 	memcpy(&(mensaje_catch->posx), payload + offset, sizeof(int));
 		offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
+
+	free(payload);
 
 	return mensaje_catch;
 }
@@ -692,8 +705,7 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package) {
 	memcpy(&(size), package + offset, sizeof(int));
 	offset += sizeof(int);
 
-	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*) malloc(
-			sizeof(t_mensaje_catch));
+	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*) malloc(sizeof(t_mensaje_catch));
 
 	memcpy(&(mensaje_catch->length_pokemon), package + offset, sizeof(int));
 
@@ -707,6 +719,8 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_catch;
 }
@@ -827,6 +841,8 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon(void* payload) {
 	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
 	stream += sizeof(int);
 
+	free(payload);
+
 	return mensaje_appeared;
 }
 
@@ -847,6 +863,8 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon_con_barra(void* payloa
 
 	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
 	stream += sizeof(int);
+
+	free(payload);
 
 	return mensaje_appeared;
 }
@@ -881,6 +899,8 @@ t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_appeared->posy), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_appeared;
 }
@@ -1002,6 +1022,7 @@ t_mensaje_localized* deserializar_paquete_localized_pokemon(void* package) {
 		memcpy(&(mensaje_localized->pos[i].posy), package+offset, sizeof(int));
 		offset += sizeof(int);
 	}
+	free(package);
 
 	return mensaje_localized;
 }
@@ -1107,6 +1128,8 @@ t_mensaje_localized* deserializar_payload_localized_pokemon(void* package) {
 
 	}
 
+	free(package);
+
 	return mensaje_localized;
 }
 
@@ -1148,8 +1171,9 @@ t_mensaje_localized* deserializar_payload_localized_pokemon_con_barra(void* pack
 
 	memcpy(&(mensaje_localized->pos[i].posy), package+offset, sizeof(int));
 		offset += sizeof(int);
-
 	}
+
+	free(package);
 
 	return mensaje_localized;
 }

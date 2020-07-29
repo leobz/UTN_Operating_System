@@ -25,7 +25,10 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			}
 			else{
 				ingresar_en_cola_y_cache(paquete);
-				meter_en_diccionario(mensajes_iguales,pasar_a_char(paquete->id_correlativo),paquete->id_proceso);
+
+				char*id_men=pasar_a_char(paquete->id_correlativo);
+				meter_en_diccionario(mensajes_iguales,id_men,paquete->id_proceso);
+				free(id_men);
 			}
 		}
 	}
