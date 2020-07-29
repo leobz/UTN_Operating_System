@@ -109,7 +109,7 @@ void inicializar_tcbs_enviaron_catch() {
 	enviaron_catch = dictionary_create();
 }
 
-void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
+t_dictionary* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
 	if (list_get(team_config->pokemon_entrenadores, *i) != NULL) {
 		return list_get(team_config->pokemon_entrenadores, *i);
 	}
@@ -122,13 +122,9 @@ void* inicializar_pokemones_capturados(t_team_config* team_config, int* i) {
 
 void destroy_tcb_entrenador_full(t_tcb_entrenador* tcb) {
 	queue_destroy(tcb->rafaga);
-	//free(tcb->pokemon_a_capturar->posicion);
-	free(tcb->pokemon_a_capturar);
 	free(tcb->posicion);
-	free(tcb->objetivos);
-	free(tcb->pokemones_capturados);
-
-	free(tcb);
+	dictionary_destroy(tcb->objetivos);
+	dictionary_destroy(tcb->pokemones_capturados); //
 }
 
 void destroy_all_tcbs() {
@@ -406,6 +402,9 @@ void quitar_pokemon_de_mapa(t_tcb_entrenador* entrenador) {
 void aplicar_acciones_caught(t_tcb_entrenador* entrenador) {
 	quitar_pokemon_de_planificados(entrenador);
 	definir_cola_post_caught(entrenador);
+
+	free(entrenador->pokemon_a_capturar->posicion);
+	free(entrenador->pokemon_a_capturar);
 	entrenador->pokemon_a_capturar = NULL;
 }
 

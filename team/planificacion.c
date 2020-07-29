@@ -236,6 +236,7 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 		sem_wait(tcb->semaforo);
 
 		if (tcb->finalizo) {
+			destroy_tcb_entrenador_full(tcb);
 			break;
 		}
 
@@ -625,6 +626,8 @@ void finalizar_hilo_planificador() {
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
 	finalizar_hilo_tcb(tcb);
+
+
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");
