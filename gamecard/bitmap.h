@@ -35,9 +35,9 @@ typedef struct{
 }t_metadata;
 
 typedef struct {
-	int tiempo_reintento_conexion;
-	int tiempo_reintento_operacion;
-	int tiempo_retardo_operacion;
+	double tiempo_reintento_conexion;
+	double tiempo_reintento_operacion;
+	double tiempo_retardo_operacion;
 	char* punto_montaje_tallgrass;
 	char* ip_broker;
 	char* puerto_broker;

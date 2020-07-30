@@ -19,11 +19,11 @@
 #include <dirent.h>
 
 // Estructuras
+pthread_mutex_t mutex_abrir_archivos;
 
 // Variables
 t_dictionary* archivos_existentes;
 t_dictionary* cantidad_posiciones_pokemon;
-t_dictionary* pokemon_semaphores;
 pthread_t suscripcion_broker;
 
 
@@ -41,5 +41,6 @@ void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
 void inicializar_diccionarios();
 void finalizar_gamecard();
+void inicializar_semaforos();
 
 #endif /* GAMECARD_H_ */
