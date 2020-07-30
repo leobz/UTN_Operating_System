@@ -17,6 +17,8 @@ void inicializar_listas() {
 	pthread_mutex_init(&mutex_planificador, NULL);
 	pthread_mutex_init(&mutex_manejar_deadlock, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
+	pthread_mutex_init(&mutex_mapa, NULL);
+
 }
 
 void inicializar_diccionarios(t_team_config* team_config) {
@@ -24,7 +26,6 @@ void inicializar_diccionarios(t_team_config* team_config) {
 	inicializar_pokemones_atrapados(team_config);
 	inicializar_pokemones_en_mapa();
 
-	enviaron_catch = dictionary_create();
 	enviaron_get = dictionary_create();
 
 	inicializar_pokemones_planificados();
@@ -35,6 +36,7 @@ void inicializar_hilos_tcbs() {
 	void cargar_semaforo_y_thread_al_tcb(t_tcb_entrenador* entrenador) {
 		pthread_t thread_tcb;
 		pthread_create(&thread_tcb, NULL, (void*)ejecutar_tcb, entrenador);
+		pthread_detach(thread_tcb);
 		entrenador->entrenador = &thread_tcb;
 	}
 
@@ -42,6 +44,7 @@ void inicializar_hilos_tcbs() {
 }
 
 void iniciar_planificador() {
+	finalizo_planificador = false;
 	inicializar_hilos_tcbs();
 	pthread_create(&planificador, NULL, (void*) planificar, NULL);
 	pthread_detach(planificador);
@@ -68,8 +71,18 @@ void planificar() {
 
 	while (1) {
 		pthread_mutex_lock(&mutex_planificador);
+
+		if(finalizo_planificador){
+			break;
+		}
+
 		if (!list_is_empty(ready) && (tcb_exec == NULL)){
 			pthread_mutex_lock(&mutex_tcb_exec);
+
+			if(finalizo_planificador){
+				break;
+			}
+
 
 			tcb_exec = siguiente_tcb_a_ejecutar();
 			pasar_a_exec(tcb_exec);
@@ -224,6 +237,11 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 	while(true){
 		sem_wait(tcb->semaforo);
 
+		if (tcb->finalizo) {
+			destroy_tcb_entrenador_full(tcb);
+			break;
+		}
+
 		printf("TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
 		printf("Posicion del TCB: %d ->(%d, %d)\n", tcb->tid, tcb->posicion->x, tcb->posicion->y);
 
@@ -250,7 +268,6 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 		pasar_a_ready_si_esta_libre_y_hay_pokemon_en_mapa(tcb);
 
 		pthread_mutex_unlock(&mutex_tcb_exec);
-
 	}
 }
 
@@ -304,7 +321,9 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 	}
 
 	metricas->cantidad_ciclos_CPU_totales += cantidad_ciclos_instruccion;
-	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, pasar_a_char(tcb->tid), cantidad_ciclos_instruccion);
+	char* tid = pasar_a_char(tcb->tid);
+	dictionary_increment_value_in(metricas->cantidad_ciclos_CPU_entrenador, tid, cantidad_ciclos_instruccion);
+	free(tid);
 }
 
 void cargar_tcb_captura(t_tcb_entrenador* tcb, t_pokemon* pokemon) {
@@ -521,7 +540,9 @@ void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
-			pasar_a_ready_to_exchange(tcb, string_maximo_permitido(tcb));
+			char* motivo_maximo_permitido = string_maximo_permitido(tcb);
+			pasar_a_ready_to_exchange(tcb, motivo_maximo_permitido);
+			free(motivo_maximo_permitido);
 		}
 	} else {
 		pasar_a_unblocked(tcb);
@@ -594,8 +615,23 @@ void pasar_a_unblocked(t_tcb_entrenador* tcb) {
 	pthread_mutex_unlock(&mutex_planificador);
 }
 
+void finalizar_hilo_tcb(t_tcb_entrenador* tcb) {
+	tcb->finalizo = true;
+	sem_post(tcb->semaforo);
+}
+
+void finalizar_hilo_planificador() {
+	finalizo_planificador = true;
+	pthread_mutex_unlock(&mutex_planificador);
+	pthread_mutex_unlock(&mutex_tcb_exec);
+
+}
+
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	finalizar_hilo_tcb(tcb);
+
+
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");
@@ -620,6 +656,7 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 		log_info(logger, "[METRICAS] Cantidad de deadlocks resueltos: %d", metricas->cantidad_deadlocks_resueltos);
 
 		team_cumplio_objetivo = true;
+		finalizar_hilo_planificador();
 		finalizar_team(team_config);
 	}
 
@@ -669,10 +706,12 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	t_tcb_entrenador* tcb_a_intercambiar = list_get(lista_deadlock,list_size(lista_deadlock)-1);
 
 	t_list* no_necesita_actual = pokemones_no_necesitados(tcb_actual);
-	t_list* necesita_anterior =pokemones_necesitados(tcb_anterior);
+	t_list* necesita_actual =  pokemones_necesitados(tcb_actual);
+	t_list* necesita_anterior = pokemones_necesitados(tcb_anterior);
+	t_list* no_necesita_a_intercambiar = pokemones_no_necesitados(tcb_a_intercambiar);
 
 	t_list* tcb_actual_pokemones_a_intercambiar = list_intersection_strings(no_necesita_actual, necesita_anterior);
-	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(pokemones_no_necesitados(tcb_a_intercambiar), pokemones_necesitados(tcb_actual));
+	t_list* tcb_a_intercambiar_pokemones_a_intercambiar = list_intersection_strings(no_necesita_a_intercambiar, necesita_actual);
 
 	tcb_actual->entrenador_a_intercambiar = tcb_a_intercambiar;
 	tcb_actual->pokemon_a_dar_en_intercambio = list_pop_first(tcb_actual_pokemones_a_intercambiar);
@@ -686,7 +725,13 @@ t_deadlock* crear_deadlock(t_list* lista_deadlock){
 	list_destroy_and_destroy_elements(tcb_actual_pokemones_a_intercambiar, (void *)free);
 	list_destroy_and_destroy_elements(tcb_a_intercambiar_pokemones_a_intercambiar, (void *)free);
 	list_destroy_and_destroy_elements(no_necesita_actual, (void *)free);
+	list_destroy_and_destroy_elements(necesita_actual, (void *)free);
 	list_destroy_and_destroy_elements(necesita_anterior, (void *)free);
+	list_destroy_and_destroy_elements(no_necesita_a_intercambiar, (void *)free);
+
+
+
+
 
 	return deadlock;
 }

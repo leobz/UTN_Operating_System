@@ -20,6 +20,7 @@ bool team_cumplio_objetivo;
 
 pthread_mutex_t mutex_planificador;
 pthread_mutex_t mutex_lista_new;
+pthread_mutex_t mutex_mapa;
 
 typedef t_dictionary t_objetivo_global;
 typedef t_dictionary t_pokemon_requeridos;
@@ -73,7 +74,7 @@ typedef struct{
 	t_list* objetivos_entrenadores;
 	int cantidad_entrenadores;
 	int tiempoDeReconexion;
-	int retardo_ciclo_cpu;
+	double retardo_ciclo_cpu;
 	char *algoritmo_de_planificacion;
 	int quantum;
 	double alpha;
@@ -110,6 +111,7 @@ typedef struct t_tcb{
 	bool necesita_nueva_estimacion;
 	struct t_list* les_puede_dar;
 	int nivel_de_grafo_en_deadlock;
+	bool finalizo;
 }t_tcb_entrenador;
 
 typedef struct {

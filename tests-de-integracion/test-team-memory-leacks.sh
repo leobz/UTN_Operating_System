@@ -2,6 +2,7 @@ echo Team: Memory Leacks
 
 echo "  Cargando configuracion de Memory Leacks"
 cp team.config team.config.auxiliar; rm team.config; cp team.config.memory.leacks team.config
+rm *.log
 
 echo "  Levanto Team en segundo plano"
 valgrind --leak-check=yes ../team/Debug/team 2> memory-leaks.log &
