@@ -9,7 +9,9 @@ void crear_archivo_metadata_y_bitmap_fs() {
 
 	//Creo archivo Metadata.bin
 
-	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
+	char* ruta_absoluta = crear_ruta("Metadata/Metadata.bin");
+
+	t_bloque* bloque_metadata_bin = crear_bloque(ruta_absoluta);
 	config_set_value(bloque_metadata_bin, "BLOCK_SIZE",string_itoa(metadata->block_size));
 	config_set_value(bloque_metadata_bin, "BLOCKS",string_itoa(metadata->blocks));
 	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",metadata->magic_number);

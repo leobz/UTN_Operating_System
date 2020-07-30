@@ -13,7 +13,6 @@ char* crear_ruta(char* ruta) {
 	string_append(&path_ruta_absoluta, gamecard_config->punto_montaje_tallgrass);
 	string_append(&path_ruta_absoluta, "/");
 	string_append(&path_ruta_absoluta, ruta);
-	free(ruta);
 
 	return path_ruta_absoluta;
 }
@@ -32,8 +31,6 @@ void modificar_bit(t_bitarray*bitmap,bool valor,int bit){
 
 	else   //si esta ocupado ese bloque
 		bitarray_clean_bit(bitmap, bit);
-	free(bitmap->bitarray);
-	free(bitmap);
 }
 
 
@@ -50,8 +47,8 @@ void actualizar_archivo_bitmap(t_bitarray*bitmap) {
 	fwrite(bitmap->bitarray, sizeof(char), bitmap->size, bitmap_file);
 
 	fclose(bitmap_file);
-	free(bitmap);
 	free(bitmap->bitarray);
+	free(bitmap);
 }
 
 

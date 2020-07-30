@@ -77,10 +77,10 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 
 	char* ruta = crear_ruta(ruta_al_metadata_bin_del_archivo);
 	t_bloque* bloque_metadata_archivo = config_create(ruta);
-	archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
+	archivo->directory = strdup(config_get_string_value(bloque_metadata_archivo, "DIRECTORY"));
 	char* string_blocks = config_get_array_value(bloque_metadata_archivo, "BLOCKS");
 	archivo->blocks = strings_to_list(string_blocks);
-	archivo->open = config_get_string_value(bloque_metadata_archivo, "OPEN");
+	archivo->open = strdup(config_get_string_value(bloque_metadata_archivo, "OPEN"));
 	archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
 
 	free(ruta);
