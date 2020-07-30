@@ -5,6 +5,7 @@ int main(){
 	inicializar_gamecard();
 	inicializar_directorios();
 	inicializar_diccionarios();
+	inicializar_semaforos();
 	pthread_create(&suscripcion_broker, NULL, (void*)suscribirme_al_broker, NULL);
 
 /*

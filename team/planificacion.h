@@ -17,6 +17,8 @@ pthread_t reintentador_de_conexion;
 pthread_mutex_t mutex_tcb_exec;
 pthread_mutex_t mutex_manejar_deadlock;
 
+bool finalizo_planificador;
+
 typedef struct {
 	t_tcb_entrenador* tcb_1;
 	t_tcb_entrenador* tcb_2;

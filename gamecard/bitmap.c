@@ -47,7 +47,8 @@ void actualizar_archivo_bitmap(t_bitarray*bitmap) {
 	fwrite(bitmap->bitarray, sizeof(char), bitmap->size, bitmap_file);
 
 	fclose(bitmap_file);
-	bitarray_destroy(bitmap);
+	free(bitmap->bitarray);
+	free(bitmap);
 }
 
 
