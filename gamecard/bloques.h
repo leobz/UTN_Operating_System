@@ -70,6 +70,7 @@ char* archivo_a_string(char* ruta);
 */
 t_config *cargar_config_desde_buffer(char* un_buffer);
 
+void destruir_metadata_pokemon(t_metadata_pokemon* metadata_pokemon);
 char* config_save_to_buffer(t_config *self) ;
 int cantidad_de_bloques_necesarios(int size_buffer_de_guardado) ;
 int escribir_buffer_en_bloque(char* buffer, char*  numero_de_bloque);

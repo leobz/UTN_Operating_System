@@ -9,11 +9,14 @@ void crear_archivo_metadata_y_bitmap_fs() {
 
 	//Creo archivo Metadata.bin
 
-	t_bloque* bloque_metadata_bin = crear_bloque(crear_ruta("Metadata/Metadata.bin"));
+	char* ruta_absoluta = crear_ruta("Metadata/Metadata.bin");
+
+	t_bloque* bloque_metadata_bin = crear_bloque(ruta_absoluta);
 	config_set_value(bloque_metadata_bin, "BLOCK_SIZE",string_itoa(metadata->block_size));
 	config_set_value(bloque_metadata_bin, "BLOCKS",string_itoa(metadata->blocks));
 	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",metadata->magic_number);
 	config_save(bloque_metadata_bin);
+	config_destroy(bloque_metadata_bin);
 
 	//Creo archivo Bitmap.bin
 	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
@@ -170,8 +173,8 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
 		log_info(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
-
 	}
+	eliminar_mensaje_catch(mensaje_catch);
 }
 
 void crear_metadata_para_directorios(char*ruta_directorio){
@@ -181,17 +184,12 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 }
-void crear_diccionario_semaforo(char*pokemonn){
-	pthread_mutex_t pokemon_sem;
-	dictionary_put(pokemon_semaphores,pokemonn,&pokemon_sem);
-}
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 	int bloque_disponible=bloque_disponible_en_bitmap();
 	if(bloque_disponible!=-1){
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
-		crear_diccionario_semaforo(mensaje_new->pokemon);
 		setear_bloque_ocupado(bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,true);//indica que esta abierto
@@ -236,35 +234,27 @@ char* crear_pokemon_metadata(char*pokemonn){
 	return path_completo;
 }
 
+void setear_abierto_si_corresponde(char* pokemon) {
+	pthread_mutex_lock(&mutex_abrir_archivos);
+	if (!archivo_esta_abierto(pokemon)) {
+		setear_archivo_abierto(pokemon);
+		pthread_mutex_unlock(&mutex_abrir_archivos);
+	} else {
+		pthread_mutex_unlock(&mutex_abrir_archivos);
+		sleep(gamecard_config->tiempo_reintento_operacion);
+		checkear_archivo_abierto(pokemon);
+	}
+}
 
 void checkear_archivo_abierto(char*pokemonn){
-	bool abierto=archivo_esta_abierto(pokemonn);
-
-	pthread_mutex_t *pokemon_sem;
-	pokemon_sem=dictionary_get(pokemon_semaphores,pokemonn);
-
-	if(abierto==true){ //sie el archivo esta abierto
-
-		//ESTO ES LO HAY Q VER ESTE SEMAFORO
-		//pthread_mutex_lock(pokemon_sem);
-
-		while(abierto==true){
+	if (archivo_esta_abierto(pokemonn)) {
+		while(archivo_esta_abierto(pokemonn)){
 			sleep(gamecard_config->tiempo_reintento_operacion);
-			abierto=archivo_esta_abierto(pokemonn);
 		}
-		abierto=true;
-		setear_archivo_abierto(pokemonn);
-
-		//pthread_mutex_unlock(pokemon_sem);
-
+		setear_abierto_si_corresponde(pokemonn);
 	}
-	else{ //si el archivo esta cerrado
-
-
-		//Y ESTE
-		//pthread_mutex_lock(pokemon_sem);
-			setear_archivo_abierto(pokemonn);
-		//pthread_mutex_unlock(pokemon_sem);
+	else{
+		setear_abierto_si_corresponde(pokemonn);
 	}
 }
 
@@ -280,6 +270,7 @@ char* setear_archivo_abierto(char*pokemonn){
 	config_set_value(pokemon_config, "OPEN","Y");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_absoluta);
 	return path_pokemon;
 }
 
@@ -290,6 +281,7 @@ void cerrar_archivo(char* pokemonn){
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_absoluta);
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
 
@@ -304,11 +296,14 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 	string_append(&posicion_pokemonn,"-");
 	string_append_with_format(&posicion_pokemonn, "%s",posy);
 
+	char* cantidad;
+
 	if(config_has_property(archivo_pokemon_config, posicion_pokemonn)){//si esa posicion ya estaba en el archivo
 
 		int cantidad_pokemon=config_get_int_value(archivo_pokemon_config,posicion_pokemonn);
 		cantidad_pokemon+=mensaje_new->cantidad;
-		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(cantidad_pokemon));
+		cantidad = string_itoa(cantidad_pokemon);
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 	else{ //si es una nueva posicion
@@ -316,9 +311,16 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		cant_posiciones += 1;
 		dictionary_put(cantidad_posiciones_pokemon, mensaje_new->pokemon, cant_posiciones);
 		printf("Cant Posiciones: %d\n", dictionary_get(cantidad_posiciones_pokemon, mensaje_new->pokemon));
-		config_set_value(archivo_pokemon_config, posicion_pokemonn, string_itoa(mensaje_new->cantidad));
+		cantidad = string_itoa(mensaje_new->cantidad);
+		config_set_value(archivo_pokemon_config, posicion_pokemonn, cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
+
 	}
+	config_destroy(archivo_pokemon_config);
+	free(posicion_pokemonn);
+	free(cantidad);
+	free(posx);
+	free(posy);
 }
 
 t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
@@ -376,6 +378,7 @@ int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_catch->pokemon);
 		resultado = OK;
 	}
+	config_destroy(archivo_pokemon_config);
 	return resultado;
 }
 
