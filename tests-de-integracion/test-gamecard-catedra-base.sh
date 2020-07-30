@@ -1,3 +1,5 @@
+sleep_time=0.5
+
 echo  "## Test Gamecard: Base ##\n"
 
 # INICIO DEL TEST
@@ -7,21 +9,21 @@ cp gamecard.config gamecard.config.auxiliar; rm gamecard.config; cp gamecard.con
 echo "  Eliminando archivos existentes del FileSystem"
 rm -r ../tall_grass/Files/* 
 rm ../tall_grass/Blocks/*
+rm *.log
 
 echo "  Actualizando Metadata.bin"
 echo -e "BLOCK_SIZE=64\nBLOCKS=4096\nMAGIC_NUMBER=TALL_GRASS" > ../tall_grass/Metadata/Metadata.bin
 
 echo "  Levanto gamecard en segundo plano"
 1>/dev/null 2>/dev/null ../gamecard/Debug/gamecard &
-
+sleep 0.1
 
 # PETICIONES new_pikachu.sh
 echo "\nEjecutando el script new_pikachu.sh"
-sleep 0.5
 ../gameboy/Debug/gameboy GAMECARD NEW_POKEMON Pikachu 2 5 10 9
+sleep $sleep_time
 
 echo "Comprobacion: Se creo la carpeta Pikachu y su metadata indica que el tamaño es 7 bytes.\n"
-sleep 0.5
 cat ../tall_grass/Files/Pikachu/Metadata.bin
 
 
@@ -36,26 +38,24 @@ echo "\nEjecutando el script new_pokemons_varios.sh"
 ../gameboy/Debug/gameboy GAMECARD NEW_POKEMON Charmander 65 93 3001 6
 ../gameboy/Debug/gameboy GAMECARD NEW_POKEMON Charmander 12 17 34 7
 ../gameboy/Debug/gameboy GAMECARD NEW_POKEMON Charmander 129 547 11 8
+sleep $(calc $sleep_time \* 8)
 
 echo "Comprobacion: El tamaño del archivo Pikachu se haya actualizado a 13 bytes.\n"
-sleep 0.5
 cat ../tall_grass/Files/Pikachu/Metadata.bin
 
 echo "\nComprobacion: Se creo la carpeta Charmander y su metadata indique
  que posee dos bloques y su tamaño es 70 bytes\n"
-sleep 0.5
 cat ../tall_grass/Files/Charmander/Metadata.bin
 
 
 # PETICIONES catch_charmander.sh
 echo "\nEjecutar el script catch_charmander.sh"
 ../gameboy/Debug/gameboy GAMECARD CATCH_POKEMON Charmander 413 17 1
+sleep $sleep_time
 
 echo "Comprobacion: Verificar que el archivo Charmander ahora indique que posee
 solo un bloque y su tamaño es 61 bytes.\n"
-sleep 0.5
 cat ../tall_grass/Files/Charmander/Metadata.bin
-
 
 
 
