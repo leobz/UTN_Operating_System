@@ -23,7 +23,6 @@
 // Variables
 t_dictionary* archivos_existentes;
 t_dictionary* cantidad_posiciones_pokemon;
-t_dictionary* pokemon_semaphores;
 pthread_t suscripcion_broker;
 
 

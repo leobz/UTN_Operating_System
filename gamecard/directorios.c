@@ -184,17 +184,12 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 }
-void crear_diccionario_semaforo(char*pokemonn){
-	pthread_mutex_t pokemon_sem;
-	dictionary_put(pokemon_semaphores,pokemonn,&pokemon_sem);
-}
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 	int bloque_disponible=bloque_disponible_en_bitmap();
 	if(bloque_disponible!=-1){
 		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
-		crear_diccionario_semaforo(mensaje_new->pokemon);
 		setear_bloque_ocupado(bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,true);//indica que esta abierto
@@ -243,31 +238,16 @@ char* crear_pokemon_metadata(char*pokemonn){
 void checkear_archivo_abierto(char*pokemonn){
 	bool abierto=archivo_esta_abierto(pokemonn);
 
-	pthread_mutex_t *pokemon_sem;
-	pokemon_sem=dictionary_get(pokemon_semaphores,pokemonn);
-
-	if(abierto==true){ //sie el archivo esta abierto
-
-		//ESTO ES LO HAY Q VER ESTE SEMAFORO
-		//pthread_mutex_lock(pokemon_sem);
-
+	if(abierto == true){
 		while(abierto==true){
 			sleep(gamecard_config->tiempo_reintento_operacion);
 			abierto=archivo_esta_abierto(pokemonn);
 		}
 		abierto=true;
 		setear_archivo_abierto(pokemonn);
-
-		//pthread_mutex_unlock(pokemon_sem);
-
 	}
-	else{ //si el archivo esta cerrado
-
-
-		//Y ESTE
-		//pthread_mutex_lock(pokemon_sem);
-			setear_archivo_abierto(pokemonn);
-		//pthread_mutex_unlock(pokemon_sem);
+	else{
+		setear_archivo_abierto(pokemonn);
 	}
 }
 

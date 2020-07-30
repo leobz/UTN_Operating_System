@@ -53,7 +53,6 @@ void inicializar_gamecard() {
 void inicializar_diccionarios(){
 archivos_existentes = dictionary_create();
 cantidad_posiciones_pokemon=dictionary_create();
-pokemon_semaphores=dictionary_create();
 }
 
 
