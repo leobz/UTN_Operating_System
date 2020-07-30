@@ -27,8 +27,20 @@ void guardar_pid(){
 	fclose(file);
 }
 
-int main(int argc, char ** argv) {
+void finalizar_servidor(){
+	log_info(logger,"Finalizando Broker!");
+	liberar_conexion(socket_servidor);
+	exit(0);
+}
 
+void iniciar_manejador_de_seniales() {
+	signal(SIGUSR1, dump_cache);
+	signal(SIGINT, finalizar_servidor);
+	signal(SIGKILL, finalizar_servidor);
+	signal(SIGTERM, finalizar_servidor);
+}
+
+int main(int argc, char ** argv) {
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
 			correrTests();
@@ -41,10 +53,11 @@ int main(int argc, char ** argv) {
 
 		char*ip=broker_config->ip_broker;
 		char*puerto=broker_config->puerto_broker;
-		int socket_servidor = iniciar_servidor(ip, puerto);
+		socket_servidor = iniciar_servidor(ip, puerto);
 
 		guardar_pid();
-		signal(SIGUSR1, dump_cache);
+
+		iniciar_manejador_de_seniales();
 
 		pthread_create(&sem_mensajes[NEW_POKEMON],NULL,(void*)enviar_mensajes_en_cola,NEW_POKEMON);
 		pthread_create(&sem_mensajes[GET_POKEMON],NULL,(void*)enviar_mensajes_en_cola,GET_POKEMON);
