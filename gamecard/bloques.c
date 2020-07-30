@@ -1,16 +1,24 @@
 #include "bloques.h"
 
+void destruir_metadata_pokemon(t_metadata_pokemon* metadata_pokemon){
+	list_destroy(metadata_pokemon->blocks);
+	free(metadata_pokemon->directory);
+	free(metadata_pokemon);
+}
+
 t_bloque* crear_bloque(char* ruta_archivo) {
 	FILE* archivo;
 	archivo = fopen(ruta_archivo, "w");
 	fclose(archivo);
 
 	t_bloque* bloque = config_create(ruta_archivo);
+	free(ruta_archivo);
 	return bloque;
 }
 void cerrar_bloque(char*bloque_restante){
 	char*ruta=ruta_blocks(bloque_restante);
 	fclose(fopen(ruta, "w")); //permite limpiar el contenido de dicho bloque
+	free(ruta);
 }
 
 t_config *cargar_config_desde_buffer(char* un_buffer) {
@@ -70,11 +78,13 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 	char* ruta = crear_ruta(ruta_al_metadata_bin_del_archivo);
 	t_bloque* bloque_metadata_archivo = config_create(ruta);
 	archivo->directory = config_get_string_value(bloque_metadata_archivo, "DIRECTORY");
-	archivo->blocks = strings_to_list(config_get_array_value(bloque_metadata_archivo, "BLOCKS"));
+	char* string_blocks = config_get_array_value(bloque_metadata_archivo, "BLOCKS");
+	archivo->blocks = strings_to_list(string_blocks);
 	archivo->open = config_get_string_value(bloque_metadata_archivo, "OPEN");
 	archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
 
 	free(ruta);
+	free(string_blocks);
 	config_destroy(bloque_metadata_archivo);
 
 	return archivo;
@@ -88,17 +98,15 @@ char* ruta_blocks(char* numero_de_bloque) {
 
 char* buffer_del_archivo_completo(t_metadata_pokemon* archivo) {
 	char* buffer_archivo = string_new();
-
 	void unir_bloques(char* numero_de_bloque) {
-		char* buffer_bloque = archivo_a_string(ruta_blocks(numero_de_bloque));
-
+		char* buffer_bloque = string_new();
+		char* ruta = ruta_blocks(numero_de_bloque);
+		buffer_bloque = archivo_a_string(ruta);
 		string_append(&buffer_archivo, buffer_bloque);
-		//TODO: Liberar ruta bloque y buffer bloque
-
+		free(buffer_bloque);
+		free(ruta);
 	}
-
 	list_iterate(archivo->blocks, unir_bloques);
-
 	return buffer_archivo;
 }
 
@@ -128,6 +136,7 @@ int escribir_buffer_en_bloque(char* buffer, char* numero_de_bloque) {
 	int result = fwrite(buffer, strlen(buffer), 1, file);
 	fclose(file);
 	free(buffer);
+	free(ruta_bloque);
 	return result;
 }
 
@@ -191,18 +200,20 @@ void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon* archivo, char*
 	config_set_value(pokemon_config,"BLOCKS",vector_de_bloques);
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
-
+	free(path_absoluta);
 }
 
 void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn){
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
 	int space=strlen(buffer_pokemon);
+	char* space_st = string_itoa(space);
 	t_config*pokemon_config=config_create(path_absoluta);
-	config_set_value(pokemon_config,"SIZE",string_itoa(space));
+	config_set_value(pokemon_config,"SIZE",space_st);
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
 	free(path_absoluta);
+	free(space_st);
 }
 
 char* formar_archivo_pokemon(char*pokemonn){
@@ -230,7 +241,7 @@ void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon) 
 	actualizar_tamanio_archivo(buffer_pokemon,pokemon);
 	escribir_archivo(metadata_pokemon, buffer_pokemon, pokemon);
 
-	free(metadata_pokemon);
+	destruir_metadata_pokemon(metadata_pokemon);
 	free(buffer_pokemon);
 
 }

@@ -14,6 +14,7 @@ void crear_archivo_metadata_y_bitmap_fs() {
 	config_set_value(bloque_metadata_bin, "BLOCKS",string_itoa(metadata->blocks));
 	config_set_value(bloque_metadata_bin, "MAGIC_NUMBER",metadata->magic_number);
 	config_save(bloque_metadata_bin);
+	config_destroy(bloque_metadata_bin);
 
 	//Creo archivo Bitmap.bin
 	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
@@ -170,8 +171,8 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
 		log_info(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
-
 	}
+	eliminar_mensaje_catch(mensaje_catch);
 }
 
 void crear_metadata_para_directorios(char*ruta_directorio){
@@ -306,11 +307,14 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 	string_append(&posicion_pokemonn,"-");
 	string_append_with_format(&posicion_pokemonn, "%s",posy);
 
+	char* cantidad;
+
 	if(config_has_property(archivo_pokemon_config, posicion_pokemonn)){//si esa posicion ya estaba en el archivo
 
 		int cantidad_pokemon=config_get_int_value(archivo_pokemon_config,posicion_pokemonn);
 		cantidad_pokemon+=mensaje_new->cantidad;
-		config_set_value(archivo_pokemon_config,posicion_pokemonn,string_itoa(cantidad_pokemon));
+		cantidad = string_itoa(cantidad_pokemon);
+		config_set_value(archivo_pokemon_config,posicion_pokemonn,cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config,mensaje_new->pokemon);
 	}
 	else{ //si es una nueva posicion
@@ -318,10 +322,16 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		cant_posiciones += 1;
 		dictionary_put(cantidad_posiciones_pokemon, mensaje_new->pokemon, cant_posiciones);
 		printf("Cant Posiciones: %d\n", dictionary_get(cantidad_posiciones_pokemon, mensaje_new->pokemon));
-		config_set_value(archivo_pokemon_config, posicion_pokemonn, string_itoa(mensaje_new->cantidad));
+		cantidad = string_itoa(mensaje_new->cantidad);
+		config_set_value(archivo_pokemon_config, posicion_pokemonn, cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
+
 	}
 	config_destroy(archivo_pokemon_config);
+	free(posicion_pokemonn);
+	free(cantidad);
+	free(posx);
+	free(posy);
 }
 
 t_posiciones*obtener_posiciones_pokemon(char*pokemonn){
@@ -379,6 +389,7 @@ int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_catch->pokemon);
 		resultado = OK;
 	}
+	config_destroy(archivo_pokemon_config);
 	return resultado;
 }
 
