@@ -234,20 +234,27 @@ char* crear_pokemon_metadata(char*pokemonn){
 	return path_completo;
 }
 
+void setear_abierto_si_corresponde(char* pokemon) {
+	pthread_mutex_lock(&mutex_abrir_archivos);
+	if (!archivo_esta_abierto(pokemon)) {
+		setear_archivo_abierto(pokemon);
+		pthread_mutex_unlock(&mutex_abrir_archivos);
+	} else {
+		pthread_mutex_unlock(&mutex_abrir_archivos);
+		sleep(gamecard_config->tiempo_reintento_operacion);
+		checkear_archivo_abierto(pokemon);
+	}
+}
 
 void checkear_archivo_abierto(char*pokemonn){
-	bool abierto=archivo_esta_abierto(pokemonn);
-
-	if(abierto == true){
-		while(abierto==true){
+	if (archivo_esta_abierto(pokemonn)) {
+		while(archivo_esta_abierto(pokemonn)){
 			sleep(gamecard_config->tiempo_reintento_operacion);
-			abierto=archivo_esta_abierto(pokemonn);
 		}
-		abierto=true;
-		setear_archivo_abierto(pokemonn);
+		setear_abierto_si_corresponde(pokemonn);
 	}
 	else{
-		setear_archivo_abierto(pokemonn);
+		setear_abierto_si_corresponde(pokemonn);
 	}
 }
 

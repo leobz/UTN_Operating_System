@@ -55,6 +55,11 @@ archivos_existentes = dictionary_create();
 cantidad_posiciones_pokemon=dictionary_create();
 }
 
+void inicializar_semaforos() {
+	pthread_mutex_init(&mutex_abrir_archivos, NULL);
+
+}
+
 
 void liberar_paths(){
 	free(path_directorio_metadata);
