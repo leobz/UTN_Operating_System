@@ -235,6 +235,7 @@ char* crear_pokemon_metadata(char*pokemonn){
 	char*path_completo=crear_ruta(path_archivo_pokemon);
 	mkdir(path_completo, 0777);
 	string_append(&path_completo, "/Metadata.bin");
+	free(path_archivo_pokemon);
 
 	return path_completo;
 }
@@ -275,7 +276,7 @@ bool archivo_esta_abierto(char *pokemonn){
 	return dictionary_get(archivos_existentes,pokemonn);
 }
 
-char* setear_archivo_abierto(char*pokemonn){
+void setear_archivo_abierto(char*pokemonn){
 	dictionary_put(archivos_existentes,pokemonn,true);
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
@@ -283,8 +284,8 @@ char* setear_archivo_abierto(char*pokemonn){
 	config_set_value(pokemon_config, "OPEN","Y");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_pokemon);
 	free(path_absoluta);
-	return path_pokemon;
 }
 
 void cerrar_archivo(char* pokemonn){
@@ -294,6 +295,7 @@ void cerrar_archivo(char* pokemonn){
 	config_set_value(pokemon_config, "OPEN","N");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_pokemon);
 	free(path_absoluta);
 	dictionary_put(archivos_existentes,pokemonn,false);
 }
