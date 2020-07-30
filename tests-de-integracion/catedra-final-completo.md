@@ -2,7 +2,7 @@
 
 ## Disclaimer:
 
-Esta prueba tiene como objetivo verificar el funcionamiento del esquema de memoria Buddy System. Para esto, será necesario la ejecución del proceso broker y de los scripts proporcionados por la cátedra.
+El objetivo de la prueba es verificar el correcto funcionamiento del sistema global incluyendo mensajes Localized en el sistema.
 
 ## Actividades:
 
