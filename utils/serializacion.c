@@ -536,7 +536,6 @@ t_mensaje_get* deserializar_payload_get_pokemon(void*payload){
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
 
-	free(payload);
 
 	return mensaje_get;
 }
@@ -666,7 +665,6 @@ t_mensaje_catch* deserializar_payload_catch_pokemon(void* payload) {
 		offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
 
-	free(payload);
 
 	return mensaje_catch;
 }
@@ -841,7 +839,6 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon(void* payload) {
 	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
 	stream += sizeof(int);
 
-	free(payload);
 
 	return mensaje_appeared;
 }
@@ -1128,7 +1125,6 @@ t_mensaje_localized* deserializar_payload_localized_pokemon(void* package) {
 
 	}
 
-	free(package);
 
 	return mensaje_localized;
 }
