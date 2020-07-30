@@ -8,9 +8,9 @@
 #include "gamecard.h"
 
 void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *config) {
-	gamecard_config->tiempo_reintento_conexion = config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION");
-	gamecard_config->tiempo_reintento_operacion = config_get_int_value(config, "TIEMPO_DE_REINTENTO_OPERACION");
-	gamecard_config->tiempo_retardo_operacion = config_get_int_value(config, "TIEMPO_RETARDO_OPERACION");
+	gamecard_config->tiempo_reintento_conexion = config_get_double_value(config, "TIEMPO_DE_REINTENTO_CONEXION");
+	gamecard_config->tiempo_reintento_operacion = config_get_double_value(config, "TIEMPO_DE_REINTENTO_OPERACION");
+	gamecard_config->tiempo_retardo_operacion = config_get_double_value(config, "TIEMPO_RETARDO_OPERACION");
 	gamecard_config->punto_montaje_tallgrass = strdup(config_get_string_value(config, "PUNTO_MONTAJE_TALLGRASS"));
 	gamecard_config->ip_broker = strdup(config_get_string_value(config, "IP_BROKER"));
 	gamecard_config->puerto_broker = strdup(config_get_string_value(config, "PUERTO_BROKER"));
