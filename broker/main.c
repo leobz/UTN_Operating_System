@@ -1,6 +1,7 @@
 #include "main.h"
 #include "test/testing.h"
 
+
 void inicializar_diccionarios() {
 	administracion_por_id = dictionary_create();
 	administracion_por_cod = dictionary_create();
@@ -29,7 +30,17 @@ void guardar_pid(){
 
 void finalizar_servidor(){
 	log_info(logger,"Finalizando Broker!");
-	liberar_conexion(socket_servidor);
+
+	if ( -1 == shutdown(socket_servidor,2))
+			perror("shutdown");
+	else
+		printf("- %d: shutdown\n",socket_servidor);
+
+	if ( -1 == close(socket_servidor))
+		perror("close");
+	else
+		printf("- %d: closed\n", socket_servidor);
+
 	exit(0);
 }
 

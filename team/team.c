@@ -557,8 +557,6 @@ void enviar_get_pokemon() {
 			agregar_a_enviaron_get(id_mensaje, key_pokemon);
 
 			liberar_conexion(conexion);
-			free(a_enviar);
-			free(id_mensaje);
 		}
 	}
 

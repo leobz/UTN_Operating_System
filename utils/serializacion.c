@@ -20,8 +20,10 @@ void eliminar_paquete(t_paquete* paquete) {
 }
 
 void liberar_paquete_socket(t_paquete_socket* paquete) {
-	free(paquete->buffer->stream);
-	free(paquete->buffer);
+	if(paquete->buffer != NULL){
+		free(paquete->buffer->stream);
+		free(paquete->buffer);
+	}
 	free(paquete);
 }
 
@@ -889,9 +891,11 @@ t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package) {
 
 
 
-t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]){
+t_buffer* buffer_localized_pokemon(char* nombre_pokemon, t_list* posiciones){
+	printf("[GAMECARD] Inicio funcion buffer_localized_pokemon()\n");
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
-	int cant_coordenadas=cantidad_posiciones*2;
+	int cantidad_posiciones = list_size(posiciones);
+	printf("[GAMECARD] Cantidad de posiciones: %d\n", list_size(posiciones));
 
 	char *pokemon = strdup(nombre_pokemon);
 	int pokemon_lenght = strlen(pokemon) + 1;
@@ -899,36 +903,53 @@ t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones
 	buffer->size = sizeof(t_posiciones)*(cantidad_posiciones)+ sizeof(int)*3 + pokemon_lenght;
 	buffer->stream = malloc(buffer->size);
 
+	printf("[GAMECARD] Memcpy de pokemon_lenght\n");
 	int offset = 0;
 	memcpy(buffer->stream + offset, &pokemon_lenght, sizeof(int));
 	offset += sizeof(int);
+	printf("[GAMECARD] Memcpy de pokemon\n");
 	memcpy(buffer->stream + offset, pokemon, pokemon_lenght);
 	offset += pokemon_lenght;
+	printf("[GAMECARD] Memcpy de cantidad_posiciones\n");
 	memcpy(buffer->stream + offset, &cantidad_posiciones, sizeof(int));
 	offset += sizeof(int);
 
-	for(int i=0;i<cantidad_posiciones;i++){
+	void copiar_posiciones(t_posiciones* posicion){
+		printf("[GAMECARD] Memcpy de posx\n");
+		memcpy(buffer->stream + offset, &(posicion->posx), sizeof(int));
+		offset += sizeof(int);
 
-	memcpy(buffer->stream + offset, &pos[i].posx, sizeof(int));
-		offset+=sizeof(int);
-	memcpy(buffer->stream + offset, &pos[i].posy, sizeof(int));
-		offset+=sizeof(int);
+		printf("[GAMECARD] Memcpy de posy\n");
+		memcpy(buffer->stream + offset, &(posicion->posy), sizeof(int));
+		offset += sizeof(int);
 	}
 
+	list_iterate(posiciones, (void*)copiar_posiciones);
+
 	free(pokemon);
+	printf("[GAMECARD] Free pokemon\n");
 
 	return buffer;
 }
 
-void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,
-		t_posiciones pos[], int id_mensaje, int id_correlativo) {
+void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, t_list* posiciones, int id_mensaje, int id_correlativo) {
 
-	t_buffer* buffer = buffer_localized_pokemon(nombre_pokemon, cantidad_posiciones,pos);
+	printf("[GAMECARD] Inicio funcion serializar_localized_pokemon()\n");
+	t_buffer* buffer = buffer_localized_pokemon(nombre_pokemon, posiciones);
+	printf("[GAMECARD] Obtuvo buffer\n");
 	t_paquete *paquete = crear_paquete(LOCALIZED_POKEMON, buffer, id_mensaje,id_correlativo);
+	printf("[GAMECARD] Creado de paquete\n");
 
 	*bytes = paquete->buffer->size + sizeof(int) * 4;
 	void* a_enviar = serializar_paquete(paquete, *bytes);
+	printf("[GAMECARD] Serializado de paquete en a_enviar\n");
 	eliminar_paquete(paquete);
+	printf("[GAMECARD] Eliminado de paquete\n");
+	void destruir_posiciones(t_posiciones* posicion){
+		free(posicion);
+	}
+	list_destroy_and_destroy_elements(posiciones, (void*)destruir_posiciones);
+	printf("[GAMECARD] Destruir posiciones\n");
 
 	return a_enviar;
 }
