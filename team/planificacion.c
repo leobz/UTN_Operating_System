@@ -461,7 +461,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0,0);
 		enviar_mensaje(conexion, a_enviar, bytes);
 
-		char* id_correlativo = recibir_id_correlativo(conexion);
+		char* id_correlativo = recibir_id_mensaje(conexion, pokemon->pokemon, CATCH_POKEMON);
 
 		agregar_a_enviaron_catch(id_correlativo, tcb);
 		pasar_a_blocked(tcb);
@@ -558,18 +558,6 @@ void confirmar_caught(t_tcb_entrenador* tcb){
 	asignar_pokemon(tcb);
 
 	log_info(logger, "[CAPTURA] TID:%d Capturó pokemon. Total capturados:%d", tcb->tid, total_capturados(tcb));
-}
-
-char* recibir_id_correlativo(int socket_cliente) {
-	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
-
-	int length = snprintf( NULL, 0, "%d", paquete->id_correlativo);
-	char* id_correlativo_char = malloc( length + 1 );
-	snprintf(id_correlativo_char, length + 1, "%d", paquete->id_correlativo);
-
-	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:%s", id_correlativo_char);
-
-	return id_correlativo_char;
 }
 
 void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
