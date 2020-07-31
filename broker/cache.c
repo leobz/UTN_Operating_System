@@ -569,7 +569,7 @@ t_list* obtener_particiones_posibles(int tamanio) {
 	t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 
 	while (particiones_posibles==NULL) {
-		free(particiones_posibles);
+
 		if (supero_limite_de_eliminaciones(particiones_eliminadas)) {
 			compactar_particiones_dinamicas();
 			particiones_eliminadas = 0;
@@ -579,7 +579,7 @@ t_list* obtener_particiones_posibles(int tamanio) {
 		//printf("Particiones posibles %d",list_size(particiones_posibles));
 
 		if (particiones_posibles==NULL) {
-			free(particiones_posibles);
+
 			eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 			particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 			particiones_eliminadas++;

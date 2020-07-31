@@ -98,6 +98,7 @@ void* sacar_de_diccionario(t_dictionary* dictionary,int key){
 void*obtener_de_diccionario(t_dictionary*dictionary, int key){
 	char*char_key=pasar_a_char(key);
 	void*value=dictionary_get(dictionary,char_key);
+	free(char_key);
 	return value;
 }
 
