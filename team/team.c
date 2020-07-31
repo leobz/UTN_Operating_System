@@ -541,7 +541,7 @@ char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion) {
 
 void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
 	if (id_mensaje != NULL){
-		dictionary_put(enviaron_get, id_mensaje, pokemon);
+		dictionary_put(enviaron_get, id_mensaje, strdup(pokemon));
 	}
 }
 

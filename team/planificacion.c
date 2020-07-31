@@ -308,7 +308,6 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
 
 		ejecutar_intercambio(tcb);
-
 		cantidad_ciclos_instruccion = 5;
 		sleep(team_config->retardo_ciclo_cpu * 5);
 
@@ -590,10 +589,8 @@ void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
-	list_add(blocked, tcb);
-	tcb->estado_tcb = BLOCKED;
+	pasar_a_cola(tcb, blocked, BLOCKED, "Espera confirmacion Caught");
 	metricas->cantidad_cambios_contexto++;
-	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
 	pthread_mutex_unlock(&mutex_planificador);
 }
 
@@ -617,6 +614,12 @@ void finalizar_hilo_planificador() {
 
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	list_remove_element(ready,tcb);
+	list_remove_element(blocked, tcb);
+	list_remove_element(unblocked, tcb);
+	list_remove_element(ready_to_exchange, tcb);
+	list_remove_element(new, tcb);
+
 	finalizar_hilo_tcb(tcb);
 
 
