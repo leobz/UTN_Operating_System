@@ -20,7 +20,7 @@ void agregar_tests_algoritmos(){
 
 void inicializar_test_algoritmos_bf(){
 
-
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANO_MEMORIA;
 	free(broker_config->algoritmo_memoria);
@@ -37,6 +37,7 @@ void inicializar_test_algoritmos_bf(){
 
 void inicializar_test_algoritmos_ff(){
 
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANO_MEMORIA;
@@ -350,6 +351,7 @@ void liberar_listas_y_diccionarios(){
 void finalizar_test_algoritmos() {
 	finalizar_memoria_cache();
 	destruir_broker_config(broker_config);
+	destruir_logger(logger);
 }
 
 

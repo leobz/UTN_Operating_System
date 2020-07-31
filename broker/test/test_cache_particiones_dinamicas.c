@@ -15,6 +15,8 @@ void agregar_tests_particiones_dinamicas(){
 }
 
 void inicializar_test_con_particion_dinamica(){
+
+	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
 	broker_config = cargar_broker_config("broker.config.sample");
 	broker_config->tamanio_memoria = TAMANIO_MEMORIA;
 	free(broker_config->algoritmo_memoria);
@@ -26,6 +28,7 @@ void inicializar_test_con_particion_dinamica(){
 void finalizar_test() {
 	finalizar_memoria_cache();
 	destruir_broker_config(broker_config);
+	destruir_logger(logger);
 }
 
 void test_inicializar_cache_crea_particion_libre(){
@@ -50,6 +53,7 @@ void test_guardar_un_payload(){
 	assert_particion_esta_ocupada(particion_de_guardado);
 	assert_particion_tiene_el_tamanio(particion_de_guardado, tamanio);
 	assert_particion_tiene_offset(particion_de_guardado, 0);
+
 
 	finalizar_test();
 }
@@ -81,9 +85,17 @@ void test_guardar_varias_particiones_no_afecta_particiones_previas(){
 	t_particion_dinamica* particion_escrita_b = guardar_string_en_particion(a_guardar_b);
 	t_particion_dinamica* particion_escrita_c = guardar_string_en_particion(a_guardar_c);
 
-	CU_ASSERT_STRING_EQUAL(a_guardar_a, leer_particion_dinamica(particion_escrita_a));
-	CU_ASSERT_STRING_EQUAL(a_guardar_b, leer_particion_dinamica(particion_escrita_b));
-	CU_ASSERT_STRING_EQUAL(a_guardar_c, leer_particion_dinamica(particion_escrita_c));
+	char*part_a=leer_particion_dinamica(particion_escrita_a);
+	char*part_b=leer_particion_dinamica(particion_escrita_b);
+	char*part_c=leer_particion_dinamica(particion_escrita_c);
+
+	CU_ASSERT_STRING_EQUAL(a_guardar_a, part_a);
+	CU_ASSERT_STRING_EQUAL(a_guardar_b, part_b);
+	CU_ASSERT_STRING_EQUAL(a_guardar_c, part_c);
+
+	free(part_a);
+	free(part_b);
+	free(part_c);
 
 	finalizar_test();
 }

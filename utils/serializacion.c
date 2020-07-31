@@ -97,36 +97,46 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 		case NEW_POKEMON:{
 
 			t_mensaje_new* men=deserializar_payload_new_pokemon(payload);
-			return payload_new_sin_barra(men->pokemon,men->posx,men->posy,men->cantidad);
 
+			char*payd=payload_new_sin_barra(men->pokemon,men->posx,men->posy,men->cantidad);
+			free(men);
+			return payd;
 			break;
 		}
 		case GET_POKEMON:{
 
 			t_mensaje_get* men=deserializar_payload_get_pokemon(payload);
-			return payload_get_sin_barra(men->pokemon);
-
+			char*payd=payload_get_sin_barra(men->pokemon);
+			free(men);
+			return payd;
 
 			break;
 		}
 		case CATCH_POKEMON:{
 
 			t_mensaje_catch* men=deserializar_payload_catch_pokemon(payload);
-			return payload_catch_sin_barra(men->pokemon,men->posx,men->posy);
-
+			char*payd=payload_catch_sin_barra(men->pokemon,men->posx,men->posy);
+			free(men);
+			return payd;
 			break;
 		}
 		case APPEARED_POKEMON:{
 
 			t_mensaje_appeared* men=deserializar_payload_appeared_pokemon(payload);
-			return payload_appeared_sin_barra(men->pokemon,men->posx,men->posy);
+
+			char*payd=payload_appeared_sin_barra(men->pokemon,men->posx,men->posy);
+			free(men);
+			return payd;
 
 			break;
 		}
 		case LOCALIZED_POKEMON:{
 
 			t_mensaje_localized* men=deserializar_payload_localized_pokemon(payload);
-			return payload_localized_sin_barra(men->pokemon,men->cantidad_posiciones,men->pos);
+
+			char*payd=payload_localized_sin_barra(men->pokemon,men->cantidad_posiciones,men->pos);
+			free(men);
+			return payd;
 
 			break;
 		}
@@ -350,6 +360,8 @@ t_mensaje_new* deserializar_payload_new_pokemon_con_barra(void*payload) {
 		offset += sizeof(int);
 	memcpy(&(mensaje_new->cantidad), payload + offset, sizeof(int));
 
+	free(payload);
+
 	return mensaje_new;
 }
 
@@ -387,6 +399,8 @@ t_mensaje_new* deserializar_paquete_new_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_new->cantidad), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_new;
 }
@@ -511,14 +525,15 @@ t_mensaje_get* deserializar_paquete_get_pokemon(void* package) {
 	memcpy(&(size), package + offset, sizeof(int));
 	offset += sizeof(int);
 
-	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(
-			sizeof(t_mensaje_get));
+	t_mensaje_get* mensaje_get = (t_mensaje_get*) malloc(sizeof(t_mensaje_get));
 
 	memcpy(&(mensaje_get->length_pokemon), package + offset, sizeof(int));
 
 	mensaje_get->pokemon = malloc(mensaje_get->length_pokemon);
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, package + offset,mensaje_get->length_pokemon);
+
+	free(package);
 
 	return mensaje_get;
 }
@@ -533,6 +548,7 @@ t_mensaje_get* deserializar_payload_get_pokemon(void*payload){
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
 
+
 	return mensaje_get;
 }
 
@@ -545,6 +561,8 @@ t_mensaje_get* deserializar_payload_get_pokemon_con_barra(void*payload){
 	mensaje_get->pokemon = malloc((mensaje_get->length_pokemon)+1);
 	offset += sizeof(int);
 	memcpy(mensaje_get->pokemon, payload + offset,mensaje_get->length_pokemon);
+
+	free(payload);
 
 	return mensaje_get;
 }
@@ -659,6 +677,7 @@ t_mensaje_catch* deserializar_payload_catch_pokemon(void* payload) {
 		offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
 
+
 	return mensaje_catch;
 }
 
@@ -674,6 +693,8 @@ t_mensaje_catch* deserializar_payload_catch_pokemon_con_barra(void* payload) {
 	memcpy(&(mensaje_catch->posx), payload + offset, sizeof(int));
 		offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy),payload + offset, sizeof(int));
+
+	free(payload);
 
 	return mensaje_catch;
 }
@@ -694,8 +715,7 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package) {
 	memcpy(&(size), package + offset, sizeof(int));
 	offset += sizeof(int);
 
-	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*) malloc(
-			sizeof(t_mensaje_catch));
+	t_mensaje_catch* mensaje_catch = (t_mensaje_catch*) malloc(sizeof(t_mensaje_catch));
 
 	memcpy(&(mensaje_catch->length_pokemon), package + offset, sizeof(int));
 
@@ -709,6 +729,8 @@ t_mensaje_catch* deserializar_paquete_catch_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_catch->posy), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_catch;
 }
@@ -829,6 +851,7 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon(void* payload) {
 	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
 	stream += sizeof(int);
 
+
 	return mensaje_appeared;
 }
 
@@ -849,6 +872,8 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon_con_barra(void* payloa
 
 	memcpy(&(mensaje_appeared->posy), stream, sizeof(int));
 	stream += sizeof(int);
+
+	free(payload);
 
 	return mensaje_appeared;
 }
@@ -883,6 +908,8 @@ t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package) {
 
 	offset += sizeof(int);
 	memcpy(&(mensaje_appeared->posy), package + offset, sizeof(int));
+
+	free(package);
 
 	return mensaje_appeared;
 }
@@ -1023,6 +1050,7 @@ t_mensaje_localized* deserializar_paquete_localized_pokemon(void* package) {
 		memcpy(&(mensaje_localized->pos[i].posy), package+offset, sizeof(int));
 		offset += sizeof(int);
 	}
+	free(package);
 
 	return mensaje_localized;
 }
@@ -1128,6 +1156,7 @@ t_mensaje_localized* deserializar_payload_localized_pokemon(void* package) {
 
 	}
 
+
 	return mensaje_localized;
 }
 
@@ -1169,8 +1198,9 @@ t_mensaje_localized* deserializar_payload_localized_pokemon_con_barra(void* pack
 
 	memcpy(&(mensaje_localized->pos[i].posy), package+offset, sizeof(int));
 		offset += sizeof(int);
-
 	}
+
+	free(package);
 
 	return mensaje_localized;
 }

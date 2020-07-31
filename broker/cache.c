@@ -488,8 +488,9 @@ t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cer
 
 	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
 
-
-	return guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+	t_particion_dinamica*part_dinamica=guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+	free(payload);
+	return part_dinamica;
 }
 
 int obtener_particion_minima_suficiente(int tamanio_mensaje, op_code cod_op) {
@@ -528,11 +529,6 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void *payloa
 	//printf("Almacenando mensaje en cache en posicion %d\n",particion_destino->offset);
 	crear_particion_intermedia(particion_destino);
 
-	t_list* particiones_libres=obtener_particiones_dinamicas_libres();
-		//printf("Particiones libres: %d\n",list_size(particiones_libres));
-
-	free(particiones_libres);
-
 	guardar_en_cache(payload, particion_destino->offset, particion_destino->tamanio_particion);
 
 
@@ -561,8 +557,9 @@ int calcular_tamanio_particion_intermedia(t_particion_dinamica* part_ocupada, t_
 t_particion_dinamica* buscar_particion_dinamica_libre(int tamanio){
 	t_list* particiones_posibles = obtener_particiones_posibles(tamanio);
 	ordenar_segun_algoritmo_de_particiones_libres(particiones_posibles);
-
-	return list_first(particiones_posibles);
+	t_particion_dinamica*part=list_first(particiones_posibles);
+	free(particiones_posibles);
+	return part;
 }
 
 
@@ -572,6 +569,7 @@ t_list* obtener_particiones_posibles(int tamanio) {
 	t_list* particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 
 	while (particiones_posibles==NULL) {
+		free(particiones_posibles);
 		if (supero_limite_de_eliminaciones(particiones_eliminadas)) {
 			compactar_particiones_dinamicas();
 			particiones_eliminadas = 0;
@@ -581,6 +579,7 @@ t_list* obtener_particiones_posibles(int tamanio) {
 		//printf("Particiones posibles %d",list_size(particiones_posibles));
 
 		if (particiones_posibles==NULL) {
+			free(particiones_posibles);
 			eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
 			particiones_posibles = filtar_particiones_libres_y_suficientes(tamanio);
 			particiones_eliminadas++;
@@ -597,6 +596,7 @@ t_list* filtar_particiones_libres_y_suficientes(int tamanio) {
 	t_list* particiones_posibles = filtrar_particiones_por_tamanio(particiones_libres, tamanio);
 
 	if(list_is_empty(particiones_posibles)){
+		free(particiones_libres);
 		free(particiones_posibles);
 		return NULL;}
 
@@ -659,6 +659,7 @@ void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 	t_particion_dinamica* particion_victima= list_first(particiones_ocupadas);
 
 		liberar_particion_dinamica(particion_victima);
+		free(particiones_ocupadas);
 		unir_particiones_dinamicas_libres();//consolidacion
 
 }
@@ -761,6 +762,8 @@ void eliminar_particiones_libres(){
 	}
 
 	list_iterate(particiones_libres,&eliminar_particion);
+
+	free(particiones_libres);
 }
 
 t_list* filtrar_particiones_por_tamanio(t_list* particiones, int tamanio_payload) {

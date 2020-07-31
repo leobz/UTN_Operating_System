@@ -38,7 +38,11 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 	mensaje->payload= serializar_segun_codigo_con_barra(payload,mensaje->codigo_operacion,&payload_size);
 	mensaje->payload_size = payload_size;
 
-	return empaquetar_mensaje_broker(mensaje, bytes);
+	void*payd=empaquetar_mensaje_broker(mensaje, bytes);
+
+	free(mensaje->payload);
+	free(mensaje);
+	return payd;
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {
@@ -64,12 +68,16 @@ void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaj
 
 	op_code cod_ope = admins_mensaje->codigo_operacion;
 
-	dictionary_remove(administracion_por_id, pasar_a_char(id_mensajee));
+	char*id_men=pasar_a_char(id_mensajee);
+	dictionary_remove(administracion_por_id, id_men);
+	free(id_men);
 
 
 	//Elimino adm_mensaje de la lista asociada al diccionario 'administracion_por_cod'
-	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, pasar_a_char(cod_ope));
 
+	char*cod=pasar_a_char(cod_ope);
+	t_list* lista_adm_mensajes = dictionary_get(administracion_por_cod, cod);
+	free(cod);
 
 	bool tiene_mismo_id_mensaje(t_adm_mensaje* elem_adm_mensaje){
 		return elem_adm_mensaje->id_mensaje == id_mensajee;

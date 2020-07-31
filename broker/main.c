@@ -103,7 +103,7 @@ void loggear_mensaje_enviado(int socket, int codigo_de_operacion) {
 	log_info(logger, "Mensaje enviado %s a socket: %d", op_code_to_string(codigo_de_operacion), socket);
 }
 
-void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
+void loggear_mensaje_recibido(int codigo_de_operacion, void* send_package) {
 	// Esta funcion no es de tanta prioridad, terminar solo despues de hacer la adminstracion de mensajes completa
 	switch (codigo_de_operacion) {
 
@@ -112,7 +112,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		t_mensaje_new *mensaje_new_recibido;
 
-		mensaje_new_recibido = deserializar_paquete_new_pokemon(sent_package);
+		mensaje_new_recibido = deserializar_paquete_new_pokemon(send_package);
 
 			log_info(logger,"Mensaje recibido NEW_POKEMON %s %d %d %d",mensaje_new_recibido->pokemon,
 					mensaje_new_recibido->posx,mensaje_new_recibido->posy,mensaje_new_recibido->cantidad);
@@ -126,7 +126,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		t_mensaje_get *mensaje_get_recibido;
 
-		mensaje_get_recibido= deserializar_paquete_get_pokemon(sent_package);
+		mensaje_get_recibido= deserializar_paquete_get_pokemon(send_package);
 
 			log_info(logger,"Mensaje recibido GET_POKEMON %s",mensaje_get_recibido->pokemon);
 
@@ -140,7 +140,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		t_mensaje_catch *mensaje_catch_recibido;
 
-		mensaje_catch_recibido = deserializar_paquete_catch_pokemon(sent_package);
+		mensaje_catch_recibido = deserializar_paquete_catch_pokemon(send_package);
 		log_info(logger, "Mensaje recibido CATCH_POKEMON %s %d %d",
 				mensaje_catch_recibido->pokemon, mensaje_catch_recibido->posx,
 				mensaje_catch_recibido->posy);
@@ -153,7 +153,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		t_mensaje_appeared *mensaje_appeared_recibido;
 
-		mensaje_appeared_recibido= deserializar_paquete_appeared_pokemon(sent_package);
+		mensaje_appeared_recibido= deserializar_paquete_appeared_pokemon(send_package);
 
 		log_info(logger,"Mensaje recibido APPEARED_POKEMON %s %d %d",mensaje_appeared_recibido->pokemon,
 				mensaje_appeared_recibido->posx,mensaje_appeared_recibido->posy);
@@ -169,7 +169,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 
 		t_mensaje_localized* mensaje_localized;
 
-		mensaje_localized= deserializar_paquete_localized_pokemon(sent_package);
+		mensaje_localized= deserializar_paquete_localized_pokemon(send_package);
 
 			log_info(logger,"Mensaje recibido LOCALIZED_POKEMON %s %d",mensaje_localized->pokemon, mensaje_localized->cantidad_posiciones);
 
@@ -182,7 +182,7 @@ void loggear_mensaje_recibido(int codigo_de_operacion, void* sent_package) {
 	case CAUGHT_POKEMON:{
 
 		t_mensaje_caught *mensaje_caught_recibido;
-		mensaje_caught_recibido= deserializar_paquete_caught_pokemon(sent_package);
+		mensaje_caught_recibido= deserializar_paquete_caught_pokemon(send_package);
 
 		log_info(logger,"Mensaje recibido CAUGHT_POKEMON %d %s",mensaje_caught_recibido->id_correlativo,
 				value_to_state(mensaje_caught_recibido->resultado));
@@ -208,7 +208,11 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		int bytes=0;
 		void *sent_package = empaquetar_mensaje_broker(mensaje[codigo_de_operacion],&bytes);
 
-		loggear_mensaje_recibido(codigo_de_operacion, sent_package);
+
+		//LO CREO PQ LOGGEAR HACE FREE DEL PAQUETE AUXILIAR
+		char*paquete_auxiliar=malloc(bytes);
+		memcpy(paquete_auxiliar,sent_package,bytes);
+		loggear_mensaje_recibido(codigo_de_operacion, paquete_auxiliar);
 
 		t_adm_mensaje* administrator=iniciar_administracion(mensaje[codigo_de_operacion]);
 
@@ -232,8 +236,6 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 
 	if(list_size(suscriptores[codigo_de_operacion])!=0){
 		list_iterate(suscriptores[codigo_de_operacion],&enviar_a_suscriptores);}
-
-
 
 		free(sent_package);
 		free(mensaje[codigo_de_operacion]->payload);

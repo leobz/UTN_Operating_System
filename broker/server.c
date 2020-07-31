@@ -18,14 +18,21 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 
 		if(paquete->id_correlativo==0){
 			ingresar_en_cola_y_cache(paquete);
+			liberar_paquete_socket(paquete);
 		}
 		else{
 			if(esta_en_diccionario(mensajes_iguales,paquete->id_correlativo)){
 				enviar_confirmacion(++id_mensaje,CONFIRMACION,paquete->socket_cliente);
+				liberar_paquete_socket(paquete);
 			}
 			else{
 				ingresar_en_cola_y_cache(paquete);
-				meter_en_diccionario(mensajes_iguales,pasar_a_char(paquete->id_correlativo),paquete->id_proceso);
+
+				char*id_men=pasar_a_char(paquete->id_correlativo);
+				meter_en_diccionario(mensajes_iguales,id_men,paquete->id_proceso);
+				free(id_men);
+
+				liberar_paquete_socket(paquete);
 			}
 		}
 	}
@@ -119,10 +126,9 @@ void verificar_cache(t_proceso* proceso){
 			void* mensaje_para_enviar = generar_mensaje(actual_administrator,&bytes);
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
-			if(validez!=1) //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
-
-			//verificar pq puede que ese proceso ya exista en esa lista
+			if(validez!=1)
 			list_add(actual_administrator->suscriptores_enviados,proceso);
+			free(mensaje_para_enviar);
 		}
 
 	}
@@ -167,7 +173,6 @@ void ingresar_en_cola_y_cache(t_paquete_socket* paquete){
 
 	sem_post(&cola_vacia[paquete->codigo_operacion]);
 
-	liberar_paquete_socket(paquete);
 }
 
 
