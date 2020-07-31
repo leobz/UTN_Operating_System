@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ciclo_cpu_time=1
+ciclo_cpu_time=0.4
 
 echo "\n**  Test Final Prueba completa	**\n" 
 
@@ -87,3 +87,27 @@ echo "\n**  Parte 3: Ejecutando script 'new_pokemon_post_team.sh'  **\n"
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Umbreon 10 6 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Espeon 7 1 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Vaporeon 4 10 1
+
+sleep $(calc $ciclo_cpu_time \* 40)
+
+
+echo "\nComprobacion: Ambos team cumplieron objetivo:\n"
+
+tail -10 team.log
+echo
+tail -10 ../team/Debug/team.log
+
+
+echo "\n\nEjecutando test de byexample\n"
+byexample -l shell catedra-final-completo.md
+
+
+echo "Restaurando configuracion inicial"
+rm broker.config; cp broker.config.auxiliar broker.config; rm broker.config.auxiliar
+rm gamecard.config; cp gamecard.config.auxiliar gamecard.config; rm gamecard.config.auxiliar
+rm team.config; cp team.config.auxiliar team.config; rm team.config.auxiliar
+rm ../team/Debug/team.config; cp ../team/Debug/team.config.auxiliar ../team/Debug/team.config; ../team/Debug/team.config.auxiliar
+#rm *.log
+
+echo "Cerrando procesos anteriores.."
+./mataProcesos.sh 2> /dev/null

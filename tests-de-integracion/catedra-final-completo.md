@@ -21,24 +21,67 @@ El objetivo de la prueba es verificar el correcto funcionamiento del sistema glo
 3) Verificar que ambos procesos Team finalicen cumpliendo su objetivo
 4) Verificar que la memoria vaya realizando los reemplazos necesarios para el correcto funcionamiento
 
+-------------------------------------------------------------------------------------
+## Comprobar que finalizan los teams
 
 ```bash
-$ cat broker.log | grep "Almacenando mensaje"
-<...>Almacenando mensaje con ID 1 en cache en posicion 0<...>
-<...>Almacenando mensaje con ID 2 en cache en posicion 4<...>
-<...>Almacenando mensaje con ID 3 en cache en posicion 32<...>
-<...>Almacenando mensaje con ID 4 en cache en posicion 16<...>
+$ cat team.log | grep "FIN DEL PROCESO"
+<...>[FIN DEL PROCESO] ¡Team cumplió objetivo!<...>
 ```
 
 
 ```bash
-$ cat broker.log | grep "BUDDY SYSTEM"
-<...>Eliminación de partición con posición de inicio: 0<...>
-<...>Eliminación de partición con posición de inicio: 4<...>
-<...>Eliminación de partición con posición de inicio: 32<...>
+$ cat ../team/Debug/team.log | grep "FIN DEL PROCESO"
+<...>[FIN DEL PROCESO] ¡Team cumplió objetivo!<...>
+```
+
+
+-------------------------------------------------------------------------------------
+## Comprobar que el FS esta vacio
+
+```bash
+$ cat ../tall_grass/Files/Espeon/Metadata.bin
+<...>SIZE=0
 ```
 
 ```bash
-$ cat broker.log | grep "Almacenando mensaje"
-<...>Almacenando mensaje con ID 5 en cache en posicion 32
+$ cat ../tall_grass/Files/Flareon/Metadata.bin
+<...>SIZE=0
 ```
+
+```bash
+$ cat ../tall_grass/Files/Jolteon/Metadata.bin
+<...>SIZE=0
+```
+
+```bash
+$ cat ../tall_grass/Files/Gengar/Metadata.bin
+<...>SIZE=0
+```
+
+```bash
+$ cat ../tall_grass/Files/Onix/Metadata.bin
+<...>SIZE=0
+```
+
+```bash
+$ cat ../tall_grass/Files/Pikachu/Metadata.bin
+<...>SIZE=0
+```
+
+```bash
+$ cat ../tall_grass/Files/Squirtle/Metadata.bin
+<...>SIZE=0
+```
+
+```bash
+$ cat ../tall_grass/Files/Umbreon/Metadata.bin
+<...>SIZE=0
+```
+
+
+```bash
+$ cat ../tall_grass/Files/Vaporeon/Metadata.bin
+<...>SIZE=0
+```
+
