@@ -107,6 +107,7 @@ void enviar_mensaje_localized(void* a_enviar,int bytes){
 	int conexion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
 	if (conexion == -1) {
 		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+		free(a_enviar);
 	}
 	else {
 
@@ -152,7 +153,7 @@ void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 	else {
 		int bytes;
 
-		void* a_enviar = serializar_caught_pokemon(&bytes, estado,paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		void* a_enviar = serializar_caught_pokemon(&bytes, estado,0, paquete_socket->id_mensaje);
 		printf("Enviando mensaje %s \n",op_code_to_string(CAUGHT_POKEMON));
 
 		enviar_mensaje(conexion, a_enviar, bytes);

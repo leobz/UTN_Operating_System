@@ -126,8 +126,10 @@ void verificar_cache(t_proceso* proceso){
 			void* mensaje_para_enviar = generar_mensaje(actual_administrator,&bytes);
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
-			if(validez!=1)
-			list_add(actual_administrator->suscriptores_enviados,proceso);
+			if(validez!=1){
+				//log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",num_cola, proceso->id_proceso, proceso->socket);
+				list_add(actual_administrator->suscriptores_enviados,proceso);
+			}
 			free(mensaje_para_enviar);
 		}
 
