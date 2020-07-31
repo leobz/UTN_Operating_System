@@ -488,8 +488,9 @@ t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cer
 
 	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
 
-
-	return guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+	t_particion_dinamica*part_dinamica=guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
+	free(payload);
+	return part_dinamica;
 }
 
 int obtener_particion_minima_suficiente(int tamanio_mensaje, op_code cod_op) {

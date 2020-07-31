@@ -66,9 +66,6 @@ void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* me
 	else {
 		int bytes=0;
 		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,mensaje_new->posx, mensaje_new->posy,0, paquete_socket->id_mensaje);
-		t_mensaje_appeared* mensaje_appeared_recibido=deserializar_paquete_appeared_pokemon(a_enviar);
-
-		//printf("Mensaje recibido APPEARED_POKEMON %s %d %d\n",mensaje_appeared_recibido->pokemon,mensaje_appeared_recibido->posx,mensaje_appeared_recibido->posy);
 
 		printf("Enviando mensaje %s \n",op_code_to_string(APPEARED_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
@@ -183,6 +180,7 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 }
 void crear_diccionario_semaforo(char*pokemonn){
 	pthread_mutex_t pokemon_sem;
+	pthread_mutex_init(&pokemon_sem, NULL);
 	dictionary_put(pokemon_semaphores,pokemonn,&pokemon_sem);
 }
 

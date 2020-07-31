@@ -38,7 +38,11 @@ void* generar_mensaje(t_adm_mensaje* actual_administrator, int*bytes){
 	mensaje->payload= serializar_segun_codigo_con_barra(payload,mensaje->codigo_operacion,&payload_size);
 	mensaje->payload_size = payload_size;
 
-	return empaquetar_mensaje_broker(mensaje, bytes);
+	void*payd=empaquetar_mensaje_broker(mensaje, bytes);
+
+	free(mensaje->payload);
+	free(mensaje);
+	return payd;
 }
 
 void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaje* mensaje) {

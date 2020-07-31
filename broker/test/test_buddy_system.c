@@ -121,12 +121,15 @@ void test_obtener_tamanio_real_memoria_cache_segun_config() {
 }
 
 void test_obtener_tamanio_particion_necesario_segun_tamanio_mensaje() {
+	inicializar_test_bs();
+
 	int tamanio_mensaje = 70;
 	int tamanio_particion_necesaria = 0;
 
 	tamanio_particion_necesaria = obtener_tamanio_particion_necesaria(tamanio_mensaje);
 
 	CU_ASSERT_EQUAL_FATAL(tamanio_particion_necesaria, 128);
+	finalizar_test_bs();
 }
 
 void test_hojas_libres_para_guardar_mensaje() {
