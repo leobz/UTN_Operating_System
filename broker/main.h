@@ -12,6 +12,7 @@
 #include "administracion-de-mensajes.h"
 
 t_mensaje* mensaje[6];
+int socket_servidor;
 
 //t_broker_config* config_broker;
 //t_log* log_broker;
