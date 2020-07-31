@@ -29,7 +29,7 @@ echo "\nEjecutando script new_pokemon_antes_team.sh (NEW_POKEMON -> Broker)"
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Squirtle 5 2 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Jolteon 2 2 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Flareon 4 6 1
-sleep 0.5
+sleep 2
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
 echo
@@ -52,7 +52,7 @@ echo "Levanto Team 1 en segundo plano"
 1>/dev/null 2>/dev/null     ../team/Debug/team &
 
 echo "\nCargando configuracion Team 2 de la Cátedra"
-rm ../team/Debug/team.config; cp team.2.config.final.completo ../team/Debug/team.config
+cp ../team/Debug/team.config ../team/Debug/team.config.auxiliar; rm ../team/Debug/team.config; cp team.2.config.final.completo ../team/Debug/team.config
 echo "Levanto Team 2 en segundo plano"
 cd ../team/Debug/
 1>/dev/null 2>/dev/null     ./team & 
