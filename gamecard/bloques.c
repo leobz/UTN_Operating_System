@@ -78,7 +78,7 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 	char* ruta = crear_ruta(ruta_al_metadata_bin_del_archivo);
 	t_bloque* bloque_metadata_archivo = config_create(ruta);
 	archivo->directory = strdup(config_get_string_value(bloque_metadata_archivo, "DIRECTORY"));
-	char* string_blocks = config_get_array_value(bloque_metadata_archivo, "BLOCKS");
+	char** string_blocks = config_get_array_value(bloque_metadata_archivo, "BLOCKS");
 	archivo->blocks = strings_to_list(string_blocks);
 	archivo->open = strdup(config_get_string_value(bloque_metadata_archivo, "OPEN"));
 	archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
@@ -93,7 +93,9 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 char* ruta_blocks(char* numero_de_bloque) {
 	char* ruta_bloque = string_new();
 	string_append_with_format(&ruta_bloque, "Blocks/%s.bin",numero_de_bloque);
-	return crear_ruta(ruta_bloque);
+	char* ruta = crear_ruta(ruta_bloque);
+	free(ruta_bloque);
+	return ruta;
 }
 
 char* buffer_del_archivo_completo(t_metadata_pokemon* archivo) {
@@ -141,8 +143,10 @@ int escribir_buffer_en_bloque(char* buffer, char* numero_de_bloque) {
 }
 
 char* obtener_numero_de_bloque_disponible(){
+	pthread_mutex_lock(&mutex_bitmap);
+	int bloque_disponible= bloque_disponible_en_bitmap();
+	pthread_mutex_unlock(&mutex_bitmap);
 
-	int bloque_disponible=bloque_disponible_en_bitmap();
 		return string_itoa(bloque_disponible);
 	return NULL;
 }
@@ -200,6 +204,7 @@ void actualizar_vector_de_bloques_en_metadata(t_metadata_pokemon* archivo, char*
 	config_set_value(pokemon_config,"BLOCKS",vector_de_bloques);
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_pokemon);
 	free(path_absoluta);
 }
 
@@ -212,6 +217,7 @@ void actualizar_tamanio_archivo(char*buffer_pokemon,char*pokemonn){
 	config_set_value(pokemon_config,"SIZE",space_st);
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_pokemon);
 	free(path_absoluta);
 	free(space_st);
 }
@@ -225,22 +231,26 @@ char* formar_archivo_pokemon(char*pokemonn){
 }
 
 t_config* leer_config_pokemon(char* pokemon){
-	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon));
+	char* archivo_pokemon = formar_archivo_pokemon(pokemon);
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(archivo_pokemon);
 	char* buffer_pokemon = buffer_del_archivo_completo(metadata_pokemon);
 	t_config* config_pokemon = cargar_config_desde_buffer(buffer_pokemon);
 
-	free(metadata_pokemon);
+	free(archivo_pokemon);
+	destruir_metadata_pokemon(metadata_pokemon);
 	free(buffer_pokemon);
 
 	return config_pokemon;
 }
 
 void guardar_config_en_archivo_pokemon(t_config* config_pokemon, char *pokemon) {
-	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemon));
+	char* archivo_pokemon = formar_archivo_pokemon(pokemon);
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(archivo_pokemon);
 	char* buffer_pokemon = config_save_to_buffer(config_pokemon);
 	actualizar_tamanio_archivo(buffer_pokemon,pokemon);
 	escribir_archivo(metadata_pokemon, buffer_pokemon, pokemon);
 
+	free(archivo_pokemon);
 	destruir_metadata_pokemon(metadata_pokemon);
 	free(buffer_pokemon);
 

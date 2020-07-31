@@ -189,15 +189,18 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 }
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
-	int bloque_disponible=bloque_disponible_en_bitmap();
+	pthread_mutex_lock(&mutex_bitmap);
+	int bloque_disponible = bloque_disponible_en_bitmap();
 	if(bloque_disponible!=-1){
-		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
-		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		setear_bloque_ocupado(bloque_disponible);
+		pthread_mutex_unlock(&mutex_bitmap);
+		char*path_archivo_pokemon = crear_pokemon_metadata(mensaje_new->pokemon);
+		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,true);//indica que esta abierto
 	}
 	else{
+		pthread_mutex_unlock(&mutex_bitmap);
 		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
 		exit(1);
 	}
@@ -233,6 +236,7 @@ char* crear_pokemon_metadata(char*pokemonn){
 	char*path_completo=crear_ruta(path_archivo_pokemon);
 	mkdir(path_completo, 0777);
 	string_append(&path_completo, "/Metadata.bin");
+	free(path_archivo_pokemon);
 
 	return path_completo;
 }
@@ -265,7 +269,7 @@ bool archivo_esta_abierto(char *pokemonn){
 	return dictionary_get(archivos_existentes,pokemonn);
 }
 
-char* setear_archivo_abierto(char*pokemonn){
+void setear_archivo_abierto(char*pokemonn){
 	dictionary_put(archivos_existentes,pokemonn,true);
 	char*path_pokemon=formar_archivo_pokemon(pokemonn);
 	char*path_absoluta=crear_ruta(path_pokemon);
@@ -273,8 +277,8 @@ char* setear_archivo_abierto(char*pokemonn){
 	config_set_value(pokemon_config, "OPEN","Y");
 	config_save(pokemon_config);
 	config_destroy(pokemon_config);
+	free(path_pokemon);
 	free(path_absoluta);
-	return path_pokemon;
 }
 
 void cerrar_archivo(char* pokemonn){
@@ -292,6 +296,7 @@ void cerrar_archivo(char* pokemonn){
 	printf("[GAMECARD] Guardo cambio en pokemon_config\n");
 	config_destroy(pokemon_config);
 	printf("[GAMECARD] Destruyo pokemon_config\n");
+	free(path_pokemon);
 	free(path_absoluta);
 	printf("[GAMECARD] Libero path_absoluta\n");
 	printf("[GAMECARD] Tamaño diccionario archivos_existentes: %d\n", dictionary_size(archivos_existentes));

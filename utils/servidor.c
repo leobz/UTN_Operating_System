@@ -39,10 +39,13 @@ void esperar_cliente(int socket_servidor, void(*procesar_mensaje_recibido)(t_paq
 {
 
 	struct sockaddr_in dir_cliente;
-
 	socklen_t tam_direccion = sizeof(struct sockaddr_in);
-
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+
+    if (socket_cliente < 1) {
+                perror("accept");
+                exit(socket_cliente);
+    }
 
 	t_paquete_socket* paquete = recibir_mensajes(socket_cliente);
 

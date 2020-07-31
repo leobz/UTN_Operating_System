@@ -21,7 +21,9 @@ char*ruta_bitmap(){
 	char* path_bitmap = string_new();
 	string_append(&path_bitmap,	"Metadata");
 	string_append(&path_bitmap, "/Bitmap.bin");
-	return crear_ruta(path_bitmap);
+	char* ruta = crear_ruta(path_bitmap);
+	free(path_bitmap);
+	return ruta;
 }
 
 void modificar_bit(t_bitarray*bitmap,bool valor,int bit){
@@ -123,13 +125,15 @@ void setear_bloque_ocupado(int numero_bloque){
 }
 
 void setear_bloque_libre(int numero_bloque){
+	pthread_mutex_lock(&mutex_bitmap);
 	t_bitarray*bitmap=leer_bitmap();
 	modificar_bit(bitmap,false,numero_bloque);
 	actualizar_archivo_bitmap(bitmap);
+	pthread_mutex_unlock(&mutex_bitmap);
+
 }
 
 int bloque_disponible_en_bitmap(){
-
 	int indice=-1;
 	bool bit=true;
 

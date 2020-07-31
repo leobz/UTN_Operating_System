@@ -21,7 +21,7 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket);
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket);
 void procesar_get_pokemon(t_paquete_socket* paquete_socket);
 bool archivo_esta_abierto(char* pokemonn);
-char* setear_archivo_abierto(char*pokemonn);
+void setear_archivo_abierto(char*pokemonn);
 void cerrar_archivo(char* pokemonn);
 t_bitarray * crear_bitmap(int cant_bloques);
 void actualizar_archivo_bitmap(t_bitarray * bitmap);

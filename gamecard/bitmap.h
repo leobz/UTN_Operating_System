@@ -28,6 +28,9 @@
 #include "../utils/cliente.h"
 #define BIT_SIZE(x,y) ((x - 1) / y + 1);
 
+
+pthread_mutex_t mutex_bitmap;
+
 typedef struct{
 	int block_size;
 	int blocks;
