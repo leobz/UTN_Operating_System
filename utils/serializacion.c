@@ -20,8 +20,10 @@ void eliminar_paquete(t_paquete* paquete) {
 }
 
 void liberar_paquete_socket(t_paquete_socket* paquete) {
-	free(paquete->buffer->stream);
-	free(paquete->buffer);
+	if(paquete->buffer != NULL){
+		free(paquete->buffer->stream);
+		free(paquete->buffer);
+	}
 	free(paquete);
 }
 

@@ -71,7 +71,7 @@ Cierro broker y gameboy (De otro modo los puertos quedan sin poder usarse)
 
 ```bash
 $ rm *.log; kill <gameboy-pid> ; kill <gameboy-pid2> ; kill <broker-pid> ; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
-<...>Term<...>
+<...>Hecho<...>
 <...>Term<...>
 <...>Term<...>
 ```

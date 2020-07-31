@@ -30,7 +30,7 @@ $ ../broker/Debug/broker &   # byexample: +fail-fast
 Levanto Team en segundo plano
 
 ```bash
-$ ../team/Debug/team &       # byexample: +fail-fast
+$ sleep <sleep-time>; ../team/Debug/team &       # byexample: +fail-fast +paste
 <...>[<job-team-id>] <team-pid>
 ```
 
@@ -41,14 +41,14 @@ $ ../team/Debug/team &       # byexample: +fail-fast
 Suscripción
 
 ```bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 120 & # byexample: +timeout=100 +fail-fast +paste
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 120 & # byexample: +timeout=100 +fail-fast +paste
 <...>[<job-gameboy-id>] <gameboy-pid>
 ```
 
 Comprobación
 
 ```bash
-$ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste
+$ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste +fail-fast
 <...>[SUSCRIPCION] Cola:CATCH_POKEMON ID_Proceso:120<...>
 ```
 
@@ -94,8 +94,8 @@ $ sleep <sleep-time>; cat gameboy.log   # byexample: +timeout=10 +fail-fast +pas
 Cierro broker, gameboy suscriptor y team (De otro modo los puertos quedan sin poder usarse)
 
 ```bash
-$ rm *.log; kill <gameboy-pid> ; kill <broker-pid> ; kill <team-pid>; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
-<...>Term<...>
-<...>Term<...>
-<...>Term<...>
-```
+$ rm *.log ; kill <broker-pid> ;  kill <gameboy-pid>; kill <team-pid>; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
+<...>Hecho<...>
+<...>Terminado<...>
+<...>Terminado<...>
+``` 
