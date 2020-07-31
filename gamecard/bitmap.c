@@ -21,7 +21,9 @@ char*ruta_bitmap(){
 	char* path_bitmap = string_new();
 	string_append(&path_bitmap,	"Metadata");
 	string_append(&path_bitmap, "/Bitmap.bin");
-	return crear_ruta(path_bitmap);
+	char* ruta = crear_ruta(path_bitmap);
+	free(path_bitmap);
+	return ruta;
 }
 
 void modificar_bit(t_bitarray*bitmap,bool valor,int bit){
