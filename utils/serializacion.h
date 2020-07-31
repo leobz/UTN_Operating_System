@@ -6,6 +6,8 @@
 #include<string.h>
 #include <stdbool.h>
 #include <commons/string.h>
+#include "commons/collections/list.h"
+
 // ESTRUCTURAS
 
 typedef enum {
@@ -169,8 +171,8 @@ t_mensaje_appeared* deserializar_payload_appeared_pokemon_con_barra(void*payload
 
 //LOCALIZED_POKEMON
 
-t_buffer* buffer_localized_pokemon(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);
-void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[],int id_mensaje, int id_correlativo);
+t_buffer* buffer_localized_pokemon(char* nombre_pokemon, t_list* posiciones);
+void* serializar_localized_pokemon(int* bytes, char* nombre_pokemon, t_list* posiciones,int id_mensaje, int id_correlativo);
 t_mensaje_localized* deserializar_mensaje_localized_pokemon(t_buffer* buffer);
 t_mensaje_localized* deserializar_paquete_localized_pokemon(void* package);
 void* payload_localized_sin_barra(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);

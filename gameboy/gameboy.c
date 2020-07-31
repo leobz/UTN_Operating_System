@@ -198,14 +198,19 @@ int main(int argc, char **argv) {
 		if (strcmp(argv[2], "LOCALIZED_POKEMON") == 0) {
 			char *pokemon = argv[3];
 			int cantidad_de_posiciones = atoi(argv[4]);
-			t_posiciones posi[cantidad_de_posiciones];
+//			t_posiciones posi[cantidad_de_posiciones];
+			t_list* posiciones = list_create();
 
 			int posicion_argumentos = 5;
 			for (int indice_par = 0; indice_par < cantidad_de_posiciones; indice_par++) {
-				posi[indice_par].posx = atoi(argv[posicion_argumentos]);
+				t_posiciones* posicion = malloc(sizeof(t_posiciones));
+
+				posicion->posx = atoi(argv[posicion_argumentos]);
 				posicion_argumentos++;
-				posi[indice_par].posy = atoi(argv[posicion_argumentos]);
+				posicion->posy = atoi(argv[posicion_argumentos]);
 				posicion_argumentos++;
+
+				list_add(posiciones, posicion);
 			}
 
 			int id_correlativo = atoi(argv[posicion_argumentos]);
@@ -220,7 +225,7 @@ int main(int argc, char **argv) {
 			log_info(logger, "Conexion establecida con [Broker]");
 
 			int bytes;
-			void* a_enviar = serializar_localized_pokemon(&bytes,pokemon,cantidad_de_posiciones,posi,0, id_correlativo);
+			void* a_enviar = serializar_localized_pokemon(&bytes,pokemon,posiciones,0, id_correlativo);
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 			recibir_id_correlativo(conexion);
