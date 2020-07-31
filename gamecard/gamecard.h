@@ -21,6 +21,7 @@
 // Estructuras
 pthread_mutex_t mutex_abrir_archivos;
 
+
 // Variables
 t_dictionary* archivos_existentes;
 t_dictionary* cantidad_posiciones_pokemon;

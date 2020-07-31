@@ -143,8 +143,10 @@ int escribir_buffer_en_bloque(char* buffer, char* numero_de_bloque) {
 }
 
 char* obtener_numero_de_bloque_disponible(){
+	pthread_mutex_lock(&mutex_bitmap);
+	int bloque_disponible= bloque_disponible_en_bitmap();
+	pthread_mutex_unlock(&mutex_bitmap);
 
-	int bloque_disponible=bloque_disponible_en_bitmap();
 		return string_itoa(bloque_disponible);
 	return NULL;
 }

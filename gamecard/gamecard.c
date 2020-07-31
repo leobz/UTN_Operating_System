@@ -57,7 +57,7 @@ cantidad_posiciones_pokemon=dictionary_create();
 
 void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_abrir_archivos, NULL);
-
+	pthread_mutex_init(&mutex_bitmap, NULL);
 }
 
 

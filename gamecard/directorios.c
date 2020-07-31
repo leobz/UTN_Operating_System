@@ -186,15 +186,18 @@ void crear_metadata_para_directorios(char*ruta_directorio){
 }
 
 void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
-	int bloque_disponible=bloque_disponible_en_bitmap();
+	pthread_mutex_lock(&mutex_bitmap);
+	int bloque_disponible = bloque_disponible_en_bitmap();
 	if(bloque_disponible!=-1){
-		char*path_archivo_pokemon=crear_pokemon_metadata(mensaje_new->pokemon);
-		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		setear_bloque_ocupado(bloque_disponible);
+		pthread_mutex_unlock(&mutex_bitmap);
+		char*path_archivo_pokemon = crear_pokemon_metadata(mensaje_new->pokemon);
+		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,true);//indica que esta abierto
 	}
 	else{
+		pthread_mutex_unlock(&mutex_bitmap);
 		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
 		exit(1);
 	}
