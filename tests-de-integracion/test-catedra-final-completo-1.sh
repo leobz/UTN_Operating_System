@@ -8,6 +8,7 @@ echo "Eliminando archivos anteriores"
 rm -r ../tall_grass/Files/*     2>/dev/null
 rm ../tall_grass/Blocks/*       2>/dev/null
 rm *.log                        2>/dev/null
+rm ../team/Debug/*.log          2>/dev/null
 
 
 
@@ -63,7 +64,7 @@ sleep 0.5
 
 
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
-sleep $(calc $ciclo_cpu_time \* 5)
+sleep $(calc $ciclo_cpu_time \* 8)
 
 echo
 cat ../tall_grass/Files/Pikachu/Metadata.bin
@@ -76,7 +77,7 @@ cat ../tall_grass/Files/Flareon/Metadata.bin
 echo
 
 
-
+sleep $(calc $ciclo_cpu_time \* 20)
 echo "\n**  Parte 3: Ejecutando script 'new_pokemon_post_team.sh'  **\n"
 
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Onix 2 8 1

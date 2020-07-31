@@ -18,7 +18,7 @@ void finalizar_team(t_team_config* team_config) {
 int main(int argc, char ** argv) {
 
 	//TODO: Tomar id proceso por archivo de configuracion
-	int id_proceso = 999;
+	int id_proceso = (int)getpid();
 
 	team_cumplio_objetivo = false;
 
