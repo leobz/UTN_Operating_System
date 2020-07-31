@@ -1,5 +1,7 @@
 #!/bin/sh
 
+ciclo_cpu_time=1
+
 echo "\n**  Test Final Prueba completa	**\n" 
 
 echo "Eliminando archivos anteriores"
@@ -56,5 +58,31 @@ cp ../team/Debug/team.config ../team/Debug/team.config.auxiliar; rm ../team/Debu
 echo "Levanto Team 2 en segundo plano"
 cd ../team/Debug/
 1>/dev/null 2>/dev/null     ./team & 
-
+cd ../../tests-de-integracion/
 sleep 0.5
+
+
+echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
+sleep $(calc $ciclo_cpu_time \* 5)
+
+echo
+cat ../tall_grass/Files/Pikachu/Metadata.bin
+echo
+cat ../tall_grass/Files/Squirtle/Metadata.bin
+echo
+cat ../tall_grass/Files/Jolteon/Metadata.bin
+echo
+cat ../tall_grass/Files/Flareon/Metadata.bin
+echo
+
+
+
+echo "\n**  Parte 3: Ejecutando script 'new_pokemon_post_team.sh'  **\n"
+
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Onix 2 8 1
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Gengar 6 6 1
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Squirtle 5 5 1
+
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Umbreon 10 6 1
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Espeon 7 1 1
+../gameboy/Debug/gameboy BROKER NEW_POKEMON Vaporeon 4 10 1
