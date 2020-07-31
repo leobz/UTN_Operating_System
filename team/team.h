@@ -82,6 +82,7 @@ typedef struct{
 	char *ip_broker;
 	char *puerto_broker;
 	char *log_file;
+	char* puerto_team;
 }t_team_config;
 
 t_team_config* team_config;

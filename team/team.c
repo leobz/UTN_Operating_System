@@ -38,6 +38,7 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 	team_config->log_file = strdup(config_get_string_value(config, "LOG_FILE"));
+	team_config->puerto_team =  strdup(config_get_string_value(config, "PUERTO_TEAM"));
 }
 
 char** separar_por_pipe(char* string_con_pipes) {
