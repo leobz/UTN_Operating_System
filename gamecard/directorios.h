@@ -29,7 +29,7 @@ void crear_archivo_metadata(char *path_pokemonn,int contador_bloques);
 void agregar_posicion(t_mensaje_new*);
 t_mensaje_appeared*obtener_mensaje_appeared(t_mensaje_new*);
 void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new);
-t_posiciones*obtener_posiciones_pokemon(char*);
+t_list*obtener_posiciones_pokemon(char*);
 void checkear_archivo_abierto(char*pokemonn);
 char* crear_pokemon_metadata(char*pokemonn);
 void enviar_mensaje_localized(void* a_enviar,int bytes);
