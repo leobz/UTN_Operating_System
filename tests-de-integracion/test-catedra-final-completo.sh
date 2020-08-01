@@ -1,7 +1,17 @@
 #!/bin/sh
 
-ciclo_cpu_time=1
-sleep_time=1
+echo "Elija algoritmo de planificacion. Opciones disponibles => 'FIFO', 'SJF :"
+read "algoritmo"
+if [ "$algoritmo" = "SJF" ]; then
+echo "\nEligio Algoritmo SJF\n"
+sleep 1;
+else
+echo "\nEligio FIFO o no ingreso nada (FIFO por default)\n"
+sleep 1;
+fi
+
+ciclo_cpu_time=0.2
+sleep_time=0.5
 
 echo "\n**  Test Final Prueba completa	**\n" 
 
@@ -50,22 +60,30 @@ sleep $sleep_time
 
 echo "\n**  Parte 2: 2 instancias de Team  **\n" 
 
-echo "Cargando configuracion Team 1 de la Cátedra"
+echo "Cargando configuracion Team 1 y Team 2 de la Cátedra"
 cp team.config team.config.auxiliar; rm team.config; cp team.1.config.final.completo team.config
+cp ../team/Debug/team.config ../team/Debug/team.config.auxiliar; rm ../team/Debug/team.config; cp team.2.config.final.completo ../team/Debug/team.config
+
+
+if [ "$algoritmo" = "SJF" ]; then
+sed -i 's/ALGORITMO_PLANIFICACION=FIFO/ALGORITMO_PLANIFICACION=SJF-SD/g' team.config 
+sed -i 's/ALGORITMO_PLANIFICACION=RR/ALGORITMO_PLANIFICACION=SJF-CD/g' ../team/Debug/team.config 
+fi
+
 echo "Levanto Team 1 en segundo plano"
 1>/dev/null 2>/dev/null     ../team/Debug/team &
+sleep $sleep_time
 
-echo "\nCargando configuracion Team 2 de la Cátedra"
-cp ../team/Debug/team.config ../team/Debug/team.config.auxiliar; rm ../team/Debug/team.config; cp team.2.config.final.completo ../team/Debug/team.config
+
 echo "Levanto Team 2 en segundo plano"
 cd ../team/Debug/
 1>/dev/null 2>/dev/null     ./team & 
 cd ../../tests-de-integracion/
-sleep $sleep_time
+
 
 
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
-sleep $(calc $ciclo_cpu_time \* 8)
+sleep $(calc $ciclo_cpu_time \* 10)
 
 echo
 cat ../tall_grass/Files/Pikachu/Metadata.bin
@@ -78,7 +96,7 @@ cat ../tall_grass/Files/Flareon/Metadata.bin
 echo
 
 
-sleep $(calc $ciclo_cpu_time \* 20)
+sleep $(calc $ciclo_cpu_time \* 40)
 echo "\n**  Parte 3: Ejecutando script 'new_pokemon_post_team.sh'  **\n"
 
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Onix 2 8 1
@@ -111,4 +129,4 @@ rm ../team/Debug/team.config; cp ../team/Debug/team.config.auxiliar ../team/Debu
 #rm *.log
 
 echo "Cerrando procesos anteriores.."
-sh mataProcesos.sh 2> /dev/null
+#sh mataProcesos.sh 2> /dev/null
