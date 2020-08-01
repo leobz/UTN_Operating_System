@@ -650,11 +650,11 @@ bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinam
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima(){
 
 
-	int particion_esta_libre(t_particion_dinamica* particion){
+	int particion_esta_ocupada(t_particion_dinamica* particion){
 			return !particion->esta_libre;
 		}
 
-	t_list* particiones_ocupadas=list_filter(particiones_dinamicas, (void*) particion_esta_libre);
+	t_list* particiones_ocupadas=list_filter(particiones_dinamicas, (void*) particion_esta_ocupada);
 	list_sort(particiones_ocupadas, (void*)pd_es_menor_contador_uso);
 	t_particion_dinamica* particion_victima= list_first(particiones_ocupadas);
 
@@ -679,6 +679,7 @@ void liberar_particion_dinamica(t_particion_dinamica* particion_victima){
 void unir_particiones_dinamicas_libres(){
 
 	t_list* particiones_libres=obtener_particiones_dinamicas_libres();
+	t_list*particiones_a_eliminar=list_create();
 
 	list_sort(particiones_libres,(void*)pd_es_menor_offset);
 
@@ -687,23 +688,33 @@ void unir_particiones_dinamicas_libres(){
 		if(dinamica->siguiente_particion!=NULL){
 			if(dinamica->siguiente_particion->esta_libre){
 
-				int counter=dinamica->orden_creacion;
-				dinamica->siguiente_particion->tamanio_particion+=dinamica->tamanio_particion;
-				dinamica->siguiente_particion->offset=dinamica->offset;
+				t_particion_dinamica*part_auxiliar= dinamica->siguiente_particion;
+
+				int counter=part_auxiliar->orden_creacion;
+				dinamica->tamanio_particion+=part_auxiliar->tamanio_particion;
+				dinamica->siguiente_particion=part_auxiliar->siguiente_particion;
+				part_auxiliar->siguiente_particion=NULL;
 
 				bool tiene_mismo_orden_creacion(t_particion_dinamica* particion_din){
 						return particion_din->orden_creacion== counter;
 					}
 
-				list_remove_by_condition(particiones_dinamicas, (void*)tiene_mismo_orden_creacion);
+				t_particion_dinamica*a_eliminar=list_remove_by_condition(particiones_dinamicas, (void*)tiene_mismo_orden_creacion);
 
-				free(dinamica);
-
+				list_add(particiones_a_eliminar,a_eliminar);
 			}
 		}
 	}
 	list_iterate(particiones_libres,&unir_libres);
 
+	void eliminar_particion(t_particion_dinamica* part){
+		free(part);
+	}
+
+	if(list_size(particiones_a_eliminar)!=0)
+		list_iterate(particiones_a_eliminar,(void*)eliminar_particion);
+
+	free(particiones_a_eliminar);
 	free(particiones_libres);
 }
 
@@ -715,6 +726,7 @@ void compactar_particiones_dinamicas(){
 	int offset_hueco=0;
 
 	t_list* particiones_ocupadas=obtener_particiones_dinamicas_ocupadas();
+	t_particion_dinamica*ultima_particion;
 
 	list_sort(particiones_ocupadas, (void*)pd_es_menor_offset);
 
@@ -723,6 +735,7 @@ void compactar_particiones_dinamicas(){
 		reubicar_particion(particion_din,offset_hueco);
 		particion_din->offset=offset_hueco;
 		offset_hueco=particion_din->offset + particion_din->tamanio_particion; //para la proxima particion a compactar
+		ultima_particion=particion_din;
 	}
 
 	list_iterate(particiones_ocupadas,&compactar);
@@ -735,6 +748,7 @@ void compactar_particiones_dinamicas(){
 
 	if(tamanio_restante>=broker_config->tamanio_minimo_particion){
 			t_particion_dinamica*particion_final = crear_particion_dinamica_libre(offset_libre, tamanio_restante);
+			ultima_particion->siguiente_particion=particion_final;
 			list_add(particiones_dinamicas, particion_final);}
 
 	free(particiones_ocupadas);
