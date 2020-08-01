@@ -81,7 +81,6 @@ cd ../team/Debug/
 cd ../../tests-de-integracion/
 
 
-
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
 sleep $(calc $ciclo_cpu_time \* 10)
 
@@ -97,6 +96,19 @@ echo
 
 
 sleep $(calc $ciclo_cpu_time \* 40)
+
+echo "\nComprobacion: Team 1 tiene 2 TCBs Unblocked:"
+cat team.log | grep Unblocked
+
+echo "\nComprobacion: Team 2 tiene 2 TCBs Ready to Exchange:"
+cat ../team/Debug/team.log | grep "Ready to Exchange"
+
+
+
+
+echo "\n\nAprete enter para correr 'new_pokemon_post_team.sh' "
+read "foo"
+
 echo "\n**  Parte 3: Ejecutando script 'new_pokemon_post_team.sh'  **\n"
 
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Onix 2 8 1
@@ -116,6 +128,9 @@ tail -10 team.log
 echo
 tail -10 ../team/Debug/team.log
 
+
+echo "\n\nAprete enter para correr test de by-example "
+read "foo"
 
 echo "\n\nEjecutando test de byexample\n"
 byexample -l shell catedra-final-completo.md

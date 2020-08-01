@@ -10,6 +10,16 @@ void imprimir_diccionario(t_dictionary* diccionario) {
 	dictionary_iterator(diccionario, imprimir_clave_valor);
 }
 
+
+void loggear_diccionario(t_dictionary* diccionario) {
+	void imprimir_clave_valor(char* key, int value) {
+		log_info(logger,"	%s -> %d", key, value);
+	}
+
+	dictionary_iterator(diccionario, imprimir_clave_valor);
+}
+
+
 void imprimir_posicion(t_posicion* posicion){
 	printf("	(%d, %d)\n", posicion->x, posicion->y);
 

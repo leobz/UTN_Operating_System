@@ -622,6 +622,10 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 
 	finalizar_hilo_tcb(tcb);
 
+	loggear_diccionario(objetivo_global);
+	loggear_diccionario(pokemones_atrapados);
+
+	log_info(logger,"Todos en exit? : %d", todos_los_entrenadores_exit());
 
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
