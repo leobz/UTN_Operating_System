@@ -174,6 +174,7 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
 		log_info(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
+		enviar_mensaje_caught(paquete_socket, FAIL);
 	}
 	eliminar_mensaje_catch(mensaje_catch);
 }
@@ -342,7 +343,7 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 }
 
 t_list* obtener_posiciones_pokemon(char*pokemonn){
-	printf("En obtencion\n");
+
 	int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,pokemonn);
 	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemonn));
 	char* buffer_pokemon = buffer_del_archivo_completo(metadata_pokemon);

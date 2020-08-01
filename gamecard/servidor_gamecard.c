@@ -18,7 +18,7 @@ void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 void servidor_gamecard(int conexion){
 	while (1){
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_recibido(paquete);
+		procesar_mensaje_recibido_broker(paquete);
 	}
 }
 
@@ -30,13 +30,14 @@ void suscribirme_al_broker(){
 	int i;
 	for (i=0; i<3; i++){
 		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-		socket_broker = conexion;
+
 		while (conexion == -1) {
 			printf("ERROR: Conexion con [Broker] no establecida\n");
 			sleep(gamecard_config->tiempo_reintento_conexion);
 			conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
 		}
 
+		socket_broker = conexion;
 		pthread_t hilo_gamecard_servidor;
 		pthread_create(&hilo_gamecard_servidor, NULL, (void*)servidor_gamecard, conexion);
 		pthread_detach(hilo_gamecard_servidor);
@@ -54,28 +55,13 @@ void suscribirme_al_broker(){
 	}
 }
 
-void confirmar_recepcion(t_paquete_socket* paquete_socket){
-	printf("Enviando confirmacion al socket %d... \n", socket_broker);
-	int offset = 0;
-	int* confirmacion = CONFIRMACION;
-	void* a_enviar = malloc(sizeof(int)*3);
-
-	memcpy(a_enviar, &confirmacion, sizeof(int));
-	offset += sizeof(int);
-	memcpy(a_enviar, &paquete_socket->id_mensaje, sizeof(int));
-	offset += sizeof(int);
-	memcpy(a_enviar, &gamecard_config->id_proceso, sizeof(int));
-
-	enviar_mensaje(paquete_socket->socket_cliente, a_enviar, sizeof(int)*2);
-}
-
-void procesar_mensaje_recibido(t_paquete_socket* paquete_socket){
+void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 
 	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
 		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
 		loggear_nueva_conexion(logger, paquete_socket);
 
-		confirmar_recepcion(paquete_socket);
+		preparar_confirmacion(paquete_socket->id_mensaje);
 
 		switch (paquete_socket->codigo_operacion){
 		case NEW_POKEMON:
@@ -92,5 +78,48 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket){
 		}
 		liberar_paquete_socket(paquete_socket);
 	}
+}
+
+void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket){
+
+	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
+		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
+		loggear_nueva_conexion(logger, paquete_socket);
+
+		switch (paquete_socket->codigo_operacion){
+		case NEW_POKEMON:
+			procesar_new_pokemon(paquete_socket);
+			break;
+
+		case CATCH_POKEMON:
+			procesar_catch_pokemon(paquete_socket);
+			break;
+
+		case GET_POKEMON:
+			procesar_get_pokemon(paquete_socket);
+			break;
+		}
+		liberar_paquete_socket(paquete_socket);
+	}
+}
+
+void preparar_confirmacion(int id_men){
+
+	int conexion_corfirmacion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
+	enviar_confirmacion(id_men,CONFIRMACION,conexion_corfirmacion);
+	liberar_conexion(conexion_corfirmacion);
+}
+
+void enviar_confirmacion(int id, int confirmacion, int socket){
+	int offset=0;
+	printf("Enviando confirmacion al socket %d... \n", socket);
+	void*enviar = malloc(sizeof(int) * 3);
+	memcpy(enviar, &confirmacion,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&gamecard_config->id_proceso,sizeof(int));
+
+	enviar_mensaje(socket,enviar,sizeof(int)*3);
 }
 
