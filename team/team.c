@@ -379,16 +379,21 @@ void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
 		pthread_mutex_unlock(&mutex_mapa);
 
-
+		printf("[TEAM]Finalizo funcion agregar_pokemon_a_mapa_by_mensaje_appeared()\n");
 		pthread_mutex_lock(&mutex_lista_new);
 		pasar_a_ready_si_corresponde(mensaje_appeared);
 		pthread_mutex_unlock(&mutex_lista_new);
-
+		printf("[TEAM]Finalizo funcion pasar_a_ready_si_corresponde()\n");
 	}
 	else {
 		pthread_mutex_unlock(&mutex_mapa);
 	}
+
+	printf("[TEAM]Inicio funcion eliminar_mensaje_appeared()\n");
+	printf("[TEAM]Mensaje appeared ¿es NULL?: %d\n", mensaje_appeared == NULL);
+	printf("[TEAM]Pokemon de mensaje appeared ¿es NULL?: %d\n", mensaje_appeared->pokemon == NULL);
 	eliminar_mensaje_appeared(mensaje_appeared);
+	printf("[TEAM]Finalizo funcion eliminar_mensaje_appeared()\n");
 }
 
 void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_correlativo) {
@@ -457,7 +462,7 @@ void procesar_mensaje_localized(t_paquete_socket* paquete) {
 
 
 	for(int i = 0; i < mensaje_localized->cantidad_posiciones ; i++) {
-		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(mensaje_appeared));
+		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(t_mensaje_appeared));
 		mensaje_appeared->length_pokemon = mensaje_localized->length_pokemon;
 		mensaje_appeared->pokemon = strdup(mensaje_localized->pokemon);
 		mensaje_appeared->posx = mensaje_localized->pos[i].posx;

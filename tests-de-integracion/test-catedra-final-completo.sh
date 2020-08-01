@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ciclo_cpu_time=0.4
+ciclo_cpu_time=1
+sleep_time=1
 
 echo "\n**  Test Final Prueba completa	**\n" 
 
@@ -18,13 +19,13 @@ echo "Cargando configuracion Broker de la Cátedra"
 cp broker.config broker.config.auxiliar; rm broker.config; cp broker.config.final.completo broker.config
 echo "Levanto Broker en segundo plano"
 1>/dev/null 2>/dev/null     ../broker/Debug/broker &
-sleep 0.5
+sleep $sleep_time
 
 echo "Cargando configuracion Gamecard de la Cátedra"
 cp gamecard.config gamecard.config.auxiliar; rm gamecard.config; cp gamecard.config.final.completo gamecard.config
 echo "Levanto Gamecard en segundo plano"
 1>/dev/null 2>/dev/null     ../gamecard/Debug/gamecard &
-sleep 0.5
+sleep $sleep_time
 
 
 echo "\nEjecutando script new_pokemon_antes_team.sh (NEW_POKEMON -> Broker)"
@@ -32,7 +33,7 @@ echo "\nEjecutando script new_pokemon_antes_team.sh (NEW_POKEMON -> Broker)"
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Squirtle 5 2 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Jolteon 2 2 1
 ../gameboy/Debug/gameboy BROKER NEW_POKEMON Flareon 4 6 1
-sleep 2
+sleep $(calc $sleep_time \* 4)
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
 echo
@@ -45,7 +46,7 @@ echo
 cat ../tall_grass/Files/Flareon/Metadata.bin
 echo
 
-
+sleep $sleep_time
 
 echo "\n**  Parte 2: 2 instancias de Team  **\n" 
 
@@ -60,7 +61,7 @@ echo "Levanto Team 2 en segundo plano"
 cd ../team/Debug/
 1>/dev/null 2>/dev/null     ./team & 
 cd ../../tests-de-integracion/
-sleep 0.5
+sleep $sleep_time
 
 
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
@@ -106,8 +107,8 @@ echo "Restaurando configuracion inicial"
 rm broker.config; cp broker.config.auxiliar broker.config; rm broker.config.auxiliar
 rm gamecard.config; cp gamecard.config.auxiliar gamecard.config; rm gamecard.config.auxiliar
 rm team.config; cp team.config.auxiliar team.config; rm team.config.auxiliar
-rm ../team/Debug/team.config; cp ../team/Debug/team.config.auxiliar ../team/Debug/team.config; ../team/Debug/team.config.auxiliar
+rm ../team/Debug/team.config; cp ../team/Debug/team.config.auxiliar ../team/Debug/team.config; rm ../team/Debug/team.config.auxiliar
 #rm *.log
 
 echo "Cerrando procesos anteriores.."
-./mataProcesos.sh 2> /dev/null
+sh mataProcesos.sh 2> /dev/null
