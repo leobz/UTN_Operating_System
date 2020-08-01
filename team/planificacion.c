@@ -612,6 +612,30 @@ void finalizar_hilo_planificador() {
 
 }
 
+void debug_loggear_estado_exit() {
+	bool todos_tcbs_estado_exit(t_tcb_entrenador* tcb) {
+		return tcb->estado_tcb == EXIT;
+	}
+
+
+	log_info(logger_debug, "Objetivo Global:");
+	debug_loggear_diccionario(objetivo_global);
+	log_info(logger_debug, "Total de Pokemones Atrapados:");
+	debug_loggear_diccionario(pokemones_atrapados);
+	log_info(logger_debug, "Todos en exit? : %d", todos_los_entrenadores_exit());
+	if(todos_los_entrenadores_exit != true){
+		log_info(logger_debug, "  Todos los TCBs en lista exit con estado Exit?: %d",
+				list_all_satisfy(l_exit, (void*) todos_tcbs_estado_exit));
+
+		log_info(logger_debug, "  Tamaño de lista new: %d", list_size(new));
+		log_info(logger_debug, "  Tamaño de lista ready: %d", list_size(ready));
+		log_info(logger_debug, "  Tamaño de lista blocked: %d", list_size(blocked));
+		log_info(logger_debug, "  Tamaño de lista ready_to_exchange: %d", list_size(ready_to_exchange));
+		log_info(logger_debug, "  Tamaño de lista l_exit: %d", list_size(l_exit));
+
+	}
+}
+
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
 	list_remove_element(ready,tcb);
@@ -622,11 +646,7 @@ void pasar_a_exit(t_tcb_entrenador* tcb) {
 
 	finalizar_hilo_tcb(tcb);
 
-	loggear_diccionario(objetivo_global);
-	loggear_diccionario(pokemones_atrapados);
-
-	log_info(logger,"Todos en exit? : %d", todos_los_entrenadores_exit());
-
+	debug_loggear_estado_exit();
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");

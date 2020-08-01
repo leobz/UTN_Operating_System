@@ -41,6 +41,7 @@ t_list* ready_to_exchange;
 t_list* l_exit;
 
 t_log* logger;
+t_log* logger_debug;
 
 typedef struct {
 	int x;

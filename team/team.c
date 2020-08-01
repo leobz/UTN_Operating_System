@@ -402,6 +402,12 @@ void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_corr
 			id_correlativo, mensaje_caught->resultado);
 }
 
+void debug_loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_correlativo) {
+	log_info(logger_debug,
+			"[MSG_RECIBIDO] CAUGHT_POKEMON: ID_Correlativo:%s Resultado:%d",
+			id_correlativo, mensaje_caught->resultado);
+}
+
 void quitar_pokemon_de_planificados(t_tcb_entrenador* entrenador) {
 	dictionary_decrement_value(pokemones_planificados,
 			entrenador->pokemon_a_capturar->pokemon);
@@ -440,6 +446,8 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 
 	char* id_correlativo = pasar_a_char(paquete->id_correlativo);
 
+	debug_loggear_recepcion_de_caught(mensaje_caught, id_correlativo);
+
 	if (dictionary_has_key(enviaron_catch, id_correlativo)) {
 		loggear_recepcion_de_caught(mensaje_caught, id_correlativo);
 		t_tcb_entrenador* entrenador = dictionary_get(enviaron_catch, id_correlativo);
@@ -447,7 +455,7 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 		if (mensaje_caught->resultado == 1){
 			confirmar_caught(entrenador);
 		}
-
+		list_remove_element(blocked, entrenador);
 		aplicar_acciones_caught(entrenador);
 	}
 	free(id_correlativo);

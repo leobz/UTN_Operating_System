@@ -11,9 +11,9 @@ void imprimir_diccionario(t_dictionary* diccionario) {
 }
 
 
-void loggear_diccionario(t_dictionary* diccionario) {
+void debug_loggear_diccionario(t_dictionary* diccionario) {
 	void imprimir_clave_valor(char* key, int value) {
-		log_info(logger,"	%s -> %d", key, value);
+		log_info(logger_debug,"	%s -> %d", key, value);
 	}
 
 	dictionary_iterator(diccionario, imprimir_clave_valor);

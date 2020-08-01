@@ -144,4 +144,4 @@ rm ../team/Debug/team.config; cp ../team/Debug/team.config.auxiliar ../team/Debu
 #rm *.log
 
 echo "Cerrando procesos anteriores.."
-#sh mataProcesos.sh 2> /dev/null
+sh mataProcesos.sh 2> /dev/null

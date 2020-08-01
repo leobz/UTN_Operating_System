@@ -23,6 +23,7 @@ int main(int argc, char ** argv) {
 	team_cumplio_objetivo = false;
 
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
+	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
 
 	char* puerto_broker = team_config->puerto_broker;
