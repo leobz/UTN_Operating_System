@@ -74,7 +74,6 @@ bool todos_los_entrenadores_exit();
 
 // Mensajes
 void ejecutar_catch(t_tcb_entrenador*);
-char* recibir_id_correlativo(int);
 void agregar_a_enviaron_catch(char*, t_tcb_entrenador*);
 
 // Conexiones

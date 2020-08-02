@@ -41,6 +41,7 @@ t_list* ready_to_exchange;
 t_list* l_exit;
 
 t_log* logger;
+t_log* logger_debug;
 
 typedef struct {
 	int x;
@@ -82,6 +83,7 @@ typedef struct{
 	char *ip_broker;
 	char *puerto_broker;
 	char *log_file;
+	char* puerto_team;
 }t_team_config;
 
 t_team_config* team_config;

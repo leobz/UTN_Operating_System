@@ -682,9 +682,13 @@ void unir_particiones_dinamicas_libres(){
 
 	list_sort(particiones_libres,(void*)pd_es_menor_offset);
 
+	int i=0;
 	void unir_libres(t_particion_dinamica* dinamica){
-
-		if(dinamica->siguiente_particion!=NULL){
+		printf("[PARTICIONES DINAMICAS] Inicio funcion unir_libres() con iteracion: %d\n", i);
+		if(dinamica->siguiente_particion != NULL){
+			printf("[PARTICIONES DINAMICAS] Particion 'dinamica' ¿es NULL?: %d\n", dinamica == NULL);
+			printf("[PARTICIONES DINAMICAS] Particion 'dinamica->siguiente_particion' ¿es NULL?: %d\n", dinamica->siguiente_particion == NULL);
+			printf("[PARTICIONES DINAMICAS] Particion 'dinamica->siguiente_particion' ¿esta libre?: %d\n", dinamica->siguiente_particion->esta_libre);
 			if(dinamica->siguiente_particion->esta_libre){
 
 				int counter=dinamica->orden_creacion;
@@ -701,8 +705,9 @@ void unir_particiones_dinamicas_libres(){
 
 			}
 		}
+		i++;
 	}
-	list_iterate(particiones_libres,&unir_libres);
+	list_iterate(particiones_libres, (void*)unir_libres);
 
 	free(particiones_libres);
 }
@@ -725,7 +730,7 @@ void compactar_particiones_dinamicas(){
 		offset_hueco=particion_din->offset + particion_din->tamanio_particion; //para la proxima particion a compactar
 	}
 
-	list_iterate(particiones_ocupadas,&compactar);
+	list_iterate(particiones_ocupadas, (void*)compactar);
 
 
 	eliminar_particiones_libres();
@@ -761,7 +766,7 @@ void eliminar_particiones_libres(){
 		list_remove_and_destroy_by_condition(particiones_dinamicas, (void*)tiene_mismo_orden_creacion,(void*)eliminar_particion_free);
 	}
 
-	list_iterate(particiones_libres,&eliminar_particion);
+	list_iterate(particiones_libres, (void*)eliminar_particion);
 
 	free(particiones_libres);
 }
@@ -925,7 +930,7 @@ static void particion_dinamica_destroy(t_particion_dinamica* particion) {
 }
 
 void finalizar_particiones_dinamicas() {
-	list_destroy_and_destroy_elements(particiones_dinamicas, particion_dinamica_destroy);
+	list_destroy_and_destroy_elements(particiones_dinamicas, (void*)particion_dinamica_destroy);
 }
 
 void finalizar_memoria_cache() {
