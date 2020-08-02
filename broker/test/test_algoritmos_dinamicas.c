@@ -156,16 +156,16 @@ void test_firstfit_y_fifo_dinamicas(){
 	iniciar_envio_de_mensajes();
 
 
-	char *picachupu = "PicachuPu";
+	char *picachupu = "PicachuPu";//10
 	int picachupu_length = strlen(picachupu) + 1;
 
-	char *dani = "Dani";
+	char *dani = "Dani";//5
 	int dani_length = strlen(dani) + 1;
 
-	char *davide = "Davide";
+	char *davide = "Davide";//7
 	int davide_length = strlen(davide) + 1;
 
-	char *leo = "Leote";
+	char *leo = "Leote";//6
 	int leo_length = strlen(leo) + 1;
 
 
@@ -202,8 +202,8 @@ void test_firstfit_y_fifo_dinamicas(){
 
 	//assert_particion_tiene_offset(particion_first, 32);
 	assert_particion_tiene_offset(particion_dani, 10);
-	assert_particion_tiene_offset(particion_leo, 24);
-	assert_particiones_libres(libres,2);
+	assert_particion_tiene_offset(particion_leo, 22);
+	assert_particiones_libres(libres,1);
 
 	free(libres);
 
@@ -280,20 +280,22 @@ t_adm_mensaje* iniciar_adm(t_adm_mensaje *adm,op_code cola){
 void iniciar_envio_de_mensajes(){
 
 
-	char *picachu = "Picachu";
+	char *picachu = "Picachu"; //8
 	int picachu_length = strlen(picachu) + 1;
 
-	char *charizar = "Charizar";
+	char *charizar = "Charizar";//9
 	int charizar_length = strlen(charizar) + 1;
 
-	char *charmander = "Charmander";
+	char *charmander = "Charmander";//11
 	int charmander_length = strlen(charmander) + 1;
 
-	char *diegojose = "DiegoJose";
+	char *diegojose = "DiegoJose";//10
 	int diegojose_length = strlen(diegojose) + 1;
 
-	char *marico = "Marico";
+	char *marico = "Marico";//7
 	int marico_length = strlen(marico) + 1;
+
+	//TOTAL:45
 
 	t_adm_mensaje*adm_picachu;
 	adm_picachu=iniciar_adm(adm_picachu,GET_POKEMON);

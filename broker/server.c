@@ -80,11 +80,14 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			log_info(logger, "[MSG_RECIBIDO] CON ID_MENSAJE: %d", paquete->id_mensaje);
 			printf("Confirmacion CON ID_MENSAJE: %d\n", paquete->id_mensaje);
 
-			t_adm_mensaje* administrador_confirmado = obtener_de_diccionario(administracion_por_id, paquete->id_mensaje);
-			t_proceso* proceso_confirmado = obtener_de_diccionario(subscribers,paquete->id_proceso);
+			if(esta_en_diccionario(administracion_por_id,paquete->id_mensaje)){
+				if(esta_en_diccionario(subscribers,paquete->id_proceso)){
+				t_adm_mensaje* administrador_confirmado = obtener_de_diccionario(administracion_por_id, paquete->id_mensaje);
+				t_proceso* proceso_confirmado = obtener_de_diccionario(subscribers,paquete->id_proceso);
 
-			list_add(administrador_confirmado->suscriptores_confirmados, proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
-
+				list_add(administrador_confirmado->suscriptores_confirmados, proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
+				}
+			}
 			//printf("Recibida confirmacion de proceso: %d\n",paquete->id_proceso);
 
 			break;}

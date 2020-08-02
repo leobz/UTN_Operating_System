@@ -75,6 +75,9 @@ void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 		case GET_POKEMON:
 			procesar_get_pokemon(paquete_socket);
 			break;
+
+		default:
+			break;
 		}
 		liberar_paquete_socket(paquete_socket);
 	}

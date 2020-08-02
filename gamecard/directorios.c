@@ -395,7 +395,7 @@ int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 	if (config_has_property(archivo_pokemon_config, posicion_pokemon)) {
 
 		int cantidad_pokemon = config_get_int_value(archivo_pokemon_config, posicion_pokemon);
-		if (cantidad_pokemon <= 1) {
+		if (cantidad_pokemon == 1) {
 			int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_catch->pokemon);
 			dictionary_put(cantidad_posiciones_pokemon,mensaje_catch->pokemon,cant_posiciones-1);
 			config_remove_key(archivo_pokemon_config, posicion_pokemon);
