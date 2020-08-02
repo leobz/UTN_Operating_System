@@ -489,7 +489,8 @@ t_particion_dinamica* agregar_mensaje_memoria_cache_particion_dinamica_barra_cer
 	void* payload = serializar_segun_codigo_sin_barra(mensaje->payload,mensaje->codigo_operacion,&size);
 
 	t_particion_dinamica*part_dinamica=guardar_payload_en_particion_dinamica_con_adm(payload, size, admin);
-	free(payload);
+	if(mensaje->codigo_operacion!=CAUGHT_POKEMON)
+		free(payload);
 	return part_dinamica;
 }
 
