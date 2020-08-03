@@ -11,6 +11,7 @@
 #include "../utils/diccionarios.h"
 #include "../utils/config.h"
 #include "../utils/servidor.h"
+#include "../utils/cliente.h"
 #include "../utils/log.h"
 #include <commons/collections/queue.h>
 
@@ -84,6 +85,7 @@ typedef struct{
 	char *puerto_broker;
 	char *log_file;
 	char* puerto_team;
+	int id_proceso;
 }t_team_config;
 
 t_team_config* team_config;
