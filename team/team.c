@@ -466,9 +466,6 @@ void procesar_mensaje_localized(t_paquete_socket* paquete) {
 	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
 	loggear_localized_recibido(mensaje_localized, paquete->id_correlativo);
 
-	liberar_paquete_socket(paquete);
-
-
 	for(int i = 0; i < mensaje_localized->cantidad_posiciones ; i++) {
 		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(t_mensaje_appeared));
 		mensaje_appeared->length_pokemon = mensaje_localized->length_pokemon;
@@ -507,18 +504,47 @@ int localized_es_valido(t_paquete_socket* paquete) {
 	return localized_valido;
 }
 
-void procesar_mensaje_recibido(t_paquete_socket* paquete) {
+
+void confirmar_recepcion(int id_mensajee,int sockett){
+	printf("Enviando confirmacion al socket %d... \n", sockett);
+	int offset = 0;
+	int confirmacion = CONFIRMACION;
+	int id_proceso=0;
+	void* a_enviar = malloc(sizeof(int)*3);
+
+	memcpy(a_enviar, &confirmacion, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar+offset, &id_mensajee, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar+offset, &team_config->id_proceso, sizeof(int));
+
+	printf("ID proceso = %d\n", team_config->id_proceso);
+	enviar_mensaje(sockett, a_enviar, sizeof(int)*3);
+}
+
+void enviar_confirmacion(int id,op_code confirmacion,int socket){
+	int offset=0;
+
+	void*enviar=malloc(sizeof(int)*3);
+	memcpy(enviar,&confirmacion,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&team_config->id_proceso,sizeof(int)); //valor nulo pq no es un id_proceso
+
+	enviar_mensaje(socket,enviar,sizeof(int)*3);
+	//le devuelve al proceso emisor el id del mensaje
+}
+
+void procesar_mensaje_recibido_broker(t_paquete_socket* paquete) {
+
+	preparar_confirmacion(paquete->id_mensaje);
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:;
 			t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
-			liberar_paquete_socket(paquete);
 			loggear_appeared_recibido(mensaje_appeared);
 			procesar_mensaje_appeared(mensaje_appeared);
-			break;
-
-		case CONFIRMACION:
-			log_info(logger,"Confirmacion %d",paquete->id_mensaje);
 			break;
 
 		case CAUGHT_POKEMON:
@@ -535,7 +561,46 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 			pthread_exit(NULL);
 			break;
 	}
+	liberar_paquete_socket(paquete);
 }
+
+void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete) {
+
+	confirmar_recepcion(paquete->id_mensaje,paquete->socket_cliente);
+
+	switch(paquete->codigo_operacion) {
+		case APPEARED_POKEMON:;
+			t_mensaje_appeared* mensaje_appeared = deserializar_mensaje_appeared_pokemon(paquete->buffer);
+			liberar_paquete_socket(paquete);
+			loggear_appeared_recibido(mensaje_appeared);
+			procesar_mensaje_appeared(mensaje_appeared);
+			break;
+
+		case CAUGHT_POKEMON:
+			procesar_mensaje_caught(paquete);
+			liberar_paquete_socket(paquete);
+			break;
+
+		case LOCALIZED_POKEMON:
+
+			if (localized_es_valido(paquete))
+				procesar_mensaje_localized(paquete);
+				liberar_paquete_socket(paquete);
+			break;
+
+		default:
+			pthread_exit(NULL);
+			break;
+	}
+}
+
+void preparar_confirmacion(int id_men){
+
+	int conexion_corfirmacion = crear_conexion(team_config->ip_broker,team_config->puerto_broker);
+	enviar_confirmacion(id_men,CONFIRMACION,conexion_corfirmacion);
+	liberar_conexion(conexion_corfirmacion);
+}
+
 
 char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion) {
 	t_paquete_socket* paquete =  recibir_mensajes(conexion);

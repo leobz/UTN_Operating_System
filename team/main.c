@@ -18,13 +18,17 @@ void finalizar_team(t_team_config* team_config) {
 int main(int argc, char ** argv) {
 
 	//TODO: Tomar id proceso por archivo de configuracion
-	int id_proceso = (int)getpid();
 
 	team_cumplio_objetivo = false;
 
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
 	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
+
+	int id_proceso = (int)getpid();
+	//CAMBIAR POR CONFIGURACION
+	team_config->id_proceso = id_proceso;
+
 
 	char* puerto_broker = team_config->puerto_broker;
 	char* ip_broker = team_config->ip_broker;
@@ -55,7 +59,7 @@ int main(int argc, char ** argv) {
 		enviar_get_pokemon();
 
 		while (!team_cumplio_objetivo)
-			esperar_cliente(socket_servidor, &procesar_mensaje_recibido);
+			esperar_cliente(socket_servidor, &procesar_mensaje_recibido_cliente);
 
 		finalizar_team(team_config);
 		return 0;
