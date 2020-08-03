@@ -1,8 +1,8 @@
 #!/bin/sh
 
-echo
-echo Enviando mensajes CATCH_POKEMON, CAUGHT_POKEMON y GET_POKEMON a Broker:
-echo
+# echo
+# echo Enviando mensajes CATCH_POKEMON, CAUGHT_POKEMON y GET_POKEMON a Broker:
+# echo
 
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Pikachu 9 3
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Squirtle 9 3
