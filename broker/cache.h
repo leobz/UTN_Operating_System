@@ -106,6 +106,7 @@ t_particion_dinamica* crear_particion_dinamica(int, int);
 t_particion_dinamica* crear_particion_dinamica_libre(int , int);
 void ordenar_segun_algoritmo_de_particiones_libres(t_list*);
 bool pd_es_menor_offset(t_particion_dinamica*, t_particion_dinamica*);
+bool pd_es_mayor_offset(t_particion_dinamica*, t_particion_dinamica*);
 bool pd_es_menor_tamanio(t_particion_dinamica*, t_particion_dinamica*);
 t_list* filtrar_particiones_por_tamanio(t_list*, int);
 void eliminar_una_particion_dinamica_segun_algoritmo_de_eleccion_de_victima();
@@ -117,10 +118,9 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica(void*, int);
 t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void*, int,t_adm_mensaje*);
 void* leer_particion_dinamica(t_particion_dinamica*);
 int supero_limite_de_eliminaciones(int particiones_eliminadas);
+void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones);
 void eliminar_particiones_libres();
-void reubicar_particion(t_particion_dinamica*, int);
 void crear_particion_intermedia(t_particion_dinamica* );
-
 bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
 t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin);
 void unir_particiones_dinamicas_libres();
@@ -130,8 +130,12 @@ void agregar_contenido_particion_dinamica_archivo_dump(FILE* archivo_dump);
 bool menor_orden_creacion(t_particion_dinamica* particiones, t_particion_dinamica* siguiente_particion) ;
 void liberar_particion_dinamica(t_particion_dinamica* particion_victima);
 bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
-
-
+void consolidar_particiones_dinamicas(t_particion_dinamica*particion_victima);
+void anterior_particion_libre(t_particion_dinamica* anterior);
+void anterior_particion_ocupada(t_particion_dinamica* anterior,t_particion_dinamica* particion_victima);
+void eliminar_particiones_libres();
+void siguiente_particion_libre(t_particion_dinamica*particion_victima);
+void siguiente_particion_ocupada(t_particion_dinamica*particion_victima);
 
 // ********************************** FINALIZACION MEMORIA CACHE ********************************** //
 void finalizar_mutex_cache();

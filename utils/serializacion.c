@@ -98,7 +98,8 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 
 			t_mensaje_new* men=deserializar_payload_new_pokemon(payload);
 
-			char*payd=payload_new_sin_barra(men->pokemon,men->posx,men->posy,men->cantidad);
+			void*payd=payload_new_sin_barra(men->pokemon,men->posx,men->posy,men->cantidad);
+			free(men->pokemon);
 			free(men);
 			return payd;
 			break;
@@ -106,7 +107,8 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 		case GET_POKEMON:{
 
 			t_mensaje_get* men=deserializar_payload_get_pokemon(payload);
-			char*payd=payload_get_sin_barra(men->pokemon);
+			void*payd=payload_get_sin_barra(men->pokemon);
+			free(men->pokemon);
 			free(men);
 			return payd;
 
@@ -115,7 +117,8 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 		case CATCH_POKEMON:{
 
 			t_mensaje_catch* men=deserializar_payload_catch_pokemon(payload);
-			char*payd=payload_catch_sin_barra(men->pokemon,men->posx,men->posy);
+			void*payd=payload_catch_sin_barra(men->pokemon,men->posx,men->posy);
+			free(men->pokemon);
 			free(men);
 			return payd;
 			break;
@@ -124,7 +127,8 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 
 			t_mensaje_appeared* men=deserializar_payload_appeared_pokemon(payload);
 
-			char*payd=payload_appeared_sin_barra(men->pokemon,men->posx,men->posy);
+			void*payd=payload_appeared_sin_barra(men->pokemon,men->posx,men->posy);
+			free(men->pokemon);
 			free(men);
 			return payd;
 
@@ -134,7 +138,8 @@ void* serializar_segun_codigo_sin_barra(void*payload,op_code codigo,int* size){
 
 			t_mensaje_localized* men=deserializar_payload_localized_pokemon(payload);
 
-			char*payd=payload_localized_sin_barra(men->pokemon,men->cantidad_posiciones,men->pos);
+			void*payd=payload_localized_sin_barra(men->pokemon,men->cantidad_posiciones,men->pos);
+			free(men->pokemon);
 			free(men);
 			return payd;
 
@@ -166,7 +171,12 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 			t_mensaje_new* men=deserializar_payload_new_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
 			pokemonn[men->length_pokemon]='\0';
-			return payload_new_con_barra(pokemonn,men->posx,men->posy,men->cantidad);
+
+			void*payd=payload_new_con_barra(pokemonn,men->posx,men->posy,men->cantidad);
+			free(men->pokemon);
+			free(men);
+			return payd;
+
 
 			break;
 		}
@@ -175,7 +185,12 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 			t_mensaje_get* men=deserializar_payload_get_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
 			pokemonn[men->length_pokemon]='\0';
-			return payload_get_con_barra(men->pokemon);
+
+			void*payd=payload_get_con_barra(men->pokemon);
+			free(men->pokemon);
+			free(men);
+			return payd;
+
 
 
 			break;
@@ -185,7 +200,11 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 			t_mensaje_catch* men=deserializar_payload_catch_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
 			pokemonn[men->length_pokemon]='\0';
-			return payload_catch_con_barra(pokemonn,men->posx,men->posy);
+
+			void*payd=payload_catch_con_barra(pokemonn,men->posx,men->posy);
+			free(men->pokemon);
+			free(men);
+			return payd;
 
 			break;
 		}
@@ -194,7 +213,11 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 			t_mensaje_appeared* men=deserializar_payload_appeared_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
 			pokemonn[men->length_pokemon]='\0';
-			return payload_appeared_con_barra(pokemonn,men->posx,men->posy);
+
+			void*payd=payload_appeared_con_barra(pokemonn,men->posx,men->posy);
+			free(men->pokemon);
+			free(men);
+			return payd;
 
 			break;
 		}
@@ -203,8 +226,11 @@ void* serializar_segun_codigo_con_barra(void* payload,op_code codigo,int* size){
 			t_mensaje_localized* men=deserializar_payload_localized_pokemon_con_barra(payload);
 			char*pokemonn=men->pokemon;
 			pokemonn[men->length_pokemon]='\0';
-			return payload_localized_con_barra(men->pokemon,men->cantidad_posiciones,men->pos);
 
+			void*payd=payload_localized_con_barra(men->pokemon,men->cantidad_posiciones,men->pos);
+			free(men->pokemon);
+			free(men);
+			return payd;
 
 			break;
 		}

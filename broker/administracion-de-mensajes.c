@@ -85,7 +85,7 @@ void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaj
 
 	t_adm_mensaje* men=list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
 
-	//printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
+	printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
 
 
 	if(list_size(admins_mensaje->suscriptores_enviados)!=0)
