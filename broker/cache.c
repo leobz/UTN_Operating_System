@@ -822,7 +822,6 @@ void unir_particiones_dinamicas_libres(){
 				free(part_auxiliar);
 			}
 		}
-		i++;
 	}
 	list_iterate(particiones_libres, (void*)unir_libres);
 
