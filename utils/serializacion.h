@@ -179,6 +179,7 @@ void* payload_localized_sin_barra(char* nombre_pokemon, int cantidad_posiciones,
 t_mensaje_localized* deserializar_payload_localized_pokemon(void* package);
 void* payload_localized_con_barra(char* nombre_pokemon, int cantidad_posiciones,t_posiciones pos[]);
 t_mensaje_localized* deserializar_payload_localized_pokemon_con_barra(void* package);
+void eliminar_mensaje_localized(t_mensaje_localized* mensaje_localized);
 
 //CAUGHT_POKEMON
 void* serializar_caught_pokemon(int* bytes, int estado,int id_mensaje, int id_correlativo);

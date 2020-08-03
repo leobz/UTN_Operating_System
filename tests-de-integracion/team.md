@@ -88,6 +88,7 @@ Como no pertenece al Objetivo Global no se agrega.
 
 ```bash
 $ ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Charmander 1 1; sleep <sleep-time> # byexample: +timeout=4 +paste +fail-fast
+<...>
 ```
 
 ```bash

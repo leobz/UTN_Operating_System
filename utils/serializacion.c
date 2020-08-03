@@ -1012,27 +1012,33 @@ t_mensaje_localized* deserializar_mensaje_localized_pokemon(t_buffer* buffer) {
 
 	void* stream = buffer->stream;
 
+	printf("[TEAM] Inicio funcion deserializar_mensaje_localized_pokemon()\n");
 	memcpy(&(mensaje_localized->length_pokemon), stream, sizeof(int));
 	stream += sizeof(int);
 
+	printf("[TEAM] Length pokemon: %d\n", mensaje_localized->length_pokemon);
 	mensaje_localized->pokemon = malloc(mensaje_localized->length_pokemon);
 
 	memcpy(mensaje_localized->pokemon, stream, mensaje_localized->length_pokemon);
 	stream += mensaje_localized->length_pokemon;
+	printf("[TEAM] Pokemon: %s\n", mensaje_localized->pokemon);
 
 	memcpy(&(mensaje_localized->cantidad_posiciones), stream, sizeof(int));
 	stream += sizeof(int);
-
+	printf("[TEAM] Cantidad posiciones: %d\n", mensaje_localized->cantidad_posiciones);
 
 	for(int i=0;i<mensaje_localized->cantidad_posiciones;i++){
 
 	memcpy(&(mensaje_localized->pos[i].posx), stream, sizeof(int));
 		stream += sizeof(int);
 
+		printf("[TEAM] Pos x: %d\n", mensaje_localized->pos[i].posx);
 	memcpy(&(mensaje_localized->pos[i].posy), stream, sizeof(int));
 		stream += sizeof(int);
-
+		printf("[TEAM] Pos y: %d\n", mensaje_localized->pos[i].posy);
 	}
+
+	printf("[TEAM] Fin de funcion deserializar_mensaje_localized_pokemon()\n");
 
 	return mensaje_localized;
 }

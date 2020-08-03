@@ -67,7 +67,7 @@ Comprobación de recepción de mensaje Appeared Pokemon, selección de TCB, movi
 $  sleep <sleep-time>; cat team.log     # byexample: +timeout=10 +fail-fast +paste
 <...>[MSG_RECIBIDO] APPEARED_POKEMON:<...>
 <...>[INSTRUCCION]<...>CATCH<...>
-<...>[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:<...>
+<...>[MSG_RECIBIDO] CONFIRMACION: CATCH_POKEMON<...>
 ```
 
 ## 5 Team envía el mensaje Catch al Broker correctamente
