@@ -16,17 +16,12 @@ sed -i 's/TAMANO_MINIMO_PARTICION=4/TAMANO_MINIMO_PARTICION=16/g' broker.config
 sleep 1
 
 echo "\nEjecutar 'test-broker-catedra-base-tamanio-minimo-16-2.sh'?"
-read "rta"
+#read "rta"
 sh test-broker-catedra-base-tamanio-minimo-16-2.sh
-sleep $(expr $sleep_time \* 3)
+#sleep $(expr $sleep_time \* 3)
 
-
-echo "\nComprobacion: Cumplio objetivo Global:\n"
-tail broker.log
-
-
-echo "\nEjecutar test?\n"
-read "rta"
+echo "\nEjecutando test:\n"
+#read "rta"
 byexample -l shell broker-catedra-base-tamanio-minimo-16.md
 
 # Restaurando configuracion inicial

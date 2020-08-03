@@ -107,6 +107,7 @@ void enviar_mensaje_localized(void* a_enviar,int bytes){
 	int conexion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
 	if (conexion == -1) {
 		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+		free(a_enviar);
 	}
 	else {
 
@@ -152,7 +153,7 @@ void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 	else {
 		int bytes;
 
-		void* a_enviar = serializar_caught_pokemon(&bytes, estado,paquete_socket->id_correlativo, paquete_socket->id_mensaje);
+		void* a_enviar = serializar_caught_pokemon(&bytes, estado,0, paquete_socket->id_mensaje);
 		printf("Enviando mensaje %s \n",op_code_to_string(CAUGHT_POKEMON));
 
 		enviar_mensaje(conexion, a_enviar, bytes);
@@ -173,6 +174,7 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
 		log_info(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
+		enviar_mensaje_caught(paquete_socket, FAIL);
 	}
 	eliminar_mensaje_catch(mensaje_catch);
 }
@@ -341,7 +343,7 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 }
 
 t_list* obtener_posiciones_pokemon(char*pokemonn){
-	printf("En obtencion\n");
+
 	int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,pokemonn);
 	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(formar_archivo_pokemon(pokemonn));
 	char* buffer_pokemon = buffer_del_archivo_completo(metadata_pokemon);
@@ -393,7 +395,7 @@ int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 	if (config_has_property(archivo_pokemon_config, posicion_pokemon)) {
 
 		int cantidad_pokemon = config_get_int_value(archivo_pokemon_config, posicion_pokemon);
-		if (cantidad_pokemon <= 1) {
+		if (cantidad_pokemon == 1) {
 			int cant_posiciones=dictionary_get(cantidad_posiciones_pokemon,mensaje_catch->pokemon);
 			dictionary_put(cantidad_posiciones_pokemon,mensaje_catch->pokemon,cant_posiciones-1);
 			config_remove_key(archivo_pokemon_config, posicion_pokemon);
