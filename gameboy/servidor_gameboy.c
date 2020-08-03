@@ -122,6 +122,7 @@ void recibir_id_correlativo(int socket_cliente) {
 
 	//log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO: %d\n", paquete->id_mensaje);
 	printf("Recibida Confirmacion: %d\n",paquete->id_mensaje);
+	free(paquete);
 }
 
 void preparar_confirmacion(int id_men){

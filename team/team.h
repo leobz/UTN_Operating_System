@@ -153,10 +153,13 @@ void destruir_lista_posiciones(t_list* posiciones);
 void destruir_posicion(t_posicion* posicion);
 
 // PROCESO DE MENSAJES
-void procesar_mensaje_recibido(t_paquete_socket* paquete);
+void procesar_mensaje_recibido_broker(t_paquete_socket* paquete);
+void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete);
 void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion);
+void preparar_confirmacion(int id_men);
+void enviar_confirmacion(int id,op_code confirmacion,int socket);
 
 int localized_es_valido(t_paquete_socket*);
 t_list* transformar_localized_en_appeareds(t_mensaje_localized* mensaje_localized);

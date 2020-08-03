@@ -11,7 +11,7 @@ t_suscripcion* crear_t_suscripcion(int id_proceso, int cola) {
 void recibir_mensajes_team(int conexion) {
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_recibido(paquete);
+		procesar_mensaje_recibido_broker(paquete);
 	}
 }
 

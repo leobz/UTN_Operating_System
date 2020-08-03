@@ -92,17 +92,19 @@ void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket){
 		switch (paquete_socket->codigo_operacion){
 		case NEW_POKEMON:
 			procesar_new_pokemon(paquete_socket);
+			liberar_paquete_socket(paquete_socket);
 			break;
 
 		case CATCH_POKEMON:
 			procesar_catch_pokemon(paquete_socket);
+			liberar_paquete_socket(paquete_socket);
 			break;
 
 		case GET_POKEMON:
 			procesar_get_pokemon(paquete_socket);
+			liberar_paquete_socket(paquete_socket);
 			break;
 		}
-		liberar_paquete_socket(paquete_socket);
 	}
 }
 
