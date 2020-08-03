@@ -261,6 +261,7 @@ int main(int argc, char **argv) {
 
 			enviar_mensaje(conexion, a_enviar, bytes);
 
+			recibir_id_correlativo(conexion);
 			liberar_conexion(conexion);
 		}
 	}

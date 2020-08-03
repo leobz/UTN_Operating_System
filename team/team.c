@@ -507,7 +507,40 @@ int localized_es_valido(t_paquete_socket* paquete) {
 	return localized_valido;
 }
 
+void confirmar_recepcion(t_paquete_socket* paquete_socket){
+	printf("Enviando confirmacion al socket %d... \n", paquete_socket->socket_cliente);
+	int offset = 0;
+	int* confirmacion = CONFIRMACION;
+	void* a_enviar = malloc(sizeof(int)*3);
+
+	memcpy(a_enviar, &confirmacion, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar, &paquete_socket->id_mensaje, sizeof(int));
+	offset += sizeof(int);
+	memcpy(a_enviar, &team_config->id_proceso, sizeof(int));
+
+	printf("ID proceso = %d\n", team_config->id_proceso);
+	enviar_mensaje(paquete_socket->socket_cliente, a_enviar, sizeof(int)*3);
+}
+
+void enviar_confirmacion(int id,op_code confirmacion,int socket){
+	int offset=0;
+	int id_falso=0;
+
+	void*enviar=malloc(sizeof(int)*3);
+	memcpy(enviar,&confirmacion,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id,sizeof(int));
+	offset+=sizeof(int);
+	memcpy(enviar+offset,&id_falso,sizeof(int)); //valor nulo pq no es un id_proceso
+
+	enviar_mensaje(socket,enviar,sizeof(int)*3);
+	//le devuelve al proceso emisor el id del mensaje
+}
+
 void procesar_mensaje_recibido(t_paquete_socket* paquete) {
+
+	confirmar_recepcion(paquete);
 
 	switch(paquete->codigo_operacion) {
 		case APPEARED_POKEMON:;

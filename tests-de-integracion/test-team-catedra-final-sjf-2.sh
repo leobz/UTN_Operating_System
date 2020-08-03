@@ -1,5 +1,5 @@
-echo
-echo "Ejecutando solicitudes APPEARED"
+# echo
+# echo "Ejecutando solicitudes APPEARED"
 ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 9 9
 ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Squirtle 6 7
 ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Onix 2 8
