@@ -60,10 +60,11 @@ t_paquete_socket* recibir_mensajes(int socket_cliente) {
 
 	paquete->socket_cliente = socket_cliente;
 
+	int recv_result = recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL);
 
-	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL) == -1){
+	if(recv_result == 0 || recv_result == -1){
 		paquete->codigo_operacion= OP_ERROR;
-		}
+	}
 
 	if(paquete->codigo_operacion==SUSCRIPCION){
 		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);

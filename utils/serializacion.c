@@ -1387,3 +1387,11 @@ char* pasar_a_char(int numero){
 	return numero_char;
 
 }
+
+t_suscripcion* crear_t_suscripcion(int id_proceso, int cola) {
+	t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
+	suscripcion->cod_operacion = SUSCRIPCION;
+	suscripcion->cola_a_suscribir = cola;
+	suscripcion->id_proceso = id_proceso;
+	return suscripcion;
+}

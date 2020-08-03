@@ -9,51 +9,53 @@
 
 int socket_broker;
 
+void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
+	t_suscripcion* suscripcion = crear_t_suscripcion(id_proceso, cola);
+	void* a_enviar = empaquetar_suscripcion(suscripcion);
+	log_info(logger, "Conexion %s establecida con [Broker]", op_code_to_string(cola));
+	enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
+}
+
+void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion) {
+	pthread_t hilo_suscripcion;
+	pthread_create(&hilo_suscripcion, NULL, (void*) recibir_mensajes_gamecard, datos_suscripcion);
+	pthread_detach(hilo_suscripcion);
+}
+
+void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion) {
+	while (datos_suscripcion->conexion == -1) {
+		printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(datos_suscripcion->cola));
+		sleep(gamecard_config->tiempo_reintento_conexion);
+		datos_suscripcion->conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+	}
+
+	solicitar_suscripcion(datos_suscripcion->id_proceso, datos_suscripcion->cola, datos_suscripcion->conexion);
+}
+
 void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
 	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
 			op_code_to_string(paquete->codigo_operacion),
 			paquete->id_correlativo);
 }
 
-void servidor_gamecard(int conexion){
-	while (1){
-		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_recibido_broker(paquete);
-	}
-}
+void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion){
+	iniciar_suscripcion(datos_suscripcion);
 
-void suscribirme_al_broker(){
-	printf("Suscribiendome al broker...\n");
+	while (true){
+		t_paquete_socket* paquete =  recibir_mensajes(datos_suscripcion->conexion);
 
-	int colas_a_suscribir[] = {NEW_POKEMON, GET_POKEMON, CATCH_POKEMON};
-	int id_proceso = 0;
-	int i;
-	for (i=0; i<3; i++){
-		int conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
-
-		while (conexion == -1) {
-			printf("ERROR: Conexion con [Broker] no establecida\n");
-			sleep(gamecard_config->tiempo_reintento_conexion);
-			conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+		if (paquete->codigo_operacion != OP_ERROR) {
+			procesar_mensaje_recibido_broker(paquete);
 		}
-
-		socket_broker = conexion;
-		pthread_t hilo_gamecard_servidor;
-		pthread_create(&hilo_gamecard_servidor, NULL, (void*)servidor_gamecard, conexion);
-		pthread_detach(hilo_gamecard_servidor);
-
-		t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
-		suscripcion->cod_operacion = SUSCRIPCION;
-		suscripcion->cola_a_suscribir = colas_a_suscribir[i];
-		suscripcion->id_proceso = id_proceso;
-
-		void *a_enviar = empaquetar_suscripcion(suscripcion);
-		printf("Enviando mensaje de cola %d...\n", suscripcion->cola_a_suscribir);
-		enviar_mensaje(socket_broker, a_enviar, sizeof(int) * 3);
-
-		//TODO liberar_conexion(conexion);
+		else {
+			close(datos_suscripcion->conexion);
+			datos_suscripcion->conexion = -1;
+			iniciar_suscripcion(datos_suscripcion);
+		}
 	}
 }
+
+
 
 void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 
