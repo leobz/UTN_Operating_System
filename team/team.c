@@ -38,6 +38,7 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 	team_config->log_file = strdup(config_get_string_value(config, "LOG_FILE"));
+	team_config->puerto_team =  strdup(config_get_string_value(config, "PUERTO_TEAM"));
 }
 
 char** separar_por_pipe(char* string_con_pipes) {
@@ -378,20 +379,31 @@ void procesar_mensaje_appeared(t_mensaje_appeared* mensaje_appeared) {
 		agregar_pokemon_a_mapa_by_mensaje_appeared(mensaje_appeared);
 		pthread_mutex_unlock(&mutex_mapa);
 
-
+		printf("[TEAM]Finalizo funcion agregar_pokemon_a_mapa_by_mensaje_appeared()\n");
 		pthread_mutex_lock(&mutex_lista_new);
 		pasar_a_ready_si_corresponde(mensaje_appeared);
 		pthread_mutex_unlock(&mutex_lista_new);
-
+		printf("[TEAM]Finalizo funcion pasar_a_ready_si_corresponde()\n");
 	}
 	else {
 		pthread_mutex_unlock(&mutex_mapa);
 	}
+
+	printf("[TEAM]Inicio funcion eliminar_mensaje_appeared()\n");
+	printf("[TEAM]Mensaje appeared ¿es NULL?: %d\n", mensaje_appeared == NULL);
+	printf("[TEAM]Pokemon de mensaje appeared ¿es NULL?: %d\n", mensaje_appeared->pokemon == NULL);
 	eliminar_mensaje_appeared(mensaje_appeared);
+	printf("[TEAM]Finalizo funcion eliminar_mensaje_appeared()\n");
 }
 
 void loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_correlativo) {
 	log_info(logger,
+			"[MSG_RECIBIDO] CAUGHT_POKEMON: ID_Correlativo:%s Resultado:%d",
+			id_correlativo, mensaje_caught->resultado);
+}
+
+void debug_loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* id_correlativo) {
+	log_info(logger_debug,
 			"[MSG_RECIBIDO] CAUGHT_POKEMON: ID_Correlativo:%s Resultado:%d",
 			id_correlativo, mensaje_caught->resultado);
 }
@@ -434,6 +446,8 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 
 	char* id_correlativo = pasar_a_char(paquete->id_correlativo);
 
+	debug_loggear_recepcion_de_caught(mensaje_caught, id_correlativo);
+
 	if (dictionary_has_key(enviaron_catch, id_correlativo)) {
 		loggear_recepcion_de_caught(mensaje_caught, id_correlativo);
 		t_tcb_entrenador* entrenador = dictionary_get(enviaron_catch, id_correlativo);
@@ -441,7 +455,7 @@ void procesar_mensaje_caught(t_paquete_socket* paquete) {
 		if (mensaje_caught->resultado == 1){
 			confirmar_caught(entrenador);
 		}
-
+		list_remove_element(blocked, entrenador);
 		aplicar_acciones_caught(entrenador);
 	}
 	free(id_correlativo);
@@ -456,7 +470,7 @@ void procesar_mensaje_localized(t_paquete_socket* paquete) {
 
 
 	for(int i = 0; i < mensaje_localized->cantidad_posiciones ; i++) {
-		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(mensaje_appeared));
+		t_mensaje_appeared* mensaje_appeared = malloc(sizeof(t_mensaje_appeared));
 		mensaje_appeared->length_pokemon = mensaje_localized->length_pokemon;
 		mensaje_appeared->pokemon = strdup(mensaje_localized->pokemon);
 		mensaje_appeared->posx = mensaje_localized->pos[i].posx;
@@ -540,7 +554,7 @@ char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion) {
 
 void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
 	if (id_mensaje != NULL){
-		dictionary_put(enviaron_get, id_mensaje, pokemon);
+		dictionary_put(enviaron_get, id_mensaje, strdup(pokemon));
 	}
 }
 

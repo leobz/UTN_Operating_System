@@ -119,6 +119,7 @@ t_particion_dinamica* guardar_payload_en_particion_dinamica_con_adm(void*, int,t
 void* leer_particion_dinamica(t_particion_dinamica*);
 int supero_limite_de_eliminaciones(int particiones_eliminadas);
 void reubicar_particion(t_particion_dinamica* particion_din,int hueco_particiones);
+
 bool pd_es_menor_contador_uso(t_particion_dinamica* particion, t_particion_dinamica* siguiente_particion);
 t_particion_dinamica* guardar_payload_con_adm_mensaje(void *payload, int tamanio, t_adm_mensaje *admin);
 void unir_particiones_dinamicas_libres();

@@ -308,7 +308,6 @@ void ejecutar_instruccion(int instruccion, t_tcb_entrenador* tcb) {
 		t_tcb_entrenador* entrenador_a_intercambiar = tcb->entrenador_a_intercambiar;
 
 		ejecutar_intercambio(tcb);
-
 		cantidad_ciclos_instruccion = 5;
 		sleep(team_config->retardo_ciclo_cpu * 5);
 
@@ -461,7 +460,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 		void *a_enviar = serializar_catch_pokemon(&bytes, pokemon->pokemon, pos_x, pos_y, 0,0);
 		enviar_mensaje(conexion, a_enviar, bytes);
 
-		char* id_correlativo = recibir_id_correlativo(conexion);
+		char* id_correlativo = recibir_id_mensaje(conexion, pokemon->pokemon, CATCH_POKEMON);
 
 		agregar_a_enviaron_catch(id_correlativo, tcb);
 		pasar_a_blocked(tcb);
@@ -560,18 +559,6 @@ void confirmar_caught(t_tcb_entrenador* tcb){
 	log_info(logger, "[CAPTURA] TID:%d Capturó pokemon. Total capturados:%d", tcb->tid, total_capturados(tcb));
 }
 
-char* recibir_id_correlativo(int socket_cliente) {
-	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
-
-	int length = snprintf( NULL, 0, "%d", paquete->id_correlativo);
-	char* id_correlativo_char = malloc( length + 1 );
-	snprintf(id_correlativo_char, length + 1, "%d", paquete->id_correlativo);
-
-	log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO para CATCH:%s", id_correlativo_char);
-
-	return id_correlativo_char;
-}
-
 void agregar_a_enviaron_catch(char* id_correlativo, t_tcb_entrenador* tcb) {
 	dictionary_put(enviaron_catch, id_correlativo, tcb);
 }
@@ -602,10 +589,8 @@ void pasar_a_exec(t_tcb_entrenador* tcb_exec) {
 }
 
 void pasar_a_blocked(t_tcb_entrenador* tcb) {
-	list_add(blocked, tcb);
-	tcb->estado_tcb = BLOCKED;
+	pasar_a_cola(tcb, blocked, BLOCKED, "Espera confirmacion Caught");
 	metricas->cantidad_cambios_contexto++;
-	log_info(logger,"[CAMBIO DE COLA] TID:%d Pasó a lista Blocked", tcb->tid);
 	pthread_mutex_unlock(&mutex_planificador);
 }
 
@@ -627,11 +612,41 @@ void finalizar_hilo_planificador() {
 
 }
 
+void debug_loggear_estado_exit() {
+	bool todos_tcbs_estado_exit(t_tcb_entrenador* tcb) {
+		return tcb->estado_tcb == EXIT;
+	}
+
+
+	log_info(logger_debug, "Objetivo Global:");
+	debug_loggear_diccionario(objetivo_global);
+	log_info(logger_debug, "Total de Pokemones Atrapados:");
+	debug_loggear_diccionario(pokemones_atrapados);
+	log_info(logger_debug, "Todos en exit? : %d", todos_los_entrenadores_exit());
+	if(todos_los_entrenadores_exit != true){
+		log_info(logger_debug, "  Todos los TCBs en lista exit con estado Exit?: %d",
+				list_all_satisfy(l_exit, (void*) todos_tcbs_estado_exit));
+
+		log_info(logger_debug, "  Tamaño de lista new: %d", list_size(new));
+		log_info(logger_debug, "  Tamaño de lista ready: %d", list_size(ready));
+		log_info(logger_debug, "  Tamaño de lista blocked: %d", list_size(blocked));
+		log_info(logger_debug, "  Tamaño de lista ready_to_exchange: %d", list_size(ready_to_exchange));
+		log_info(logger_debug, "  Tamaño de lista l_exit: %d", list_size(l_exit));
+
+	}
+}
+
 void pasar_a_exit(t_tcb_entrenador* tcb) {
 	pasar_a_cola(tcb, l_exit, EXIT, "Cumplió Objetivo");
+	list_remove_element(ready,tcb);
+	list_remove_element(blocked, tcb);
+	list_remove_element(unblocked, tcb);
+	list_remove_element(ready_to_exchange, tcb);
+	list_remove_element(new, tcb);
+
 	finalizar_hilo_tcb(tcb);
 
-
+	debug_loggear_estado_exit();
 	metricas->cantidad_cambios_contexto++;
 	if (dictionaries_are_equals(objetivo_global, pokemones_atrapados) && todos_los_entrenadores_exit()){
 		log_info(logger,"[FIN DEL PROCESO] ¡Team cumplió objetivo!");

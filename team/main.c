@@ -18,17 +18,17 @@ void finalizar_team(t_team_config* team_config) {
 int main(int argc, char ** argv) {
 
 	//TODO: Tomar id proceso por archivo de configuracion
-	int id_proceso = 999;
+	int id_proceso = (int)getpid();
 
 	team_cumplio_objetivo = false;
 
 	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
+	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
 
-	char* puerto = team_config->puerto_broker;
-	char* ip = team_config->ip_broker;
-
-	char* puerto_gameboy = "4444";
+	char* puerto_broker = team_config->puerto_broker;
+	char* ip_broker = team_config->ip_broker;
+	char* puerto_team = team_config->puerto_team;
 
 	inicializar_listas();
 	inicializar_diccionarios(team_config);
@@ -40,13 +40,13 @@ int main(int argc, char ** argv) {
 			mostrar_lista_entrenadores(team_config);
 			correrTests();
 	} else {
-		int socket_servidor = iniciar_servidor(ip, puerto_gameboy);
+		int socket_servidor = iniciar_servidor(ip_broker, puerto_team);
 
 		iniciar_planificador();
 
-		int conexion_appeared = crear_conexion(ip, puerto);
-		int conexion_caught = crear_conexion(ip, puerto);
-		int conexion_localized = crear_conexion(ip, puerto);
+		int conexion_appeared = crear_conexion(ip_broker, puerto_broker);
+		int conexion_caught = crear_conexion(ip_broker, puerto_broker);
+		int conexion_localized = crear_conexion(ip_broker, puerto_broker);
 
 		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
 		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
