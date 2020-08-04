@@ -8,3 +8,4 @@ sh test-team-catedra-espera-circular.sh
 sh test-team-catedra-final.sh
 sh test-team-catedra-final-rr.sh
 sh test-team-catedra-final-sjf.sh
+sh test-team-catedra-final-sjf-cd.sh

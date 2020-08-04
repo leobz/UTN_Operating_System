@@ -66,6 +66,7 @@ int main(int argc, char ** argv) {
 		char*puerto=broker_config->puerto_broker;
 		socket_servidor = iniciar_servidor(ip, puerto);
 
+
 		guardar_pid();
 
 		iniciar_manejador_de_seniales();
