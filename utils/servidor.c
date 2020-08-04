@@ -17,10 +17,18 @@ int iniciar_servidor(char* ip, char* puerto)
     {
         if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1){
         	printf("Error al momento de crear el socket del servidor\n");
+			perror("socket");
         	continue;
         }
 
-        if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
+		int activado=1;
+
+		if (setsockopt(socket_servidor,SOL_SOCKET,SO_REUSEADDR,&activado,sizeof(int)) == -1) {
+			perror("setsockopt");
+			exit(1);
+		}
+
+		if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
         	printf("Error al momento de asociar el socket del servidor al puerto: %s\n", puerto);
             close(socket_servidor);
             continue;
@@ -60,10 +68,11 @@ t_paquete_socket* recibir_mensajes(int socket_cliente) {
 
 	paquete->socket_cliente = socket_cliente;
 
+	int recv_result = recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL);
 
-	if(recv(socket_cliente, &(paquete->codigo_operacion), sizeof(int), MSG_WAITALL) == -1){
+	if(recv_result == 0 || recv_result == -1){
 		paquete->codigo_operacion= OP_ERROR;
-		}
+	}
 
 	if(paquete->codigo_operacion==SUSCRIPCION){
 		recv(socket_cliente, &(paquete->cola), sizeof(int), MSG_WAITALL);

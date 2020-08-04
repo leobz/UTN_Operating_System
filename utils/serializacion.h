@@ -200,4 +200,5 @@ int string_to_op_code(char* enum_cola);
 char* value_to_state(int value);
 char* pasar_a_char(int numero);
 void liberar_paquete_socket(t_paquete_socket* paquete);
+t_suscripcion* crear_t_suscripcion(int id_proceso, int cola);
 #endif /* SERIALIZACION_H_ */

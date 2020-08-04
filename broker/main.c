@@ -66,8 +66,7 @@ int main(int argc, char ** argv) {
 		char*puerto=broker_config->puerto_broker;
 		socket_servidor = iniciar_servidor(ip, puerto);
 
-		int activado=1;
-		setsockopt(socket_servidor,SOL_SOCKET,SO_REUSEADDR,&activado,sizeof(activado));
+
 
 		guardar_pid();
 
