@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 		// TODO: funcion de alarm
 		// TODO: buscar como terminar un hilo por cierto tiempo
 
+
 		pthread_t hilo_gameboy;
 		pthread_create(&hilo_gameboy,NULL,(void*)servidor_gameboy,conexion);
 		pthread_detach(hilo_gameboy);
@@ -42,7 +43,6 @@ int main(int argc, char **argv) {
 
 		log_info(logger, "%ld Conexion establecida con [Broker]", (long)getpid());
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
-
 		log_info(logger,"%ld Mensaje enviado a [Broker]: SUSCRIPCION id_proceso %d cola %d por %d segundos", (long)getpid(), id_process, cola, tiempo);
 
 		sleep(tiempo);

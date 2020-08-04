@@ -29,6 +29,12 @@ void enviar_mensaje(int socket_cliente, void* a_enviar, int bytes) {
 	send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
 	free(a_enviar);
 }
+int enviar_mensaje_con_retorno_eliminando(int socket_cliente, void* a_enviar, int bytes) {
+	int verificacion=send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
+	free(a_enviar);
+	return verificacion;
+}
+
 void enviar_mensaje_nofree(int socket_cliente, void* a_enviar, int bytes) {
 	send(socket_cliente, a_enviar, bytes, MSG_NOSIGNAL);
 }

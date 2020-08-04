@@ -15,6 +15,9 @@ int main(){
 	inicializar_diccionarios();
 	inicializar_semaforos();
 
+
+	//CAMBIAR POR ARCHIVO DE CONFIGURACION
+
 	int id_proceso = (int)getpid();
 
 	char* puerto_broker = gamecard_config->puerto_broker;

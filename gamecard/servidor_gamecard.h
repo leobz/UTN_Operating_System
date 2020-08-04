@@ -14,12 +14,6 @@
 int id_proceso_gamecard;
 int finalizo_suscripcion;
 
-typedef struct {
-	int id_proceso;
-	int conexion;
-	int cola;
-} t_datos_suscripcion;
-
 // Funciones
 void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket);
 void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket);

@@ -69,11 +69,9 @@ void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* me
 	else {
 		int bytes=0;
 		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,mensaje_new->posx, mensaje_new->posy,0, paquete_socket->id_mensaje);
-
 		printf("Enviando mensaje %s \n",op_code_to_string(APPEARED_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
-
-
+		liberar_conexion(conexion);
 	}
 	free(mensaje_new->pokemon);
 	free(mensaje_new);
@@ -90,13 +88,12 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 		checkear_archivo_abierto(mensaje_new->pokemon);
 	}
 
-
 	else//si el archivo no existia
 		crear_archivo_pokemon(mensaje_new);
 
-	agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+		agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
+		sleep(gamecard_config->tiempo_retardo_operacion);
 
-	sleep(gamecard_config->tiempo_retardo_operacion);
 	cerrar_archivo(mensaje_new->pokemon);
 
 	enviar_mensaje_appeared(paquete_socket, mensaje_new);
@@ -110,9 +107,9 @@ void enviar_mensaje_localized(void* a_enviar,int bytes){
 		free(a_enviar);
 	}
 	else {
-
 		printf("Enviando mensaje %s\n",op_code_to_string(LOCALIZED_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
+		liberar_conexion(conexion);
 	}
 }
 
@@ -123,10 +120,10 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){
 
 		checkear_archivo_abierto(mensaje_get->pokemon);
-
-		t_list* posiciones_pokemon = obtener_posiciones_pokemon(mensaje_get->pokemon);
-		printf("[GAMECARD] Salio de funcion obtener_posiciones_pokemon()\n");
-		printf("[GAMECARD] Posiciones pokemon ¿es NULL?: %d\n", posiciones_pokemon == NULL);
+			t_list* posiciones_pokemon = obtener_posiciones_pokemon(mensaje_get->pokemon);
+			printf("[GAMECARD] Salio de funcion obtener_posiciones_pokemon()\n");
+			printf("[GAMECARD] Posiciones pokemon ¿es NULL?: %d\n", posiciones_pokemon == NULL);
+			sleep(gamecard_config->tiempo_retardo_operacion);
 		cerrar_archivo(mensaje_get->pokemon);
 
 		printf("[GAMECARD] Cerro archivo\n");
@@ -155,8 +152,8 @@ void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 
 		void* a_enviar = serializar_caught_pokemon(&bytes, estado,0, paquete_socket->id_mensaje);
 		printf("Enviando mensaje %s \n",op_code_to_string(CAUGHT_POKEMON));
-
 		enviar_mensaje(conexion, a_enviar, bytes);
+		liberar_conexion(conexion);
 	}
 }
 
@@ -167,7 +164,8 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
 	if(dictionary_has_key(archivos_existentes,mensaje_catch->pokemon)){//si el archivo ya se encontraba
 		checkear_archivo_abierto(mensaje_catch->pokemon);
-		int resultado = decrementar_cantidad(mensaje_catch);
+			int resultado = decrementar_cantidad(mensaje_catch);
+			sleep(gamecard_config->tiempo_retardo_operacion);
 		cerrar_archivo(mensaje_catch->pokemon);
 		enviar_mensaje_caught(paquete_socket, resultado);
 	}

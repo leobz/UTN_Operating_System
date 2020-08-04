@@ -67,7 +67,6 @@ int main(int argc, char ** argv) {
 		socket_servidor = iniciar_servidor(ip, puerto);
 
 
-
 		guardar_pid();
 
 		iniciar_manejador_de_seniales();

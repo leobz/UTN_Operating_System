@@ -12,7 +12,15 @@ void servidor_gameboy(int conexion) {
 
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_recibido(paquete);
+
+		if (paquete->codigo_operacion != OP_ERROR) {
+			procesar_mensaje_recibido(paquete);
+		}
+		else {
+			close(conexion);
+			free(paquete);
+			break;
+		}
 	}
 }
 
@@ -128,6 +136,7 @@ void recibir_id_correlativo(int socket_cliente) {
 void preparar_confirmacion(int id_men){
 
 	int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+
 	enviar_confirmacion(id_men,CONFIRMACION,conexion_corfirmacion);
 	liberar_conexion(conexion_corfirmacion);
 }
