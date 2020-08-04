@@ -64,7 +64,6 @@ void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 
 	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
 		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
-		loggear_nueva_conexion(logger, paquete_socket);
 
 		preparar_confirmacion(paquete_socket->id_mensaje);
 
@@ -92,7 +91,6 @@ void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket){
 
 	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
 		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
-		loggear_nueva_conexion(logger, paquete_socket);
 
 		switch (paquete_socket->codigo_operacion){
 		case NEW_POKEMON:
