@@ -48,13 +48,13 @@ int main(int argc, char ** argv) {
 
 		iniciar_planificador();
 
-		int conexion_appeared = crear_conexion(ip_broker, puerto_broker);
-		int conexion_caught = crear_conexion(ip_broker, puerto_broker);
-		int conexion_localized = crear_conexion(ip_broker, puerto_broker);
+		t_datos_suscripcion* datos_suscripcion_appeared = crear_datos_suscripcion(id_proceso, APPEARED_POKEMON);
+		t_datos_suscripcion* datos_suscripcion_localized = crear_datos_suscripcion(id_proceso, LOCALIZED_POKEMON);
+		t_datos_suscripcion* datos_suscripcion_caught = crear_datos_suscripcion(id_proceso, CAUGHT_POKEMON);
 
-		iniciar_suscripcion(id_proceso, conexion_appeared, APPEARED_POKEMON);
-		iniciar_suscripcion(id_proceso, conexion_caught, CAUGHT_POKEMON);
-		iniciar_suscripcion(id_proceso, conexion_localized, LOCALIZED_POKEMON);
+		iniciar_hilo_suscripcion(datos_suscripcion_appeared);
+		iniciar_hilo_suscripcion(datos_suscripcion_localized);
+		iniciar_hilo_suscripcion(datos_suscripcion_caught);
 
 		enviar_get_pokemon();
 

@@ -12,7 +12,15 @@ void servidor_gameboy(int conexion) {
 
 	while (1) {
 		t_paquete_socket* paquete =  recibir_mensajes(conexion);
-		procesar_mensaje_recibido(paquete);
+
+		if (paquete->codigo_operacion != OP_ERROR) {
+			procesar_mensaje_recibido(paquete);
+		}
+		else {
+			close(conexion);
+			free(paquete);
+			break;
+		}
 	}
 }
 

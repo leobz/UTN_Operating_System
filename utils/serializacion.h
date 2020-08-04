@@ -111,6 +111,12 @@ typedef struct {
 	int id_proceso;
 } t_suscripcion;
 
+typedef struct {
+	int id_proceso;
+	int conexion;
+	int cola;
+} t_datos_suscripcion;
+
 
 // PAQUETES GENERAL
 t_paquete* crear_paquete(int codigo_operacion, t_buffer* buffer, int id_mensaje,

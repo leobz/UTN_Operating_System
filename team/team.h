@@ -158,8 +158,18 @@ void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete);
 void agregar_pokemon_a_mapa_by_mensaje_appeared(t_mensaje_appeared* mensaje);
 void pasar_entrenador_a_ready_segun_cercania(t_mensaje_appeared* mensaje);
 char* recibir_id_mensaje(int conexion, char* pokemon, int codigo_de_operacion);
+
+// SUSCRIPCION
+t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola);
+void solicitar_suscripcion(int id_proceso, int cola, int conexion);
+void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion);
+void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion);
+void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket);
+void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket);
+void recibir_mensajes_team(t_datos_suscripcion* datos_suscripcion);
 void preparar_confirmacion(int id_men);
 void enviar_confirmacion(int id,op_code confirmacion,int socket);
+
 
 int localized_es_valido(t_paquete_socket*);
 t_list* transformar_localized_en_appeareds(t_mensaje_localized* mensaje_localized);
