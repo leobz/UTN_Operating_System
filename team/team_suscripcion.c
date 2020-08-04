@@ -1,12 +1,5 @@
 #include "team_suscripcion.h"
 
-t_suscripcion* crear_t_suscripcion(int id_proceso, int cola) {
-	t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
-	suscripcion->cod_operacion = SUSCRIPCION;
-	suscripcion->cola_a_suscribir = cola;
-	suscripcion->id_proceso = id_proceso;
-	return suscripcion;
-}
 
 void recibir_mensajes_team(int conexion) {
 	while (1) {
@@ -16,6 +9,7 @@ void recibir_mensajes_team(int conexion) {
 }
 
 void iniciar_suscripcion(int id_proceso, int conexion, int cola) {
+	//TIENE QUE SER EL MISMO ID_PROCESO PARA TODAS LAS COLAS
 	id_proceso = id_proceso * 10 + cola;
 	if (conexion == -1) {
 		printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(cola));

@@ -128,6 +128,7 @@ void recibir_id_correlativo(int socket_cliente) {
 void preparar_confirmacion(int id_men){
 
 	int conexion_corfirmacion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
+
 	enviar_confirmacion(id_men,CONFIRMACION,conexion_corfirmacion);
 	liberar_conexion(conexion_corfirmacion);
 }

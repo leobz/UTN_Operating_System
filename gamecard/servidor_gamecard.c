@@ -14,6 +14,8 @@ void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
 	void* a_enviar = empaquetar_suscripcion(suscripcion);
 	log_info(logger, "Conexion %s establecida con [Broker]", op_code_to_string(cola));
 	enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
+	free(suscripcion);
+
 }
 
 void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion) {
@@ -24,6 +26,7 @@ void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 
 void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 	while (datos_suscripcion->conexion == -1) {
+		liberar_conexion(datos_suscripcion->conexion);
 		printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(datos_suscripcion->cola));
 		sleep(gamecard_config->tiempo_reintento_conexion);
 		datos_suscripcion->conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
