@@ -2,32 +2,32 @@
 sleep_time=2
 
 
-echo "\n\n\n  **  Test Team Catedra Final SJF Con Desalojo  **\n\n\n"
+echo "\n\n\n  **  Test Team Catedra: Final SJF Con Desalojo  **\n\n\n"
 
 
-echo "Ejecutando 'sh test-team-catedra-final-rr.sh'"
-
+echo "Cargando archivos de configuracion"
 rm *.log
-cp team.config team.config.auxiliar; rm team.config; cp team.config.catedra.final team.config
+cp configuraciones/team.config.catedra.final team.config
 
-echo "Actualizando configuracion a SJF CD"
+echo "Actualizando ALGORITMO_PLANIFICACION=SJF-CD"
 sed -i 's/FIFO/SJF-CD/g' team.config
 
+echo "Levantando Team"
 1>/dev/null 2>/dev/null     ../team/Debug/team &
 
-echo "\nEjecutar 'test-team-catedra-final-sjf-cd-2'?"
+echo "\nEjecutar 'prueba_final_team.sh'?"
 read "rta"
-sh test-team-catedra-final-sjf-cd-2.sh
+sh delibird-pruebas/prueba_final_team.sh
+
 sleep $(expr $sleep_time \* 35)
 
 
 echo "\nComprobacion: Cumplio objetivo Global:\n"
 tail team.log
 
-
 echo "\nEjecutar test?\n"
 read "rta"
-byexample -l shell team-catedra-final-sjf-cd.md
+byexample -l shell byexample-pruebas/team-catedra-final-sjf-cd.md
 
 # Restaurando configuracion inicial
-rm team.config; cp team.config.auxiliar team.config; rm team.config.auxiliar
+rm team.config;
