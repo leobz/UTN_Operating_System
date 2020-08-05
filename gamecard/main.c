@@ -7,12 +7,7 @@ int main(){
 	inicializar_diccionarios();
 	inicializar_semaforos();
 
-	//CAMBIAR POR ARCHIVO DE CONFIGURACION
-	int id_proceso = (int)getpid();
-
-	char* puerto_broker = gamecard_config->puerto_broker;
-	char* ip_broker = gamecard_config->ip_broker;
-
+	int id_proceso = gamecard_config->id_proceso;
 
 	t_datos_suscripcion* datos_suscripcion_get = crear_datos_suscripcion(id_proceso, GET_POKEMON);
 	t_datos_suscripcion* datos_suscripcion_new = crear_datos_suscripcion(id_proceso, NEW_POKEMON);

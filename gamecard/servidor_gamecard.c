@@ -9,6 +9,15 @@
 
 int socket_broker;
 
+
+t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola) {
+	t_datos_suscripcion* datos_suscripcion = malloc(sizeof(t_datos_suscripcion));
+	datos_suscripcion->conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+	datos_suscripcion->cola = cola;
+	datos_suscripcion->id_proceso = id_proceso;
+	return datos_suscripcion;
+}
+
 void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
 	t_suscripcion* suscripcion = crear_t_suscripcion(id_proceso, cola);
 	void* a_enviar = empaquetar_suscripcion(suscripcion);
@@ -54,6 +63,7 @@ void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion){
 			close(datos_suscripcion->conexion);
 			datos_suscripcion->conexion = -1;
 			iniciar_suscripcion(datos_suscripcion);
+			free(paquete);
 		}
 	}
 }

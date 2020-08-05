@@ -150,7 +150,7 @@ void enviar_confirmacion(int id, int confirmacion, int socket){
 	offset+=sizeof(int);
 	memcpy(enviar+offset,&id,sizeof(int));
 	offset+=sizeof(int);
-	memcpy(enviar+offset,&id_proceso_gameboy,sizeof(int)); //valor nulo pq no es un id_proceso
+	memcpy(enviar+offset,&gameboy_config->id_proceso_gameboy,sizeof(int)); //valor nulo pq no es un id_proceso
 
 	enviar_mensaje(socket,enviar,sizeof(int)*3);
 	//le devuelve al proceso emisor el id del mensaje

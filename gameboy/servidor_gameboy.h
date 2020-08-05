@@ -23,6 +23,7 @@ typedef struct {
 	char *puerto_team;
 	char *puerto_gamecard;
 	char *puerto_gameboy;
+	int id_proceso_gameboy;
 } t_gameboy_config;
 
 t_gameboy_config *gameboy_config;

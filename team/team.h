@@ -82,6 +82,7 @@ typedef struct{
 	double alpha;
 	double estimacion_inicial;
 	char *ip_broker;
+	char* ip_team;
 	char *puerto_broker;
 	char *log_file;
 	char* puerto_team;

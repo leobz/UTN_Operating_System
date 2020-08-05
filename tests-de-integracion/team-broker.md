@@ -41,7 +41,7 @@ $ sleep <sleep-time>; ../team/Debug/team &       # byexample: +fail-fast +paste
 Suscripción
 
 ```bash
-$ sleep <sleep-time>; ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 120 & # byexample: +timeout=100 +fail-fast +paste
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy SUSCRIPTOR CATCH_POKEMON 200 & # byexample: +timeout=100 +fail-fast +paste
 <...>[<job-gameboy-id>] <gameboy-pid>
 ```
 
@@ -49,7 +49,7 @@ Comprobación
 
 ```bash
 $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste +fail-fast
-<...>[SUSCRIPCION] Cola:CATCH_POKEMON ID_Proceso:120<...>
+<...>[SUSCRIPCION] Cola:CATCH_POKEMON ID_Proceso:<...>
 ```
 
 ## 2 Mandar un Appeared Pokémon de Gameboy a Team

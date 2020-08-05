@@ -14,13 +14,12 @@
 int id_proceso_gamecard;
 int finalizo_suscripcion;
 
-typedef struct {
-	int id_proceso;
-	int conexion;
-	int cola;
-} t_datos_suscripcion;
 
 // Funciones
+t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola);
+void solicitar_suscripcion(int id_proceso, int cola, int conexion);
+void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion);
+void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion);
 void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket);
 void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket);
 void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion);

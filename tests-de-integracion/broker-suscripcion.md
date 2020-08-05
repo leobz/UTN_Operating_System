@@ -30,7 +30,7 @@ $ rm *.log ; ../broker/Debug/broker &
 Suscripción a APPEARED_POKEMON
 
 ```  bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION APPEARED_POKEMON 200 & # byexample: +timeout=4 +paste
+$ ../gameboy/Debug/gameboy SUSCRIPTOR APPEARED_POKEMON 200 & # byexample: +timeout=4 +paste
 [<job-id-gameboy>] <pid-gameboy>
 ```
 

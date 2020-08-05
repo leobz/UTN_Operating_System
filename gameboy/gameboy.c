@@ -11,12 +11,10 @@ int main(int argc, char **argv) {
 	}
 
 	// ./gameboy SUSCRIPCION [COLA_DE_MENSAJES] [TIEMPO]
-	if (strcmp(argv[1], "SUSCRIPCION") == 0) {
+	if (strcmp(argv[1], "SUSCRIPTOR") == 0) {
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
-		int id_process = atoi(argv[4]);
 
-		id_proceso_gameboy=id_process;
 
 		int conexion = crear_conexion(gameboy_config->ip_broker,gameboy_config->puerto_broker);
 
@@ -36,14 +34,14 @@ int main(int argc, char **argv) {
 		t_suscripcion *suscripcion = malloc(sizeof(t_suscripcion));
 		suscripcion->cod_operacion = SUSCRIPCION;
 		suscripcion->cola_a_suscribir = cola;
-		suscripcion->id_proceso=id_process;
+		suscripcion->id_proceso=gameboy_config->id_proceso_gameboy;
 
 
 		void *a_enviar = empaquetar_suscripcion(suscripcion);
 
 		log_info(logger, "%ld Conexion establecida con [Broker]", (long)getpid());
 		enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
-		log_info(logger,"%ld Mensaje enviado a [Broker]: SUSCRIPCION id_proceso %d cola %d por %d segundos", (long)getpid(), id_process, cola, tiempo);
+		log_info(logger,"%ld Mensaje enviado a [Broker]: SUSCRIPCION id_proceso %d cola %d por %d segundos", (long)getpid(), gameboy_config->id_proceso_gameboy, cola, tiempo);
 
 		sleep(tiempo);
 
@@ -377,6 +375,7 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 			config_get_string_value(config, "PUERTO_TEAM"));
 	gameboy_config->puerto_gameboy = strdup(
 			config_get_string_value(config, "PUERTO_GAMEBOY"));
+	gameboy_config->id_proceso_gameboy=config_get_int_value(config,"ID_PROCESO");
 }
 
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {
