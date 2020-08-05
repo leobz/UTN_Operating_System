@@ -638,11 +638,12 @@ void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
 }
 
 void enviar_get_pokemon() {
-	//TODO: inicializar id_mensaje = id_proceso * 10
+
 	void enviar_get(char* key_pokemon, void* value) {
 		int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
 		if (conexion != -1){
+
 			int bytes;
 			void *a_enviar = serializar_get_pokemon(&bytes, key_pokemon, 0, 0);
 			enviar_mensaje(conexion, a_enviar, bytes);
@@ -653,6 +654,7 @@ void enviar_get_pokemon() {
 		}
 	}
 
+	sem_wait(&sem_get);
 	dictionary_iterator(objetivo_global, (void*) enviar_get);
 }
 

@@ -20,21 +20,29 @@ void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
 
 
 void recibir_mensajes_team(t_datos_suscripcion* datos_suscripcion) {
+	if (datos_suscripcion->conexion == -1 && datos_suscripcion->cola == LOCALIZED_POKEMON) {
+		sem_post(&sem_get);
+	}
+
 	iniciar_suscripcion(datos_suscripcion);
 
-		while (true){
-			t_paquete_socket* paquete =  recibir_mensajes(datos_suscripcion->conexion);
+	if (datos_suscripcion->cola == LOCALIZED_POKEMON){
+		sem_post(&sem_get);
+	}
 
-			if (paquete->codigo_operacion != OP_ERROR) {
-				procesar_mensaje_recibido_broker(paquete);
-			}
-			else {
-				close(datos_suscripcion->conexion);
-				datos_suscripcion->conexion = -1;
-				iniciar_suscripcion(datos_suscripcion);
-				free(paquete);
-			}
+	while (true){
+		t_paquete_socket* paquete =  recibir_mensajes(datos_suscripcion->conexion);
+
+		if (paquete->codigo_operacion != OP_ERROR) {
+			procesar_mensaje_recibido_broker(paquete);
 		}
+		else {
+			close(datos_suscripcion->conexion);
+			datos_suscripcion->conexion = -1;
+			iniciar_suscripcion(datos_suscripcion);
+			free(paquete);
+		}
+	}
 }
 
 

@@ -18,6 +18,7 @@
 bool team_cumplio_objetivo;
 
 //ESTRUCTURAS
+sem_t sem_get;
 
 pthread_mutex_t mutex_planificador;
 pthread_mutex_t mutex_lista_new;
