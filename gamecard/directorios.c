@@ -1,5 +1,19 @@
 #include "directorios.h"
 
+void log_debug_metadata(char* pokemon) {
+	char* archivo_pokemon = formar_archivo_pokemon(pokemon);
+	t_metadata_pokemon* metadata_pokemon = leer_metadata_pokemon(archivo_pokemon);
+	char* vector_de_bloques = list_to_char_array(metadata_pokemon->blocks);
+
+
+	log_info(logger, "[MODIFICADO ARCHIVO] %s -> Tamaño:%d , Bloques: %s",
+			pokemon, metadata_pokemon->size, vector_de_bloques);
+
+	free(archivo_pokemon);
+	free(vector_de_bloques);
+	destruir_metadata_pokemon(metadata_pokemon);
+
+}
 
 void crear_archivo_metadata_y_bitmap_fs() {
 	metadata = malloc(sizeof(t_metadata));
@@ -64,7 +78,7 @@ void inicializar_directorios() {
 void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new){
 	int conexion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
 	if (conexion == -1) {
-		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+		log_error(logger, "No se pude conectar con el broker");
 	}
 	else {
 		int bytes=0;
@@ -77,12 +91,18 @@ void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* me
 	free(mensaje_new);
 }
 
+void loggear_msg_new(t_paquete_socket* paquete_socket, t_mensaje_new* mensaje_new) {
+	log_info(logger, "[MSG RECIBIDO] ID:%d NEW_POKEMON %s (%d,%d) %d",
+			paquete_socket->id_correlativo,mensaje_new->pokemon,
+			mensaje_new->posx, mensaje_new->posy,mensaje_new->cantidad);
+}
+
 void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 
 	t_mensaje_new*mensaje_new;
-	mensaje_new=deserializar_mensaje_new_pokemon(paquete_socket->buffer);
+	mensaje_new = deserializar_mensaje_new_pokemon(paquete_socket->buffer);
 
-	//log_info(logger,"Mensaje recibido NEW_POKEMON %s %d %d %d",mensaje_new->pokemon,mensaje_new->posx,mensaje_new->posy,mensaje_new->cantidad);
+	loggear_msg_new(paquete_socket, mensaje_new);
 
 	if(dictionary_has_key(archivos_existentes,mensaje_new->pokemon)){//si el archivo ya se encontraba
 		checkear_archivo_abierto(mensaje_new->pokemon);
@@ -103,7 +123,7 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 void enviar_mensaje_localized(void* a_enviar,int bytes){
 	int conexion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
 	if (conexion == -1) {
-		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+		log_error(logger, "No se pude conectar con el broker");
 		free(a_enviar);
 	}
 	else {
@@ -113,9 +133,17 @@ void enviar_mensaje_localized(void* a_enviar,int bytes){
 	}
 }
 
+void loggear_msg_get(t_paquete_socket* paquete_socket,
+		t_mensaje_get* mensaje_get) {
+	log_info(logger, "[MSG RECIBIDO] ID:%d GET_POKEMON %s",
+			paquete_socket->id_correlativo, mensaje_get->pokemon);
+}
+
 void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	t_mensaje_get* mensaje_get;
 	mensaje_get=deserializar_mensaje_get_pokemon(paquete_socket->buffer);
+
+	loggear_msg_get(paquete_socket, mensaje_get);
 
 	if(dictionary_has_key(archivos_existentes,mensaje_get->pokemon)){
 
@@ -138,14 +166,14 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 	}
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_get->pokemon);
-		log_info(logger,"No se encontro el pokemon :%s",mensaje_get->pokemon);}
+		log_error(logger,"No se encontro el pokemon :%s",mensaje_get->pokemon);}
 }
 
 void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 	int conexion = crear_conexion(gamecard_config->ip_broker,gamecard_config->puerto_broker);
 
 	if (conexion == -1) {
-		log_info(logger, "[ERROR][BROKER] Error de conexion con el broker");
+		log_error(logger, "No se pude conectar con el broker");
 	}
 	else {
 		int bytes;
@@ -157,11 +185,18 @@ void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 	}
 }
 
+void loggear_msg_catch(t_paquete_socket* paquete_socket, t_mensaje_catch* mensaje_catch) {
+	log_info(logger, "[MSG RECIBIDO] ID:%d CATCH_POKEMON %s (%d,%d)",
+			paquete_socket->id_correlativo, mensaje_catch->pokemon, mensaje_catch->posx, mensaje_catch->posy);
+}
 
 void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	t_mensaje_catch* mensaje_catch;
 
 	mensaje_catch = deserializar_mensaje_catch_pokemon(paquete_socket->buffer);
+
+	loggear_msg_catch(paquete_socket, mensaje_catch);
+
 	if(dictionary_has_key(archivos_existentes,mensaje_catch->pokemon)){//si el archivo ya se encontraba
 		checkear_archivo_abierto(mensaje_catch->pokemon);
 			int resultado = decrementar_cantidad(mensaje_catch);
@@ -171,7 +206,7 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 	}
 	else{
 		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
-		log_info(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
+		log_error(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
 		enviar_mensaje_caught(paquete_socket, FAIL);
 	}
 	eliminar_mensaje_catch(mensaje_catch);
@@ -195,10 +230,12 @@ void crear_archivo_pokemon(t_mensaje_new* mensaje_new) {
 		crear_archivo_metadata(path_archivo_pokemon,bloque_disponible);
 		dictionary_put(cantidad_posiciones_pokemon,mensaje_new->pokemon,0);
 		dictionary_put(archivos_existentes,mensaje_new->pokemon,true);//indica que esta abierto
+
+		log_info(logger, "[NUEVO ARCHIVO] %s", mensaje_new->pokemon);
 	}
 	else{
 		pthread_mutex_unlock(&mutex_bitmap);
-		printf("ERROR: No existen bloques disponibles para crear el archivo\n");
+		log_error(logger, "No existen bloques disponibles para crear el archivo %s", mensaje_new->pokemon);
 		exit(1);
 	}
 }
@@ -332,7 +369,11 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		config_set_value(archivo_pokemon_config, posicion_pokemonn, cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
 
+
 	}
+
+	log_debug_metadata(mensaje_new->pokemon);
+
 	config_destroy(archivo_pokemon_config);
 	free(posicion_pokemonn);
 	free(cantidad);
@@ -380,6 +421,7 @@ t_list* obtener_posiciones_pokemon(char*pokemonn){
 	return posiciones;
 }
 
+
 int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 	int resultado = FAIL;
 	t_config* archivo_pokemon_config = leer_config_pokemon(mensaje_catch->pokemon);
@@ -403,10 +445,12 @@ int decrementar_cantidad(t_mensaje_catch* mensaje_catch) {
 
 			config_set_value(archivo_pokemon_config, posicion_pokemon, string_itoa(cantidad_pokemon));
 		}
+
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_catch->pokemon);
 		resultado = OK;
 	}
 	config_destroy(archivo_pokemon_config);
+	log_debug_metadata(mensaje_catch->pokemon);
 	return resultado;
 }
 

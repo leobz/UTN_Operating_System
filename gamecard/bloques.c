@@ -1,7 +1,7 @@
 #include "bloques.h"
 
 void destruir_metadata_pokemon(t_metadata_pokemon* metadata_pokemon){
-	list_destroy(metadata_pokemon->blocks);
+	list_destroy_and_destroy_elements(metadata_pokemon->blocks, (void*) free);
 	free(metadata_pokemon->directory);
 	free(metadata_pokemon);
 }
@@ -71,6 +71,14 @@ char* archivo_a_string(char* ruta_absoluta) {
 	return buffer;
 }
 
+void liberar_char_doble_asterisco(char** char_doble_asterisco) {
+	int i = 0;
+	while (char_doble_asterisco[i] != NULL) {
+		free(char_doble_asterisco[i]);
+		i++;
+	}
+	free(char_doble_asterisco);
+}
 
 t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo) {
 	t_metadata_pokemon* archivo = malloc(sizeof(t_metadata_pokemon));
@@ -84,7 +92,8 @@ t_metadata_pokemon* leer_metadata_pokemon(char* ruta_al_metadata_bin_del_archivo
 	archivo->size = config_get_int_value(bloque_metadata_archivo, "SIZE");
 
 	free(ruta);
-	free(string_blocks);
+
+	liberar_char_doble_asterisco(string_blocks);
 	config_destroy(bloque_metadata_archivo);
 
 	return archivo;
