@@ -7,6 +7,7 @@
 *.txt
 *.auxiliar
 so-commons-library/
+test-catedra/delibird-pruebas/
 
 .*/*.log
 */*.gitignore

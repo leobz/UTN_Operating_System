@@ -8,7 +8,7 @@ echo "\n\n\n  **  Test Broker Catedra: FIFO BS  **\n\n\n"
 echo "Ejecutando 'sh test-broker-catedra-fifo-buddy-system.sh'"
 
 rm *.log
-cp broker.config broker.config.auxiliar; rm broker.config; cp broker.config.buddy.system broker.config
+cp broker.config broker.config.auxiliar; rm broker.config; cp configuraciones/broker.config.buddy.system broker.config
 
 1>/dev/null 2>/dev/null     ../broker/Debug/broker &
 sleep 1

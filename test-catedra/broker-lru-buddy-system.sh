@@ -8,7 +8,7 @@ echo "\n\n\n  **  Test Broker Catedra: LRU BS  **\n\n\n"
 echo "Ejecutando 'sh test-broker-catedra-lru-buddy-system.sh'"
 
 rm *.log
-cp broker.config broker.config.auxiliar; rm broker.config; cp broker.config.buddy.system broker.config
+cp broker.config broker.config.auxiliar; rm broker.config; cp configuraciones/broker.config.buddy.system broker.config
 echo Actualizando configuracion a LRU
 sed -i 's/FIFO/LRU/g' broker.config
 
