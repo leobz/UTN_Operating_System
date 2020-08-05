@@ -31,5 +31,3 @@ byexample -l shell team-catedra-final-sjf.md
 
 # Restaurando configuracion inicial
 rm team.config; cp team.config.auxiliar team.config; rm team.config.auxiliar
-
-1>/dev/null 2>/dev/nul         sh mataProcesos.sh

@@ -17,10 +17,18 @@ int iniciar_servidor(char* ip, char* puerto)
     {
         if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1){
         	printf("Error al momento de crear el socket del servidor\n");
+			perror("socket");
         	continue;
         }
 
-        if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
+		int activado=1;
+
+		if (setsockopt(socket_servidor,SOL_SOCKET,SO_REUSEADDR,&activado,sizeof(int)) == -1) {
+			perror("setsockopt");
+			exit(1);
+		}
+
+		if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
         	printf("Error al momento de asociar el socket del servidor al puerto: %s\n", puerto);
             close(socket_servidor);
             continue;

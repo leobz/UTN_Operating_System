@@ -31,5 +31,3 @@ echo "\n\nEjecutar test?\n"
 read "rta"
 byexample -l shell team-catedra-base.md
 
-
-1>/dev/null 2>/dev/nul         sh mataProcesos.sh

@@ -28,5 +28,3 @@ tail team.log
 echo "\nCorrer test?\n"
 read "rta"
 byexample -l shell team-catedra-espera-circular.md
-
-1>/dev/null 2>/dev/null         sh mataProcesos.sh

@@ -1,8 +1,8 @@
 #!/bin/sh
 
-echo
-echo Enviando mensajes CAUGHT_POKEMON, CATCH_POKEMON y SUSCRIPCION a Broker:
-echo
+# echo
+# echo Enviando mensajes CAUGHT_POKEMON, CATCH_POKEMON y SUSCRIPCION a Broker:
+# echo
 
 ../gameboy/Debug/gameboy BROKER CAUGHT_POKEMON 1 OK
 ../gameboy/Debug/gameboy BROKER CAUGHT_POKEMON 2 FAIL

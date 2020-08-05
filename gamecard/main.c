@@ -1,5 +1,13 @@
 #include "main.h"
 
+t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola) {
+	t_datos_suscripcion* datos_suscripcion = malloc(sizeof(t_datos_suscripcion));
+	datos_suscripcion->conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
+	datos_suscripcion->cola = cola;
+	datos_suscripcion->id_proceso = id_proceso * 10 + datos_suscripcion->cola;
+	return datos_suscripcion;
+}
+
 int main(){
 
 	inicializar_gamecard();
