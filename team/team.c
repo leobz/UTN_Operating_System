@@ -414,6 +414,12 @@ void debug_loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* i
 			id_correlativo, mensaje_caught->resultado);
 }
 
+void debug_loggear_recepcion_de_localized(t_mensaje_localized* mensaje_localized, char* id_correlativo) {
+	log_info(logger_debug,
+			"[MSG_RECIBIDO] LOCALIZED_POKMEON: ID_Correlativo:%s Pokemon:%s",
+			id_correlativo, mensaje_localized->pokemon);
+}
+
 void quitar_pokemon_de_planificados(t_tcb_entrenador* entrenador) {
 	dictionary_decrement_value(pokemones_planificados,
 			entrenador->pokemon_a_capturar->pokemon);
@@ -498,6 +504,8 @@ int localized_es_valido(t_paquete_socket* paquete) {
 	bool localized_valido = false;
 	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
 	char* id_correlativo = string_itoa(paquete->id_correlativo);
+
+	debug_loggear_recepcion_de_localized(mensaje_localized, id_correlativo);
 
 	if (localized_tiene_id_valido(id_correlativo)) {
 		localized_valido = strcmp(dictionary_get(enviaron_get, id_correlativo), mensaje_localized->pokemon) == 0;
