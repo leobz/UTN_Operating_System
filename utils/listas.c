@@ -23,7 +23,7 @@ t_list* list_map_free(t_list* self, void*(*transformer)(void*)){
 t_list* strings_to_list(char** strings) {
 	t_list* list = list_create();
 	while (*strings != NULL) {
-		list_add(list, *strings);
+		list_add(list, strdup(*strings));
 		strings++;
 	}
 	return list;

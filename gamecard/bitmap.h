@@ -53,6 +53,7 @@ typedef struct {
 } t_gamecard_config;
 
 t_log* logger;
+t_log* logger_debug;
 t_gamecard_config* gamecard_config;
 
 t_metadata* metadata;

@@ -49,6 +49,8 @@ t_gamecard_config* cargar_gamecard_config(char* path_archivo){
 void inicializar_gamecard() {
 	gamecard_config = cargar_gamecard_config("gamecard.config");
 	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
+	logger_debug = iniciar_logger("gamecard_debug.log", "gamecard", LOG_LEVEL_INFO);
+
 }
 void inicializar_diccionarios(){
 archivos_existentes = dictionary_create();
