@@ -2,7 +2,7 @@
 sleep_time=2
 
 
-echo "\n\n\n  **  Test Broker Catedra: Consolidacion FIFO Particiones Dinamicas  **\n\n\n"
+echo "\n\n\n  **  Test Broker Catedra: Consolidacion LRU Particiones Dinamicas  **\n\n\n"
 
 
 echo "Cargando archivos de configuracion"
