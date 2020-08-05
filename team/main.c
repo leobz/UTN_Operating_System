@@ -25,13 +25,9 @@ int main(int argc, char ** argv) {
 	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
 
-	int id_proceso = (int)getpid();
 	//CAMBIAR POR CONFIGURACION
-	team_config->id_proceso = id_proceso;
-
-
-	char* puerto_broker = team_config->puerto_broker;
-	char* ip_broker = team_config->ip_broker;
+	int id_proceso=team_config->id_proceso;
+	char* ip_team=team_config->ip_team;
 	char* puerto_team = team_config->puerto_team;
 
 	inicializar_listas();
@@ -44,7 +40,7 @@ int main(int argc, char ** argv) {
 			mostrar_lista_entrenadores(team_config);
 			correrTests();
 	} else {
-		int socket_servidor = iniciar_servidor(ip_broker, puerto_team);
+		int socket_servidor = iniciar_servidor(ip_team, puerto_team);
 
 		iniciar_planificador();
 

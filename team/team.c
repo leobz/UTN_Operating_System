@@ -33,13 +33,15 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->alpha = config_get_double_value(config, "ALPHA");
 	team_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
+	team_config->ip_team = strdup(
+				config_get_string_value(config, "IP_TEAM"));
 	team_config->estimacion_inicial = config_get_double_value(config,
 			"ESTIMACION_INICIAL");
 	team_config->puerto_broker = strdup(
 			config_get_string_value(config, "PUERTO_BROKER"));
 	team_config->log_file = strdup(config_get_string_value(config, "LOG_FILE"));
 	team_config->puerto_team =  strdup(config_get_string_value(config, "PUERTO_TEAM"));
-	//team_config->id_proceso=config_get_int_value(config,"ID_PROCESO");
+	team_config->id_proceso=config_get_int_value(config,"ID_PROCESO");
 }
 
 char** separar_por_pipe(char* string_con_pipes) {
@@ -83,7 +85,10 @@ void destruir_team_config(t_team_config *team_config) {
 	free(team_config->pokemon_entrenadores);
 	free(team_config->objetivos_entrenadores);
 	free(team_config->algoritmo_de_planificacion);
-	free(team_config->log_file);
+	free(team_config->ip_broker);
+	free(team_config->ip_team);
+	free(team_config->puerto_broker);
+	free(team_config->puerto_team);
 	free(team_config);
 }
 
@@ -409,6 +414,12 @@ void debug_loggear_recepcion_de_caught(t_mensaje_caught* mensaje_caught, char* i
 			id_correlativo, mensaje_caught->resultado);
 }
 
+void debug_loggear_recepcion_de_localized(t_mensaje_localized* mensaje_localized, char* id_correlativo) {
+	log_info(logger_debug,
+			"[MSG_RECIBIDO] LOCALIZED_POKMEON: ID_Correlativo:%s Pokemon:%s",
+			id_correlativo, mensaje_localized->pokemon);
+}
+
 void quitar_pokemon_de_planificados(t_tcb_entrenador* entrenador) {
 	dictionary_decrement_value(pokemones_planificados,
 			entrenador->pokemon_a_capturar->pokemon);
@@ -493,6 +504,8 @@ int localized_es_valido(t_paquete_socket* paquete) {
 	bool localized_valido = false;
 	t_mensaje_localized* mensaje_localized = deserializar_mensaje_localized_pokemon(paquete->buffer);
 	char* id_correlativo = string_itoa(paquete->id_correlativo);
+
+	debug_loggear_recepcion_de_localized(mensaje_localized, id_correlativo);
 
 	if (localized_tiene_id_valido(id_correlativo)) {
 		localized_valido = strcmp(dictionary_get(enviaron_get, id_correlativo), mensaje_localized->pokemon) == 0;
@@ -625,11 +638,12 @@ void agregar_a_enviaron_get(char* id_mensaje, char* pokemon) {
 }
 
 void enviar_get_pokemon() {
-	//TODO: inicializar id_mensaje = id_proceso * 10
+
 	void enviar_get(char* key_pokemon, void* value) {
 		int conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 
 		if (conexion != -1){
+
 			int bytes;
 			void *a_enviar = serializar_get_pokemon(&bytes, key_pokemon, 0, 0);
 			enviar_mensaje(conexion, a_enviar, bytes);
@@ -640,6 +654,7 @@ void enviar_get_pokemon() {
 		}
 	}
 
+	sem_wait(&sem_get);
 	dictionary_iterator(objetivo_global, (void*) enviar_get);
 }
 

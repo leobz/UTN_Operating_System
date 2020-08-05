@@ -5,8 +5,7 @@ t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola) {
 	t_datos_suscripcion* datos_suscripcion = malloc(sizeof(t_datos_suscripcion));
 	datos_suscripcion->conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 	datos_suscripcion->cola = cola;
-	//TIENE QUE SER EL MISMO ID_PROCESO PARA TODAS LAS COLAS
-	datos_suscripcion->id_proceso = id_proceso * 10 + datos_suscripcion->cola;
+	datos_suscripcion->id_proceso = id_proceso;
 	return datos_suscripcion;
 }
 
@@ -21,21 +20,29 @@ void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
 
 
 void recibir_mensajes_team(t_datos_suscripcion* datos_suscripcion) {
+	if (datos_suscripcion->conexion == -1 && datos_suscripcion->cola == LOCALIZED_POKEMON) {
+		sem_post(&sem_get);
+	}
+
 	iniciar_suscripcion(datos_suscripcion);
 
-		while (true){
-			t_paquete_socket* paquete =  recibir_mensajes(datos_suscripcion->conexion);
+	if (datos_suscripcion->cola == LOCALIZED_POKEMON){
+		sem_post(&sem_get);
+	}
 
-			if (paquete->codigo_operacion != OP_ERROR) {
-				procesar_mensaje_recibido_broker(paquete);
-			}
-			else {
-				close(datos_suscripcion->conexion);
-				datos_suscripcion->conexion = -1;
-				iniciar_suscripcion(datos_suscripcion);
-				free(paquete);
-			}
+	while (true){
+		t_paquete_socket* paquete =  recibir_mensajes(datos_suscripcion->conexion);
+
+		if (paquete->codigo_operacion != OP_ERROR) {
+			procesar_mensaje_recibido_broker(paquete);
 		}
+		else {
+			close(datos_suscripcion->conexion);
+			datos_suscripcion->conexion = -1;
+			iniciar_suscripcion(datos_suscripcion);
+			free(paquete);
+		}
+	}
 }
 
 

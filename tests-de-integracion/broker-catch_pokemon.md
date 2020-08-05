@@ -30,7 +30,7 @@ $ rm *.log ; ../broker/Debug/broker &
 Suscripción a CATCH_POKEMON
 
 ```  bash
-$ ../gameboy/Debug/gameboy SUSCRIPCION CATCH_POKEMON 200 & # byexample: +timeout=4 +paste
+$ ../gameboy/Debug/gameboy SUSCRIPTOR CATCH_POKEMON 200 & # byexample: +timeout=4 +paste
 [<job-id-gameboy>] <pid-gameboy>
 ```
 

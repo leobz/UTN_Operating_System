@@ -12,6 +12,6 @@
 
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Onyx 4 5
 
-../gameboy/Debug/gameboy SUSCRIPCION CAUGHT_POKEMON 10 1
+../gameboy/Debug/gameboy SUSCRIPTOR CAUGHT_POKEMON 10
 
 ../gameboy/Debug/gameboy BROKER CATCH_POKEMON Charmander 4 5
