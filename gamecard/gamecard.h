@@ -28,10 +28,6 @@ t_dictionary* cantidad_posiciones_pokemon;
 pthread_t suscripcion_broker;
 
 
-char* path_directorio_metadata;
-char* path_directorio_files;
-char* path_directorio_blocks;
-int id_proceso_gamecard;
 
 
 
@@ -41,6 +37,8 @@ void suscribirme_al_broker();
 void destruir_gamecard_config(t_gamecard_config* gamecard_config);
 void inicializar_gamecard();
 void inicializar_diccionarios();
+void cargar_pokemones_existentes();
+void cargar_posiciones_existentes();
 void finalizar_gamecard();
 void inicializar_semaforos();
 
