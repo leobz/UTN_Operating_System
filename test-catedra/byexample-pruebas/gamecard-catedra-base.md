@@ -19,7 +19,7 @@ Metadata FileSystem
 El tamaño del archivo Pikachu se haya actualizado a 13 bytes.
 
 ```bash
-$ cat ../tall_grass/Files/Pikachu/Metadata.bin
+$ cat ../tall-grass/Files/Pikachu/Metadata.bin
 OPEN=N
 DIRECTORY=N
 BLOCKS=[0]
@@ -31,7 +31,7 @@ SIZE=13
 Verificar que el archivo Charmander ahora indique que posee solo un bloque y su tamaño es 61 bytes.
 
 ```bash
-$ cat ../tall_grass/Files/Charmander/Metadata.bin
+$ cat ../tall-grass/Files/Charmander/Metadata.bin
 OPEN=N
 DIRECTORY=N
 BLOCKS=[1]
@@ -49,7 +49,7 @@ Dentro del file system de linux y el punto de montaje, validar:
 5) Verificar que al liberar espacio suficiente, se liberen los bloques innecesarios.
 
 ```bash
-$ ls -l ../tall_grass/Blocks/
+$ ls -l ../tall-grass/Blocks/
 total 12
 <...> 13 <...> 0.bin
 <...> 61 <...> 1.bin

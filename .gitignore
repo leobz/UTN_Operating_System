@@ -12,6 +12,7 @@ test-catedra/team.config
 test-catedra/broker.config
 test-catedra/gamecard.config
 team/Debug/team.config
+tall-grass/
 
 .*/*.log
 */*.gitignore

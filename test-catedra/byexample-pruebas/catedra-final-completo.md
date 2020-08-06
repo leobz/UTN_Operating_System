@@ -40,48 +40,48 @@ $ cat ../team/Debug/team.log | grep "FIN DEL PROCESO"
 ## Comprobar que el FS esta vacio
 
 ```bash
-$ cat ../tall_grass/Files/Espeon/Metadata.bin
+$ cat ../tall-grass/Files/Espeon/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Flareon/Metadata.bin
+$ cat ../tall-grass/Files/Flareon/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Jolteon/Metadata.bin
+$ cat ../tall-grass/Files/Jolteon/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Gengar/Metadata.bin
+$ cat ../tall-grass/Files/Gengar/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Onix/Metadata.bin
+$ cat ../tall-grass/Files/Onix/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Pikachu/Metadata.bin
+$ cat ../tall-grass/Files/Pikachu/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Squirtle/Metadata.bin
+$ cat ../tall-grass/Files/Squirtle/Metadata.bin
 <...>SIZE=0
 ```
 
 ```bash
-$ cat ../tall_grass/Files/Umbreon/Metadata.bin
+$ cat ../tall-grass/Files/Umbreon/Metadata.bin
 <...>SIZE=0
 ```
 
 
 ```bash
-$ cat ../tall_grass/Files/Vaporeon/Metadata.bin
+$ cat ../tall-grass/Files/Vaporeon/Metadata.bin
 <...>SIZE=0
 ```
 

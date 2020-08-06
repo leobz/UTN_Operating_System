@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ciclo_cpu_time=0.2
-sleep_time=0.5
+ciclo_cpu_time=1
+sleep_time=1
 
 
 echo "Levanto Team 1 en segundo plano"
@@ -15,20 +15,20 @@ cd ../../test-catedra/
 
 
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
-sleep $(calc $ciclo_cpu_time \* 10)
+sleep $ciclo_cpu_time
 
 echo
-cat ../tall_grass/Files/Pikachu/Metadata.bin
+cat ../tall-grass/Files/Pikachu/Metadata.bin
 echo
-cat ../tall_grass/Files/Squirtle/Metadata.bin
+cat ../tall-grass/Files/Squirtle/Metadata.bin
 echo
-cat ../tall_grass/Files/Jolteon/Metadata.bin
+cat ../tall-grass/Files/Jolteon/Metadata.bin
 echo
-cat ../tall_grass/Files/Flareon/Metadata.bin
+cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
 
 
-sleep $(calc $ciclo_cpu_time \* 40)
+sleep $(expr $ciclo_cpu_time \* 4)
 
 echo "\nComprobacion: Team 1 tiene 2 TCBs Unblocked:"
 cat team.log | grep Unblocked
@@ -42,7 +42,7 @@ read "foo"
 
 sh delibird-pruebas/new_pokemon_post_team.sh
 
-sleep $(calc $ciclo_cpu_time \* 40)
+sleep $(expr $ciclo_cpu_time \* 8)
 
 
 echo "\nComprobacion: Ambos team cumplieron objetivo:\n"

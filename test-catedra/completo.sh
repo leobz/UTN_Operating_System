@@ -1,15 +1,15 @@
 #!/bin/sh
 
-ciclo_cpu_time=0.2
-sleep_time=0.5
+ciclo_cpu_time=2
+sleep_time=2
 
 
 echo "\n**  Test Final Prueba completa	**\n" 
 
 
 echo "Eliminando archivos anteriores"
-rm -r ../tall_grass/Files/*     2>/dev/null
-rm ../tall_grass/Blocks/*       2>/dev/null
+rm -r ../tall-grass/Files/*     2>/dev/null
+rm ../tall-grass/Blocks/*       2>/dev/null
 rm *.log                        2>/dev/null
 rm ../team/Debug/*.log          2>/dev/null
 
@@ -41,22 +41,22 @@ sleep $sleep_time
 echo "\nEjecutando 'new_pokemon_antes_team.sh'"
 sh delibird-pruebas/new_pokemon_antes_team.sh
 
-sleep $(calc $sleep_time \* 4)
+sleep $sleep_time
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
 echo
-cat ../tall_grass/Files/Pikachu/Metadata.bin
+cat ../tall-grass/Files/Pikachu/Metadata.bin
 echo
-cat ../tall_grass/Files/Squirtle/Metadata.bin
+cat ../tall-grass/Files/Squirtle/Metadata.bin
 echo
-cat ../tall_grass/Files/Jolteon/Metadata.bin
+cat ../tall-grass/Files/Jolteon/Metadata.bin
 echo
-cat ../tall_grass/Files/Flareon/Metadata.bin
+cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
 
-sleep $sleep_time
+sleep $sleep_time 
 
-sh test-catedra-final-completo-parte-team.sh
+sh completo-parte-team.sh
 
 
 echo "\n\nBajando broker"
@@ -71,7 +71,7 @@ rm ../team/Debug/team.log;
 
 
 
-echo "\n\n*  Parte 2: Particiones, FIFO y RR  **\n\n" 
+echo "\n\n*  Parte 2: BS, SFJ-SD y SFJ-CD  **\n\n" 
 
 
 echo "Actualizando configuracion Broker ALGORITMO_MEMORIA=BS"
@@ -90,26 +90,28 @@ echo "Levantando Broker"
 sleep $sleep_time
 
 
-echo "\nEjecutando 'new_pokemon_antes_team.sh'"
+echo "\nEjecutar 'new_pokemon_antes_team.sh'?" 
+read "foo"
+
 sh delibird-pruebas/new_pokemon_antes_team.sh
 
-sleep $(calc $sleep_time \* 4)
+sleep $(expr $sleep_time \* 2)
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
 echo
-cat ../tall_grass/Files/Pikachu/Metadata.bin
+cat ../tall-grass/Files/Pikachu/Metadata.bin
 echo
-cat ../tall_grass/Files/Squirtle/Metadata.bin
+cat ../tall-grass/Files/Squirtle/Metadata.bin
 echo
-cat ../tall_grass/Files/Jolteon/Metadata.bin
+cat ../tall-grass/Files/Jolteon/Metadata.bin
 echo
-cat ../tall_grass/Files/Flareon/Metadata.bin
+cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
 
 sleep $sleep_time
 
 
-sh test-catedra-final-completo-parte-team.sh
+sh completo-parte-team.sh
 
 
 
