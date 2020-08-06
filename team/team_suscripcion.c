@@ -12,7 +12,7 @@ t_datos_suscripcion* crear_datos_suscripcion(int id_proceso, int cola) {
 void solicitar_suscripcion(int id_proceso, int cola, int conexion) {
 	t_suscripcion* suscripcion = crear_t_suscripcion(id_proceso, cola);
 	void* a_enviar = empaquetar_suscripcion(suscripcion);
-	log_info(logger, "Conexion %s establecida con [Broker]", op_code_to_string(cola));
+	log_info(logger, "Suscripcion %s establecida con [Broker]", op_code_to_string(cola));
 	enviar_mensaje(conexion, a_enviar, sizeof(int) * 3);
 	free(suscripcion);
 
@@ -49,8 +49,8 @@ void recibir_mensajes_team(t_datos_suscripcion* datos_suscripcion) {
 void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 	while (datos_suscripcion->conexion == -1) {
 		liberar_conexion(datos_suscripcion->conexion);
-		//printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(datos_suscripcion->cola));
-		sleep(1);
+		log_error(logger, "[CONEXION] Suscripcion %s con [Broker] no establecida, reintentando...", op_code_to_string(datos_suscripcion->cola));
+		sleep(team_config->tiempoDeReconexion);
 		datos_suscripcion->conexion = crear_conexion(team_config->ip_broker, team_config->puerto_broker);
 	}
 

@@ -44,13 +44,13 @@ sh delibird-pruebas/new_pokemon_antes_team.sh
 sleep $sleep_time
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
-echo
+echo "\nMetadata Pikachu:"
 cat ../tall-grass/Files/Pikachu/Metadata.bin
-echo
+echo "\nMetadata Squirtle:"
 cat ../tall-grass/Files/Squirtle/Metadata.bin
-echo
+echo "\nMetadata Jolteon:"
 cat ../tall-grass/Files/Jolteon/Metadata.bin
-echo
+echo "\nMetadata Flareon:"
 cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
 
@@ -98,15 +98,16 @@ sh delibird-pruebas/new_pokemon_antes_team.sh
 sleep $(expr $sleep_time \* 2)
 
 echo "\nComprobacion: Se crearon los 4 pokemon en el FileSystem:"
-echo
+echo "\nMetadata Pikachu:"
 cat ../tall-grass/Files/Pikachu/Metadata.bin
-echo
+echo "\nMetadata Squirtle:"
 cat ../tall-grass/Files/Squirtle/Metadata.bin
-echo
+echo "\nMetadata Jolteon:"
 cat ../tall-grass/Files/Jolteon/Metadata.bin
-echo
+echo "\nMetadata Flareon:"
 cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
+
 
 sleep $sleep_time
 

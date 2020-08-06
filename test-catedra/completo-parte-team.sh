@@ -17,15 +17,16 @@ cd ../../test-catedra/
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
 sleep $ciclo_cpu_time
 
-echo
+echo "\nMetadata Pikachu:"
 cat ../tall-grass/Files/Pikachu/Metadata.bin
-echo
+echo "\nMetadata Squirtle:"
 cat ../tall-grass/Files/Squirtle/Metadata.bin
-echo
+echo "\nMetadata Jolteon:"
 cat ../tall-grass/Files/Jolteon/Metadata.bin
-echo
+echo "\nMetadata Flareon:"
 cat ../tall-grass/Files/Flareon/Metadata.bin
 echo
+
 
 
 sleep $(expr $ciclo_cpu_time \* 4)
