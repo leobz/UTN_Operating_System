@@ -76,6 +76,16 @@ t_bitarray * crear_bitmap(int cant_bloques){
 t_bitarray *crear_bitmap(int cant_bloques) {
 
 
+	char *ruta = ruta_bitmap();
+
+	FILE *bitmap_file = fopen(ruta, "rb");
+	free(ruta);
+
+	if(bitmap_file!=NULL){
+		return leer_bitmap();
+	}
+
+
 	size_t bytes = BIT_SIZE(cant_bloques, CHAR_BIT);
 	//printf("Tamanio bitmap :%d\n",bytes);
 
