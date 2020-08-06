@@ -75,7 +75,7 @@ t_metadata* metadata;
 *
 */
 char* crear_ruta(char* ruta);
-
+t_bitarray *checkear_bitmap();
 char*ruta_bitmap();
 void modificar_bit(t_bitarray*bitmap,bool valor,int bit);
 void actualizar_archivo_bitmap(t_bitarray*bitmap);

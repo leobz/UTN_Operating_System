@@ -1,4 +1,4 @@
-sleep_time=0.5
+sleep_time=2
 
 echo  "## Test Gamecard: Base ##\n"
 
@@ -9,6 +9,7 @@ cp gamecard.config gamecard.config.auxiliar; rm gamecard.config; cp gamecard.con
 echo "  Eliminando archivos existentes del FileSystem"
 rm -r ../tall_grass/Files/* 
 rm ../tall_grass/Blocks/*
+rm -r ../tall_grass/Metadata/*
 rm *.log
 
 echo "  Actualizando Metadata.bin"
@@ -16,7 +17,7 @@ echo -e "BLOCK_SIZE=64\nBLOCKS=4096\nMAGIC_NUMBER=TALL_GRASS" > ../tall_grass/Me
 
 echo "  Levanto gamecard en segundo plano"
 1>/dev/null 2>/dev/null ../gamecard/Debug/gamecard &
-sleep 0.1
+sleep 1
 
 # PETICIONES new_pikachu.sh
 echo "\nEjecutando el script new_pikachu.sh"
