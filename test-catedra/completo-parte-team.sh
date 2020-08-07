@@ -15,7 +15,7 @@ cd ../../test-catedra/
 
 
 echo "\nComprobacion: Se hicieron 4 Catch => Se eliminan bloques"
-sleep $ciclo_cpu_time
+sleep $(expr $ciclo_cpu_time \* 20)
 
 echo "\nMetadata Pikachu:"
 cat ../tall-grass/Files/Pikachu/Metadata.bin
@@ -43,7 +43,7 @@ read "foo"
 
 sh delibird-pruebas/new_pokemon_post_team.sh
 
-sleep $(expr $ciclo_cpu_time \* 8)
+sleep $(expr $ciclo_cpu_time \* 75)
 
 
 echo "\nComprobacion: Ambos team cumplieron objetivo:\n"
