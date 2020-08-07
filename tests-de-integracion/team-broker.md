@@ -95,7 +95,7 @@ Cierro broker, gameboy suscriptor y team (De otro modo los puertos quedan sin po
 
 ```bash
 $ rm *.log ; kill <broker-pid> ;  kill <gameboy-pid>; kill <team-pid>; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
-<...>Hecho<...>
-<...>Terminado<...>
-<...>Terminado<...>
+<...>closed<...>
+<...>Term<...>
+<...>Term<...>
 ``` 

@@ -84,7 +84,7 @@ $ sed -i 's/ID_PROCESO=2000/ID_PROCESO=1000/g' gameboy.config # byexample: -skip
 
 ```bash
 $ rm *.log; kill <gameboy-pid> ; kill <gameboy-pid2> ; kill <broker-pid> ; sleep <sleep-time>     # byexample: +timeout=20 +norm-ws +paste -skip
-<...>Hecho<...>
+<...>closed<...>
 <...>Term<...>
 <...>Term<...>
 ```
