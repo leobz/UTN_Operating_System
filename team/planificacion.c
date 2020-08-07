@@ -242,8 +242,8 @@ void ejecutar_tcb(t_tcb_entrenador* tcb) {
 			break;
 		}
 
-		printf("TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
-		printf("Posicion del TCB: %d ->(%d, %d)\n", tcb->tid, tcb->posicion->x, tcb->posicion->y);
+		log_info(logger_debug,"TCB: %d -> Tamaño de rafaga: %d  ", tcb->tid, queue_size(tcb->rafaga));
+		log_info(logger_debug,"Posicion del TCB: %d ->(%d, %d)", tcb->tid, tcb->posicion->x, tcb->posicion->y);
 
 		int algoritmo = string_to_algoritmo_de_planificacion(team_config->algoritmo_de_planificacion);
 
@@ -443,7 +443,7 @@ void ejecutar_catch(t_tcb_entrenador* tcb){
 
 	if (conexion == -1){
 
-		//printf("ERROR al conectar con BROKER");
+		log_error(logger_debug,"ERROR al conectar con BROKER");
 		//exit(1);
 		// TODO: Preguntar si en foro si la mantenemos o no, caso contrario quitar
 		// lanzar_reintentar_conexion(int conexion);
@@ -536,7 +536,7 @@ char* string_motivo_intercambio() {
 void definir_cola_post_caught(t_tcb_entrenador* tcb) {
 	if (capturo_maximo_permitido(tcb)) {
 		if (cumplio_objetivo(tcb)) {
-			printf("[TCB-info] TID:%d Cumplió objetivo\n", tcb->tid);
+			log_info(logger_debug,"[TCB-info] TID:%d Cumplió objetivo", tcb->tid);
 			pasar_a_exit(tcb);
 		} else {
 			char* motivo_maximo_permitido = string_maximo_permitido(tcb);

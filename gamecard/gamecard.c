@@ -80,7 +80,7 @@ void cargar_pokemones_existentes(){
 	else
 	  perror ("Couldn't open the directory");
 
-	printf("Cantidad de pokemons: %d\n", dictionary_size(archivos_existentes));
+	log_info(logger_debug,"Cantidad de pokemons: %d", dictionary_size(archivos_existentes));
 	free(path_files);
 
 }
@@ -92,7 +92,7 @@ void cargar_posiciones_existentes(){
 	void cargar_posiciones(char*pokemon,void*value){
 		t_config* archivo_pokemon_config = leer_config_pokemon(pokemon);
 		cantidad_posiciones_del_pokemon=archivo_pokemon_config->properties->elements_amount;
-		printf("Cantidad de posiciones de %s: %d\n",pokemon,cantidad_posiciones_del_pokemon);
+		log_info(logger_debug,"Cantidad de posiciones de %s: %d",pokemon,cantidad_posiciones_del_pokemon);
 		dictionary_put(cantidad_posiciones_pokemon,pokemon,cantidad_posiciones_del_pokemon);
 		config_destroy(archivo_pokemon_config);
 	}
@@ -118,6 +118,7 @@ void finalizar_gamecard() {
 	liberar_paths();
 	destruir_gamecard_config(gamecard_config);
 	destruir_logger(logger);
+	destruir_logger(logger_debug);
 }
 
 

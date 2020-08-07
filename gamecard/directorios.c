@@ -83,7 +83,7 @@ void enviar_mensaje_appeared(t_paquete_socket* paquete_socket, t_mensaje_new* me
 	else {
 		int bytes=0;
 		void* a_enviar = serializar_appeared_pokemon(&bytes, mensaje_new->pokemon,mensaje_new->posx, mensaje_new->posy,0, paquete_socket->id_mensaje);
-		printf("Enviando mensaje %s \n",op_code_to_string(APPEARED_POKEMON));
+		log_info(logger_debug,"Enviando mensaje %s",op_code_to_string(APPEARED_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
 		liberar_conexion(conexion);
 	}
@@ -127,7 +127,7 @@ void enviar_mensaje_localized(void* a_enviar,int bytes){
 		free(a_enviar);
 	}
 	else {
-		printf("Enviando mensaje %s\n",op_code_to_string(LOCALIZED_POKEMON));
+		log_info(logger_debug,"Enviando mensaje %s",op_code_to_string(LOCALIZED_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
 		liberar_conexion(conexion);
 	}
@@ -149,23 +149,18 @@ void procesar_get_pokemon(t_paquete_socket* paquete_socket){
 
 		checkear_archivo_abierto(mensaje_get->pokemon);
 			t_list* posiciones_pokemon = obtener_posiciones_pokemon(mensaje_get->pokemon);
-			printf("[GAMECARD] Salio de funcion obtener_posiciones_pokemon()\n");
-			printf("[GAMECARD] Posiciones pokemon ¿es NULL?: %d\n", posiciones_pokemon == NULL);
 			sleep(gamecard_config->tiempo_retardo_operacion);
 		cerrar_archivo(mensaje_get->pokemon);
 
-		printf("[GAMECARD] Cerro archivo\n");
+		log_info(logger_debug,"[GAMECARD] Cerro archivo");
 		int bytes=0;
-
-		printf("[GAMECARD] Obtuvo cantidad de posiciones\n");
 		void*localized_package=serializar_localized_pokemon(&bytes, mensaje_get->pokemon,posiciones_pokemon,0, paquete_socket->id_mensaje);
 
-		printf("[GAMECARD] Se serializo el mensaje localized\n");
 		enviar_mensaje_localized(localized_package,bytes);
-		printf("[GAMECARD] Se envio el mensaje localized\n");
+		log_info(logger_debug,"[GAMECARD] Se envio el mensaje localized");
 	}
 	else{
-		printf("No se encontro el pokemon :%s\n",mensaje_get->pokemon);
+		log_error(logger_debug,"No se encontro el pokemon :%s",mensaje_get->pokemon);
 		log_error(logger,"No se encontro el pokemon :%s",mensaje_get->pokemon);}
 }
 
@@ -179,7 +174,7 @@ void enviar_mensaje_caught(t_paquete_socket* paquete_socket, int estado) {
 		int bytes;
 
 		void* a_enviar = serializar_caught_pokemon(&bytes, estado,0, paquete_socket->id_mensaje);
-		printf("Enviando mensaje %s \n",op_code_to_string(CAUGHT_POKEMON));
+		log_info(logger_debug,"Enviando mensaje %s",op_code_to_string(CAUGHT_POKEMON));
 		enviar_mensaje(conexion, a_enviar, bytes);
 		liberar_conexion(conexion);
 	}
@@ -205,7 +200,7 @@ void procesar_catch_pokemon(t_paquete_socket* paquete_socket) {
 		enviar_mensaje_caught(paquete_socket, resultado);
 	}
 	else{
-		printf("No se encontro el pokemon :%s\n",mensaje_catch->pokemon);
+		log_error(logger_debug,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
 		log_error(logger,"No se encontro el pokemon :%s",mensaje_catch->pokemon);
 		enviar_mensaje_caught(paquete_socket, FAIL);
 	}
@@ -316,27 +311,18 @@ void setear_archivo_abierto(char*pokemonn){
 }
 
 void cerrar_archivo(char* pokemonn){
-	printf("[GAMECARD] Entro a funcion cerrar_archivo()\n");
-	printf("[GAMECARD] Pokemon parametro: %s\n", pokemonn);
+	log_info(logger_debug,"[GAMECARD] Entro a funcion cerrar_archivo()");
+	log_info(logger_debug,"[GAMECARD] Pokemon parametro: %s", pokemonn);
 	char*path_pokemon = formar_archivo_pokemon(pokemonn);
-	printf("[GAMECARD] Obtuvo path_pokemon: %s\n", path_pokemon);
 	char*path_absoluta = crear_ruta(path_pokemon);
-	printf("[GAMECARD] Obtuvo path_absoluta: %s\n", path_absoluta);
 	t_config* pokemon_config = config_create(path_absoluta);
-	printf("[GAMECARD] Creo pokemon_config\n");
 	config_set_value(pokemon_config, "OPEN","N");
-	printf("[GAMECARD] Seteo pokemon_config\n");
 	config_save(pokemon_config);
-	printf("[GAMECARD] Guardo cambio en pokemon_config\n");
 	config_destroy(pokemon_config);
-	printf("[GAMECARD] Destruyo pokemon_config\n");
 	free(path_pokemon);
 	free(path_absoluta);
-	printf("[GAMECARD] Libero path_absoluta\n");
-	printf("[GAMECARD] Tamaño diccionario archivos_existentes: %d\n", dictionary_size(archivos_existentes));
 	dictionary_put(archivos_existentes,pokemonn,false);
-	printf("[GAMECARD] Agrego pokemon a diccionario archivos_existentes\n");
-	printf("[GAMECARD] Tamaño diccionario archivos_existentes: %d\n", dictionary_size(archivos_existentes));
+	log_info(logger_debug,"[GAMECARD] Tamaño diccionario archivos_existentes: %d", dictionary_size(archivos_existentes));
 }
 
 void agregar_posicion(t_mensaje_new*mensaje_new){
@@ -364,7 +350,8 @@ void agregar_posicion(t_mensaje_new*mensaje_new){
 		int cant_posiciones = dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
 		cant_posiciones += 1;
 		dictionary_put(cantidad_posiciones_pokemon, mensaje_new->pokemon, cant_posiciones);
-		printf("Cant Posiciones: %d\n", dictionary_get(cantidad_posiciones_pokemon, mensaje_new->pokemon));
+		int posicioness=dictionary_get(cantidad_posiciones_pokemon,mensaje_new->pokemon);
+		log_info(logger_debug,"Cantidad de Posiciones de %s: %d",mensaje_new->pokemon ,posicioness);
 		cantidad = string_itoa(mensaje_new->cantidad);
 		config_set_value(archivo_pokemon_config, posicion_pokemonn, cantidad);
 		guardar_config_en_archivo_pokemon(archivo_pokemon_config, mensaje_new->pokemon);
@@ -405,18 +392,15 @@ t_list* obtener_posiciones_pokemon(char*pokemonn){
 		list_add(posiciones, estructura_posicion);
 //		posiciones_pokemon[iterador] = estructura_posiciones;
 
-		printf("[GAMECARD] Tamaño de lista posiciones: %d\n", list_size(posiciones));
+		log_info(logger_debug,"[GAMECARD] Tamaño de lista posiciones: %d", list_size(posiciones));
 
 		iterador++;
 	}
 	string_iterate_lines(string_vector, separar_y_obtener_posiciones);
 
-	printf("[GAMECARD] Se separa y obtiene las posiciones\n");
-
 	free(metadata_pokemon);
 	free(buffer_pokemon);
 
-	printf("[GAMECARD] libero variables\n");
 
 	return posiciones;
 }

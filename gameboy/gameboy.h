@@ -11,7 +11,7 @@
 
 
 // CONFIGURACION
-void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger);
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger,t_log **logger_debug);
 void finalizar_gameboy(t_gameboy_config* gameboy_config, t_log* logger);
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config);
 

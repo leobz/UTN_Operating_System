@@ -37,6 +37,7 @@ typedef struct {
 
 
 t_log* logger;
+t_log* logger_debug;
 t_broker_config* broker_config;
 
 

@@ -28,6 +28,7 @@ typedef struct {
 
 t_gameboy_config *gameboy_config;
 t_log *logger;
+t_log *logger_debug;
 int id_proceso_gameboy;
 int conexion_gameboy;
 

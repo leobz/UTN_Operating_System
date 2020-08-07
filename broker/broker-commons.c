@@ -84,11 +84,13 @@ t_broker_config *cargar_broker_config(char *path_archivo) {
 void inicializar_broker() {
 	broker_config = cargar_broker_config("broker.config");
 	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
+	logger_debug = iniciar_logger("broker_debug.log", "broker", LOG_LEVEL_INFO);
 }
 
 void finalizar_broker() {
 	destruir_broker_config(broker_config);
 	destruir_logger(logger);
+	destruir_logger(logger_debug);
 }
 
 

@@ -5,11 +5,13 @@ t_log* logger;
 t_team_config* team_config;
 
 void finalizar_team(t_team_config* team_config) {
-	printf("Cerrando programa...\n");
+	log_info(logger_debug,"Cerrando programa...");
 	destruir_metricas();
 	destruir_objetivo_global();
 	//destruir_pokemon_requeridos();
 	destruir_team_config(team_config);
+	destruir_logger(logger_debug);
+	destruir_logger(logger);
 	destroy_all_tcbs();
 
 	exit(1);

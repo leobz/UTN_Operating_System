@@ -200,7 +200,7 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		sem_wait(&cola_vacia[codigo_de_operacion]); //existen mensajes en la cola
 
 		pthread_mutex_lock(&mutex[codigo_de_operacion]);
-		mensaje[codigo_de_operacion] = extraer_mensaje(codigo_de_operacion);
+			mensaje[codigo_de_operacion] = extraer_mensaje(codigo_de_operacion);
 		pthread_mutex_unlock(&mutex[codigo_de_operacion]);
 
 		int bytes=0;
@@ -223,7 +223,7 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 		void enviar_a_suscriptores(t_proceso* proceso){
 
 			int validez=enviar_mensaje_con_retorno(proceso->socket,sent_package,bytes);
-			//log_info(logger,"Validez: %d",validez);
+			log_info(logger_debug,"Validez (cantidad de bytes enviados): %d",validez);
 
 			if(validez!=1){ //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
 				log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",op_code_to_string(codigo_de_operacion), proceso->id_proceso, proceso->socket);

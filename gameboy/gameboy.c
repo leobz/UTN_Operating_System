@@ -3,7 +3,7 @@
 
 
 int main(int argc, char **argv) {
-	inicializar_gameboy(&gameboy_config, &logger);
+	inicializar_gameboy(&gameboy_config, &logger,&logger_debug);
 	// ./gameboy test
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
 		if (conexion == -1)
 		{
-			printf("ERROR: Conexion con [Broker] no estable1cida");
+			log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 			//exit(-1);
 		}
 		// TODO: funcion de alarm
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_team);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Team] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Team] no estable1cida");
 				exit(-1);
 			}
 
@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no establecida");
 				exit(-1);
 			}
 
@@ -304,7 +304,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no estable1cida");
 				exit(-1);
 			}
 
@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no estable1cida");
 				exit(-1);
 			}
 
@@ -348,14 +348,16 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger) {
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger,t_log **logger_debug) {
 	*gameboy_config = cargar_gameboy_config("gameboy.config");
 	*logger = iniciar_logger("gameboy.log", "gameboy", LOG_LEVEL_INFO);
+	*logger_debug = iniciar_logger("gameboy_debug.log", "gameboy", LOG_LEVEL_INFO);
 }
 
 void finalizar_gameboy(t_gameboy_config *gameboy_config, t_log *logger) {
 	destruir_gameboy_config(gameboy_config);
 	destruir_logger(logger);
+	destruir_logger(logger_debug);
 }
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
