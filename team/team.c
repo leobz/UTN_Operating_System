@@ -652,6 +652,9 @@ void enviar_get_pokemon() {
 
 			liberar_conexion(conexion);
 		}
+		else {
+			log_error(logger, "[CONEXION] No se pudo enviar msg GET_POKEMON: %s, se realizará acción por default", key_pokemon);
+		}
 	}
 
 	sem_wait(&sem_get);

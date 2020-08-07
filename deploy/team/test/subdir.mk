@@ -13,6 +13,7 @@ C_SRCS += \
 ../test/test_entrenador_cercano_a_ready.c \
 ../test/test_lista_blocked.c \
 ../test/test_lista_ready.c \
+../test/test_localized.c \
 ../test/test_movimiento_entrenador.c \
 ../test/test_rafagas.c \
 ../test/test_unblocked_a_ready.c \
@@ -28,6 +29,7 @@ OBJS += \
 ./test/test_entrenador_cercano_a_ready.o \
 ./test/test_lista_blocked.o \
 ./test/test_lista_ready.o \
+./test/test_localized.o \
 ./test/test_movimiento_entrenador.o \
 ./test/test_rafagas.o \
 ./test/test_unblocked_a_ready.o \
@@ -43,6 +45,7 @@ C_DEPS += \
 ./test/test_entrenador_cercano_a_ready.d \
 ./test/test_lista_blocked.d \
 ./test/test_lista_ready.d \
+./test/test_localized.d \
 ./test/test_movimiento_entrenador.d \
 ./test/test_rafagas.d \
 ./test/test_unblocked_a_ready.d \
@@ -53,7 +56,7 @@ C_DEPS += \
 test/%.o: ../test/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -I"/home/diego/TPCuatrimestral/tp-2020-1c-UNIX/utils" -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	gcc -I"/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils" -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

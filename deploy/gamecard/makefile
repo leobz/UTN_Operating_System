@@ -25,13 +25,13 @@ endif
 all: gamecard
 
 dependents:
-	-cd /home/diego/TPCuatrimestral/tp-2020-1c-UNIX/utils/Debug && $(MAKE) all
+	-cd /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug && $(MAKE) all
 
 # Tool invocations
-gamecard: $(OBJS) $(USER_OBJS) /home/diego/TPCuatrimestral/tp-2020-1c-UNIX/utils/Debug/libutils.so
+gamecard: $(OBJS) $(USER_OBJS) /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/diego/TPCuatrimestral/tp-2020-1c-UNIX/utils/Debug" -o "gamecard" $(OBJS) $(USER_OBJS) $(LIBS) -lm
+	gcc -L"/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug" -o "gamecard" $(OBJS) $(USER_OBJS) $(LIBS) -lm
 
 	@echo 'Finished building target: $@'
 	@echo ' '
@@ -42,6 +42,6 @@ clean:
 	-@echo ' '
 
 .PHONY: all clean dependents
-/home/diego/TPCuatrimestral/tp-2020-1c-UNIX/utils/Debug/libutils.so:
+/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so:
 
 -include ../makefile.targets

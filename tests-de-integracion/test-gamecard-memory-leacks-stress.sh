@@ -5,12 +5,12 @@ echo "  Cargando configuracion de la Cátedra"
 cp gamecard.config gamecard.config.auxiliar; rm gamecard.config; cp gamecard.config.catedra.base gamecard.config
 
 echo "  Eliminando archivos existentes del FileSystem"
-rm -r ../tall_grass/Files/*
-rm ../tall_grass/Blocks/*
+rm -r ../tall-grass/Files/*
+rm ../tall-grass/Blocks/*
 rm *.log
 
 echo "  Actualizando Metadata.bin"
-echo -e "BLOCK_SIZE=64\nBLOCKS=96\nMAGIC_NUMBER=TALL_GRASS" > ../tall_grass/Metadata/Metadata.bin
+echo -e "BLOCK_SIZE=64\nBLOCKS=96\nMAGIC_NUMBER=TALL_GRASS" > ../tall-grass/Metadata/Metadata.bin
 
 echo "  Levanto gamecard en segundo plano"
 valgrind --leak-check=yes ../gamecard/Debug/gamecard 2> memory-leaks-stress-gamecard.log &
@@ -43,7 +43,7 @@ while [ "$i" -le 250 ]; do
 done 
 
 echo "\n\n  Listado de archivos blocks\n\n"
-ls -l ../tall_grass/Blocks/
+ls -l ../tall-grass/Blocks/
 
 echo "\n  Finalizando Gamecard"
 sh mataProcesos.sh &
