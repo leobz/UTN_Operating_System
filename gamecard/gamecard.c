@@ -53,8 +53,53 @@ void inicializar_gamecard() {
 
 }
 void inicializar_diccionarios(){
-archivos_existentes = dictionary_create();
-cantidad_posiciones_pokemon=dictionary_create();
+	archivos_existentes = dictionary_create();
+	cantidad_posiciones_pokemon=dictionary_create();
+	cargar_pokemones_existentes();
+	cargar_posiciones_existentes();
+}
+void cargar_pokemones_existentes(){
+
+	char first_letter;
+	DIR *dp;
+	struct dirent *ep;
+	char*path_files=crear_ruta("Files");
+
+	dp = opendir (path_files);
+
+	if (dp != NULL)
+	{
+	  while ((ep = readdir(dp)) != NULL){
+		 first_letter=ep->d_name[0];
+		  if((strcmp(ep->d_name, "Metadata.bin") != 0)&&(isalpha(first_letter)))
+			  dictionary_put(archivos_existentes,ep->d_name,false);
+	  }
+
+	  (void) closedir (dp);
+	}
+	else
+	  perror ("Couldn't open the directory");
+
+	printf("Cantidad de pokemons: %d\n", dictionary_size(archivos_existentes));
+	free(path_files);
+
+}
+
+void cargar_posiciones_existentes(){
+
+	int cantidad_posiciones_del_pokemon=0;
+
+	void cargar_posiciones(char*pokemon,void*value){
+		t_config* archivo_pokemon_config = leer_config_pokemon(pokemon);
+		cantidad_posiciones_del_pokemon=archivo_pokemon_config->properties->elements_amount;
+		printf("Cantidad de posiciones de %s: %d\n",pokemon,cantidad_posiciones_del_pokemon);
+		dictionary_put(cantidad_posiciones_pokemon,pokemon,cantidad_posiciones_del_pokemon);
+		config_destroy(archivo_pokemon_config);
+	}
+
+	if((dictionary_size(archivos_existentes))!=0){
+		dictionary_iterator(archivos_existentes,cargar_posiciones);
+	}
 }
 
 void inicializar_semaforos() {

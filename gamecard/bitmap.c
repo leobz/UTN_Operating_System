@@ -76,6 +76,16 @@ t_bitarray * crear_bitmap(int cant_bloques){
 t_bitarray *crear_bitmap(int cant_bloques) {
 
 
+	char *ruta = ruta_bitmap();
+
+	FILE *bitmap_file = fopen(ruta, "rb");
+	free(ruta);
+
+	if(bitmap_file!=NULL){
+		return checkear_bitmap();
+	}
+
+
 	size_t bytes = BIT_SIZE(cant_bloques, CHAR_BIT);
 	//printf("Tamanio bitmap :%d\n",bytes);
 
@@ -92,6 +102,57 @@ t_bitarray *crear_bitmap(int cant_bloques) {
 	return bitmap;
 }
 
+
+t_bitarray *checkear_bitmap(){
+	char *ruta = ruta_bitmap();
+
+		FILE *bitmap_file = fopen(ruta, "rb");
+		free(ruta);
+
+		size_t bitarray_size = BIT_SIZE(metadata->blocks, CHAR_BIT); // CHAR_BIT = cantidad bits x char
+
+		char *bitarray = malloc(bitarray_size);
+
+		//creo que seria sizeof(char) en vez de 1
+		size_t read_bytes = fread(bitarray, 1, bitarray_size, bitmap_file);
+
+		if (read_bytes < bitarray_size) {
+
+			char *bit_new = calloc(bitarray_size, sizeof(char));
+
+			t_bitarray * bitmap=bitarray_create_with_mode(bit_new, bitarray_size, LSB_FIRST);
+
+				for(int cont=0; cont < metadata->blocks; cont++){ //Limpia los bits del bitarray (Los pone en 0)
+						bitarray_clean_bit(bitmap, cont);
+					}
+
+			memmove(bitmap->bitarray,bitarray,read_bytes);
+
+			fclose(bitmap_file);
+			free(bitarray);
+			//free(bit_new);
+			printf("Actualizando Bitmap menor que actual\n");
+			return bitmap;
+		}
+		else if(read_bytes > bitarray_size){
+
+			char *bit_new = calloc(bitarray_size, sizeof(char));
+
+			t_bitarray * bitmap=bitarray_create_with_mode(bit_new, bitarray_size, LSB_FIRST);
+
+			memmove(bitmap->bitarray,bitarray,bitarray_size);
+
+			fclose(bitmap_file);
+			free(bitarray);
+			//free(bit_new);
+			printf("Actualizando Bitmap mayor que actual\n");
+			return bitmap;
+		}
+
+		fclose(bitmap_file);
+
+		return bitarray_create_with_mode(bitarray, bitarray_size, LSB_FIRST);
+}
 
 t_bitarray *leer_bitmap() {
 	char *ruta = ruta_bitmap();

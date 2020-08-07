@@ -226,7 +226,7 @@ void enviar_mensajes_en_cola(int codigo_de_operacion){
 			//log_info(logger,"Validez: %d",validez);
 
 			if(validez!=1){ //si se pudo enviar se agrega el proceso a la lista de suscriptores_enviados
-				//log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",codigo_de_operacion, proceso->id_proceso, proceso->socket);
+				log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",op_code_to_string(codigo_de_operacion), proceso->id_proceso, proceso->socket);
 				list_add(administrator->suscriptores_enviados,proceso);
 				loggear_mensaje_enviado(proceso->socket, codigo_de_operacion); //Por ahora de prueba
 			}

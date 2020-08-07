@@ -67,10 +67,13 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				meter_en_diccionario(subscribers,paquete->id_proceso,proceso);
 			}
 
-			cola_paquete=paquete->cola;
+			t_proceso_y_cola* process_q=malloc(sizeof(t_proceso_y_cola));
+			process_q->cola=paquete->cola;
+			process_q->socket=proceso->socket;
+			process_q->id_proceso=proceso->id_proceso;
 
 			pthread_t thread_subscribers;
-			pthread_create(&thread_subscribers,NULL,&verificar_cache,proceso);
+			pthread_create(&thread_subscribers,NULL,&verificar_cache,process_q);
 			pthread_detach(thread_subscribers);
 
 			break;}
@@ -109,11 +112,11 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 }
 
 
-void verificar_cache(t_proceso* proceso){
+void verificar_cache(t_proceso_y_cola* proceso){
 	//printf("Entro a hilo verificar cache\n");
 	int id_suscriptor=proceso->id_proceso;
 	int socket=proceso->socket;
-	int num_cola=cola_paquete;
+	int num_cola=proceso->cola;
 
 	//leer primero iteracion ****
 
@@ -131,17 +134,21 @@ void verificar_cache(t_proceso* proceso){
 
 			int validez = enviar_mensaje_con_retorno(socket,mensaje_para_enviar,bytes);
 			if(validez!=1){
-				//log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",num_cola, proceso->id_proceso, proceso->socket);
+				log_info(logger,"Mensaje %s enviado a suscriptor con id: %d y socket: %d",op_code_to_string(num_cola), proceso->id_proceso, proceso->socket);
 				list_add(actual_administrator->suscriptores_enviados,proceso);
 			}
+			else
+				printf("Proceso con socket cerrado\n");
+
 			free(mensaje_para_enviar);
 		}
-
 	}
-
 //***** primero itera
-	list_iterate(administradores[num_cola],&enviar_mensajes_cacheados); //checkeo por cada estructura de administracion si se le habia enviado ese mensaje
 
+	if(list_size(administradores[num_cola])!=0)
+		list_iterate(administradores[num_cola],&enviar_mensajes_cacheados); //checkeo por cada estructura de administracion si se le habia enviado ese mensaje
+
+	free(proceso);
 }
 
 t_mensaje* preparar_mensaje(t_paquete_socket* paquete) {

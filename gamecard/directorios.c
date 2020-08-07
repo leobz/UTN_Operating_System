@@ -108,8 +108,8 @@ void procesar_new_pokemon(t_paquete_socket* paquete_socket) {
 		checkear_archivo_abierto(mensaje_new->pokemon);
 	}
 
-	else//si el archivo no existia
-		crear_archivo_pokemon(mensaje_new);
+	else{ //si el archivo no existia
+		crear_archivo_pokemon(mensaje_new);}
 
 		agregar_posicion(mensaje_new); //aqui tendrias las posiciones dentro del mensaje y la lista de bloques
 		sleep(gamecard_config->tiempo_retardo_operacion);

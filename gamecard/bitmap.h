@@ -8,6 +8,8 @@
 #ifndef BITMAP_H_
 #define BITMAP_H_
 
+#define _XOPEN_SOURCE 700
+#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
@@ -18,6 +20,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <math.h>
+#include <ctype.h>
 #include "commons/string.h"
 #include "commons/bitarray.h"
 #include "../utils/config.h"
@@ -27,6 +30,12 @@
 #include "../utils/diccionarios.h"
 #include "../utils/cliente.h"
 #define BIT_SIZE(x,y) ((x - 1) / y + 1);
+
+
+char* path_directorio_metadata;
+char* path_directorio_files;
+char* path_directorio_blocks;
+int id_proceso_gamecard;
 
 
 pthread_mutex_t mutex_bitmap;
@@ -66,7 +75,7 @@ t_metadata* metadata;
 *
 */
 char* crear_ruta(char* ruta);
-
+t_bitarray *checkear_bitmap();
 char*ruta_bitmap();
 void modificar_bit(t_bitarray*bitmap,bool valor,int bit);
 void actualizar_archivo_bitmap(t_bitarray*bitmap);
