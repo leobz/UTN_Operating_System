@@ -282,7 +282,7 @@ int main(int argc, char **argv) {
 
 		// ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]
 		if (strcmp(argv[2], "APPEARED_POKEMON") == 0) {
-			if (argc < 6) {
+			if (argc != 6) {
 				printf("ERROR: Comando invalido, pruebe: ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]\n");
 				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]");
 				exit(-1);
@@ -421,7 +421,7 @@ int main(int argc, char **argv) {
 
 void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger,t_log **logger_debug) {
 	*gameboy_config = cargar_gameboy_config("gameboy.config");
-	*logger = iniciar_logger("gameboy.log", "gameboy", LOG_LEVEL_INFO);
+	*logger = iniciar_logger((*gameboy_config)->path_logger, "gameboy", LOG_LEVEL_INFO);
 	*logger_debug = iniciar_logger("gameboy_debug.log", "gameboy", LOG_LEVEL_INFO);
 }
 
@@ -432,6 +432,18 @@ void finalizar_gameboy(t_gameboy_config *gameboy_config, t_log *logger) {
 }
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
+
+	char* obtener_path_logger(char* path_logger){
+		if (strcmp(path_logger, "DEFAULT") == 0) {
+			char* path = strdup("gameboy.log");
+			return path;
+		}
+		else {
+			char* path = strdup(path_logger);
+			return path;
+		}
+	}
+
 	gameboy_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
 	gameboy_config->ip_gamecard = strdup(
@@ -449,6 +461,7 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 	gameboy_config->puerto_gameboy = strdup(
 			config_get_string_value(config, "PUERTO_GAMEBOY"));
 	gameboy_config->id_proceso_gameboy=config_get_int_value(config,"ID_PROCESO");
+	gameboy_config->path_logger = obtener_path_logger(config_get_string_value(config, "LOG_FILE"));
 }
 
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {

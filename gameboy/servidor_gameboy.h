@@ -24,6 +24,7 @@ typedef struct {
 	char *puerto_gamecard;
 	char *puerto_gameboy;
 	int id_proceso_gameboy;
+	char* path_logger;
 } t_gameboy_config;
 
 t_gameboy_config *gameboy_config;

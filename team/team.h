@@ -88,6 +88,7 @@ typedef struct{
 	char *log_file;
 	char* puerto_team;
 	int id_proceso;
+	char* path_logger;
 }t_team_config;
 
 t_team_config* team_config;

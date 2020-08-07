@@ -6,8 +6,7 @@ echo "Cargando configuracion de la Cátedra"
 cp configuraciones/gamecard.config.catedra.base gamecard.config
 
 echo "Eliminando archivos existentes del FileSystem"
-rm -r ../tall-grass/Files/* 
-rm ../tall-grass/Blocks/*
+rm -r ../tall-grass
 rm *.log
 
 # echo "  Actualizando Metadata.bin"

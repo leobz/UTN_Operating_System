@@ -15,6 +15,19 @@ t_team_config *cargar_team_config(char *path_archivo) {
 }
 
 void parsear_team_config(t_team_config *team_config, t_config *config) {
+
+	char* obtener_path_logger(char* path_logger){
+		if (strcmp(path_logger, "DEFAULT") == 0) {
+			char* path = strdup("team.log");
+			return path;
+		}
+		else {
+			char* path = strdup(path_logger);
+			return path;
+		}
+	}
+
+
 	team_config->posiciones_entrenadores = obtener_lista_de_posiciones(config,
 			"POSICIONES_ENTRENADORES");
 	team_config->pokemon_entrenadores = obtener_lista_de_pokemones(config,
@@ -42,6 +55,7 @@ void parsear_team_config(t_team_config *team_config, t_config *config) {
 	team_config->log_file = strdup(config_get_string_value(config, "LOG_FILE"));
 	team_config->puerto_team =  strdup(config_get_string_value(config, "PUERTO_TEAM"));
 	team_config->id_proceso=config_get_int_value(config,"ID_PROCESO");
+	team_config->path_logger = obtener_path_logger(config_get_string_value(config, "LOG_FILE"));
 }
 
 char** separar_por_pipe(char* string_con_pipes) {

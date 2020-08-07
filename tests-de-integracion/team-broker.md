@@ -57,7 +57,7 @@ $ sleep <sleep-time>; cat broker.log    # byexample: +timeout=10 +paste +fail-fa
 Envio el mensaje APPEARED_POKEMON
 
 ```bash
-$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6 10; sleep <sleep-time> # byexample: +timeout=8 +paste
+$ sleep <sleep-time>; ../gameboy/Debug/gameboy TEAM APPEARED_POKEMON Pikachu 6 6; sleep <sleep-time> # byexample: +timeout=8 +paste
 <...>
 ```
 

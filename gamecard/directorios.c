@@ -39,6 +39,32 @@ void crear_archivo_metadata_y_bitmap_fs() {
 
 //Inicializar directorios-> t config
 void inicializar_directorios() {
+	//Creo Punto de Montaje si no existe
+	DIR *dp;
+
+	if ((dp = opendir(gamecard_config->punto_montaje_tallgrass)) == NULL) {
+		printf("No existe punto de montaje: %s", gamecard_config->punto_montaje_tallgrass);
+
+		mkdir(gamecard_config->punto_montaje_tallgrass, 0777);
+
+		if ((dp = opendir(gamecard_config->punto_montaje_tallgrass)) == NULL){
+			printf("Imposible crear punto de montaje. Finalizando el programa\n");
+			log_error(logger, "Imposible crear punto de montaje. Finalizando el programa");
+			exit(-1);
+		}
+		else {
+			printf("Se creó el punto de montaje: %s \n", gamecard_config->punto_montaje_tallgrass);
+			log_info(logger, "Se creó el punto de montaje: %s \n", gamecard_config->punto_montaje_tallgrass);
+			(void) closedir (dp);
+		}
+	}
+	else {
+		(void) closedir (dp);
+	}
+
+
+
+
 
 	//Creo Metadata
 

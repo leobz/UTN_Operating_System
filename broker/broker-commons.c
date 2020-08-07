@@ -41,6 +41,17 @@ int id_necesario(int id_mensaje,int id_correlativo,op_code codigo_operacion){
 }
 
 void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
+	char* obtener_path_logger(char* path_logger){
+		if (strcmp(path_logger, "DEFAULT") == 0) {
+			char* path = strdup("broker.log");
+			return path;
+		}
+		else {
+			char* path = strdup(path_logger);
+			return path;
+		}
+	}
+
 	broker_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
 
@@ -54,6 +65,8 @@ void parsear_broker_config(t_broker_config *broker_config, t_config *config) {
 	broker_config->algoritmo_reemplazo = strdup(config_get_string_value(config, "ALGORITMO_REEMPLAZO"));
 	broker_config->algoritmo_particion_libre = strdup(config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE"));
 	broker_config->frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
+	broker_config->path_logger = obtener_path_logger(config_get_string_value(config, "LOG_FILE"));
+
 
 }
 
@@ -83,7 +96,7 @@ t_broker_config *cargar_broker_config(char *path_archivo) {
 
 void inicializar_broker() {
 	broker_config = cargar_broker_config("broker.config");
-	logger = iniciar_logger("broker.log", "broker", LOG_LEVEL_INFO);
+	logger = iniciar_logger(broker_config->path_logger, "broker", LOG_LEVEL_INFO);
 	logger_debug = iniciar_logger("broker_debug.log", "broker", LOG_LEVEL_INFO);
 }
 

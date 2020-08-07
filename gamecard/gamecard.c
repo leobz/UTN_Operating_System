@@ -8,6 +8,17 @@
 #include "gamecard.h"
 
 void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *config) {
+
+	char* obtener_path_logger(char* path_logger){
+		if (strcmp(path_logger, "DEFAULT") == 0) {
+			char* path = strdup("gamecard.log");
+			return path;
+		}
+		else {
+			char* path = strdup(path_logger);
+			return path;
+		}
+	}
 	gamecard_config->tiempo_reintento_conexion = config_get_double_value(config, "TIEMPO_DE_REINTENTO_CONEXION");
 	gamecard_config->tiempo_reintento_operacion = config_get_double_value(config, "TIEMPO_DE_REINTENTO_OPERACION");
 	gamecard_config->tiempo_retardo_operacion = config_get_double_value(config, "TIEMPO_RETARDO_OPERACION");
@@ -21,6 +32,7 @@ void parsear_gamecard_config(t_gamecard_config* gamecard_config, t_config *confi
 	gamecard_config->block_size = config_get_int_value(config, "BLOCK_SIZE");
 	gamecard_config->magic_number =  strdup(config_get_string_value(config, "MAGIC_NUMBER"));
 	gamecard_config->blocks = config_get_int_value(config, "BLOCKS");
+	gamecard_config->path_logger = obtener_path_logger(config_get_string_value(config, "LOG_FILE"));
 }
 
 
@@ -48,7 +60,7 @@ t_gamecard_config* cargar_gamecard_config(char* path_archivo){
 
 void inicializar_gamecard() {
 	gamecard_config = cargar_gamecard_config("gamecard.config");
-	logger = iniciar_logger("gamecard.log", "gamecard", LOG_LEVEL_INFO);
+	logger = iniciar_logger(gamecard_config->path_logger, "gamecard", LOG_LEVEL_INFO);
 	logger_debug = iniciar_logger("gamecard_debug.log", "gamecard", LOG_LEVEL_INFO);
 
 }
