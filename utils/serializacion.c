@@ -945,10 +945,8 @@ t_mensaje_appeared* deserializar_paquete_appeared_pokemon(void* package) {
 
 
 t_buffer* buffer_localized_pokemon(char* nombre_pokemon, t_list* posiciones){
-	printf("[GAMECARD] Inicio funcion buffer_localized_pokemon()\n");
 	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
 	uint32_t cantidad_posiciones = list_size(posiciones);
-	printf("[GAMECARD] Cantidad de posiciones: %d\n", list_size(posiciones));
 
 	char *pokemon = strdup(nombre_pokemon);
 	uint32_t pokemon_lenght = strlen(pokemon) + 1;
@@ -956,23 +954,18 @@ t_buffer* buffer_localized_pokemon(char* nombre_pokemon, t_list* posiciones){
 	buffer->size = sizeof(t_posiciones)*(cantidad_posiciones)+ sizeof(uint32_t)*3 + pokemon_lenght;
 	buffer->stream = malloc(buffer->size);
 
-	printf("[GAMECARD] Memcpy de pokemon_lenght\n");
 	uint32_t offset = 0;
 	memcpy(buffer->stream + offset, &pokemon_lenght, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	printf("[GAMECARD] Memcpy de pokemon\n");
 	memcpy(buffer->stream + offset, pokemon, pokemon_lenght);
 	offset += pokemon_lenght;
-	printf("[GAMECARD] Memcpy de cantidad_posiciones\n");
 	memcpy(buffer->stream + offset, &cantidad_posiciones, sizeof(uint32_t));
 	offset += sizeof(uint32_t);
 
 	void copiar_posiciones(t_posiciones* posicion){
-		printf("[GAMECARD] Memcpy de posx\n");
 		memcpy(buffer->stream + offset, &(posicion->posx), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
 
-		printf("[GAMECARD] Memcpy de posy\n");
 		memcpy(buffer->stream + offset, &(posicion->posy), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
 	}
@@ -980,29 +973,22 @@ t_buffer* buffer_localized_pokemon(char* nombre_pokemon, t_list* posiciones){
 	list_iterate(posiciones, (void*)copiar_posiciones);
 
 	free(pokemon);
-	printf("[GAMECARD] Free pokemon\n");
 
 	return buffer;
 }
 
 void* serializar_localized_pokemon(uint32_t* bytes, char* nombre_pokemon, t_list* posiciones, uint32_t id_mensaje, uint32_t id_correlativo) {
 
-	printf("[GAMECARD] Inicio funcion serializar_localized_pokemon()\n");
 	t_buffer* buffer = buffer_localized_pokemon(nombre_pokemon, posiciones);
-	printf("[GAMECARD] Obtuvo buffer\n");
 	t_paquete *paquete = crear_paquete(LOCALIZED_POKEMON, buffer, id_mensaje,id_correlativo);
-	printf("[GAMECARD] Creado de paquete\n");
 
 	*bytes = paquete->buffer->size + sizeof(uint32_t) * 4;
 	void* a_enviar = serializar_paquete(paquete, *bytes);
-	printf("[GAMECARD] Serializado de paquete en a_enviar\n");
 	eliminar_paquete(paquete);
-	printf("[GAMECARD] Eliminado de paquete\n");
 	void destruir_posiciones(t_posiciones* posicion){
 		free(posicion);
 	}
 	list_destroy_and_destroy_elements(posiciones, (void*)destruir_posiciones);
-	printf("[GAMECARD] Destruir posiciones\n");
 
 	return a_enviar;
 }
@@ -1012,33 +998,26 @@ t_mensaje_localized* deserializar_mensaje_localized_pokemon(t_buffer* buffer) {
 
 	void* stream = buffer->stream;
 
-	printf("[TEAM] Inicio funcion deserializar_mensaje_localized_pokemon()\n");
 	memcpy(&(mensaje_localized->length_pokemon), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 
-	printf("[TEAM] Length pokemon: %d\n", mensaje_localized->length_pokemon);
 	mensaje_localized->pokemon = malloc(mensaje_localized->length_pokemon);
 
 	memcpy(mensaje_localized->pokemon, stream, mensaje_localized->length_pokemon);
 	stream += mensaje_localized->length_pokemon;
-	printf("[TEAM] Pokemon: %s\n", mensaje_localized->pokemon);
 
 	memcpy(&(mensaje_localized->cantidad_posiciones), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
-	printf("[TEAM] Cantidad posiciones: %d\n", mensaje_localized->cantidad_posiciones);
 
 	for(uint32_t i=0;i<mensaje_localized->cantidad_posiciones;i++){
 
 	memcpy(&(mensaje_localized->pos[i].posx), stream, sizeof(uint32_t));
 		stream += sizeof(uint32_t);
 
-		printf("[TEAM] Pos x: %d\n", mensaje_localized->pos[i].posx);
 	memcpy(&(mensaje_localized->pos[i].posy), stream, sizeof(uint32_t));
 		stream += sizeof(uint32_t);
-		printf("[TEAM] Pos y: %d\n", mensaje_localized->pos[i].posy);
 	}
 
-	printf("[TEAM] Fin de funcion deserializar_mensaje_localized_pokemon()\n");
 
 	return mensaje_localized;
 }
