@@ -81,7 +81,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 		case CONFIRMACION:{
 
 			log_info(logger, "[MSG_RECIBIDO] CON ID_MENSAJE: %d", paquete->id_mensaje);
-			printf("Confirmacion CON ID_MENSAJE: %d\n", paquete->id_mensaje);
+			log_info(logger_debug,"Confirmacion CON ID_MENSAJE: %d", paquete->id_mensaje);
 
 			if(esta_en_diccionario(administracion_por_id,paquete->id_mensaje)){
 				if(esta_en_diccionario(subscribers,paquete->id_proceso)){
@@ -91,14 +91,12 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete) {
 				list_add(administrador_confirmado->suscriptores_confirmados, proceso_confirmado); //Lo agrego a la lista deconfirmados de ese mensaje
 				}
 			}
-			//printf("Recibida confirmacion de proceso: %d\n",paquete->id_proceso);
 
 			break;}
 
 		case OP_ERROR:
 
-			printf("Error al recibir mensaje del socket: %d\n",
-					paquete->socket_cliente);
+			log_error(logger,"Error al recibir mensaje del socket: %d",paquete->socket_cliente);
 			pthread_exit(NULL);
 			break;
 
@@ -138,7 +136,7 @@ void verificar_cache(t_proceso_y_cola* proceso){
 				list_add(actual_administrator->suscriptores_enviados,proceso);
 			}
 			else
-				printf("Proceso con socket cerrado\n");
+				log_error(logger,"Proceso con socket cerrado");
 
 			free(mensaje_para_enviar);
 		}

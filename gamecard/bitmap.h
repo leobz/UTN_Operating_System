@@ -59,6 +59,7 @@ typedef struct {
 	int block_size;
 	int blocks;
 	char* magic_number;
+	char* path_logger;
 } t_gamecard_config;
 
 t_log* logger;

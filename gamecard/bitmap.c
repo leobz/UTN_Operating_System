@@ -43,7 +43,7 @@ void actualizar_archivo_bitmap(t_bitarray*bitmap) {
 	free(ruta);
 
 	if (bitmap_file == NULL) {
-		printf("No se pudo actualizar el archivo Bitmap.bin");
+		log_error(logger,"No se pudo actualizar el archivo Bitmap.bin");
 	}
 
 	fwrite(bitmap->bitarray, sizeof(char), bitmap->size, bitmap_file);
@@ -53,26 +53,6 @@ void actualizar_archivo_bitmap(t_bitarray*bitmap) {
 	free(bitmap);
 }
 
-
-/*
-t_bitarray * crear_bitmap(int cant_bloques){
-
-	int tamanio_bitarray=cant_bloques/8;
-	if(cant_bloques % 8 != 0){
-	  tamanio_bitarray++;
-	 }
-
-	char* bits=malloc(tamanio_bitarray);
-
-	t_bitarray * bitarray = bitarray_create_with_mode(bits,tamanio_bitarray,LSB_FIRST);
-
-
-	for(int cont=0; cont < tamanio_bitarray*8; cont++){ //Limpia los bits del bitarray (Los pone en 0)
-		bitarray_clean_bit(bitarray, cont);
-	}
-
-	return bitarray;
-}*/
 t_bitarray *crear_bitmap(int cant_bloques) {
 
 
@@ -87,9 +67,9 @@ t_bitarray *crear_bitmap(int cant_bloques) {
 
 
 	size_t bytes = BIT_SIZE(cant_bloques, CHAR_BIT);
-	//printf("Tamanio bitmap :%d\n",bytes);
 
-	//Duda sizeof(char)
+	log_info(logger_debug,"Tamanio bitmap :%d",bytes);
+
 	char *bitarray = calloc(bytes, sizeof(char));
 
 	t_bitarray * bitmap=bitarray_create_with_mode(bitarray, bytes, LSB_FIRST);
@@ -131,7 +111,7 @@ t_bitarray *checkear_bitmap(){
 			fclose(bitmap_file);
 			free(bitarray);
 			//free(bit_new);
-			printf("Actualizando Bitmap menor que actual\n");
+			log_info(logger_debug,"Actualizando Bitmap menor que actual");
 			return bitmap;
 		}
 		else if(read_bytes > bitarray_size){
@@ -145,7 +125,7 @@ t_bitarray *checkear_bitmap(){
 			fclose(bitmap_file);
 			free(bitarray);
 			//free(bit_new);
-			printf("Actualizando Bitmap mayor que actual\n");
+			log_info(logger_debug,"Actualizando Bitmap mayor que actual");
 			return bitmap;
 		}
 
@@ -170,7 +150,7 @@ t_bitarray *leer_bitmap() {
 	if (read_bytes != bitarray_size) {
 		fclose(bitmap_file);
 		free(bitarray);
-		printf("El Bitmap esta incompleto\n");
+		log_info(logger,"El Bitmap esta incompleto");
 		return NULL;
 	}
 

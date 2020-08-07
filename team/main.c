@@ -5,11 +5,13 @@ t_log* logger;
 t_team_config* team_config;
 
 void finalizar_team(t_team_config* team_config) {
-	printf("Cerrando programa...\n");
+	log_info(logger_debug,"Cerrando programa...");
 	destruir_metricas();
 	destruir_objetivo_global();
 	//destruir_pokemon_requeridos();
 	destruir_team_config(team_config);
+	destruir_logger(logger_debug);
+	destruir_logger(logger);
 	destroy_all_tcbs();
 
 	exit(1);
@@ -21,9 +23,9 @@ int main(int argc, char ** argv) {
 
 	team_cumplio_objetivo = false;
 
-	logger = iniciar_logger("team.log", "team", LOG_LEVEL_INFO);
-	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 	team_config = cargar_team_config("team.config");
+	logger = iniciar_logger(team_config->path_logger, "team", LOG_LEVEL_INFO);
+	logger_debug = iniciar_logger("team_debug.log", "team", LOG_LEVEL_INFO);
 
 	//CAMBIAR POR CONFIGURACION
 	int id_proceso=team_config->id_proceso;

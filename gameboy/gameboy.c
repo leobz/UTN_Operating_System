@@ -3,7 +3,7 @@
 
 
 int main(int argc, char **argv) {
-	inicializar_gameboy(&gameboy_config, &logger);
+	inicializar_gameboy(&gameboy_config, &logger,&logger_debug);
 	// ./gameboy test
 	if (argc == 2) {
 		if (strcmp(argv[1], "test") == 0)
@@ -12,6 +12,12 @@ int main(int argc, char **argv) {
 
 	// ./gameboy SUSCRIPCION [COLA_DE_MENSAJES] [TIEMPO]
 	if (strcmp(argv[1], "SUSCRIPTOR") == 0) {
+		if (argc != 4) {
+			printf("ERROR: Comando invalido, pruebe: ./gameboy SUSCRIPCION [COLA_DE_MENSAJES] [TIEMPO]\n");
+			log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy SUSCRIPCION [COLA_DE_MENSAJES] [TIEMPO]");
+			exit(-1);
+		}
+
 		int cola = string_to_op_code(argv[2]);
 		int tiempo = atoi(argv[3]);
 
@@ -20,7 +26,7 @@ int main(int argc, char **argv) {
 
 		if (conexion == -1)
 		{
-			printf("ERROR: Conexion con [Broker] no estable1cida");
+			log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 			//exit(-1);
 		}
 		// TODO: funcion de alarm
@@ -52,6 +58,12 @@ int main(int argc, char **argv) {
 
 		// ./gameboy BROKER NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD]
 		if (strcmp(argv[2], "NEW_POKEMON") == 0) {
+			if (argc != 7) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ../gameboy BROKER NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -63,7 +75,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -80,6 +92,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy BROKER GET_POKEMON [POKEMON]
 		if (strcmp(argv[2], "GET_POKEMON") == 0) {
+
+			if (argc != 4) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER GET_POKEMON [POKEMON]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy BROKER GET_POKEMON [POKEMON]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int id_mensaje=0;
 			int id_correlativo = 0;
@@ -88,7 +107,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -106,6 +125,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy BROKER CATCH_POKEMON [POKEMON] [POSX] [POSY]
 		if (strcmp(argv[2], "CATCH_POKEMON") == 0) {
+
+			if (argc != 6) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER CATCH_POKEMON [POKEMON] [POSX] [POSY]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy BROKER CATCH_POKEMON [POKEMON] [POSX] [POSY]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -116,7 +142,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no establecida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -134,6 +160,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy BROKER APPEARED_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE_CORRELATIVO]
 		if (strcmp(argv[2], "APPEARED_POKEMON") == 0) {
+
+			if (argc != 7) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER APPEARED_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE_CORRELATIVO]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy BROKER APPEARED_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE_CORRELATIVO]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -144,7 +177,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -162,6 +195,12 @@ int main(int argc, char **argv) {
 		// ./gameboy BROKER CAUGHT_POKEMON [ID_MENSAJE_CORRELATIVO] [OK/FAIL]
 		if (strcmp(argv[2], "CAUGHT_POKEMON") == 0) {
 
+			if (argc != 5) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER CAUGHT_POKEMON [ID_MENSAJE_CORRELATIVO] [OK/FAIL]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ../gameboy BROKER CAUGHT_POKEMON [ID_MENSAJE_CORRELATIVO] [OK/FAIL]");
+				exit(-1);
+			}
+
 			int id_correlativo = atoi(argv[3]);
 			int estado = 0;
 			int id_mensaje=0;
@@ -176,7 +215,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -194,6 +233,12 @@ int main(int argc, char **argv) {
 
 		// ./gameboy BROKER LOCALIZED_POKEMON [POKEMON] [CANT_PARES_POSICIONES] [POSX] [POSY].. [ID_MENSAJE_CORRELATIVO]
 		if (strcmp(argv[2], "LOCALIZED_POKEMON") == 0) {
+			if (argc < 7 ) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy BROKER LOCALIZED_POKEMON [POKEMON] [CANT_PARES_POSICIONES] [POSX] [POSY].. [ID_MENSAJE_CORRELATIVO]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy BROKER LOCALIZED_POKEMON [POKEMON] [CANT_PARES_POSICIONES] [POSX] [POSY].. [ID_MENSAJE_CORRELATIVO]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int cantidad_de_posiciones = atoi(argv[4]);
 //			t_posiciones posi[cantidad_de_posiciones];
@@ -216,7 +261,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_broker, gameboy_config->puerto_broker);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Broker] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Broker] no establecida");
 				exit(-1);
 			}
 
@@ -237,6 +282,11 @@ int main(int argc, char **argv) {
 
 		// ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]
 		if (strcmp(argv[2], "APPEARED_POKEMON") == 0) {
+			if (argc != 6) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy TEAM APPEARED_POKEMON [POKEMON] [POSX] [POSY]");
+				exit(-1);
+			}
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -247,7 +297,7 @@ int main(int argc, char **argv) {
 					gameboy_config->puerto_team);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [Team] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [Team] no estable1cida");
 				exit(-1);
 			}
 
@@ -268,6 +318,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy GAMECARD NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD] [ID_MENSAJE]
 		if (strcmp(argv[2], "NEW_POKEMON") == 0) {
+
+			if (argc != 8) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy GAMECARD NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD] [ID_MENSAJE]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy GAMECARD NEW_POKEMON [POKEMON] [POSX] [POSY] [CANTIDAD] [ID_MENSAJE]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -278,7 +335,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no establecida");
 				exit(-1);
 			}
 
@@ -295,6 +352,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy GAMECARD CATCH_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE]
 		if (strcmp(argv[2], "CATCH_POKEMON") == 0) {
+
+			if (argc != 7) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy GAMECARD CATCH_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy GAMECARD CATCH_POKEMON [POKEMON] [POSX] [POSY] [ID_MENSAJE]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int pos_x = atoi(argv[4]);
 			int pos_y = atoi(argv[5]);
@@ -304,7 +368,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no estable1cida");
 				exit(-1);
 			}
 
@@ -322,6 +386,13 @@ int main(int argc, char **argv) {
 
 		// ./gameboy GAMECARD GET_POKEMON [POKEMON] [ID_MENSAJE]
 		if (strcmp(argv[2], "GET_POKEMON") == 0) {
+
+			if (argc != 5) {
+				printf("ERROR: Comando invalido, pruebe: ./gameboy GAMECARD GET_POKEMON [POKEMON] [ID_MENSAJE]\n");
+				log_error(logger, "ERROR: Comando invalido, pruebe: ./gameboy GAMECARD GET_POKEMON [POKEMON] [ID_MENSAJE]");
+				exit(-1);
+			}
+
 			char *pokemon = argv[3];
 			int id_mensaje = atoi(argv[4]);
 			int id_correlativo=0;
@@ -329,7 +400,7 @@ int main(int argc, char **argv) {
 			int conexion = crear_conexion(gameboy_config->ip_gamecard,gameboy_config->puerto_gamecard);
 
 			if (conexion == -1) {
-				printf("ERROR: Conexion con [GAMECARD] no estable1cida");
+				log_error(logger,"ERROR: Conexion con [GAMECARD] no estable1cida");
 				exit(-1);
 			}
 
@@ -348,17 +419,31 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger) {
+void inicializar_gameboy(t_gameboy_config **gameboy_config, t_log **logger,t_log **logger_debug) {
 	*gameboy_config = cargar_gameboy_config("gameboy.config");
-	*logger = iniciar_logger("gameboy.log", "gameboy", LOG_LEVEL_INFO);
+	*logger = iniciar_logger((*gameboy_config)->path_logger, "gameboy", LOG_LEVEL_INFO);
+	*logger_debug = iniciar_logger("gameboy_debug.log", "gameboy", LOG_LEVEL_INFO);
 }
 
 void finalizar_gameboy(t_gameboy_config *gameboy_config, t_log *logger) {
 	destruir_gameboy_config(gameboy_config);
 	destruir_logger(logger);
+	destruir_logger(logger_debug);
 }
 
 void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) {
+
+	char* obtener_path_logger(char* path_logger){
+		if (strcmp(path_logger, "DEFAULT") == 0) {
+			char* path = strdup("gameboy.log");
+			return path;
+		}
+		else {
+			char* path = strdup(path_logger);
+			return path;
+		}
+	}
+
 	gameboy_config->ip_broker = strdup(
 			config_get_string_value(config, "IP_BROKER"));
 	gameboy_config->ip_gamecard = strdup(
@@ -376,6 +461,7 @@ void parsear_gameboy_config(t_gameboy_config *gameboy_config, t_config *config) 
 	gameboy_config->puerto_gameboy = strdup(
 			config_get_string_value(config, "PUERTO_GAMEBOY"));
 	gameboy_config->id_proceso_gameboy=config_get_int_value(config,"ID_PROCESO");
+	gameboy_config->path_logger = obtener_path_logger(config_get_string_value(config, "LOG_FILE"));
 }
 
 t_gameboy_config *cargar_gameboy_config(char *path_archivo) {

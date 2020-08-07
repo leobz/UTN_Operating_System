@@ -36,7 +36,7 @@ void iniciar_hilo_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 	while (datos_suscripcion->conexion == -1) {
 		liberar_conexion(datos_suscripcion->conexion);
-		printf("ERROR: Conexion %s con [Broker] no establecida\n", op_code_to_string(datos_suscripcion->cola));
+		log_error(logger,"ERROR: Conexion %s con [Broker] no establecida", op_code_to_string(datos_suscripcion->cola));
 		sleep(gamecard_config->tiempo_reintento_conexion);
 		datos_suscripcion->conexion = crear_conexion(gamecard_config->ip_broker, gamecard_config->puerto_broker);
 	}
@@ -45,9 +45,7 @@ void iniciar_suscripcion(t_datos_suscripcion* datos_suscripcion) {
 }
 
 void loggear_nueva_conexion(t_log* logger, t_paquete_socket* paquete) {
-	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",
-			op_code_to_string(paquete->codigo_operacion),
-			paquete->id_correlativo);
+	log_info(logger, "[CONEXION] COD_OP:%s ID:%d",op_code_to_string(paquete->codigo_operacion),paquete->id_correlativo);
 }
 
 void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion){
@@ -60,7 +58,7 @@ void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion){
 			procesar_mensaje_recibido_broker(paquete);
 		}
 		else {
-			close(datos_suscripcion->conexion);
+			//close(datos_suscripcion->conexion);
 			datos_suscripcion->conexion = -1;
 			iniciar_suscripcion(datos_suscripcion);
 			free(paquete);
@@ -73,7 +71,7 @@ void recibir_mensajes_gamecard(t_datos_suscripcion* datos_suscripcion){
 void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 
 	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
-		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
+		log_info(logger_debug,"Recibiendo mensaje de la cola %s...", op_code_to_string(paquete_socket->codigo_operacion));
 
 		preparar_confirmacion(paquete_socket->id_mensaje);
 
@@ -100,7 +98,7 @@ void procesar_mensaje_recibido_broker(t_paquete_socket* paquete_socket){
 void procesar_mensaje_recibido_cliente(t_paquete_socket* paquete_socket){
 
 	if ((paquete_socket->codigo_operacion >= 0) && (paquete_socket->codigo_operacion <=3)){
-		printf("Recibiendo mensaje de la cola %d... \n", paquete_socket->codigo_operacion);
+		log_info(logger_debug,"Recibiendo mensaje de la cola %s...", op_code_to_string(paquete_socket->codigo_operacion));
 
 		switch (paquete_socket->codigo_operacion){
 		case NEW_POKEMON:
@@ -130,7 +128,7 @@ void preparar_confirmacion(int id_men){
 
 void enviar_confirmacion(int id, int confirmacion, int socket){
 	int offset=0;
-	printf("Enviando confirmacion al socket %d... \n", socket);
+	log_info(logger_debug,"Enviando confirmacion al socket %d...", socket);
 	void*enviar = malloc(sizeof(int) * 3);
 	memcpy(enviar, &confirmacion,sizeof(int));
 	offset+=sizeof(int);

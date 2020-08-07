@@ -24,10 +24,12 @@ typedef struct {
 	char *puerto_gamecard;
 	char *puerto_gameboy;
 	int id_proceso_gameboy;
+	char* path_logger;
 } t_gameboy_config;
 
 t_gameboy_config *gameboy_config;
 t_log *logger;
+t_log *logger_debug;
 int id_proceso_gameboy;
 int conexion_gameboy;
 

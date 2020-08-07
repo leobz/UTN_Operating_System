@@ -128,8 +128,7 @@ void procesar_mensaje_recibido(t_paquete_socket* paquete_socket) {
 void recibir_id_correlativo(int socket_cliente) {
 	t_paquete_socket* paquete =  recibir_mensajes(socket_cliente);
 
-	//log_info(logger, "[MSG_RECIBIDO] ID_CORRELATIVO: %d\n", paquete->id_mensaje);
-	printf("Recibida Confirmacion: %d\n",paquete->id_mensaje);
+	log_info(logger_debug,"Recibida Confirmacion: %d",paquete->id_mensaje);
 	free(paquete);
 }
 

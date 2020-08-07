@@ -33,10 +33,12 @@ typedef struct {
 	char* algoritmo_reemplazo;
 	char* algoritmo_particion_libre;
 	int frecuencia_compactacion;
+	char* path_logger;
 } t_broker_config;
 
 
 t_log* logger;
+t_log* logger_debug;
 t_broker_config* broker_config;
 
 

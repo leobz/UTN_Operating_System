@@ -49,12 +49,10 @@ void agregar_mensaje_memoria_cache(t_adm_mensaje* actual_administrator, t_mensaj
 	if (es_particion_dinamica()){
 		actual_administrator->particion_dinamica = agregar_mensaje_memoria_cache_particion_dinamica_barra_cero(mensaje,actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
-		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_dinamica->offset);
 	}
 	else if(es_buddy_system()){
 		actual_administrator->particion_bs = agregar_mensaje_memoria_cache_bs_barra_cero(mensaje, actual_administrator);
 		log_info(logger,"Almacenando mensaje con ID %d en cache en posicion %d",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
-		printf("Almacenando mensaje con ID %d en cache en posicion %d\n",mensaje->id_mensaje, actual_administrator->particion_bs->offset);
 	}
 }
 
@@ -85,7 +83,7 @@ void eliminar_adm_mensaje_particion_en_diccionarios(t_adm_mensaje* admins_mensaj
 
 	t_adm_mensaje* men=list_remove_by_condition(lista_adm_mensajes, (void*)tiene_mismo_id_mensaje);
 
-	printf("Removiendo: Id: %d, Cod %d\n",men->id_mensaje, men->codigo_operacion);
+	log_info(logger_debug,"Removiendo: Id: %d, Cod %d",men->id_mensaje, men->codigo_operacion);
 
 
 	if(list_size(admins_mensaje->suscriptores_enviados)!=0)
