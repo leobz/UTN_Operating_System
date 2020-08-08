@@ -3,35 +3,8 @@
 # Edit at https://www.gitignore.io/?templates=c,eclipse
 
 ### GameBoyProject Configuration ###
+*.config
 *.log
-*.txt
-*.auxiliar
-so-commons-library/
-test-catedra/delibird-pruebas/
-test-catedra/team.config
-test-catedra/broker.config
-test-catedra/gamecard.config
-team/Debug/team.config
-tall-grass/
-
-.*/*.log
-*/*.gitignore
-*/Debug/*.gitignore
-*/Debug/makefile
-*/Debug/*.mk
-*/Debug/*.log
-*/Debug/team
-*/Debug/broker
-*/Debug/gameboy
-*/Debug/gamecard
-*/Debug/test/*.mk
-*/Debug/test/*.o
-*/Debug/test/*.ob
-*/Debug/test/*.ko
-*/Debug/test/*.elf
-*/Debug/test/*.log
-
-tests-de-integracion/byexample.config
 
 ### C ###
 # Prerequisites
