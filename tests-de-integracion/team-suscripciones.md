@@ -26,7 +26,7 @@ $ ../broker/Debug/broker &   # byexample: +fail-fast
 Levanto Team en segundo plano
 
 ```bash
-$ ../team/Debug/team &       # byexample: +fail-fast
+$ sleep <sleep-time>; ../team/Debug/team &       # byexample: +fail-fast +timeout=10 +paste
 <...>[<job-team-id>] <team-pid>
 ```
 
