@@ -87,7 +87,7 @@ sed -i 's/ALGORITMO_PLANIFICACION=RR/ALGORITMO_PLANIFICACION=SJF-CD/g' ../team/D
 
 echo "Levantando Broker"
 1>/dev/null 2>/dev/null     ../broker/Debug/broker &
-sleep $sleep_time
+sleep $(expr $sleep_time \* 5)
 
 
 echo "\nEjecutar 'new_pokemon_antes_team.sh'?" 
