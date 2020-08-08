@@ -78,6 +78,7 @@ t_metadata* metadata;
 char* crear_ruta(char* ruta);
 t_bitarray *checkear_bitmap();
 char*ruta_bitmap();
+t_bitarray *verificar_bloques_ocupados(t_bitarray *bitmap);
 void modificar_bit(t_bitarray*bitmap,bool valor,int bit);
 void actualizar_archivo_bitmap(t_bitarray*bitmap);
 t_bitarray *crear_bitmap(int cant_bloques);

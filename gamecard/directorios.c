@@ -34,6 +34,7 @@ void crear_archivo_metadata_y_bitmap_fs() {
 
 	//Creo archivo Bitmap.bin
 	t_bitarray*bitmap = crear_bitmap(metadata->blocks);
+	bitmap=verificar_bloques_ocupados(bitmap);
 	actualizar_archivo_bitmap(bitmap);
 }
 

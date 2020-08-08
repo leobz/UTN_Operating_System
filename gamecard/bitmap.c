@@ -74,7 +74,7 @@ t_bitarray *crear_bitmap(int cant_bloques) {
 
 	t_bitarray * bitmap=bitarray_create_with_mode(bitarray, bytes, LSB_FIRST);
 
-	for(int cont=0; cont < cant_bloques; cont++){ //Limpia los bits del bitarray (Los pone en 0)
+	for(int cont=0; cont < bitarray_get_max_bit(bitmap); cont++){ //Limpia los bits del bitarray (Los pone en 0)
 			bitarray_clean_bit(bitmap, cont);
 		}
 
@@ -102,7 +102,7 @@ t_bitarray *checkear_bitmap(){
 
 			t_bitarray * bitmap=bitarray_create_with_mode(bit_new, bitarray_size, LSB_FIRST);
 
-				for(int cont=0; cont < metadata->blocks; cont++){ //Limpia los bits del bitarray (Los pone en 0)
+				for(int cont=0; cont < bitarray_get_max_bit(bitmap); cont++){ //Limpia los bits del bitarray (Los pone en 0)
 						bitarray_clean_bit(bitmap, cont);
 					}
 
@@ -132,6 +132,29 @@ t_bitarray *checkear_bitmap(){
 		fclose(bitmap_file);
 
 		return bitarray_create_with_mode(bitarray, bitarray_size, LSB_FIRST);
+}
+t_bitarray *verificar_bloques_ocupados(t_bitarray *bitmap){
+
+	char*bits=string_new();
+	int contador=0;
+
+	for(int i=0;i< 20;i++){
+
+		if(bitarray_test_bit(bitmap,i)){
+
+			if(i!=0){
+				string_append(&bits,",");}
+
+				string_append_with_format(&bits,"%s",string_itoa(i));
+				contador++;
+		}
+	}
+
+	if(contador!=0)
+		log_info(logger_debug,"Bloques ocupados al cargar File System: %s  (%d)",bits,contador);
+
+	free(bits);
+	return bitmap;
 }
 
 t_bitarray *leer_bitmap() {
