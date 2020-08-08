@@ -8,8 +8,7 @@ echo "\n**  Test Final Prueba completa	**\n"
 
 
 echo "Eliminando archivos anteriores"
-rm -r ../tall-grass/Files/*     2>/dev/null
-rm ../tall-grass/Blocks/*       2>/dev/null
+rm -r ../tall-grass/      	2>/dev/null
 rm *.log                        2>/dev/null
 rm ../team/Debug/*.log          2>/dev/null
 
