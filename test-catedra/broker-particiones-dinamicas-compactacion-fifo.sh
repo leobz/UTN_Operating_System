@@ -13,8 +13,8 @@ echo "Levantando Broker"
 1>/dev/null 2>/dev/null     ../broker/Debug/broker &
 sleep 1
 
-echo "\nEjecutando 'consolidacion_basico.sh'"
-sh delibird-pruebas/consolidacion_basico.sh
+echo "\nEjecutando 'compactacion_basico.sh'"
+sh delibird-pruebas/compactacion_basico.sh
 
 echo "\nEjecutando test"
 byexample -l shell byexample-pruebas/broker-catedra-final-compactacion-fifo-particiones-dinamicas.md
