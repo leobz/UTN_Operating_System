@@ -1,78 +1,81 @@
-# tp-2020-1c-UNIX
+# Delibird: Operating System Simulator
 
-## Ficha Técnica
+**Nota**: Encuentra la versión en español en el [siguiente link](https://github.com/leobz/SO-UNIX-Delibird/blob/master/SPANISH_README.md)
 
-* Nombre del proyecto: Delibird
-* Nombre del equipo: UNIX
-* Tiempo de desarrollo: 80 dias
-* Lenguajes utilizados: C, Bash, Python
-* Enunciado/Requerimientos: [LINK](https://docs.google.com/document/d/1be91Gn93O2Vp8frZoV1i5CmtOG0scE1PS8dMHsCP314/edit)
-* Integrantes: 
-  * [Leo Bazán](https://www.linkedin.com/in/bazanotin/): Lider Técnico. Team, Broker, GameCard, GameBoy
+**Note**: All the codebase of this project is written in Spanish due to this project had an academic purpose.
+
+
+## Technical Specs
+
+* Project name: Delibird
+* Team name: UNIX
+* Development time: 2 months
+* Languages used: C, Bash, Python
+* University: 
+* Statement/Requirements: [LINK](https://docs.google.com/document/d/1be91Gn93O2Vp8frZoV1i5CmtOG0scE1PS8dMHsCP314/edit)
+* Team members: 
+  * [Leo Bazán](https://www.linkedin.com/in/bazanotin/): Technical leader. Team, Broker, GameCard, GameBoy
   * [Eze Laime](https://www.linkedin.com/in/ezequiel-laime/): Team, Broker
   * [Eze Gauna](https://www.linkedin.com/in/ezequielgauna/): GameCard, GameBoy
   * [Diego Perez](https://github.com/dprez8): Broker, GameCard, GameBoy
 
+## Summary
 
-## Resumen
+Delibird is a distributed system that simulates the behavior of an operating system, covering topics such as memory management algorithms, process scheduling algorithms, file systems, kernels, etc. All modules work concurrently and must be able to pass 25 integration tests that simulate different behaviors based on different configurations.
 
-Delibird es un sistema distribuido que simula el comportamiento de un sistema operativo, se tocan temas tales como algoritmos de gestion de memoria, algoritmos de planificación de procesos, sistemas de archivos, kernel, etc. Todos los módulos trabajan de forma concurrente y deben poder pasar 25 tests de integración que simulen distintos comportamientos en base a distintas configuraciones.
+It should be noted that these are simplified or altered versions of real hardware components and modern operating systems, in order to highlight design aspects and allow them to be feasible within the framework of a semester.
 
-Se aclara que estas son versiones simplificadas o alteradas de los componentes reales de hardware y de sistemas operativos modernos, a fin de resaltar aspectos de diseño y permitir que los mismos sean realizables dentro del marco de un cuatrimestre.
-
-
-## Módulos del sistema
-
+## System Modules
 
 ### Team 
-Es un planificador de procesos, donde cada proceso es un entrenador que compite por usar ciclos de CPU. Soporta varios algoritmos de planificación los cuales son parametrizables, un sistema de estados y un gestor de resolución de  deadlocks. 
 
-El objetivo de un team es que todos los entrenadores que formen parte de el, capturen a los pokemons que necesitan. 
+It is a process scheduler, where each process is a trainer that competes for CPU cycles. It supports several scheduling algorithms which are parametrizable, a state system, and a deadlock resolution manager.
 
-Un team, a su vez compite con otros teams por recursos compartidos que se encuentran en los gamecards. (Spoiler: ¡Los recursos son los pókemons!)
+The objective of a team is that all the trainers that are part of it, capture the Pokémon they need.
 
-Un módulo Team cumple su objetivo, cuando todos sus entrenadores lo hayan hecho (Los entrenadores cumplen su objetivo cuando capturan a todos lo ~~bichos~~ pókemons que necesitan)
+A team, in turn, competes with other teams for shared resources found in the gamecards. (Spoiler: The resources are the Pokémon!)
 
-Algoritmos de planificación soportados: FIFO, Round Robin y Shortest job first con y sin desalojo
+A Team module fulfills its objective when all its trainers have done so (Trainers fulfill their objective when they capture all the bugs Pokémon they need).
 
-
+Supported scheduling algorithms: FIFO, Round Robin, and Shortest Job First with and without preemption.
 
 ### Gamecard
-Es el FileSystem, que almacena y gestiona todos los pokemones en el mapa. Permite crear, editar y borrar archivos.
-Los archivos están conformados por bloques (Por ej 1.bin, 2.bin, 3.bin) y representados por un archivo de metadata al igual que en un Sistema de archivos real.
+
+It is the FileSystem, which stores and manages all the Pokémon in the map. It allows creating, editing, and deleting files. The files are made up of blocks (e.g., 1.bin, 2.bin, 3.bin) and represented by a metadata file just like in a real file system.
 
 ### Gameboy
 
-Envía mensajes a todos los módulos (publisher), y es el tester del sistema. Permite crear todos los mensajes del sistema: crear nuevos pokemones en el mapa, solicitar capturas,confirmar capturas, etc.
+Sends messages to all modules (publisher), and is the system tester. It allows creating all the system messages: creating new Pokémon on the map, requesting captures, confirming captures, etc.
 
 ### Broker
 
-Recibe y distribuye los mensajes entre los distintos módulos. Utiliza tecnología de Colas de Mensajes (MQ), en la cuál existen módulos suscriptores que esperan por mensajes específicos.
-Soporta e implementa por parametrización los siguientes mecanismos de gestión de memoria:
-  - Particiones dinámicas con compactación
+Receives and distributes messages among the different modules. It uses Message Queues (MQ) technology, in which there are subscriber modules waiting for specific messages.
+It supports and implements by parametrization the following memory management mechanisms:
+  - Dynamic partitions with compaction
   - Buddy System
-  - Permite realizar dump de la Caché
+  - Allows cache dump
 
-## Instalación
+## Installation
 
-1) Instalar proyecto
+1) Install project
+
 ```shell
 $ sh instalacion.sh
 ```
 
-2) Reiniciar Terminal para que se apliquen las variables de entorno (Basta con abrir otra terminal)
+2) Restart Terminal so that environment variables are applied (Just open another terminal)
 
-3) Se pueden levantar los módulos individualmente (los ejecutables estan dentro de la carpeta 'nombre-modulo/Debug/nombre-modulo') ó ejecutar los tests automatizados
+3) Modules can be started individually (the executables are inside the 'module-name/Debug/module-name' folder) or run automated tests
+
+## Automated Tests
+
+Note: Link to the [Testing Document](https://docs.google.com/document/d/1_MHl52R-wPyL4SaWYok4Crf47dVwlqZOQn1MWouo3T8/edit)
+
+1) Install byexample: It is a tool that allows running bash commands and checking module logs, enabling the automation of executions and checks. You can see the following [test example](https://github.com/leobz/SO-UNIX-Delibird/blob/master/tests-de-integracion/team-broker.md)  used to verify the integration between the Team and the Broker... =>
+[Installation guide](https://github.com/leobz/SO-UNIX-Delibird/blob/master/tests-de-integracion/README.md)
 
 
-## Pruebas automatizadas
-
-Nota: Link al [Documento de pruebas](https://docs.google.com/document/d/1_MHl52R-wPyL4SaWYok4Crf47dVwlqZOQn1MWouo3T8/edit)
-
-1) Instalar byexample: Es una herramienta que permite ejecutar comandos de bash y comprobar los logs de los módulos, permitiendo automatizar las ejecuciones y las comprobaciones. Pueden ver el siguiente [ejemplo de test](https://github.com/leobz/SO-UNIX-Delibird/blob/master/tests-de-integracion/team-broker.md) usado para comprobar la integración entre el Team y el Broker... =>
-[Guía de instalación](https://github.com/leobz/SO-UNIX-Delibird/blob/master/tests-de-integracion/README.md)
-
-2) Ejecutar tests básicos:
+1) Run basic tests:
 
 ```shell
 $ cd tests-de-integracion
@@ -81,7 +84,8 @@ $ sh team.sh
 $ sh regresion.sh
 ```
 
-3) Ejecutar tests 
+3) Run tests:
+
 ```shell
 $ cd test-catedra
 $ sh <nombre-de-prueba>.sh
