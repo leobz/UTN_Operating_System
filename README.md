@@ -1,29 +1,29 @@
 # Delibird: Operating System Simulator
 
-**Nota**: Encuentra la versión en español en el [siguiente link](https://github.com/leobz/SO-UNIX-Delibird/blob/master/SPANISH_README.md)
+![](doc/assets/media/banner.jpeg)
+## Project members
 
-**Note**: All the codebase of this project is written in Spanish due to this project had an academic purpose.
+Development time: 90 days
 
+* [Leonel Bazán](https://www.linkedin.com/in/bazanotin/): Team, Broker, GameCard, GameBoy
+* [Ezequiel Laime](https://www.linkedin.com/in/ezequiel-laime/): Team, Broker
+* [Diego Perez](https://www.linkedin.com/in/diego-p%C3%A9rez-pe%C3%B1a-b5881822a/): Broker, GameCard, GameBoy
+* [Ezequiel Gauna](https://www.linkedin.com/in/ezequielgauna/): GameCard, GameBoy
 
-## Technical Specs
+## Software Specification
 
-* Project name: Delibird
-* Team name: UNIX
-* Development time: 2 months
-* Languages used: C, Bash, Python
-* University: 
-* Statement/Requirements: [LINK](https://docs.google.com/document/d/1be91Gn93O2Vp8frZoV1i5CmtOG0scE1PS8dMHsCP314/edit)
-* Team members: 
-  * [Leo Bazán](https://www.linkedin.com/in/bazanotin/): Technical leader. Team, Broker, GameCard, GameBoy
-  * [Eze Laime](https://www.linkedin.com/in/ezequiel-laime/): Team, Broker
-  * [Eze Gauna](https://www.linkedin.com/in/ezequielgauna/): GameCard, GameBoy
-  * [Diego Perez](https://github.com/dprez8): Broker, GameCard, GameBoy
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;    \>\>\>\> &nbsp; &nbsp; [Find the full software specifications here!.](doc/requirements.md) &nbsp; &nbsp; <<<<
 
 ## Summary
 
 Delibird is a distributed system that simulates the behavior of an operating system, covering topics such as memory management algorithms, process scheduling algorithms, file systems, kernels, etc. All modules work concurrently and must be able to pass 25 integration tests that simulate different behaviors based on different configurations.
 
-It should be noted that these are simplified or altered versions of real hardware components and modern operating systems, in order to highlight design aspects and allow them to be feasible within the framework of a semester.
+The system components will be:
+
+- A publisher process that inputs messages into the system (Game Boy).
+- A Message Queue administrator process (Broker).
+- Processes that retrieve messages and perform planning based on them (Team).
+- Filesystem processes responsible for maintaining files over time (Game Card).
 
 ## System Modules
 
