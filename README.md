@@ -1,5 +1,7 @@
 # Delibird: Operating System Simulator
 
+![](doc/assets/media/banner.jpeg)
+
 ## Project members
 
 Development time: 90 days
