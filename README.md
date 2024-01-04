@@ -58,15 +58,20 @@ It supports and implements by parametrization the following memory management me
 
 ## Installation
 
-1) Install project
+Install CUnit
+```
+sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
+```
+
+Install project
 
 ```shell
 $ sh instalacion.sh
 ```
 
-2) Restart Terminal so that environment variables are applied (Just open another terminal)
+Restart Terminal so that environment variables are applied (Just open another terminal)
 
-3) Modules can be started individually (the executables are inside the 'module-name/Debug/module-name' folder) or run automated tests
+Modules can be started individually (the executables are inside the 'module-name/Debug/module-name' folder) or run automated tests
 
 ## Automated Tests
 

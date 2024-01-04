@@ -1,6 +1,9 @@
 echo
 echo Descargando so-commons-library...
 git clone https://github.com/sisoputnfrba/so-commons-library.git
+cd so-commons-library/
+git checkout 1c885402ddbf4cd2feb7d9d879ba439c5ca12c23
+cd ..
 
 echo
 echo Instalando so-commons-library...

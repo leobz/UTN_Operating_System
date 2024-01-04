@@ -26,13 +26,13 @@ endif
 all: team
 
 dependents:
-	-cd /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug && $(MAKE) all
+	-cd /home/leo/Repos/UTN-OS/utils/Debug && $(MAKE) all
 
 # Tool invocations
-team: $(OBJS) $(USER_OBJS) /home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so
+team: $(OBJS) $(USER_OBJS) /home/leo/Repos/UTN-OS/utils/Debug/libutils.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug" -o "team" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/leo/Repos/UTN-OS/utils/Debug" -o "team" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -42,6 +42,6 @@ clean:
 	-@echo ' '
 
 .PHONY: all clean dependents
-/home/leo/Programacion/C/EclipseWorkSpace/tp-2020-1c-UNIX/utils/Debug/libutils.so:
+/home/leo/Repos/UTN-OS/utils/Debug/libutils.so:
 
 -include ../makefile.targets
